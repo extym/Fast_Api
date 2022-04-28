@@ -1,0 +1,10 @@
+cache/*
+*.pyc
+parse/config.py
+bot/config.py
+.idea
+*cred.txt
+*.txt
+*previously*
+*.csv
+*.log
