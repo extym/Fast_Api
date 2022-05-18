@@ -86,19 +86,19 @@ def add(message):
     # bot.send_message(message.chat.id, f'Задача {task} добавлена на дату {date}')
 
 
-@bot.message_handler(commands=['DATE'])
-def calendar_handler(message):
-    #user_markup = telegram_bot_calendar.MONTH
-    bot.send_message(message.from_user.id, "Please select a date: ",
-                        reply_markup=telegramcalendar.create_calendar())
-
-
-def inline_handler(bot,update):
-    selected,date = telegramcalendar.process_calendar_selection(bot, update)
-    if selected:
-        bot.send_message(chat_id=update.callback_query.from_user.id,
-                        text="You selected %s" % (date.strftime("%d/%m/%Y")),
-                        reply_markup=ReplyKeyboardRemove())
+# @bot.message_handler(commands=['DATE'])
+# def calendar_handler(message):
+#     #user_markup = telegram_bot_calendar.MONTH
+#     bot.send_message(message.from_user.id, "Please select a date: ",
+#                         reply_markup=telegramcalendar.create_calendar())
+#
+#
+# def inline_handler(bot,update):
+#     selected,date = telegramcalendar.process_calendar_selection(bot, update)
+#     if selected:
+#         bot.send_message(chat_id=update.callback_query.from_user.id,
+#                         text="You selected %s" % (date.strftime("%d/%m/%Y")),
+#                         reply_markup=ReplyKeyboardRemove())
 
 
 @bot.message_handler(commands=['show'])
