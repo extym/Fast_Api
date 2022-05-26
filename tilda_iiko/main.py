@@ -8,6 +8,7 @@ from flask import Flask, request
 from cred import user_id, user_secret
 import requests
 from cred import organization
+from gevent.pywsgi import WSGIServer
 
 
 class Biz:
@@ -69,13 +70,17 @@ def json_example():
         delivery = request_data['delivery']
         if delivery == "САМОВЫВОЗ":
             street = None
+            home = None
+            apartment = None
         else:
             street = request_data['street']
             home = request_data['home']
+            apartment = request_data['apartment']
         paymentsystem = request_data['paymentsystem']
         payment = request_data['payment']
         products = request_data['payment']['products']
         summ = request_data['payment']['subtotal']
+        comment = request_data['comment']
 
     #except LookupError:
         # if request_data == 'test':
@@ -111,8 +116,8 @@ def json_example():
                     "street": street,
                     "home": home,
                     "housing": "",
-                    "apartment": "14",
-                    "comment": "ТЕСТОВАЯ ДОСТАВКА"
+                    "apartment": apartment,
+                    "comment": comment
                 },
                 "paymentItems": [
                     {
@@ -121,7 +126,7 @@ def json_example():
                             "id": "859a83b8-c1db-4411-bbf3-24b16f04eb83",
                             "code": "SAIT",
                             "name": "Оплата Сайт",
-                            "comment": "",
+                            "comment": "САЙТ",
                             "combinable": True,
                             "externalRevision": 3462277,
                             "applicableMarketingCampaigns": None,
@@ -159,8 +164,12 @@ def json_example():
 #     }
 
 if __name__ == '__main__':
+    # Debug/Development
     # run app in debug mode on port 5000
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    # app.run(debug=True, host='0.0.0.0', port=5000)
+    # Production
+    http_server = WSGIServer(('', 5000), app)
+    http_server.serve_forever()
 
 # This is a sample Python script.
 
