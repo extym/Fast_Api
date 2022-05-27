@@ -1,7 +1,4 @@
 # import main Flask class and request object
-#import code
-from asyncore import read
-from crypt import methods
 import uuid
 import json
 from flask import Flask, request
@@ -9,6 +6,8 @@ from cred import user_id, user_secret
 import requests
 from cred import organization
 from gevent.pywsgi import WSGIServer
+import schedule
+import time
 
 
 class Biz:
@@ -30,6 +29,11 @@ class Biz:
             print("Не удалось получить токен " + "\n" + self.login)
 
 
+        schedule.every(15).minutes.do(token)
+        while True:
+            schedule.run_pending()
+            time.sleep(1)
+
 i = Biz(user_id, user_secret)
 token = i.token()
 print('Token: ', token)
@@ -43,19 +47,6 @@ def getid():
 
 # create   the Flask app
 app = Flask(__name__)
-
-#
-# @app.route('/api/0', methods=['POST'])
-# def query_example():
-#     payment = request.args.get("payment")
-#     print('''<h2>The language value is: {}</h2>'''
-#           .format(payment))
-
-
-# @app.route('/', methods=['POST'])
-# def test():
-#     if request.get_data('test'):
-#         return 'test'
 
 
 @app.route('/api/0', methods=['POST'])
@@ -80,7 +71,10 @@ def json_example():
         payment = request_data['payment']
         products = request_data['payment']['products']
         summ = request_data['payment']['subtotal']
-        comment = request_data['comment']
+        if 'comment' in request_data:
+            comment = request_data['comment']
+        else:
+            comment = None
 
     #except LookupError:
         # if request_data == 'test':
@@ -138,6 +132,7 @@ def json_example():
             }
         }
         return data
+    print("555",type(create_data()), create_data())
 
     #def orders_add():
     url_address = 'https://iiko.biz:9900/api/0/orders/add?' #'https://httpbin.org/post'#'https://f73fc613-638a-487f-8a19-e528b998c4b6.mock.pstmn.io'
@@ -152,16 +147,9 @@ def json_example():
     print('4444', response)
 
     #print("4444", request_data)
-    print("555",type(create_data()), create_data())
-    return 'JSON Object Example'
 
+    return 'JSON Object'
 
-# def create_data(json):
-#     data = {
-#         "organization": organization,
-#         "customerName": customerName
-#
-#     }
 
 if __name__ == '__main__':
     # Debug/Development
@@ -171,10 +159,3 @@ if __name__ == '__main__':
     http_server = WSGIServer(('', 5000), app)
     http_server.serve_forever()
 
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
