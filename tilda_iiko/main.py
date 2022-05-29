@@ -67,8 +67,14 @@ def json_example():
             apartment = None
         else:
             street = request_data['street']
-            home = request_data['home']
-            apartment = request_data['apartment']
+            if 'home' in request_data['home']:
+                home = request_data['home']
+            else:
+                'УТОЧНИТЬ НОМЕР ДОМА'
+            if 'apartment' in request_data:
+                apartment = request_data['apartment']
+            else:
+                apartment = 'УТОЧНИТЬ КВАРТИРУ'
         paymentsystem = request_data['paymentsystem']
         payment = request_data['payment']
         products = request_data['payment']['products']
