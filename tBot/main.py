@@ -4,8 +4,8 @@ from config import token
 import datetime
 from telegram import  ReplyKeyboardRemove,ParseMode, Update
 import telegram_bot_calendar
-import telegramcalendar
-import utils
+
+
 
 bot = telebot.TeleBot(token)
 day = 0
