@@ -70,7 +70,7 @@ def json_example():
             if 'home' in request_data['home']:
                 home = request_data['home']
             else:
-                'УТОЧНИТЬ НОМЕР ДОМА'
+                home = 'УТОЧНИТЬ НОМЕР ДОМА'
             if 'apartment' in request_data:
                 apartment = request_data['apartment']
             else:
