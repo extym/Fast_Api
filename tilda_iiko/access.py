@@ -25,7 +25,7 @@ class Biz:
 i = Biz(user_id, user_secret)
 token = i.get_token()
 f = open('trap.py', 'w')
-f.write('token = '+ token)
+f.write(token) #('token = '+ token)
 f.close()
 # o = open('track','a') #open for append
 # for line in open('file'):
@@ -42,7 +42,11 @@ def job():
     token = i.get_token()
     print(datetime.datetime.now(), 'token =', token)
     f = open('trap.py', 'w')
-    f.write('token = ' + token)
+    f.write(token) #('token = ' + token)
+    f.close()
+    f = open('log-token.txt', 'a')
+    f.write(str(datetime.datetime.now()) + 'token = ' + token)
+    f.write('\n')
     f.close()
     # return token
 

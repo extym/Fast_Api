@@ -6,7 +6,7 @@ import uuid
 import json
 from flask import Flask, request
 from cred import user_id, user_secret
-from trap import token
+#from trap import access_token
 import requests
 from cred import organization
 from gevent.pywsgi import WSGIServer
@@ -61,20 +61,23 @@ def json_example():
         customerName = request_data['customerName']
         customerPhone = request_data['phone']
         delivery = request_data['delivery']
+        #isSelfService = request_data
         if delivery == "САМОВЫВОЗ":
             street = None
             home = None
             apartment = None
+            isselfservice = True
         else:
+            isselfservice = False
             street = request_data['street']
             if 'home' in request_data['home']:
                 home = request_data['home']
             else:
-                home = 'УТОЧНИТЬ НОМЕР ДОМА'
+                home = 'УТОЧНИТЬ'
             if 'apartment' in request_data:
                 apartment = request_data['apartment']
             else:
-                apartment = 'УТОЧНИТЬ КВАРТИРУ'
+                apartment = 'УТОЧНИТЬ'
         paymentsystem = request_data['paymentsystem']
         payment = request_data['payment']
         products = request_data['payment']['products']
@@ -83,6 +86,11 @@ def json_example():
             comment = request_data['comment']
         else:
             comment = None
+
+    f = open('log.txt', 'a')
+    f.write(str(datetime.datetime.now()) + 'request_from_tilda = ' + str(request_data) + '\n')
+    # f.write('\n')
+    f.close()
 
     def create_items(products):
         items = []
@@ -109,7 +117,7 @@ def json_example():
                 "id": None,  # getid(),
                 "date": None,  # "2022-05-17 14:39:50",
                 "phone": customerPhone,
-                "isSelfService": "false",
+                "isSelfService": isselfservice,
                 "items": create_items(products),
                 "address": {
                     "city": "Санкт-Петербург",
@@ -139,7 +147,15 @@ def json_example():
         }
         return data
 
-    print("555", type(create_data()), create_data())
+    print("create_data", datetime.datetime.now(), create_data())
+
+
+    def get_token():
+        with open('trap.py') as file:
+            access_token = str(file.readline())
+        return access_token
+
+    access_token = get_token()
 
     # def orders_add():
     url_address = 'https://iiko.biz:9900/api/0/orders/add?'  # 'https://httpbin.org/post'#'https://f73fc613-638a-487f-8a19-e528b998c4b6.mock.pstmn.io'
@@ -147,11 +163,17 @@ def json_example():
                'Accept': 'text/plain',
                'Content-Encoding': 'utf-8'}
     # metods = '/orders/add?' #'post' #+ 'access_token=' + token.replace('"', '')
-    answer = requests.post(url_address + 'access_token=' + token.replace('"', ''), data=json.dumps(create_data()),
+    answer = requests.post(url_address + 'access_token=' + access_token.replace('"', ''), data=json.dumps(create_data()),
                            headers=headers)
 
     response = answer.json()
-    print(answer, datetime.datetime.now(), response)
+    print(datetime.datetime.now(), response)
+    f = open('log.txt', 'a')
+    f.write(str(datetime.datetime.now()) + ' - response = ' + str(response))
+    f.write('\n')
+    f.write(str(datetime.datetime.now()) + ' - answer = ' + str(answer) + '\n')
+    f.write('\n')
+    f.close()
     #print(token)
 
     return 'JSON Object'
