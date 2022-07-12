@@ -12,13 +12,12 @@ from send_result import ids_proxy
 
 TEXT = ''
 bot = telebot.TeleBot(TOKEN)
-# s = requests.Session()
 jar = requests.cookies.RequestsCookieJar()
 general_url = 'https://zakupki.gov.ru'
 url_parse = "/epz/dizk/search/results.html"
 url = general_url + url_parse
 # https://api.telegram.org/bot5214618946:AAGIS6raKgn28A4-J_1s_9yTp5noZoGtrjw/sendMessage?chat_id={}&text={}
-url_send = BOT_URL + TOKEN+ '/sendMessage?' + 'chat_id=' + CHAT_ID + '&' + 'text=' + TEXT
+url_send = BOT_URL + TOKEN + '/sendMessage?' + 'chat_id=' + CHAT_ID + '&' + 'text=' + TEXT
 headers = {
     "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.75 Safari/537.36", #"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.190 Safari/537.36",
     "content-type": "text/plain",
@@ -29,7 +28,6 @@ headers = {
 
 header = {
     "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.75 Safari/537.36", #"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.190 Safari/537.36",
-
     "accept-encoding": "gzip, deflate, br",
     "accept": "application/json, text/plain, */*",
 }
@@ -41,12 +39,12 @@ def get_data():
     so = soup.find('div', class_="registry-entry__form")
     urls_t = soup.findAll('div', class_="registry-entry__form")
 
-    global ids_proxy
-    global links
-    global ids
+    # global ids_proxy
+    # global links
+    # global ids
+    # ids_proxy = []
 
     ids = []
-    #ids_proxy = []
     links = []
     for link in urls_t:
         link2 = general_url + link.find('a').get('href')
@@ -56,7 +54,7 @@ def get_data():
         dizkId = link2[dizkId_entry + 1:]
 
         ids.append(dizkId)
-        #print('dizkId =', dizkId)
+
 
 # def result():
     target_list = []
@@ -67,11 +65,11 @@ def get_data():
             # f.write(str(datetime.datetime.now()) + 'ids_proxy = '+ str(target_list))
             # f.close()
     f = open('send_result.py', 'w')
-    f.write('ids_proxy = ' + str(target_list))
+    f.write('ids_proxy = ' + str(ids))
     f.close()
 
     print(target_list)
-    global target_list_links
+    # global target_list_links
     target_list_links = []
 
     for ii in target_list:
@@ -83,9 +81,9 @@ def get_data():
         if target_list_links[0] is not None:
 
             TEXT = s
-            #respp = requests.get(url=url_send, headers=header, timeout=30)
-            resp = requests.post(url=url_send, headers=headers, data=json.dumps(s))
-            print(resp)
+            respp = requests.get(url=BOT_URL + TOKEN + '/sendMessage?' + 'chat_id=' + CHAT_ID + '&' + 'text=' + TEXT)
+            #resp = requests.post(url=url_send, headers=headers, data=json.dumps(s))
+            print(respp)
             sleep(2)
         else:
             pass
@@ -94,13 +92,6 @@ def get_data():
     return target_list_links
 
 #print(get_data())
-
-# @bot.message_handler(commands=None)
-# def send_link(message):
-#     bot.send_message(message.from_user.id, "Now we has: \n")
-#     for link in get_data():
-#         bot.send_message(message.chat.id, link + '\n')
-#         sleep(1)
 
 @bot.message_handler(commands=['start'])
 def handle_start(message):
