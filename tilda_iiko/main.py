@@ -13,35 +13,6 @@ from gevent.pywsgi import WSGIServer
 from schedule import every, repeat, run_pending
 
 
-# class Biz:
-#     def __init__(self, login, password):
-#         self.login = login
-#         self.password = password
-#         self.address = 'https://iiko.biz/api/0'
-#
-#     def get_token(self):
-#         try:
-#             r = requests.get(
-#                 self.address + '/auth/access_token?user_id=' + self.login + '&user_secret=' + self.password)
-#             r.text[1:-1]
-#             return r.text
-#         except requests.exceptions.ConnectTimeout:
-#             print("Не удалось получить токен " + "\n" + self.login)
-
-# i = Biz(user_id, user_secret)
-# token = i.get_token()
-# print('Token2: ', token)
-#
-# @repeat(every(9).seconds) #every(10).seconds) #for development
-# def job():
-#     i = Biz(user_id, user_secret)
-#     global token
-#     token = i.get_token()
-#     print(datetime.datetime.now(), 'Token3: ', token)
-
-
-
-
 def getid():
     id = uuid.uuid4()  # .__hash__()  # setID
     # id = hash(str(dict_data))
@@ -70,8 +41,13 @@ def json_example():
         else:
             isselfservice = False
             street = request_data['street']
-            if 'home' in request_data['home']:
+            if 'home' in request_data:
                 home = request_data['home']
+                if len(home) > 10:
+                    if 'корпус' in home:
+                        home = home.replace('корпус', 'к.')
+                    else:
+                        home = home.strip()
             else:
                 home = 'УТОЧНИТЬ'
             if 'apartment' in request_data:
@@ -88,7 +64,7 @@ def json_example():
             comment = None
 
     f = open('log.txt', 'a')
-    f.write(str(datetime.datetime.now()) + 'request_from_tilda = ' + str(request_data) + '\n')
+    f.write(str(datetime.datetime.now()) +' request_from_tilda = ' + str(request_data) + '\n')
     # f.write('\n')
     f.close()
 
@@ -169,6 +145,8 @@ def json_example():
     response = answer.json()
     print(datetime.datetime.now(), response)
     f = open('log.txt', 'a')
+    f.write(str(datetime.datetime.now()) + ' - reQuest = ' + str(create_data()))
+    f.write('\n')
     f.write(str(datetime.datetime.now()) + ' - response = ' + str(response))
     f.write('\n')
     f.write(str(datetime.datetime.now()) + ' - answer = ' + str(answer) + '\n')

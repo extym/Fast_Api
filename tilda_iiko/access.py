@@ -27,11 +27,7 @@ token = i.get_token()
 f = open('trap.py', 'w')
 f.write(token) #('token = '+ token)
 f.close()
-# o = open('track','a') #open for append
-# for line in open('file'):
-#    line = line.replace('token ','newword')
-#    o.write(line + 'n')
-# o.close()
+
 print('Token2: ', token)
 
 
