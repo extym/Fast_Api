@@ -38,7 +38,7 @@ def job():
     token = i.get_token()
     print(datetime.datetime.now(), 'token =', token)
     f = open('trap.py', 'w')
-    f.write(token) #('token = ' + token)
+    f.write(token)
     f.close()
     f = open('log-token.txt', 'a')
     f.write(str(datetime.datetime.now()) + 'token = ' + token)

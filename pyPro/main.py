@@ -39,10 +39,7 @@ def get_data():
     so = soup.find('div', class_="registry-entry__form")
     urls_t = soup.findAll('div', class_="registry-entry__form")
 
-    # global ids_proxy
-    # global links
-    # global ids
-    # ids_proxy = []
+
 
     ids = []
     links = []
@@ -55,12 +52,16 @@ def get_data():
 
         ids.append(dizkId)
 
+    #sleep(120)
+
 
 # def result():
     target_list = []
     for i in ids:
         if i not in ids_proxy:
             target_list.append(i)
+            #-
+            # target_list.reverse()
             # f = open('send_result.py', 'a')
             # f.write(str(datetime.datetime.now()) + 'ids_proxy = '+ str(target_list))
             # f.close()
@@ -84,14 +85,13 @@ def get_data():
             respp = requests.get(url=BOT_URL + TOKEN + '/sendMessage?' + 'chat_id=' + CHAT_ID + '&' + 'text=' + TEXT)
             #resp = requests.post(url=url_send, headers=headers, data=json.dumps(s))
             print(respp)
-            sleep(2)
-        else:
-            pass
-
+            sleep(3)
 
     return target_list_links
 
-#print(get_data())
+
+def print_data():
+    print('show now - ' + str(get_data()))
 
 @bot.message_handler(commands=['start'])
 def handle_start(message):
@@ -115,7 +115,7 @@ def handle_start(message):
 
 
 
-bot.polling(none_stop=True)
+bot.polling(none_stop=True, timeout=101)
 
 
 

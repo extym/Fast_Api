@@ -5,13 +5,36 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="542e37c8-6df1-42b2-ab2f-2b0f8a481766" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../form/createpdf.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../form/topdf.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/send_result.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../form/templates/c_files/css2" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../form/templates/c_files/jquery-1.10.2.min.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../form/templates/c_files/lazyload-1.3.min.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../form/templates/c_files/openapi.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../form/templates/c_files/tilda-blocks-page28827032.min.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../form/templates/c_files/tilda-blocks-page28827032.min.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../form/templates/c_files/tilda-events-1.0.min.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../form/templates/c_files/tilda-fallback-1.0.min.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../form/templates/c_files/tilda-forms-1.0.min.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../form/templates/c_files/tilda-forms-1.0.min.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../form/templates/c_files/tilda-grid-3.0.min.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../form/templates/c_files/tilda-menu-1.0.min.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../form/templates/c_files/tilda-popup-1.1.min.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../form/templates/c_files/tilda-scripts-3.0.min.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../form/templates/c_files/tilda-stat-1.0.min.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../form/templates/c_files/tilda-zero-1.0.min.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../form/templates/index-123.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../parseCow/.idea/parseCow.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../parseCow/sched.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../parseCow/send_res.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../bot_parse" beforeDir="false" afterPath="$PROJECT_DIR$/../bot_parse" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../form/CAPTCHA.png" beforeDir="false" afterPath="$PROJECT_DIR$/../form/CAPTCHA.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../form/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/../form/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scheduler.py" beforeDir="false" afterPath="$PROJECT_DIR$/scheduler.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/send_result.py" beforeDir="false" afterPath="$PROJECT_DIR$/send_result.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../t_Bot" beforeDir="false" afterPath="$PROJECT_DIR$/../t_Bot" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../tilda_iiko/access.py" beforeDir="false" afterPath="$PROJECT_DIR$/../tilda_iiko/access.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../tilda_iiko/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/../tilda_iiko/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,6 +51,12 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/config.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/main.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/scheduler.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/send_result.py" root0="FORCE_HIGHLIGHTING" />
+  </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -37,19 +66,20 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/exextym/current/bot_parse&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "/home/exextym/current/bot_parse",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)"
   }
-}</component>
-  <component name="RunManager" selected="Python.main">
+}]]></component>
+  <component name="RunManager" selected="Python.scheduler">
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="pyPro" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -64,6 +94,28 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="scheduler" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="pyPro" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/scheduler.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -96,6 +148,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.scheduler" />
         <item itemvalue="Python.send_result" />
       </list>
     </recent_temporary>
@@ -112,6 +165,7 @@
       <workItem from="1656508848550" duration="22744000" />
       <workItem from="1657183902930" duration="4042000" />
       <workItem from="1657530422802" duration="14262000" />
+      <workItem from="1657608446862" duration="38784000" />
     </task>
     <servers />
   </component>
@@ -129,19 +183,9 @@
       </map>
     </option>
   </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/main.py</url>
-          <line>113</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
-  </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/pyPro$main.coverage" NAME="main Coverage Results" MODIFIED="1657563139978" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/pyPro$main.coverage" NAME="main Coverage Results" MODIFIED="1657868794435" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/pyPro$scheduler.coverage" NAME="scheduler Coverage Results" MODIFIED="1657872737043" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/pyPro$send_result.coverage" NAME="send_result Coverage Results" MODIFIED="1656678459431" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
