@@ -9,7 +9,7 @@ import lxml
 TOKEN = "5491812290:AAFZbUoG0hjH9N8PUb9WCQ0ayvDOWLex4jw" # - t.me/GovParseBot #"5214618946:AAGIS6raKgn28A4-J_1s_9yTp5noZoGtrjw"
 BOT_NAME = 'GovParseBot'
 BOT_URL = 'https://api.telegram.org/bot'
-CHAT_ID = '471124111'
+CHAT_ID = '1508445761' #'471124111'
 #TEXT = ''
 
 jar = requests.cookies.RequestsCookieJar()
@@ -43,11 +43,18 @@ def get_data():
     # sleep(101)
 
 
+def save_data():
+    f = open('send_res.py', 'w')
+    f.write('ids_proxy = ' + str(get_data()))
+    f.close()
+
+
+
 def check_data():
-    #from send_res import ids_proxy
+    from send_res import ids_proxy
     target_list = []
     for i in get_data():
-        if i not in save_data(): #ids_proxy:
+        if i not in ids_proxy:
             target_list.append(i)
 
     f = open('send_result.py', 'w')
@@ -79,12 +86,5 @@ def send_url():
 
     return target_list_links
     #sleep(101)
-
-def save_data():
-    f = open('send_res.py', 'w')
-    f.write('ids_proxy = ' + str(get_data()))
-    f.close()
-    ids_proxy = get_data()
-    return ids_proxy
 
 #print(send_url())
