@@ -1,20 +1,19 @@
 import schedule
 import time
-from main import send_url
-
-def job():
-    print('And now we try send -')
+from main import send_url, get_data, confirm_data, proxy_list
 
 
-# def job_two():
-#     print('And now print' + print_data())
+# def job():
+#     print('And now try send -')
+#     print('save_data - ', save_data())
+#     print('get_data - ', get_data())
+#     print('check_data - ', check_data())
+#     print('send_url - ', send_url())
+#     print('proxy_list - ', proxy_list)
 
-schedule.every(160).seconds.do(job)
-schedule.every(180).seconds.do(send_url)
-# schedule.every(60).seconds.do(job_two)
-#
-# schedule.every(20).seconds.do(print_data)
 
+# schedule.every(151).seconds.do(job)
+schedule.every(251).seconds.do(send_url)
 
 while True:
     schedule.run_pending()
