@@ -16,7 +16,7 @@ CHAT_ID = '1508445761' #'471124111'
 # TEXT = ''
 
 jar = requests.cookies.RequestsCookieJar()
-general_url = 'https://zakupki.gov.ru'
+general_url = 'https://zakupki.gov.ru' #'http://95.167.245.92'#
 url_parse = "/epz/dizk/search/results.html"
 url = general_url + url_parse
 # proxy_list = []

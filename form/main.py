@@ -38,13 +38,13 @@ app = Flask(__name__,
 @app.route('/', methods=['GET', 'POST'])
 def example():
     date = datetime.date
-    return render_template('index.html', date=date)
+    return render_template('create.html', date=date)#('index.html', date=date)
 
 
 @app.route('/list', methods=['GET', 'POST'])
 def get_list():
     date = datetime.date
-    return render_template('list.html', date=date)
+    return render_template('list-last.html', date=date)#('list-2.html', date=date)
 
 # @app.route('/list7', methods=['GET', 'POST'])
 # def get_list7():
@@ -94,10 +94,10 @@ def form_example():
     return render_template('form-old.html', date=date)
 
 
-# @app.route('/popup-list9', methods=['GET', 'POST'])
-# def popup_list9():
-#     date = datetime.date
-#     return render_template('list-info9.html', date=date)
+@app.route('/test', methods=['GET', 'POST'])
+def a_list():
+    date = datetime.date
+    return render_template('a-info.html', date=date)
 #
 #
 # @app.route('/popup-list8', methods=['GET', 'POST'])

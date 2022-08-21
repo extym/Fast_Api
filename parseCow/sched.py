@@ -13,7 +13,7 @@ from main import send_url, get_data, confirm_data, proxy_list
 
 
 # schedule.every(151).seconds.do(job)
-schedule.every(251).seconds.do(send_url)
+schedule.every(351).seconds.do(send_url)
 
 while True:
     schedule.run_pending()
