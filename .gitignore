@@ -2,4 +2,7 @@
 *test.
 *.pyc
 cred.*
-
+*parseCow/send_result.py
+templates/zip/*
+*.json
+*.png
