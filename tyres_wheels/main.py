@@ -4,9 +4,14 @@ import json
 address = 'https://b2b.kolrad.ru/json/hannover/'
 num = 1
 page = 'page' + str(num)
-contract = '/contract68/?'
+contract = '/contract944/?'
 Token = '$1$jjJ1M9JP$Bz5Epibcr9.Stn.ZCQCqN0'
 vendor = 0
+
+#Получить данные
+#--------# Промежуточный файл?
+# Привести их к виду на сайте
+# Записать в бд
 
 link = address + page + contract + 'token=' + Token + '&vendor=' + str(vendor)# + '&category=3'
 category = 0
@@ -32,43 +37,38 @@ print(all_data[0]['name'])
 print(len(all_data))
 print('all_data -', type(all_data))
 
-# for i in range(len(after_t)):
-#     data = '{' + after_t[i] + '}'
-#     also_data = json.loads(data)
-# #
-# print('also_data -', type(also_data))
-# print(also_data)
-# print('data -', type(data))
-# print(data)
 
-
+# Получаем все данные по page
 for i in range(int(10)):
     links = address + 'page'+ str(i) + contract + 'token=' + Token + '&vendor=' + str(vendor)
     need_data = resp.text[983: -12]
     curr_data = []
     curr_data = curr_data.append(need_data)
+
     with open("devvv.json", "a") as write_file:
-        json.dump(curr_data, write_file) # encode dict into JSON
-        #print(f'page {i}')
+        json.dumps(curr_data, write_file) # encode dict into JSON
+        print(f'page {i}')
 print(f"Done writing JSON data into .json file on {i + 1} pages")
-
-
-# print('! - ', txt[974:982])
-# print('!! - ', txt[942:954])
-#
-
+print(need_data[:20])
+print(curr_data[0][0])
 #with open('devv.json', 'r', encoding='utf-8') as fh: #открываем файл на чтение
 # data = [json.loads(line) for line in open('devv.json', 'r')]
 
 tweets =[]
-# for line in open('devv.json', 'r'):
-#     tweets.append(json.loads(line))
-try:
-    for line in open('devv.json', 'r'):
-        l = line[1:-1].split('""')
-        tweets.append(json.loads(line))
-except ValueError:  # includes simplejson.decoder.JSONDecodeError
-    print(f'Decoding JSON has failed - {line[:500]}')
+for line in open('devv.json', 'r'):
+    l = line.replace('}"" {', ',') #[1:-1]
+    our_data = json.loads(l)
+    tweets.append(json.loads(l))
+    print(len(our_data))
+    print(type(our_data))
+    #print(tweets[0:5])
+    print(type(tweets[0]))
+# try:
+#     for line in open('devv.json', 'r'):
+#         l = line[1:-1].split('""')
+#         tweets.append(json.loads(line))
+# except ValueError:  # includes simplejson.decoder.JSONDecodeError
+#     print(f'Decoding JSON has failed - {line[:500]}')
 
 
 
@@ -81,20 +81,5 @@ except ValueError:  # includes simplejson.decoder.JSONDecodeError
 #         #print(f'page {i}')
 # print(f"Done writing JSON data into .json file on {i + 1} pages")
 
-
-# from requests.exceptions import HTTPError
-#
-# try:
-#     # response = requests.get('https://httpbin.org/get')
-#     resp.raise_for_status()
-#
-#     jsonResponse = resp.json()
-#     print("Entire JSON response")
-#     print(jsonResponse)
-#
-# except HTTPError as http_err:
-#     print(f'HTTP error occurred: {http_err}')
-# except Exception as err:
-#     print(f'Other error occurred: {err}')
 
 

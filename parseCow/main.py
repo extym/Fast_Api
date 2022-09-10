@@ -8,11 +8,11 @@ import lxml
 #
 # from config import TOKEN, BOT_URL, CHAT_ID
 from send_result import proxy_list
+from cred import TOKEN, CHAT_ID
 
-TOKEN = "5491812290:AAFZbUoG0hjH9N8PUb9WCQ0ayvDOWLex4jw"  # - t.me/GovParseBot #"5214618946:AAGIS6raKgn28A4-J_1s_9yTp5noZoGtrjw"
 BOT_NAME = 'GovParseBot'
 BOT_URL = 'https://api.telegram.org/bot'
-CHAT_ID = '1508445761' #'471124111'
+ #'471124111'
 # TEXT = ''
 
 jar = requests.cookies.RequestsCookieJar()
@@ -63,7 +63,7 @@ def write_data():
     f.write(str(datetime.datetime.now()) +  ' ids_proxy = ' + str(proxy_list) + '\n')
     f.close()
 
-    print('proxy_list from write_data  -', proxy_list)
+    print(datetime.datetime.now(), 'proxy_list from write_data  -', proxy_list)
     return proxy_list
 
 
@@ -79,7 +79,8 @@ def confirm_data():
     if len(proxy_list) > 100: # we want to have a list for 100 times
         del proxy_list[:10]
     #proxy_list = proxy
-    print('target_list from confirm_data =', target_list)
+    if target_list is not False:
+        print(datetime.datetime.now(), 'target_list from confirm_data =', target_list)
     return target_list
 
 
