@@ -1,0 +1,4 @@
+INFO:django.utils.autoreload:Watching for file changes with StatReloader
+WARNING:django.request:Not Found: /favicon.ico
+WARNING:django.request:Not Found: /cml/exchange/1c_exchange.php
+INFO:django.utils.autoreload:/home/exextym/current/prosite/prosite/manage.py changed, reloading.

@@ -12,7 +12,7 @@ from cred import TOKEN, CHAT_ID
 
 BOT_NAME = 'GovParseBot'
 BOT_URL = 'https://api.telegram.org/bot'
- #'471124111'
+
 # TEXT = ''
 
 jar = requests.cookies.RequestsCookieJar()
@@ -103,8 +103,9 @@ def send_url():
             sleep(3)
 
 
-    print('proxy_list from send_url -', proxy_list)
-    print('target_list_links from send_url -', target_list_links)
+    #print('proxy_list from send_url -', proxy_list)
+    if target_list_links is True:
+        print('target_list_links from send_url -', target_list_links)
     #return target_list_links
     write_data()
     confirm_data()
