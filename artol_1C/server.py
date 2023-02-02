@@ -15,10 +15,6 @@ import urllib3
 urllib3.disable_warnings()
 
 
-#time = datetime.now(pytz.timezone("Africa/Nairobi")).replace(microsecond=0).isoformat()
-#print(time)  #for development
-
-
 def write_json(smth_json):
     with open('test_json.json', 'w') as file:
         json.dump(smth_json, file)
@@ -44,8 +40,6 @@ def write_fake(smth):
     f = open('fake_json.txt', 'a')
     f.write(str(time) + str(smth) + '\n')
     f.close()
-    # with open('fake_jon.json', 'w') as file:
-    #     json.dump(smth, file)
 
 
 def check_cart(items, businessId):
@@ -75,39 +69,13 @@ def token_generator(size=10, chars = string.ascii_uppercase + string.digits):
 #     return ''.join(random.choice(chars) for _ in range(size))
 
 
-# def create_data_for_1c(order, list_items, created_id):
-#     delivery = order['delivery']['type']
-#     business_id = order['businessId']
-#     payment_type = order['paymentType']
-#     # items = order['items']
-#     items_pr = []
-#     for item in list_items:
-#         proxy = {}
-#         proxy['shopSku'] = item['id_1c']
-#         proxy['count'] = item['count']
-#         proxy['price'] = item['price']
-#         items_pr.append(proxy)
-#     data_re = {
-#         "order": {
-#             "shop": "Yandex",
-#             "businessId": business_id,
-#             "id": created_id,
-#             "paymentType": payment_type,
-#             "delivery": delivery,
-#             "items": items_pr
-#         }
-#     }
-#     print('data_re', data_re)
-#     return data_re
-
-
 def create_data_for_1c(order, created_id, status):
     delivery = order['delivery']['type']
     #business_id = order['businessId']
     payment_type = order['paymentType']
     date_from = order['delivery']['dates']['fromDate']
     list_items = order['items']
-    print('check_is_2222222222222222accept', list_items)
+    #print('check_is_2222222222222222accept', list_items)
     items_pr = []
     for item in list_items:
         proxy = {}
@@ -127,7 +95,7 @@ def create_data_for_1c(order, created_id, status):
             "items": items_pr
         }
     }
-    print('data_re', data_re)
+    #print('data_re', data_re)
     return data_re
 
 
@@ -137,7 +105,7 @@ def make_cancel(order_id):
         our_order = data[str(order_id)]
         created_id = our_order.get("created_id")
         # id_1c = our_order.get("id_1c")
-        print('make_cancel', created_id)
+        #print('make_cancel', created_id)
 
         return our_order
 
@@ -175,13 +143,10 @@ def write_order(order, created_id):
     order['created_id'] = created_id
     if order_id not in data.keys():
         data[order_id] = order
+        with open("/var/www/html/artol/orders.json", 'w') as file:
+            json.dump(data, file)
     else:
         rewrite_order_status(order)
-    with open("orders.json", 'w') as file:
-        json.dump(data, file)
-
-    # return order_id
-
 
 
 def rewrite_order_status(order):
@@ -197,14 +162,12 @@ def rewrite_order_status(order):
         current_order["substatus"] = substatus
         data[order_id] = current_order
 
-    with open("orders.json", 'w') as file:
+    with open("/var/www/html/artol/orders.json", 'w') as file:
         json.dump(data, file)
-
-    # return order_id
 
 
 def data_summary():
-    with open("orders.json", 'r') as file:
+    with open("/var/www/html/artol/orders.json", 'r') as file:
         data_orders = json.load(file)
 
     return data_orders
@@ -259,14 +222,6 @@ def order_resp(order, global_result):
 
     return data, id_create
 
-# def make_cancel(order_id):
-#     data  = read_order_json()
-#     created_id = ''
-#     if order_id in data.keys():
-#         our_order = data[order_id]
-#         created_id = our_order.get("created_id")
-#
-#     return created_id
 
 def proxy_time():
     dt = datetime.now().date() + timedelta(days=2)
@@ -301,7 +256,7 @@ def create_re_cart(items):
             "type": "DELIVERY",
             "dates":
                {
-              "fromDate": proxy_time(),   #data['cart']["deliveryOptions"][0]["dates"]["fromDate"]
+              "fromDate": proxy_time(),
                }
             }
         ],
@@ -344,7 +299,6 @@ def bay_bay():
     return response
 
 
-
 # allow both GET and POST requests
 @app.route('/form', methods=['GET', 'POST'])
 def form():
@@ -370,7 +324,6 @@ def form():
         <input type="submit" value="CANCEL"></div>
         
         '''
-
 
 
 #
@@ -399,6 +352,7 @@ def json_example():
         )
 
     return response
+
 
 @app.route('/order/accept', methods=['POST'])
 def order_accept():
@@ -437,7 +391,6 @@ def order_accept():
                 status=200,
                 content_type='application/json'
             )
-
 
     else:
         response = app.response_class(
@@ -481,12 +434,10 @@ def cart():
     if token == token_market_dbs or token == token_market_fbs:
         request_data = request.get_json()
         cart = request_data.get('cart')
-        # if cart is not None:
         businessId = cart.get('businessId')
         #delivery = cart.get('delivery')
         items = cart.get('items')
         check = check_cart(items, businessId)
-        # TODO
         data = create_re_cart(check[0])
 
         response = app.response_class(
@@ -523,13 +474,7 @@ def orders():
 
 @app.route('/stocks', methods=['POST'])
 def stocks():
-    headers = dict(request.headers)
-    request_data = request.get_json()
-    #write_smth(request_data)
-    write_smth('stocks')
-      ## for debag
     token = request.headers.get('Authorization')
-
     if token == token_market_dbs or token == token_market_fbs:
         req = request.get_json()
         warehouseId = req.get('warehouseId')
