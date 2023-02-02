@@ -36,12 +36,12 @@ def send_get_assortment():
     answer = requests.get(url_address, headers=headers)
     # print(str(time), type(answer))
     response = answer.json()
+    assortment = response['result']
+    products = assortment['products']
+
+    print(str(time), 'result', len(products), products)
 
 
-    print(str(time), len(response), response)
-    for key, value in response.items():
-        if key == 'result':
-            print(type(value), len(value))
 
 
 

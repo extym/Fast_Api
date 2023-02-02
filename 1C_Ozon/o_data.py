@@ -1,7 +1,7 @@
-import csv
+import pytz
 import json
 from xml.dom import minidom
-import datetime
+from datetime import datetime
 from read_json import processing_request, processing_json
 
 # warehouses = {21405051875000: "Октябрьский малый", 23012928587000: "Октябрьский крупногабарит", 23138678478000: "Октябрьский новый крупногабаритный", 23990969841000: "Основной склад - Курьеры", 23997026419000: "Осн склад Курьеры некрупный груз до 25кг",
@@ -13,33 +13,29 @@ warehouses = {'OZ.ОктМал': "Октябрьский малый",'OZ.Окт�
                'OZ.RFBSНашсклСДЭК' : "RFBS наш склад СДЭК"}
 
 
-wh_ozon = {'casual': [("Октябрьский малый", 21405051875000),("Осн склад Курьеры некрупный груз до 25кг", 23997026419000)],
-           'kgt': [("Октябрьский новый крупногабаритный", 23138678478000),("Основной склад - Курьеры", 23990969841000), ("RFBS наш склад Деловые Линии", 1020000039316000)],
-           'all': [("НАША ДОСТАВКА Москва и МО", 1020000068495000),("RFBS наш склад СДЭК", 1020000075732000)]
-           }
+# wh_ozon = {'casual': [("Октябрьский малый", 21405051875000),("Осн склад Курьеры некрупный груз до 25кг", 23997026419000)],
+#            'kgt': [("Октябрьский новый крупногабаритный", 23138678478000),("Основной склад - Курьеры", 23990969841000), ("RFBS наш склад Деловые Линии", 1020000039316000)],
+#            'all': [("НАША ДОСТАВКА Москва и МО", 1020000068495000),("RFBS наш склад СДЭК", 1020000075732000)]
+#            }
 
 ##for Test only
 # wh_ozon = {'casual': [("Октябрьский малый", 21405051875000)]}
-
-wh_ozon_product = {'casual': ['OWLM200201', 'OWLM200300', 'OWLB191000', 'OWLB191022', 'OWLB191015', 'ИМRUNN50', 'ИМRUNN40', 'OWLM200302', 'OWLM200100', 'OWLM200301', 'OWLM200202', 'OWLT190301/2', 'OWLT190303/2', 'OWLT190402/2', 'OWLT190702/2', 'OWLT200901/2', 'OWLT190901/2', 'OWLB191032', 'OWLB191033', 'OWLB191034', 'OWLB191035', 'OWLB191036', 'OWLB191037', 'OWLB191038', 'OWLB191039', 'OWLB191044', 'OWLB191045', 'OWLB191046', 'ИМALS80', 'OWLT190305'],
-           'kgt': ['OWLT190101', 'OWLT190302', 'OWLT190403S', 'OWLT190304', 'ИМOWLT190901', 'ИМOWLT200901', 'ИМMAL80', 'ИМHELLS65', 'ИМRUNN60', 'ИМVIND80', 'ИМVIND70', 'ИМVIND60', 'ИМVIND50', 'ИМRAG85', 'ИМRAG100', 'ИМNYB80', 'ИМNYB70', 'ИМNYB60', 'ИМMAL100', 'ИМHELLS80', 'ИМHELLS100', 'ИМHELL65', 'ИМHELL120', 'ИМEL75', 'ИМEL55', 'ИМVINDS80', 'OWLM200400', 'OWLM200601', 'OWLM200602', 'OWLM200600', 'OWLM200103', 'OWLM200101', 'OWLM200102', 'OWLM200200', 'OWLM200501', 'OWLM200502', 'OWLM200500', 'OWLT190601', 'OWLT190404', 'OWLT190401', 'ИМOWLT190702', 'ИМOWLT190303', 'ИМOWLT190301', 'ИМVESS75', 'ИМVESS105', 'ИМSS80', 'ИМSS65', 'ИМSS100', 'ИМSJEL80', 'ИМSJEL65', 'ИМSJEL100', 'OWLT190801', 'ИМOWLT190402', 'OWLT190301', 'OWLT190303', 'OWLT190402', 'OWLT190702', 'OWLT200901', 'OWLT190901', 'TOWLT190302', 'OWLT190201']
-           }
-
+#
+# wh_ozon_product = {'casual': ['OWLM200201', 'OWLM200300', 'OWLB191000', 'OWLB191022', 'OWLB191015', 'ИМRUNN50', 'ИМRUNN40', 'OWLM200302', 'OWLM200100', 'OWLM200301', 'OWLM200202', 'OWLT190301/2', 'OWLT190303/2', 'OWLT190402/2', 'OWLT190702/2', 'OWLT200901/2', 'OWLT190901/2', 'OWLB191032', 'OWLB191033', 'OWLB191034', 'OWLB191035', 'OWLB191036', 'OWLB191037', 'OWLB191038', 'OWLB191039', 'OWLB191044', 'OWLB191045', 'OWLB191046', 'ИМALS80', 'OWLT190305'],
+#            'kgt': ['OWLT190101', 'OWLT190302', 'OWLT190403S', 'OWLT190304', 'ИМOWLT190901', 'ИМOWLT200901', 'ИМMAL80', 'ИМHELLS65', 'ИМRUNN60', 'ИМVIND80', 'ИМVIND70', 'ИМVIND60', 'ИМVIND50', 'ИМRAG85', 'ИМRAG100', 'ИМNYB80', 'ИМNYB70', 'ИМNYB60', 'ИМMAL100', 'ИМHELLS80', 'ИМHELLS100', 'ИМHELL65', 'ИМHELL120', 'ИМEL75', 'ИМEL55', 'ИМVINDS80', 'OWLM200400', 'OWLM200601', 'OWLM200602', 'OWLM200600', 'OWLM200103', 'OWLM200101', 'OWLM200102', 'OWLM200200', 'OWLM200501', 'OWLM200502', 'OWLM200500', 'OWLT190601', 'OWLT190404', 'OWLT190401', 'ИМOWLT190702', 'ИМOWLT190303', 'ИМOWLT190301', 'ИМVESS75', 'ИМVESS105', 'ИМSS80', 'ИМSS65', 'ИМSS100', 'ИМSJEL80', 'ИМSJEL65', 'ИМSJEL100', 'OWLT190801', 'ИМOWLT190402', 'OWLT190301', 'OWLT190303', 'OWLT190402', 'OWLT190702', 'OWLT200901', 'OWLT190901', 'TOWLT190302', 'OWLT190201']
+#            }
+#
+# another_id = {'OWLT190101': 'а0026033', 'OWLM200300': 'а0027568', 'OWLT190304': 'а0027470',
+#               'OWLT190403S': 'а0027471', 'OWLT190101': 'а0026033'}
 
 def check_wh(outlets):
-    print(type(outlets))
+    # print('outlets', outlets)
     proxy = []
-    for outlet in outlets.keys():
+    for outlet in outlets:
         re_outlets = warehouses.get(outlet)
         if re_outlets is not None:
             proxy.append(re_outlets)
-    # if offers_id in wh_ozon_product['casual']:
-    #     for data in wh_ozon['casual']:
-    #         proxy.append(data[0])
-    #
-    # elif offers_id in wh_ozon_product['kgt']:
-    #     for data in wh_ozon['kgt']:
-    #         proxy.append(data[0])
+
     result = tuple(proxy)
 
     return result
@@ -68,7 +64,8 @@ def get_need_data():
 def o_create():
     root = minidom.Document()
 
-    date = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    # date = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    date = datetime.now(pytz.timezone("Africa/Nairobi")).replace(microsecond=0).isoformat()
     #print(date)
     xml_root = root.createElement('yml_catalog')
     root.appendChild(xml_root)
@@ -137,30 +134,28 @@ def o_create():
 
 
     need_data = processing_json()  #get_need_data()
-    print(len(need_data), type(need_data))
+    #print(len(need_data), type(need_data))
     count = 0
     for value in need_data:  #our_data[10:]:
-        print(value)
-        id_from_1c = value[0]
+        #id_from_1c = value[0]
         offer_id = value[1]
-        outlet = check_wh(value[4])
+        # if offer_id in another_id:
+        #     offer_id = another_id[offer_id]
+        outlets = check_wh(value[4])
         quantity = value[3]  # ???
         price = value[2]  #["Цена"]
-        # #for test only
-        # if "Октябрьский малый" in outlet:  #for test only
-        #     outlet = ["Октябрьский малый"]  #for test only
-        # else:  #for test only
-        #     continue  #for test only
+
+
 
         if offer_id != '' and quantity is not None:
             count += 1
-            create_offer(str(offer_id), outlet, str(quantity))  #(offer_id, price, oldprice, min_price, outlet)
+            create_offer(str(offer_id), outlets, str(quantity))  #(offer_id, price, oldprice, min_price, outlet)
 
     #print('in xml', count, 'products')
 
 
 
-    # print(outlet)
+    print(count)
 
     #create_offer(offer_id, price, oldprice, min_price, outlet)
 
@@ -178,9 +173,9 @@ def o_create():
 
     xml_str = root.toprettyxml(indent="\t")
     #for development
-    save_path_file = "ozon_data.xml"
+    # save_path_file = "ozon_data.xml"
     #for production
-    #save_path_file = "/var/www/html/2c/ozon_data.xml"
+    save_path_file = "/var/www/html/2c/ozon_data.xml"
 
     with open(save_path_file, "w") as f:
         f.write(xml_str)

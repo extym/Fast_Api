@@ -7,6 +7,9 @@ import requests
 from gevent import sleep
 from cred import token_market_dbs, token_market_fbs,  client_id, token_ym
 
+import urllib3
+urllib3.disable_warnings()
+
 # file  = open('data_json.json', 'r')
 # data = file.readlines()
 #
@@ -16,29 +19,51 @@ from cred import token_market_dbs, token_market_fbs,  client_id, token_ym
 # data = json.load(file)
 # print(type(data))
 #
-# data = '''
-# {
-#     "order": {
-#         "shop": "Yandex",
-#         "businessId": "3675591",
-#         "id": "12771",
-#         "paymentType": "PREPAREID",
-#         "delivery": false,
-#         "items": [
-#             {
-#                 "shopSku": "4fc6a7b0-ad96-11e2-9997-902b34460e77",
-#                 "count": 2,
-#                 "price": 336
-#             },
-#             {
-#                 "shopSku": "c9bb4043-d821-11e2-bda3-902b34460e77",
-#                 "count": 2,
-#                 "price": 520
-#             }
-#         ]
-#     }
-# }
-# '''
+data_to_1c = '''
+{
+    "order": {
+        "shop": "Yandex",
+        "businessId": "3675591",
+        "id": "1277178",
+        "paymentType": "PREPAREID",
+        "delivery": false,
+        "items": [
+            {
+                "shopSku": "4fc6a7b0-ad96-11e2-9997-902b34460e77",
+                "count": 2,
+                "price": 336
+            },
+            {
+                "shopSku": "c9bb4043-d821-11e2-bda3-902b34460e77",
+                "count": 2,
+                "price": 520
+            }
+        ]
+    }
+}
+'''
+
+order = {
+    "order": {
+        "shop": "Yandex",
+        "businessId": "3675591",
+        "id": "12347878",
+        "paymentType": "PREPAREID",
+        "delivery": False,
+        "items": [
+            {
+                "shopSku": "d7615bce-f434-11e2-be19-902b34460e77",
+                "count": 2,
+                "price": 333
+            },
+            {
+                "shopSku": "fe580a50-ee2e-11e8-be4c-4487fcda067f",
+                "count": 1,
+                "price": 523
+            }
+        ]
+    }
+}
 
 # url_address = 'https://92.39.143.137:14723/Trade/hs/post/order/post'   #'http://super-good.ml:8800/json'  #   'http://iiko.ml:8800/json'
 # ##  # #'https://iiko.biz:9900/api/0/orders/add?'  # 'https://httpbin.org/post'#'https://f73fc613-638a-487f-8a19-e528b998c4b6.mock.pstmn.io'
@@ -99,6 +124,29 @@ def write_smth(smth):
     f.close()
 
 
+def make_cancel(order_id, status, substatus, campaign_id):
+    data = {
+        "order":
+            {
+                "status": status,
+                "substatus": substatus
+            }
+    }
+    url = 'https://api.partner.market.yandex.ru/v2'
+    headers = {'Content-type': 'application/json',
+               'Authorization': f'OAuth oauth_token={token_ym}, oauth_client_id={client_id}',
+               'Content-Encoding': 'utf-8'}
+    url_address = url + campaign_id + '/orders/' + order_id + '.json'
+    answer = requests.put(url_address, data=json.dumps(data), headers=headers, verify=False)
+    write_smth(answer)
+    print('answer', str(time), answer)
+    if answer.status_code == 200:
+        result = True
+    else:
+        result = False
+
+    return result
+
 def send_post_to_market(metod, data, campaign_id):
     url = 'https://api.partner.market.yandex.ru/v2'
     headers = {'Content-type': 'application/json',
@@ -107,7 +155,7 @@ def send_post_to_market(metod, data, campaign_id):
     url_address = url + metod
     answer = requests.post(url_address, data=json.dumps(data), headers=headers, verify=False)
     write_smth(answer)
-    print('answer', str(time), answer)
+    # print('answer', str(time), answer)
 
 def send_get_to_market(metod):
     url = 'https://api.partner.market.yandex.ru/v2'
@@ -116,6 +164,19 @@ def send_get_to_market(metod):
                'Content-Encoding': 'utf-8'}
     url_address = url + metod + '.json'
     answer = requests.get(url_address, headers=headers)
+    print(str(time), answer)
+    response = answer.json()
+    print(str(time), response)
+
+
+
+def send_del_to_market(id):
+    url = 'https://api.partner.market.yandex.ru/v2'
+    headers = {'Content-type': 'application/json',
+               'Authorization': f'OAuth oauth_token={token_ym}, oauth_client_id={client_id}',
+               'Content-Encoding': 'utf-8'}
+    url_address = url + id
+    answer = requests.delete(url_address, headers=headers)
     print(str(time), answer)
     response = answer.json()
     print(str(time), response)
@@ -130,21 +191,57 @@ def send_get_ym():
     metod = '/delivery/services'
     url_address = url + metod + '.json'
     answer = requests.get(url_address, headers=headers)
-    print(str(time), answer)
-    response = answer.json()
-    print(str(time), response)
+    # print(str(time), answer)
+    # response = answer.json()
+    # print(str(time), response)
 
 # send_get_ym()
 
-async def send_post(data):
-    #sleep(6)
-    url_address = 'https://92.39.143.137:14723/Trade/hs/post/order/post'
+# def send_post(data):
+#     #sleep(6)
+#     url_address = 'https://92.39.143.137:14723/Trade/hs/post/order/post'
+#     headers = {'Content-type': 'application/json',
+#                'Authorization': 'Basic 0JzQsNGA0LrQtdGC0L/Qu9C10LnRgdGLOjExMQ==',
+#                'Content-Encoding': 'utf-8'}
+#
+#     answer = requests.post(url_address, data=json.dumps(data), headers=headers, verify=False)
+#     write_smth(answer)
+#     result = answer.status_code
+#
+#     # datas = json.dumps(data)
+#     print('answer1', str(time), answer)
+#     # response = answer.json()
+#     # print(datetime.datetime.now(), response)
+#     return result
+
+def send_test_post(data):
+    # sleep(6)
+    url_address = 'http://localhost:5000/json'  #'https://92.39.143.137:14723/Trade/hs/post/order/post'
     headers = {'Content-type': 'application/json',
                'Authorization': 'Basic 0JzQsNGA0LrQtdGC0L/Qu9C10LnRgdGLOjExMQ==',
                'Content-Encoding': 'utf-8'}
 
     answer = requests.post(url_address, data=json.dumps(data), headers=headers, verify=False)
+
     write_smth(answer)
-    print('answer', str(time), answer)
+    #print('answer', str(time), answer)
     # response = answer.json()
     # print(datetime.datetime.now(), response)
+
+
+def send_test_post_cart():
+    # sleep(6)
+    url_address = 'http://46.173.219.89/api/stocs'  #'https://92.39.143.137:14723/Trade/hs/post/order/post'
+    headers = {'Content-type': 'application/json',
+               'Authorization': 'BA00000126859FCF',
+               'Content-Encoding': 'utf-8'}
+
+    answer = requests.post(url_address, headers=headers, verify=False)
+
+    write_smth(answer)
+    #print('answer', str(time), answer)
+    # response = answer.json()
+    # print(datetime.datetime.now(), response)
+
+#send_test_post(order)
+#send_test_post_cart()

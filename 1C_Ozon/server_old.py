@@ -7,26 +7,26 @@ from flask import Flask, request
 from gevent.pywsgi import WSGIServer
 import pytz
 from datetime import datetime, timedelta
-from read_json import processing_json,  read_order_json
-from cred import token_market_dbs, token_market_fbs
+from read_json import processing_json
+token_market_dbs = ''
+token_market_fbs = ''
+#from cred import token_market_dbs, token_market_fbs, compaing_id_dbs, compaing_id_fbs
+#from request import send_post, make_cancel
 
 
-import urllib3
-urllib3.disable_warnings()
+# time = datetime.now(pytz.timezone("Africa/Nairobi")).replace(microsecond=0).isoformat()
 
-
-#time = datetime.now(pytz.timezone("Africa/Nairobi")).replace(microsecond=0).isoformat()
-#print(time)  #for development
+# print(time)  #for development
 
 
 def write_json(smth_json):
-    with open('test_json.json', 'w') as file:
+    with open('test.json', 'w') as file:
         json.dump(smth_json, file)
 
 
 def write_smth_date():
-    f = open('test_txt.txt', 'w')
     time = datetime.now(pytz.timezone("Africa/Nairobi")).isoformat()
+    f = open('test_txt.txt', 'w')
     f.write(str(time) + '\n')
     f.close()
 
@@ -37,7 +37,9 @@ def write_smth(smth):
     f.write(str(time) + str(smth) + '\n')
     f.close()
 
+
 write_smth(' start ')
+
 
 def write_fake(smth):
     time = datetime.now(pytz.timezone("Africa/Nairobi")).isoformat()
@@ -50,7 +52,7 @@ def write_fake(smth):
 
 def check_cart(items, businessId):
     data_stocks = processing_json()
-    #print('check_cart', len(data_stocks))
+    # print('check_cart', len(data_stocks))
     id_1c = ''
     for item in items:
         offer_id = item['offerId']
@@ -67,47 +69,16 @@ def check_cart(items, businessId):
 
     return items, id_1c
 
-def token_generator(size=10, chars = string.ascii_uppercase + string.digits):
+
+def token_generator(size=10, chars=string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
 
-# def token_generator(size=10, chars = string.ascii_lowercase + string.digits):
-#     return ''.join(random.choice(chars) for _ in range(size))
-
-
-# def create_data_for_1c(order, list_items, created_id):
-#     delivery = order['delivery']['type']
-#     business_id = order['businessId']
-#     payment_type = order['paymentType']
-#     # items = order['items']
-#     items_pr = []
-#     for item in list_items:
-#         proxy = {}
-#         proxy['shopSku'] = item['id_1c']
-#         proxy['count'] = item['count']
-#         proxy['price'] = item['price']
-#         items_pr.append(proxy)
-#     data_re = {
-#         "order": {
-#             "shop": "Yandex",
-#             "businessId": business_id,
-#             "id": created_id,
-#             "paymentType": payment_type,
-#             "delivery": delivery,
-#             "items": items_pr
-#         }
-#     }
-#     print('data_re', data_re)
-#     return data_re
-
-
-def create_data_for_1c(order, created_id, status):
+def create_data_for_1c(order, list_items, created_id):
     delivery = order['delivery']['type']
-    #business_id = order['businessId']
+    business_id = order['businessId']
     payment_type = order['paymentType']
-    date_from = order['delivery']['dates']['fromDate']
-    list_items = order['items']
-    print('check_is_2222222222222222accept', list_items)
+    # items = order['items']
     items_pr = []
     for item in list_items:
         proxy = {}
@@ -118,28 +89,15 @@ def create_data_for_1c(order, created_id, status):
     data_re = {
         "order": {
             "shop": "Yandex",
-            #"businessId": business_id,
+            "businessId": business_id,
             "id": created_id,
             "paymentType": payment_type,
             "delivery": delivery,
-            "status": status,
-            "date": date_from,
             "items": items_pr
         }
     }
     print('data_re', data_re)
     return data_re
-
-
-def make_cancel(order_id):
-    data  = read_order_json()
-    if str(order_id) in data.keys():
-        our_order = data[str(order_id)]
-        created_id = our_order.get("created_id")
-        # id_1c = our_order.get("id_1c")
-        print('make_cancel', created_id)
-
-        return our_order
 
 
 def check_stocks(skus, warehouse_id):
@@ -155,50 +113,28 @@ def check_stocks(skus, warehouse_id):
                 "sku": sku,
                 "warehouseId": warehouse_id,
                 "items":
-                [
-                    {
-                        "type": "FIT",
-                        "count": count,
-                        "updatedAt": str(time)
-                    }
-                ]
+                    [
+                        {
+                            "type": "FIT",
+                            "count": count,
+                            "updatedAt": str(time)
+                        }
+                    ]
             }
             proxy_list.append(data)
-    
-    return {"skus": proxy_list}  #, proxy_list
+
+    return {"skus": proxy_list}  # , proxy_list
 
 
-def write_order(order, created_id):
-    data = read_order_json()
+def write_order(order):
+    time = datetime.now(pytz.timezone("Africa/Nairobi")).replace(microsecond=0).isoformat()
     print('write_order', type(order))
-    order_id = order.get("id")
-    order['created_id'] = created_id
-    if order_id not in data.keys():
-        data[order_id] = order
-    else:
-        rewrite_order_status(order)
+    f = open('orders.txt', 'a')
+    f.write(str(time) + str(order) + '\n')
+    f.close()
+    # order_id = order.get("order_id")
     with open("orders.json", 'w') as file:
-        json.dump(data, file)
-
-    # return order_id
-
-
-
-def rewrite_order_status(order):
-    data = read_order_json()
-    print('re_write_order', type(order))
-    order_id = order.get("id")
-    status = order.get("status")
-    substatus = order.get("substatus")
-    if order_id in data.keys():
-        current_order = data[order_id]
-        current_order["prev_status"] = current_order["status"]
-        current_order["status"] = status
-        current_order["substatus"] = substatus
-        data[order_id] = current_order
-
-    with open("orders.json", 'w') as file:
-        json.dump(data, file)
+        json.dump(order, file)
 
     # return order_id
 
@@ -211,11 +147,10 @@ def data_summary():
 
 
 def check_is_accept(list_items):
-    print(type(list_items))
     data = processing_json()
     result_global = False
     cnt = 0
-
+    print('check_is_2222222222222222accept', list_items)
     for item in list_items:
         shop_sku = item['shopSku']
         if shop_sku in data.keys():
@@ -231,42 +166,40 @@ def check_is_accept(list_items):
 
     if cnt == len(list_items):
         result_global = True
-    print('check_is_accept', cnt, len(list_items))
+    print('check_is_accept', count, len(list_items))
     return result_global, list_items
 
 
-
 def order_resp(order, global_result):
+    order_id = order.get("id")
+    id_create = token_generator()
+    result = ''
     if global_result:
-        id_create = token_generator()
         data = {
             "order": {
                 "accepted": True,
                 "id": id_create,
             }
         }
-        write_order(order, id_create)
-        # result = True
+        # write_order(order)
+        result = id_create
     else:
         data = {
             "order":
                 {
                     "accepted": False,
+                    "id": order_id,
                     "reason": "OUT_OF_DATE"
                 }
         }
-        id_create = None
+        # result = False
 
-    return data, id_create
+    return data, result, id_create
+
 
 # def make_cancel(order_id):
-#     data  = read_order_json()
-#     created_id = ''
-#     if order_id in data.keys():
-#         our_order = data[order_id]
-#         created_id = our_order.get("created_id")
 #
-#     return created_id
+#     return True, order_id
 
 def proxy_time():
     dt = datetime.now().date() + timedelta(days=2)
@@ -283,7 +216,7 @@ def create_re_cart(items):
     proxy_list = []
     for item in items:
         proxy_item = {}
-        proxy_item['sellerInn'] = "6234113064"
+        proxy_item['sellerInn'] = ""
         proxy_item['delivery'] = True
         proxy_item['feedId'] = item['feedId']
         proxy_item['offerId'] = item['offerId']
@@ -291,50 +224,42 @@ def create_re_cart(items):
         proxy_list.append(proxy_item)
 
     data = {
-       "cart":
-       {
-        "deliveryOptions":
-        [
+        "cart":
             {
-            "id": delivery_id,
-            "serviceName": service_name,
-            "type": "DELIVERY",
-            "dates":
-               {
-              "fromDate": proxy_time(),   #data['cart']["deliveryOptions"][0]["dates"]["fromDate"]
-               }
+                "deliveryOptions":
+                    [
+                        {
+                            "id": delivery_id,
+                            "serviceName": service_name,
+                            "type": "DELIVERY",
+                            "dates":
+                                {
+                                    "fromDate": proxy_time(),
+                                }
+                        }
+                    ],
+                "items": proxy_list,
+                "paymentMethods":
+                    [
+                        "YANDEX",
+                        "CARD_ON_DELIVERY",
+                        "CASH_ON_DELIVERY",
+                        "TINKOFF_CREDIT",
+                        "TINKOFF_INSTALLMENTS",
+                        "SBP"
+                    ]
             }
-        ],
-        "items": proxy_list,
-        "paymentMethods":
-        [
-               "YANDEX",
-               "CARD_ON_DELIVERY",
-               "CASH_ON_DELIVERY",
-               "TINKOFF_CREDIT",
-               "TINKOFF_INSTALLMENTS",
-               "SBP"
-           ]
-        }
     }
 
     return data
 
 
-def send_post(data):
-    url_address = 'https://92.39.143.137:14723/Trade/hs/post/order/post'
-    headers = {'Content-type': 'application/json',
-               'Authorization': 'Basic 0JzQsNGA0LrQtdGC0L/Qu9C10LnRgdGLOjExMQ==',
-               'Content-Encoding': 'utf-8'}
-    answer = requests.post(url_address, data=json.dumps(data), headers=headers, verify=False)
-    write_smth(answer)
-    result = answer.status_code
-    time = datetime.now(pytz.timezone("Africa/Nairobi")).isoformat()
-    print('answer1', str(time), answer)
-    return result
+# def send_resp():
+#     r = requests.post('', data=data)
 
 
 app = Flask(__name__)
+
 
 @app.route('/', methods=['GET', 'POST'])
 def bay_bay():
@@ -342,7 +267,6 @@ def bay_bay():
         status=403
     )
     return response
-
 
 
 # allow both GET and POST requests
@@ -353,8 +277,8 @@ def form():
         campaign_id = request.form.get('campaign_id')
         status = 'CANCELLED'
         substatus = 'SHOP_FAILED'
-        smth = make_cancel(order_id)
-        return f'''<h2>The cenceled order {order_id} is: {smth[0]}</h2>
+        #smth = make_cancel(order_id, status, substatus, campaign_id)
+        return f'''<h2>The cenceled order {order_id} is: </h2>
         <form method="GET">
         <button type="submit">BACK</button>
         </form>'''
@@ -362,28 +286,25 @@ def form():
     return '''
         <form id="cancel" method="POST"></form>
             <div><label>OrderID: <input type="text" name="order_id"></label>
-        
+
         <select name="cancel" size="2" multiple form="cancel">
-            <option value="40215474">ARTOL_DBS</option>
-            <option value="10771112">FBS_ARTOL</option>
+            <option value="40215474">DBS</option>
+            <option value="10771112">FBS</option>
         </select>
         <input type="submit" value="CANCEL"></div>
-        
-        '''
 
+        '''
 
 
 #
 @app.route('/json', methods=['GET', 'POST'])
 def json_example():
-    head = request.headers.get('X-Forwarded-For')
-    ip_addr = request.environ.get('REMOTE_ADDR')  ## return ::ffff:92.39.143.137
-    # head = request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)  ## return ::ffff:92.39.143.137
+    ip_addr = request.environ.get('REMOTE_ADDR')  ## return ::ffff:62.76.102.53
+    head = request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)  ## return ::ffff:62.76.102.53
     print('X-Forwarded-For', type(ip_addr), ip_addr)
     print('REMOTE_ADDR', type(head), head)
-    if str(ip_addr) == '::ffff:92.39.143.137':
+    if str(ip_addr) == '::ffff:62.76.102.53':
         request_data = request.get_json()
-        # if 'test' in request_data:
         write_json(request_data)
         write_smth_date()
 
@@ -400,8 +321,9 @@ def json_example():
 
     return response
 
+
 @app.route('/order/accept', methods=['POST'])
-def order_accept():
+async def order_accept():
     # req = request.get_json()
     token = request.headers.get('Authorization')
     if token == token_market_dbs or token == token_market_fbs:
@@ -409,64 +331,25 @@ def order_accept():
         confirm_data = data_req["order"].get('fake')
         order = data_req["order"]
         proxy = order['items']
-        stock = check_is_accept(proxy)  # проверяем наличие for order
-        data = order_resp(order, False)
-        response = app.response_class(json.dumps(data[0]), status=200, content_type='application/json')
+        stock = check_is_accept(proxy)
+        data = order_resp(order, stock[0])
         if stock[0]:
-            order['items'] = stock[1]   ###?????
-            print('id_ic', order.get('id_ic'))
-            data = order_resp(order, stock[0])
-            send_data = create_data_for_1c(order, data[1], "accept")
+            send_data = create_data_for_1c(order, proxy, data[1])
             print('send_data', send_data)
-            if confirm_data is not True: ## if order not test
-                se_id = str(send_data['order']['id'])  #for test
-                write_smth(' order_id_accept ' + se_id)  #for test
-                result = send_post(send_data)
-                if result == 200:
-                    write_order(order, data[1])  # TODO #is need create for 2 model? FBS & DBS
-                    response = app.response_class(
-                        json.dumps(data[0]),
-                        status=200,
-                        content_type='application/json'
-                    )
-
+            write_order(send_data)  # TODO #is need create for 2 model? FBS & DBS
+            if confirm_data is not True:
+                se_id = str(send_data['order']['id'])
+                write_smth(' order_id_accept ' + se_id)
+                #await send_post(send_data)
             else:
                 write_fake(data_req)
-                response = app.response_class(
-                json.dumps(data[0]),
-                status=200,
-                content_type='application/json'
-            )
 
-
-    else:
         response = app.response_class(
-            status=403
+            json.dumps(data[0]),
+            status=200,
+            content_type='application/json'
         )
 
-    return response
-
-
-@app.route('/order/status', methods=['POST'])
-def status():
-    token = request.headers.get('Authorization')
-    if token == token_market_dbs or token == token_market_fbs:
-        request_data = request.get_json()
-        order = request_data.get("order")
-        rewrite_order_status(order)
-        status = order.get("status")
-        if status == "CANCELLED":
-            id = order["id"]
-            print('created_', id)
-            our_order = make_cancel(id)
-            print('/order/status', our_order)
-            created_id  = our_order["created_id"]
-            print(created_id)
-            data = create_data_for_1c(our_order, created_id, "canceled")
-            send_post(data)
-        response = app.response_class(
-            status=200
-        )
     else:
         response = app.response_class(
             status=403
@@ -481,13 +364,14 @@ def cart():
     if token == token_market_dbs or token == token_market_fbs:
         request_data = request.get_json()
         cart = request_data.get('cart')
-        # if cart is not None:
-        businessId = cart.get('businessId')
-        #delivery = cart.get('delivery')
-        items = cart.get('items')
-        check = check_cart(items, businessId)
-        # TODO
-        data = create_re_cart(check[0])
+        if cart is not None:
+            businessId = cart.get('businessId')
+            delivery = cart.get('delivery')
+            items = cart.get('items')
+            # cart = {"cart":{}}
+            check = check_cart(items, businessId)
+            # TODO
+            data = create_re_cart(check[0])
 
         response = app.response_class(
             json.dumps(data),
@@ -507,7 +391,7 @@ def cart():
 def orders():
     token = request.headers.get('Authorization')
     if token == token_market_dbs or token == token_market_fbs:
-        data = data_summary()  #TODO
+        data = data_summary()  # TODO
         response = app.response_class(
             json.dumps(data),
             status=200,
@@ -521,13 +405,37 @@ def orders():
     return response
 
 
+@app.route('/order/status', methods=['POST'])
+def status():
+    token = request.headers.get('Authorization')
+    if token == token_market_dbs or token == token_market_fbs:
+        request_data = request.get_json()
+        order_status = request_data['order']['status']
+        write_smth(order_status)
+        # TODO
+        # if order_status == 'DELIVERED':
+        #     write_order(request_data)
+        # else:
+        #     pass
+
+        response = app.response_class(
+            status=200
+        )
+    else:
+        response = app.response_class(
+            status=403
+        )
+
+    return response
+
+
 @app.route('/stocks', methods=['POST'])
 def stocks():
     headers = dict(request.headers)
     request_data = request.get_json()
-    #write_smth(request_data)
-    write_smth('stocks')
-      ## for debag
+    write_smth(request_data)
+    write_smth(headers)
+    ## for debag
     token = request.headers.get('Authorization')
 
     if token == token_market_dbs or token == token_market_fbs:
@@ -553,8 +461,7 @@ def order_cancell():
     token = request.headers.get('Authorization')
     if token == token_market_dbs or token == token_market_fbs:
         req_cancell = request.get_json()
-        order = req_cancell.get('order')
-        rewrite_order_status(order)
+        write_smth(req_cancell)
 
         response = app.response_class(
             status=200
@@ -565,6 +472,7 @@ def order_cancell():
         )
 
     return response
+
 
 @app.route('/test', methods=['GET'])
 def test():
@@ -577,5 +485,5 @@ if __name__ == '__main__':
     ##run app in debug mode on port 5000
     # app.run(debug=True, host='0.0.0.0', port=5000)
     # Production
-    http_server = WSGIServer(('', 5000), app)
+    http_server = WSGIServer(('', 8800), app)
     http_server.serve_forever()

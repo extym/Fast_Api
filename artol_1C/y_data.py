@@ -7,13 +7,13 @@ import pytz
 
 from read_json import processing_request, processing_json
 
-not_in_YM_fbs = ['Kpsngafrls2215byxta200msi', 'Es4022', 'KPSVVngLS1x2x1', 'UTP4PR24AWGCAT5e305mVnetrennii', 'Kcpv1005', 'KPSngAFRLS1x2x02kvmmBuhta200m',
-                 'Kvkp2075byxta200moptimus', 'Vvgngls315100', 'Gofra20mmsZondomBuhta100m', 'Kccvvngals405', 'Kcpv205', 'UTP4PR24AWGCAT5e305мVnutrenniiOptimLAN',
-                 'FTP4PR24AWGCAT5eOUTDOOROptimLAN305м', 'GPBelui', 'UTP4PR24AWGCAT5e305мOUTDOOR(Med)', 'FTP2PR24AWGCAT5e305м', 'Kcpv2004',
-                 'UTP4PR24AWGCAT5e305мOUTDOORTRFG8(tros)OptimLAN', 'KPSngAFRLS1x2x1Buhta200mRexant', 'KPSEngAFRLS2x2x075Buhta200mPuls', 'Kpcngafrls12075byxta200mpylis',
-                 'Kpsngafrls22075byxta200mpylis', 'KPSEngAFRLS1x2x075Buhta200mIvanovoRaznomeri', 'KPSngAFRLS1x2x075Buhta200mRexant', 'Ventilytor80x80podhipnik3pin',
-                 'KPSngFRLS1x2x05Buhta200m', 'KPSngAFRLS1x2x075Buhta200m', 'Gofra16mmPVHsZondomBuhta100m', 'GPmetall', 'Kkcp205mmbyxta100m', 'Kpcngafrls1275byxta200mrexant',
-                 'KPSngAFRHF1x2x075Buhta200m', 'Gofra20mmpvxszondom100m', 'KPSngFRLS1x2x02Buhta200m', 'Gofra16mmPNDsZondomBuhta100m', 'Kpcengafrls1205byxta200mpylis']
+# not_in_YM_fbs = ['Kpsngafrls2215byxta200msi', 'Es4022', 'KPSVVngLS1x2x1', 'UTP4PR24AWGCAT5e305mVnetrennii', 'Kcpv1005', 'KPSngAFRLS1x2x02kvmmBuhta200m',
+#                  'Kvkp2075byxta200moptimus', 'Vvgngls315100', 'Gofra20mmsZondomBuhta100m', 'Kccvvngals405', 'Kcpv205', 'UTP4PR24AWGCAT5e305мVnutrenniiOptimLAN',
+#                  'FTP4PR24AWGCAT5eOUTDOOROptimLAN305м', 'GPBelui', 'UTP4PR24AWGCAT5e305мOUTDOOR(Med)', 'FTP2PR24AWGCAT5e305м', 'Kcpv2004',
+#                  'UTP4PR24AWGCAT5e305мOUTDOORTRFG8(tros)OptimLAN', 'KPSngAFRLS1x2x1Buhta200mRexant', 'KPSEngAFRLS2x2x075Buhta200mPuls', 'Kpcngafrls12075byxta200mpylis',
+#                  'Kpsngafrls22075byxta200mpylis', 'KPSEngAFRLS1x2x075Buhta200mIvanovoRaznomeri', 'KPSngAFRLS1x2x075Buhta200mRexant', 'Ventilytor80x80podhipnik3pin',
+#                  'KPSngFRLS1x2x05Buhta200m', 'KPSngAFRLS1x2x075Buhta200m', 'Gofra16mmPVHsZondomBuhta100m', 'GPmetall', 'Kkcp205mmbyxta100m', 'Kpcngafrls1275byxta200mrexant',
+#                  'KPSngAFRHF1x2x075Buhta200m', 'Gofra20mmpvxszondom100m', 'KPSngFRLS1x2x02Buhta200m', 'Gofra16mmPNDsZondomBuhta100m', 'Kpcengafrls1205byxta200mpylis']
 
 
 # desk_carwel = 'Диски CARWEL- cовременный, динамично развивающийся бренд. Новейшее передовое оборудование и современные технологии по производству литых колесных дисков отвечающие самым высоким стандартам качества и надежности,является не единственным конкурентным преимуществом.'
@@ -195,10 +195,10 @@ def create():
     print(type(need_data), len(need_data))
     cnt = 0
     for key, value in need_data.items():  #our_data[10:]:
-        print(value)
+        #print(value)
         product_code = key
-        if product_code in not_in_YM_fbs:
-            continue
+        # if product_code in not_in_YM_fbs:
+        #     continue
         price = value['price_ym']
         # if pr is not None:
         #     price = int(pr) * 1.13
@@ -212,7 +212,7 @@ def create():
             create_offer(product_code, str(count), price, min_quantity)  #(name, vendor, product_code, category_id, description,  url, count, price)
             cnt += 1
 
-    print(cnt)
+    print('count_from_ydata', cnt)
 
     productChild.appendChild(nameChild)
     productChild.appendChild(companyChild)
@@ -232,9 +232,9 @@ def create():
 
     xml_str = root.toprettyxml(indent="\t")
     #for development
-    #save_path_file = "yandex.xml"
+    save_path_file = "yandex.xml"
     #for production
-    save_path_file = "/var/www/html/s0408/yandex.xml"
+    #save_path_file = "/var/www/html/s0408/yandex.xml"
 
     with open(save_path_file, "w") as f:
         f.write(xml_str)
