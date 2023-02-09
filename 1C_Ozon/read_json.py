@@ -17,7 +17,7 @@ def processing_json():
     data = r.json()
     result_list = []
     for keys, value in data.items():
-        #print('value----------===============', value)
+        # print('value----------===============', value)
         id_1c = keys
         vendor_code = value[0]
         price = value[1].get(u'Цена')  #["\u0426\u0435\u043d\u0430"]
@@ -28,17 +28,54 @@ def processing_json():
         #if quantity is not None:
         result_list.append(proxy)
 
-    print('data', len(data), value)
-    print('result_list', len(result_list))
+    # print('data', len(data), value)
+    # print('result_list', len(result_list))
+    print('value----------===============', value)
     return result_list
 
-#processing_json()
+# processing_json()
+
+def read_json_lm():
+    r = requests.get('http://super-good.ml/test_json.json')
+    data = r.json()
+    result_dict = {}
+    for keys, value in data.items():
+        outlets = value[3]
+        if 'LM.ЛеруаМерлен' in  outlets.keys():
+            id_1c = keys
+            vendor_code = value[0]
+            price = value[1].get(u'Цена')  #["\u0426\u0435\u043d\u0430"]
+            quantity = value[2].get(u'Остаток')
+            proxy = (id_1c, price, quantity) # id_1C, vendor_vode (SKU), price, quantity
+            result_dict[vendor_code] = proxy
+    print('result_dict', len(result_dict), result_dict)
+    return result_dict
+
+# read_json_lm()
+
+
+def read_json_sper():
+    r = requests.get('http://super-good.ml/test_json.json')
+    data = r.json()
+    result_list = []
+    for key, value in data.items():
+        outlets = value[3]
+        if 'SBMM.Сбермегамаркет' in  outlets.keys():
+            id_1c = key
+            vendor_code = value[0]
+            price = value[1].get(u'Цена')  #["\u0426\u0435\u043d\u0430"]
+            quantity = value[2].get(u'Остаток')
+            proxy = (id_1c, vendor_code, price, quantity) # id_1C, vendor_vode (SKU), price, quantity
+            #result_dict[vendor_code] = proxy
+            result_list.append(proxy)
+    print('result_dict', len(result_list), result_list)
+    return result_list
 
 
 def read_order_json():
     with open('orders.json', 'r') as file:
         result_dict = json.load(file)
-    print('result_dict ', len(result_dict), type(result_dict))
+    #print('result_dict ', len(result_dict), type(result_dict))
     return result_dict
 
 #processing data from request (proxy file) for price & etc.

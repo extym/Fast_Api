@@ -282,7 +282,7 @@ def create_fbs():
     print(type(need_data), len(need_data))
     cnt = 0
     for row in need_data:
-        if 'YM.СклЭкспресс' in row[4]:
+        if 'YM.СТМ' in row[4]:
             count = row[3]
             if count is None:
                 count = 0
@@ -292,7 +292,7 @@ def create_fbs():
             if product_code != '':
                 create_offer(product_code, str(count))  #(name, vendor, product_code, category_id, description,  url, count, price)
                 cnt += 1
-    print('rowYM.СклЭкспресс', row)
+    print('rowYM.СТМ', row)
     print('cnt', cnt)
 
 
@@ -314,9 +314,9 @@ def create_fbs():
 
     xml_str = root.toprettyxml(indent="\t")
     #for development
-    save_path_file = "yandex-fbs.xml"
+    # save_path_file = "yandex-fbs.xml"
     #for production
-    # save_path_file = "/var/www/html/2c/yandex-fbs.xml"
+    save_path_file = "/var/www/html/2c/yandex-fbs.xml"
 
     with open(save_path_file, "w") as f:
         f.write(xml_str)
@@ -437,7 +437,7 @@ def create_expresso():
     #print(type(need_data), len(need_data))
     cnt = 0
     for row in need_data:
-        if 'YM.СТМ' in row[4]:
+        if 'YM.СклЭкспресс' in row[4]:
             count = row[3]
             if count is None:
                 count = 0
@@ -448,7 +448,7 @@ def create_expresso():
                 create_offer(product_code, str(count))  #(name, vendor, product_code, category_id, description,  url, count, price)
                 cnt += 1
 
-    print('row_for_YM.СТМ', row)
+    print('row_for_YM.СклЭкспресс', row)
     print('cnt', cnt)
 
     productChild.appendChild(nameChild)

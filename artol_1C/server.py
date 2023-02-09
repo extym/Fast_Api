@@ -16,12 +16,12 @@ urllib3.disable_warnings()
 
 
 def write_json(smth_json):
-    with open('test_json.json', 'w') as file:
+    with open('/var/www/html/artol/test_json.json', 'w') as file:
         json.dump(smth_json, file)
 
 
 def write_smth_date():
-    f = open('test_txt.txt', 'w')
+    f = open('/var/www/html/artol/test_txt.txt', 'w')
     time = datetime.now(pytz.timezone("Africa/Nairobi")).isoformat()
     f.write(str(time) + '\n')
     f.close()
@@ -29,6 +29,7 @@ def write_smth_date():
 
 def write_smth(smth):
     time = datetime.now(pytz.timezone("Africa/Nairobi")).isoformat()
+    # f = open('/home/userbe/artol/no_test.txt', 'a')
     f = open('no_test.txt', 'a')
     f.write(str(time) + str(smth) + '\n')
     f.close()
@@ -48,12 +49,12 @@ def check_cart(items, businessId):
     id_1c = ''
     for item in items:
         offer_id = item['offerId']
-        count = item['count']
+        need_count = item['count']
         if offer_id in data_stocks.keys():
             stock = data_stocks[offer_id].get('stock')
             id_1c = data_stocks[offer_id].get('id_ic')
 
-            if int(stock) < count:
+            if int(stock) < need_count:
                 item['count'] = int(stock)
 
         else:
@@ -61,12 +62,13 @@ def check_cart(items, businessId):
 
     return items, id_1c
 
-def token_generator(size=10, chars = string.ascii_uppercase + string.digits):
-    return ''.join(random.choice(chars) for _ in range(size))
 
-
-# def token_generator(size=10, chars = string.ascii_lowercase + string.digits):
+# def token_generator(size=10, chars = string.ascii_uppercase + string.digits):
 #     return ''.join(random.choice(chars) for _ in range(size))
+
+
+def token_generator(size=10, chars = string.digits): #string.ascii_lowercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
 
 
 def create_data_for_1c(order, created_id, status):
@@ -104,8 +106,7 @@ def make_cancel(order_id):
     if str(order_id) in data.keys():
         our_order = data[str(order_id)]
         created_id = our_order.get("created_id")
-        # id_1c = our_order.get("id_1c")
-        #print('make_cancel', created_id)
+        print(our_order)
 
         return our_order
 
@@ -163,6 +164,7 @@ def rewrite_order_status(order):
         data[order_id] = current_order
 
     with open("/var/www/html/artol/orders.json", 'w') as file:
+    # with open("orders.json", 'w') as file:
         json.dump(data, file)
 
 
@@ -276,7 +278,7 @@ def create_re_cart(items):
     return data
 
 
-def send_post(data):
+async def send_post(data):
     url_address = 'https://92.39.143.137:14723/Trade/hs/post/order/post'
     headers = {'Content-type': 'application/json',
                'Authorization': 'Basic 0JzQsNGA0LrQtdGC0L/Qu9C10LnRgdGLOjExMQ==',
@@ -286,7 +288,7 @@ def send_post(data):
     result = answer.status_code
     time = datetime.now(pytz.timezone("Africa/Nairobi")).isoformat()
     print('answer1', str(time), answer)
-    return result
+    #return result
 
 
 app = Flask(__name__)
@@ -355,7 +357,7 @@ def json_example():
 
 
 @app.route('/order/accept', methods=['POST'])
-def order_accept():
+async def order_accept():
     # req = request.get_json()
     token = request.headers.get('Authorization')
     if token == token_market_dbs or token == token_market_fbs:
@@ -375,14 +377,25 @@ def order_accept():
             if confirm_data is not True: ## if order not test
                 se_id = str(send_data['order']['id'])  #for test
                 write_smth(' order_id_accept ' + se_id)  #for test
-                result = send_post(send_data)
-                if result == 200:
-                    write_order(order, data[1])  # TODO #is need create for 2 model? FBS & DBS
-                    response = app.response_class(
-                        json.dumps(data[0]),
-                        status=200,
-                        content_type='application/json'
-                    )
+                await send_post(send_data)
+
+                write_order(order, data[1])  # TODO #is need create for 2 model? FBS & DBS
+                response = app.response_class(
+                    json.dumps(data[0]),
+                    status=200,
+                    content_type='application/json'
+                )
+
+                # se_id = str(send_data['order']['id'])  #for test
+                # write_smth(' order_id_accept ' + se_id)  #for test
+                # result = send_post(send_data)
+                # if result == 200:
+                #     write_order(order, data[1])  # TODO #is need create for 2 model? FBS & DBS
+                #     response = app.response_class(
+                #         json.dumps(data[0]),
+                #         status=200,
+                #         content_type='application/json'
+                #     )
 
             else:
                 write_fake(data_req)
@@ -406,17 +419,26 @@ def status():
     if token == token_market_dbs or token == token_market_fbs:
         request_data = request.get_json()
         order = request_data.get("order")
-        rewrite_order_status(order)
         status = order.get("status")
         if status == "CANCELLED":
-            id = order["id"]
-            print('created_', id)
-            our_order = make_cancel(id)
-            print('/order/status', our_order)
-            created_id  = our_order["created_id"]
-            print(created_id)
-            data = create_data_for_1c(our_order, created_id, "canceled")
-            send_post(data)
+            try:
+                id = order["id"]
+                #print('created_', id)
+                our_order = make_cancel(id)
+                print('/order/status', status,  our_order)
+                created_id  = our_order["created_id"]
+                data = create_data_for_1c(our_order, created_id, "canceled")
+                result = send_post(data)
+                print('CANCELLED', result)
+            except :
+                rewrite_order_status(order)
+                response = app.response_class(
+                    status=200
+                )
+
+        else:
+            rewrite_order_status(order)
+
         response = app.response_class(
             status=200
         )
@@ -439,7 +461,7 @@ def cart():
         items = cart.get('items')
         check = check_cart(items, businessId)
         data = create_re_cart(check[0])
-
+        print(check)
         response = app.response_class(
             json.dumps(data),
             status=200,
