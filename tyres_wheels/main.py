@@ -11,14 +11,21 @@ vendor = 0
 #for production only
 requests.packages.urllib3.disable_warnings()
 
-link = address + page + contract + 'token=' + Token + '&vendor=' + str(vendor)# + '&category=3'
-category = 0
-# get start page & pages
-resp = requests.get(link, verify=False)
-txt = resp.text
-main_data = json.loads(txt)
-pages = int(main_data['pages'])  #get how many pages
-all_data = main_data['offers']   # get data offers
+# link = address + page + contract + 'token=' + Token + '&vendor=' + str(vendor)# + '&category=3'
+# category =5
+# # get start page & pages
+# resp = requests.get(link, verify=False)
+# txt = resp.text
+# main_data = json.loads(txt)
+# pages = int(main_data['pages'])  #get how many pages
+# all_data = main_data['offers']   # get data offers
+
+def get_pages():
+    link = address + page + contract + 'token=' + Token + '&vendor=' + str(vendor)# + '&category=3'
+    resp = requests.get(link, verify=False)
+    main_data = resp.json()
+    pages = int(main_data['pages'])  #get how many pages
+    return pages
 
 
 #for future name image
@@ -28,6 +35,7 @@ name_img = str(round(time_e, 2)).replace('.', '-')
 count = 0
 # Получаем все данные по page
 def get_wheels():
+    pages = get_pages()
     data_product = []
     for i in range(pages):
         links = address + 'page'+ str(i) + contract + 'token=' + Token + '&vendor=' + str(vendor)

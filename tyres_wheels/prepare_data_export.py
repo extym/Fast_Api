@@ -33,7 +33,7 @@ def get_need_data():
     for line in open('data_product.json', 'r'):
         l = line.replace('}"" {', ',') #[1:-1]
         our_data = json.loads(l)
-        print(type(our_data))
+        # print(type(our_data))
         try:
             for lin in our_data:
                 quantity = lin.get('in_stock')

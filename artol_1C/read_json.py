@@ -36,10 +36,10 @@ def processing_json():
 
 
 def read_order_json():
-    # with open("orders.json", 'r') as file:
-    with open("/var/www/html/artol/orders.json", 'r') as file:
+    with open("orders.json", 'r') as file:
+    # with open("/var/www/html/artol/orders.json", 'r') as file:
         result_dict = json.load(file)
-    print('result_read_order ', len(result_dict), type(result_dict))
+    print('result_read_order ', len(result_dict), result_dict.keys())
     return result_dict
 
 

@@ -1,7 +1,7 @@
-import json
+
 import random
 import string
-
+import json
 import requests
 from flask import Flask, request
 from gevent.pywsgi import WSGIServer
@@ -79,7 +79,11 @@ def token_generator(size=10, chars = string.ascii_uppercase + string.digits):
 
 
 def create_data_for_1c(order, created_id, status):
-    delivery = order['delivery']['type']
+    delivery = order.get('delivery')
+    if delivery is not None:
+        delivery_type = delivery.get('type')
+    else:
+        delivery_type = None
     #business_id = order['businessId']
     payment_type = order['paymentType']
     date_from = order['delivery']['dates']['fromDate']
@@ -97,7 +101,7 @@ def create_data_for_1c(order, created_id, status):
             #"businessId": business_id,
             "id": created_id,
             "paymentType": payment_type,
-            "delivery": delivery,
+            "delivery": delivery_type,
             "status": status,
             "date": date_from,
             "items": items_pr
@@ -212,19 +216,15 @@ def check_is_accept_sb(list_items):
             if row[1] == shop_sku:
                 count = row[3]
                 if count >= item['quantity']:
-                    result = True
                     cnt += 1
-                else:
-                    result = False
 
                 item['id_1c'] = row[0]
-                item['result'] = result
+                #item['result'] = result
 
     if cnt == len(list_items):
         result_global = True
     print('check_is_accept_sb_222222222', cnt, len(list_items), list_items)
     return result_global, list_items
-
 
 
 def order_resp_ym(order, global_result):
@@ -252,22 +252,21 @@ def order_resp_ym(order, global_result):
 
 
 def order_resp_sb(order, global_result):
-    # id_create = token_generator()
+    id_create = token_generator()
     if global_result:
         data = {
                 "data": {},
                 "meta": {},
                 "success": 1
             }
-        write_order(order)
-        # result = True
+        write_order(order, id_create)
+
     else:
         data = {
                 "data": {},
                 "meta": {},
                 "success": 0
             }
-        # result = False
 
     return data
 
@@ -335,6 +334,23 @@ def create_re_cart(items):
     return data
 
 
+##for sper
+def counter_items(items_list):
+    count = 1
+    if len(items_list) > 1:
+        proxy = items_list[0]['offerId']
+        for i in range(1, len(items_list)):
+            if items_list[i]['offerId'] == proxy:
+                count += 1
+                items_list[i - 1]['quantity'] = count
+                del items_list[i]
+
+            else:
+                proxy = items_list[i]['offerId']
+    print(items_list)
+    return items_list
+
+
 def send_post(data):
     url_address = ''
     headers = {'Content-type': 'application/json',
@@ -359,15 +375,11 @@ def bay_bay():
 
 
 @app.route('/json', methods=['GET', 'POST'])
-def json():
-    head = request.headers.get('X-Forwarded-For')
+def get_json():
     ip_addr = request.environ.get('REMOTE_ADDR')  ## return ::ffff:46.21.252.7
-    # head = request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)  ## return None
     print('REMOTE_ADDR', type(ip_addr), ip_addr)
-    print('X-Forwarded-For', type(head), head)
     if str(ip_addr) == '::ffff:46.21.252.7':
         request_data = request.get_json()
-        # if 'test' in request_data:
         write_json(request_data)
         write_smth_date()
 
@@ -486,6 +498,7 @@ def status_ym():
             created_id  = make_cancel(order["id"])
             data = create_data_for_1c(order, created_id, "canceled")
             send_post(data)
+
         response = app.response_class(
             status=200
         )
@@ -550,7 +563,8 @@ def new_order_sb():
     if token == None:
         data_req = request.get_json()
         order = data_req["data"]
-        proxy = order["shipments"][0]["items"]
+        pre_proxy = order["shipments"][0]["items"]
+        proxy = counter_items(pre_proxy)
         stock = check_is_accept_sb(proxy)  # проверяем наличие for order
         data = order_resp_sb(order, False)
         print(type(data), data)
@@ -571,6 +585,7 @@ def new_order_sb():
 
         else:
             write_fake(data_req)
+            print('response_order_new', data)
             response = app.response_class(
                 json.dumps(data),
                 status=200,
@@ -585,20 +600,23 @@ def new_order_sb():
 
     return response
 
-
+##for sper
 @app.route('/order/cancel', methods=['POST'])
-def order_cancel():
-    request_data = request.get_json()
-    if request_data['Basic auth'] == '':
+async def order_cancel():
+    token = request.headers.get('Basic auth')
+    if token == None:
+        data_req = request.get_json()
+        order = data_req["data"]["shipments"][0]
+        proxy = order['items']
+        past_proxy = counter_items(proxy)
 
-        result = ''
-
+        rewrite_order_status(order)
+        created_id = make_cancel(order["shipmentId"])
+        data = create_data_for_1c(order, created_id, "canceled")
+        await send_post(data)
         response = app.response_class(
-            json.dumps(result),
-            status=200,
-            content_type="application/json"
+            status=200
         )
-
     else:
         response = app.response_class(
             status=403

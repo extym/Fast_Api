@@ -32,7 +32,6 @@ def send_stocks():
     url = 'https://partner.sbermegamarket.ru/api/merchantIntegration/v1/offerService/'
     headers = {'Content-type': 'application/json'
                }
-
     metod = 'stock/update'
     url_address = url + metod #+ '?login=' + login_lm + '&password=' + pass_lm
     answer = requests.post(url_address, headers=headers, data=json.dumps(data))
@@ -40,4 +39,4 @@ def send_stocks():
     print(answer)
 
 
-send_stocks()
+#send_stocks()

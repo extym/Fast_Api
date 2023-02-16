@@ -1,37 +1,37 @@
 import json
-from connect import cursor, check_and_write
+from connect import check_and_write, check_write_json
 import requests
 import random
 import string
 
-categories_wheels = {'Inverno': 2000, 'Jantsa': 2000, 'FR replica': 1181, 'RADIUS': 2000, 'ГАЗ': 2000, 'LF Works': 2000,
-              'Remain': 2000, 'rtr': 2000, 'BLACK RHINO': 2000, 'BEYERN': 1897, 'REDBOURNE': 1901, 'LUMARAI': 1898,
+categories_wheels = {'Inverno': 1988, 'Jantsa': 1989, 'FR replica': 1181, 'RADIUS': 1990, 'ГАЗ': 1991, 'LF Works': 1992,
+              'Remain': 1993, 'rtr': 1994, 'BLACK RHINO': 1995, 'BEYERN': 1897, 'REDBOURNE': 1901, 'LUMARAI': 1898,
               'COVENTRY': 1903, 'VICTOR': 1893, 'Accuride': 1972, 'Asterro': 1974, 'Lemmerz/Maxion': 1973,
               'Maxion': 1973, 'Tracston': 1975, 'Alutec': 1736, 'ANTERA': 64, 'ATS': 1081, 'BBS': 1737, 'Borbet': 1738,
-              'Carwel': 1969, 'FONDMETAL': 1084, 'iFree': 628, 'KHOMEN': 1968, 'MAK': 1739, 'MANDRUS': 1887,
+              'Carwel': 1969, 'FONDMETAL': 1084, 'Fondmetal': 1084, 'iFree': 628, 'KHOMEN': 1968, 'MAK': 1739, 'MANDRUS': 1887,
               'MOMO': 1785, 'MSW': 1885, 'Neo': 1786, 'OZ': 55, 'Replay': 1221, 'Rial': 1777, 'RST': 1960,
               'Sparco': 1970, 'Tech Line': 1735, 'Venti': 1718, 'K&K': 1782, 'OE': 1883, 'Скад': 1926, 'TSW': 1083,
               'Magnetto': 723, 'Евродиск': 62, 'LS': 1139, 'LegeArtis': 1138, 'LegeArtis Concept': 1140, 'Trebl': 532,
               'Yamato': 1145, 'N2O': 1720, 'PDW': 1182, 'CrossStreet': 1873, 'Yokatta': 1143, "NZ": 1134, 'Alcasta': 1130,
               'Race Ready' : 1128, 'Arrivo': 1939, 'Antera': 64, 'Next': 1788, 'X-Race': 1874, 'Hayes Lemmerz' : 1884,
-              'Aero': 1875, 'Steger': 1879, 'Buffalo': 1882, 'ТЗСК': 2000, 'Harp': 1889, 'Off-Road Wheels': 2000,
-              'Khomen Wheels': 1968, 'LS FlowForming': 1139, 'Better': 1986, 'Lizardo': 2000}
+              'Aero': 1875, 'Steger': 1879, 'Buffalo': 1882, 'ТЗСК': 1996, 'Harp': 1889, 'Off-Road Wheels': 1997,
+              'Khomen Wheels': 1968, 'LS FlowForming': 1139, 'Better': 1986, 'Lizardo': 1987, 'YST': 827, 'LS Forged': 1998}
 
 categories_summer = {'Tunga': 1753, 'Bridgestone': 1756, 'Toyo': 1764, 'Kumho': 1924, 'Michelin': 1755, 'BFGoodrich': 1162,
                      'Nokian Tyres': 1754, 'Gislaved': 1985, 'Goodyear': 1154, 'Dunlop': 1228, 'Yokohama': 1757, 'Sava': 1855,
                      'Continental':1763, 'Maxxis': 1717, 'Hankook': 1748, 'Pirelli': 1156, 'Cordiant': 1719, 'Tigar': 1166,
                      'Matador': 1161, 'Falken': 1962, 'Кама': 933, 'Viatti': 1857, 'Nitto': 1765, 'Sunfull': 1923, 'Delinte': 1984,
                      'Laufenn': 1750, 'Aosen': 1983, 'Headway': 1177, 'Kormoran': 1160, 'Nexen': 1150, 'Marshal': 1850, 'Formula': 1167,
-                     'Kama': 933, 'Vredestein': 1839, 'GT Radial': 1766, 'Triangle': 1856, 'Altenzo': 1859, 'Compasal': 1871,
-                     'GT Radial': 1766, 'Onyx': 2000, 'Sailun': 1225, 'Cachland': 1743, 'HiFly': 2000, 'Rapid': 1742, 'Roadhiker': 2000,
-                     'Goodride': 2000, 'Tracmax': 2000}
+                     'Kama': 933, 'Vredestein': 1839, 'Triangle': 1856, 'Altenzo': 1859, 'Compasal': 1871,
+                     'GT Radial': 1766, 'Onyx': 2001, 'Sailun': 1225, 'Cachland': 1743, 'HiFly': 2002, 'Rapid': 1742, 'Roadhiker': 2005,
+                     'Goodride': 2003, 'Tracmax': 2004, 'Doublestar': 2006}
 
 categories_winter = {'Bridgestone': 1723, 'Toyo': 1770, 'Kumho': 1773, 'Michelin': 1976, 'BFGoodrich': 1214, 'Nokian Tyres': 1721,
                      'Gislaved': 1192, 'Goodyear': 1977, 'Dunlop': 1188, 'Yokohama': 1208, 'Sava': 1772, 'Continental':1210, 'Maxxis': 1776,
                      'Hankook': 1206, 'Pirelli': 1207, 'Cordiant': 1189, 'Tigar': 1771, 'Matador': 1732, 'Falken': 1978, 'Кама': 509,
                      'Viatti': 1195, 'Nitto': 1194, 'Sunfull': 1769, 'Delinte': 1980, 'Laufenn': 1913, 'Aosen': 1981, 'Headway': 1982,
                      'Dunlop JP': 1849, 'Kormoran': 1196, 'Marshal': 1191, 'Kama': 509, 'Nexen': 1213, 'Formula': 1197, 'Triangle': 859,
-                     'Altenzo': 1141, 'Onyx': 2000, 'GT Radial': 1200, 'Sailun': 1232, 'Cachland': 1767, 'HiFly': 2000}
+                     'Altenzo': 1141, 'Onyx': 1999, 'GT Radial': 1200, 'Sailun': 1232, 'Cachland': 1767, 'HiFly': 2000}
 categories_allseason = {}
 # #data = json.loads('https://b2b.4tochki.ru/export_data/M28420.json')  #'http://super-good.ml/test_json.json')
 
@@ -41,8 +41,8 @@ data = r.json()
 
 wheels = data['rims']
 tires = data['tires']
-print(type(wheels[0]), len(wheels[0]))
-print(type(tires[-1]), len(tires[-1]))
+print('wheels', len(wheels))
+print('tires', len(tires))
 print(wheels[0])
 print(tires[-1])
 
@@ -77,7 +77,7 @@ def get_price(product):
 def id_generator(size=8, chars = string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
-print(id_generator())
+
 
 def wheels_from_json(wheels):
     diction = []
@@ -110,9 +110,17 @@ def wheels_from_json(wheels):
         meta_k = 'литые диски, легкосплавные диски, колеса, цена, купить, в Москве, в интернет-магазине'
         meta_h1 = ' '
         params = 1
+        category = 5
+        options = {
+            'et': prod.get('et'),
+            "bolts_spacing": prod.get('bolts_spacing'),
+            'diameter': prod.get('diameter'),
+            'dia': prod.get('dia'),
+            'width': prod.get('width')
+        }
 
         result = [category_id, name, description, price, in_stock, enabled, product_code, vendor, meta_d, meta_k,
-                  params, koeff, meta_h1], image_tuple
+                  params, koeff, meta_h1, category], image_tuple, options
         diction.append(result)
 
     #print(diction)
@@ -122,8 +130,7 @@ def wheels_from_json(wheels):
 def tires_from_json(tyres):
     diction = []
     for prod in tyres:
-
-        print(prod)
+        print('tires_from_json', prod)
         in_stock = count(prod)
         if in_stock >= 4:
             enabled = 1
@@ -135,32 +142,42 @@ def tires_from_json(tyres):
         if vendor == 'Carwel':
             description = name
         elif vendor == '':
-            break
+            continue  #break
         # check category wheels and tyres
         category_id = prod.get('category_id')
         if category_id is None and prod.get('season') == 'Летняя':
             category_id = categories_summer[vendor]
         elif category_id is None and prod.get('season') == 'Зимняя':
             category_id = categories_winter[vendor]
+        elif vendor in categories_summer.keys():
+            category_id = categories_summer[vendor]
+        else:
+            category_id = 3000
         price = get_price(prod)
-
+        category = 12
         product_code = prod['cae']
         image_url = prod.get('img_big_my')
         name_picture = id_generator() + '.png'
         image_tuple = (name_picture, image_url)
         koeff = 1
-        meta_d = 'литые диски ' + name + ' в интернет-магазине шин и дисков 1000koles.ru'
-        meta_k = 'литые диски, легкосплавные диски, колеса, цена, купить, в Москве, в интернет-магазине'
+        meta_d = 'летняя и зимняя резина ' + name + ' в интернет-магазине шин и дисков 1000koles.ru'
+        meta_k = 'летняя и зимняя резина, колеса, цена, купить, в Москве, в интернет-магазине'
         meta_h1 = ' '
         params = 1
+        options = {
+            'diameter': prod.get('diameter'),
+            'width': prod.get('width'),
+            'profile': prod.get('height')
+        }
 
         result = [category_id, name, description, price, in_stock, enabled, product_code, vendor, meta_d, meta_k,
-                  params, koeff, meta_h1], image_tuple
+                  params, koeff, meta_h1, category], image_tuple, options
         diction.append(result)
 
-    #print(diction)
+    # print('tires_from_json', diction)
     return diction
 
 wwwheels = wheels_from_json(wheels)
-tttires = tires_from_json(tires)
-check_and_write(tttires)
+#tttires = tires_from_json(tires)
+# check_write_json(tttires)
+check_write_json(wwwheels)

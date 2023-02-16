@@ -1,0 +1,90 @@
+
+{
+  "order": {
+    "businessId": 820380,
+    "id": 190908741,
+    "fake": false,
+    "currency": "RUR",
+    "paymentType": "PREPAID",
+    "paymentMethod": "YANDEX",
+    "itemsTotal": 3360,
+    "total": 3360,
+    "subsidyTotal": 0,
+    "totalWithSubsidy": 3360,
+    "buyerItemsTotalBeforeDiscount": 4821,
+    "buyerTotalBeforeDiscount": 4821,
+    "buyerItemsTotal": 3360,
+    "buyerTotal": 3360,
+    "taxSystem": "OSN",
+    "delivery": {
+      "type": "PICKUP",
+      "price": 0,
+      "serviceName": "Самовывоз",
+      "deliveryServiceId": 87031,
+      "deliveryPartnerType": "YANDEX_MARKET",
+      "dispatchType": "UNKNOWN",
+      "dates": {
+        "fromDate": "15-02-2023",
+        "toDate": "15-02-2023",
+        "fromTime": "09:00",
+        "toTime": "18:00"
+      },
+      "region": {
+        "id": 98582,
+        "name": "Дмитровский городской округ",
+        "type": "SUBJECT_FEDERATION_DISTRICT",
+        "parent": {
+          "id": 1,
+          "name": "Москва и Московская область",
+          "type": "SUBJECT_FEDERATION",
+          "parent": {
+            "id": 3,
+            "name": "Центральный федеральный округ",
+            "type": "COUNTRY_DISTRICT",
+            "parent": {
+              "id": 225,
+              "name": "Россия",
+              "type": "COUNTRY"
+            }
+          }
+        }
+      },
+      "shipments": [
+        {
+          "id": 186083925,
+          "shipmentDate": "13-02-2023",
+          "weight": 40,
+          "width": 5,
+          "height": 10,
+          "depth": 2,
+          "status": "NEW"
+        }
+      ]
+    },
+    "buyer": {
+      "type": "PERSON"
+    },
+    "items": [
+      {
+        "id": 275930767,
+        "feedId": 9757679,
+        "offerId": "rr701t",
+        "feedCategoryId": "1673930664",
+        "offerName": "RR-701t",
+        "price": 3360,
+        "buyer-price": 3360,
+        "buyerPrice": 3360,
+        "buyerPriceBeforeDiscount": 4821,
+        "subsidy": 0,
+        "count": 1,
+        "params": "",
+        "vat": "VAT_20_120",
+        "fulfilmentShopId": 10771112,
+        "sku": "101893887261",
+        "shopSku": "rr701t",
+        "warehouseId": 280081,
+        "partnerWarehouseId": "e5b68c88-8753-4992-9295-8b770191c646"
+      }
+    ]
+  }
+}

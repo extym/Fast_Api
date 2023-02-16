@@ -137,4 +137,4 @@ def get_tyres_csv():
 
 # mems = sys.getsizeof(get_tyres_csv())
 # print(mems / 1000, 'Kb')
-get_tyres_csv()
+# get_tyres_csv()
