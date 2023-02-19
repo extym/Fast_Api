@@ -125,6 +125,33 @@ import csv
 #
 # #get_ozon_sku()
 
+
+
+##get vendor_vode (SKU), name, barcode from WB
+# def read_price():
+#     with open('./CTM_Wildberries.csv', 'r') as file:
+#         proxy = {}
+#         reader = csv.reader(file, delimiter = '\t')
+#         for row in reader:
+#             #
+#             # print(row[1])
+#             r = ''.join(row)
+#             row = r.split(',')
+#             print(row)
+#             try:
+#                 if row[4] != '':
+#                     proxy[row[0]] =  row[4]  # get vendor_vode (SKU), name, barcode
+#             except:
+#                 continue
+#
+#             print(proxy)
+#             print(len(proxy))
+#
+#
+#     return proxy
+#
+# read_price()
+
 # from datetime import datetime, timezone
 # from backports.zoneinfo import ZoneInfo
 # dt = datetime.now()

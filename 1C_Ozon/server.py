@@ -8,7 +8,7 @@ from gevent.pywsgi import WSGIServer
 import pytz
 from datetime import datetime, timedelta
 from read_json import processing_json,  read_order_json, read_json_sper
-from our_request import data_push
+from our_request import data_psh, data_pshh
 token_market_dbs = ''
 token_market_fbs = ''
 #from cred import token_market_dbs, token_market_fbs
@@ -652,9 +652,11 @@ def form():
 
         '''
 
-@app.route('/check/orders', methods=['POST'])
+@app.route('/check/orders', methods=['GET', 'POST'])
 def check_orders():
-    dt = json.dumps(data_push)
+    data = random.choice([data_psh, data_pshh])
+    dt = json.dumps(data)
+
     return dt
 
 

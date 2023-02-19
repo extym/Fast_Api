@@ -48,7 +48,7 @@ print('index', listt.index('5389'))
 
 
 
-with open('./proxy_wheels.csv', 'r') as file:
+with open('./proxy_wheels (1).csv', 'r') as file:
     count = 0
     liist = []
     reader = csv.reader(file, delimiter = '\t')

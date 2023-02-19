@@ -55,11 +55,11 @@ def count(row):  #dictionary
         # row['rest_yamka'].replace('более ', '')
         in_stock += int(row['rest_yamka'].replace('более ', ''))
 
-    if row.get('price_mkrs') is not None  and isinstance(row.get('price_mkrs'), int):
-        in_stock += row['price_mkrs']
-    elif row.get('price_mkrs') is not None and 'более ' in row.get('price_mkrs'):
-        row['price_mkrs'].replace('более ', '')
-        in_stock += int(row['price_mkrs'])
+    if row.get('rest_mkrs') is not None  and isinstance(row.get('rest_mkrs'), int):
+        in_stock += row['rest_mkrs']
+    elif row.get('rest_mkrs') is not None and 'более ' in row.get('rest_mkrs'):
+        cnt = row['rest_mkrs'].replace('более ', '')
+        in_stock += int(cnt)
 
     return in_stock
 
@@ -70,6 +70,24 @@ def get_price(product):
         price = product['price_yamka'] * 1.18 - 400
     elif product.get('price_mkrs') is not None and isinstance(product.get('price_mkrs'), int):
         price = product['price_mkrs'] * 1.18 - 400
+    price = round(price, 0)
+
+    return price
+
+
+def get_price_tires(product):
+    pre_price = 0
+    if product.get('price_yamka') is not None and isinstance(product.get('price_yamka'), int):
+        pre_price = product['price_yamka']
+    elif product.get('price_mkrs') is not None and isinstance(product.get('price_mkrs'), int):
+        pre_price = product['price_mkrs']
+
+    if product.get('diameter').replace('R', '')\
+            .replace('C', '').replace('Z', '') >= '17':
+        price = pre_price * 1.10
+    else:
+        price = pre_price * 1.12
+
     price = round(price, 0)
 
     return price
@@ -153,7 +171,7 @@ def tires_from_json(tyres):
             category_id = categories_summer[vendor]
         else:
             category_id = 3000
-        price = get_price(prod)
+        price = get_price_tires(prod)
         category = 12
         product_code = prod['cae']
         image_url = prod.get('img_big_my')
@@ -178,6 +196,6 @@ def tires_from_json(tyres):
     return diction
 
 wwwheels = wheels_from_json(wheels)
-#tttires = tires_from_json(tires)
-# check_write_json(tttires)
+tttires = tires_from_json(tires)
+check_write_json(tttires)
 check_write_json(wwwheels)

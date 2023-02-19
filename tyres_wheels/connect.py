@@ -20,7 +20,7 @@ categories = {'Inverno': 1988, 'Jantsa': 1989,  'rFR': 1181, 'RADIUS': 1990, 'Г
               'Carwel': 1969, 'FONDMETAL': 1084, 'iFree': 628, 'KHOMEN': 1968, 'MAK': 1739, 'MANDRUS': 1887,
               'NEO': 1786, 'REPLAY': 1221, 'Tech-Line': 1735, 'Venti': 1718, 'КиК': 1782, 'Евродиск': 62,
               'MOMO': 1785, 'MSW': 1885, 'Neo': 1786, 'OZ': 55, 'Replay': 1221, 'Rial': 1777, 'RST': 1960,
-              'Sparco': 1970, 'Tech Line': 1735,'K&K': 1782, 'OE': 1883, 'Скад': 1926, 'TSW': 1083,
+              'Sparco': 1970, 'Tech Line': 1735,'K&K': 1782, 'OE': 1883, 'Скад': 1926, 'TSW': 1083, 'Magnetto': 723,
               'LS': 1139, 'LegeArtis': 1138, 'LegeArtis Concept': 1140, 'Trebl': 532, 'FR replica': 1181,
               'Yamato': 1145, 'N2O': 1720, 'PDW': 1182, 'CrossStreet': 1873, 'Yokatta': 1143, "NZ": 1134, 'Alcasta': 1130,
               'Race Ready' : 1128, 'Arrivo': 1939, 'Antera': 64, 'Next': 1788, 'X-Race': 1874, 'Hayes Lemmerz' : 1884,
@@ -250,7 +250,7 @@ def make_query(connection, query, data_query):
         print("Query executed successfully from make_query")
         #connection.close()
     except Exception as e:
-        print(f"The error MAKE_QUERY WITHOUT ID'{e}' occurred")
+        print(f"The error '{data_query}'MAKE_QUERY WITHOUT ID'{e}' occurred")
 
     cursor.close()
 
@@ -280,7 +280,7 @@ add_product_picture = ("UPDATE avl_products SET default_picture = %s  WHERE prod
 add_options = ("INSERT INTO avl_product_options_values (optionID, productID, option_value)"
                "VALUES (%s, %s, %s)")
 
-query = (" SELECT in_stock, productID, Price  FROM avl_products"
+query_check = (" SELECT in_stock, productID, Price  FROM avl_products"
          " WHERE categoryID = %s AND product_code = %s")
 
 update = (
@@ -292,7 +292,7 @@ def check_is_exist(product_code, categoryID):
     result = None
     conn = create_connection()
     cursor = conn.cursor()
-    cursor.execute(query, [categoryID, product_code])
+    cursor.execute(query_check, [categoryID, product_code])
     for (in_stock, product_id, price_site) in cursor:
         if product_id:
             result = (True, in_stock, price_site)  # cursor.execute(update, data)
@@ -302,8 +302,8 @@ def check_is_exist(product_code, categoryID):
 
 
 def data_products():
-    # get_wheels()  # Получаем данные с сайта в виде списка словарей
-    # get_tyres_csv()
+    get_wheels()  # Получаем данные с сайта в виде списка словарей
+    get_tyres_csv()
     with open('data_product.json', 'r') as file:
         data_product = json.load(file)
 
@@ -513,7 +513,7 @@ def check_and_write():
                     product_code = data[0][6]
                     price_for_site = data[0][3]
                     if quantity >= 4 and [is_exist[1], is_exist[2]] != [quantity, data[0][3]]:
-                        # print(is_exist[1], is_exist[2], 'quantity2 -', quantity, data[0][3])
+                        print(is_exist[1], is_exist[2], 'quantity2 -', quantity, data[0][3])
                         enabled = 1
                         new_data = [quantity, enabled, category_id, product_code, price_for_site]
                         make_query(connection, update, new_data)  #cursor.execute(update, new_data)
@@ -626,15 +626,15 @@ def check_write_json(data_from_json):
                 product_code = data_product[0][6]
                 price_for_site = data_product[0][3]
                 if quantity >= 4 and [is_exist[1], is_exist[2]] != [quantity, data_product[0][3]]:
-                    print(is_exist[1], is_exist[2], 'quantity2 -', quantity, data_product[0][3])
+                    print(is_exist[1], is_exist[2], 'quantity12 -', quantity, data_product[0][3])
                     enabled = 1
-                    new_data = [quantity, enabled, category_id, product_code, price_for_site]
+                    new_data = [quantity, enabled, category_id, price_for_site, product_code]
                     make_query(connection, update, new_data)  #cursor.execute(update, new_data)
                 elif quantity <= 4 and is_exist[1] != quantity:
-                    print(is_exist[1], 'quantity3 -', quantity)
+                    print(is_exist[1], 'quantity13 -', quantity)
                     enabled = 0
-                    new_data = [quantity, enabled, category_id, product_code, price_for_site]
-                    make_query(update, new_data)  #cursor.execute(update, new_data)
+                    new_data = [quantity, enabled, category_id, price_for_site, product_code]
+                    make_query(connection, update, new_data)  #cursor.execute(update, new_data)
 
 
         elif category == 12:  # and quantity >= 4: ##category_id = 12  --it is tyres
@@ -658,14 +658,14 @@ def check_write_json(data_from_json):
                     product_code = data_product[0][6]
                     price_for_site = data_product[0][3]
                     if quantity >= 4 and [is_exist[1], is_exist[2]] != [quantity, data_product[0][3]]:
-                        print(is_exist[1], is_exist[2], 'quantity2 -', quantity, data_product[0][3])
+                        print(is_exist[1], is_exist[2], 'quantity22 -', quantity, data_product[0][3])
                         enabled = 1
-                        new_data = [quantity, enabled, category_id, product_code, price_for_site]
+                        new_data = [quantity, enabled, category_id, price_for_site, product_code]
                         make_query(connection, update, new_data)  #cursor.execute(update, new_data)
                     elif quantity <= 4 and is_exist[1] != quantity:
-                        print(is_exist[1], 'quantity3 -', quantity)
+                        print(is_exist[1], 'quantity23 -', quantity)
                         enabled = 0
-                        new_data = [quantity, enabled, category_id, product_code, price_for_site]
+                        new_data = [quantity, enabled, category_id, price_for_site, product_code]
                         make_query(connection, update, new_data)  #cursor.execute(update, new_data)
 
             except mysql.connector.Error as err:

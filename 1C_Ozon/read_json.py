@@ -30,10 +30,36 @@ def processing_json():
 
     # print('data', len(data), value)
     # print('result_list', len(result_list))
-    print('value----------===============', value)
+        print('value----------===============', value)
     return result_list
 
 # processing_json()
+
+
+def read_json_wb():
+    r = requests.get('http://super-good.ml/test_json.json')
+    data = r.json()
+    result_list = []
+    for keys, value in data.items():
+        outlets = value[3]
+        if 'WB.НашсклСТМ'  in outlets.keys():  # or 'WB.СверхГБсклСТМ'  in outlets.keys():
+            id_1c = keys
+            vendor_code = value[0]
+            price = value[1].get(u'Цена')  #["\u0426\u0435\u043d\u0430"]
+            quantity = value[2].get(u'Остаток')
+            outlets = value[3]
+            if quantity is None:
+                quantity = 0
+            proxy = (id_1c, vendor_code, price, quantity, outlets)
+            if vendor_code != '' or vendor_code is not None:
+                result_list.append(proxy)
+
+            print('value----------===============', value)
+            # print('data', len(data), value)
+    #print('result_list', result_list[0])
+    return result_list
+
+#read_json_wb()
 
 def read_json_lm():
     r = requests.get('http://super-good.ml/test_json.json')

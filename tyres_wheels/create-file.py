@@ -1,12 +1,13 @@
 from xml.dom import minidom
 import datetime
 from prepare_data_export import get_need_data
+from connect import check_and_write
 
 
 desk_carwel = 'Диски CARWEL- cовременный, динамично развивающийся бренд. Новейшее передовое оборудование и современные технологии по производству литых колесных дисков отвечающие самым высоким стандартам качества и надежности,является не единственным конкурентным преимуществом.'
 categories = { 'iFree' : 628, 'Carwel' : 1969,  'KHOMEN' : 1968,  'КиК' : 1782 , 'Скад'  : 1926}
 
-
+check_and_write()
 
 root = minidom.Document()
 
