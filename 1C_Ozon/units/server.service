@@ -1,0 +1,15 @@
+[Unit]
+Desctiption=uWSGI istance serve server
+After=network.target
+
+[Service]
+User=userbe
+Group=www-data
+
+WorkingDirectory=/home/userbe/artol
+Environment="PATH=/home/userbe/artol/bin"
+ExecStart=/home/userbe/artol/bin/wsgi --ini server.ini
+
+
+[Install]
+WantedBy=multi-user.target

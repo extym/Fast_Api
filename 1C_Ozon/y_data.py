@@ -2,7 +2,7 @@ import pytz
 
 from xml.dom import minidom
 from datetime import datetime
-from read_json import processing_request, processing_json
+from read_json import process_json_list
 
 
 category_parent = {'Строительство и ремонт': 1, "Товары для дома": 2}
@@ -142,7 +142,7 @@ def create_dbs():
         offerChild.appendChild(countOfferChild)
 
 
-    need_data = processing_json()
+    need_data = process_json_list()
     print(type(need_data), len(need_data))
     cnt = 0
     for row in need_data:
@@ -175,9 +175,9 @@ def create_dbs():
 
     xml_str = root.toprettyxml(indent="\t")
     #for development
-    # save_path_file = "yandex-dbs.xml"
+    save_path_file = "yandex-dbs.xml"
     #for production
-    save_path_file = "/var/www/html/2c/yandex-dbs.xml"
+    # save_path_file = "/var/www/html/2c/yandex-dbs.xml"
 
     with open(save_path_file, "w") as f:
         f.write(xml_str)
@@ -278,7 +278,7 @@ def create_fbs():
         offerChild.appendChild(countOfferChild)
 
 
-    need_data = processing_json()
+    need_data = process_json_list()
     print(type(need_data), len(need_data))
     cnt = 0
     for row in need_data:
@@ -314,9 +314,9 @@ def create_fbs():
 
     xml_str = root.toprettyxml(indent="\t")
     #for development
-    # save_path_file = "yandex-fbs.xml"
+    save_path_file = "yandex-fbs.xml"
     #for production
-    save_path_file = "/var/www/html/2c/yandex-fbs.xml"
+    # save_path_file = "/var/www/html/2c/yandex-fbs.xml"
 
     with open(save_path_file, "w") as f:
         f.write(xml_str)
@@ -433,7 +433,7 @@ def create_expresso():
         offerChild.appendChild(countOfferChild)
 
 
-    need_data = processing_json()
+    need_data = process_json_list()
     #print(type(need_data), len(need_data))
     cnt = 0
     for row in need_data:
@@ -469,14 +469,14 @@ def create_expresso():
 
     xml_str = root.toprettyxml(indent="\t")
     #for development
-    # save_path_file = "yandex-exp.xml"
+    save_path_file = "yandex-exp.xml"
     #for production
-    save_path_file = "/var/www/html/2c/yandex-exp.xml"
+    # save_path_file = "/var/www/html/2c/yandex-exp.xml"
 
     with open(save_path_file, "w") as f:
         f.write(xml_str)
 
-
-# create_dbs()
-# create_fbs()
-# create_expresso()
+#
+create_dbs()
+create_fbs()
+create_expresso()

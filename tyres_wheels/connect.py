@@ -12,24 +12,25 @@ from getcsv import get_tyres_csv
 # category_summer = {'Tunga': 1753, 'Bridgestone': 1756, 'Toyo': 1764, 'Kumho': 1924, 'Michelin': 1755, 'BFGoodrich': 1162, 'Nokian Tyres': 1754, 'Gislaved': 1985, 'Goodyear': 1154, 'Dunlop': 1228, 'Yokohama': 1757, 'Sava': 1855, 'Continental':1763, 'Maxxis': 1717, 'Hankook': 1748, 'Pirelli': 1156, 'Cordiant': 1719, 'Tigar': 1166, 'Matador': 1161, 'Falken': 1962, 'Кама': 933, 'Viatti': 1857, 'Nitto': 1765, 'Sunfull': 1923, 'Delinte': 1984, 'Laufenn': 1750, 'Aosen': 1983, 'Headway': 1177}
 # category_winter = {'Bridgestone': 1723, 'Toyo': 1770, 'Kumho': 1773, 'Michelin': 1976, 'BFGoodrich': 1214, 'Nokian Tyres': 1721, 'Gislaved': 1192, 'Goodyear': 1977, 'Dunlop': 1188, 'Yokohama': 1208, 'Sava': 1772, 'Continental':1210, 'Maxxis': 1776, 'Hankook': 1206, 'Pirelli': 1207, 'Cordiant': 1189, 'Tigar': 1771, 'Matador': 1732, 'Falken': 1978, 'Кама': 509, 'Viatti': 1195, 'Nitto': 1194, 'Sunfull': 1769, 'Delinte': 1980, 'Laufenn': 1913, 'Aosen': 1981, 'Headway': 1982}
 # category_allseason = {}
-
-categories = {'Inverno': 1988, 'Jantsa': 1989,  'rFR': 1181, 'RADIUS': 1990, 'ГАЗ': 1991, 'LF Works': 1992,
-              'Remain': 1993, 'rtr': 1994, 'BLACK RHINO': 1995, 'BEYERN': 1897, 'REDBOURNE': 1901, 'LUMARAI': 1898,
-              'COVENTRY': 1903, 'VICTOR': 1893, 'Accuride': 1972, 'Asterro': 1974, 'Lemmerz/Maxion': 1973,
-              'Maxion': 1973, 'Tracston': 1975, 'Alutec': 1736, 'ANTERA': 64, 'ATS': 1081, 'BBS': 1737, 'Borbet': 1738,
-              'Carwel': 1969, 'FONDMETAL': 1084, 'iFree': 628, 'KHOMEN': 1968, 'MAK': 1739, 'MANDRUS': 1887,
-              'NEO': 1786, 'REPLAY': 1221, 'Tech-Line': 1735, 'Venti': 1718, 'КиК': 1782, 'Евродиск': 62,
-              'MOMO': 1785, 'MSW': 1885, 'Neo': 1786, 'OZ': 55, 'Replay': 1221, 'Rial': 1777, 'RST': 1960,
-              'Sparco': 1970, 'Tech Line': 1735,'K&K': 1782, 'OE': 1883, 'Скад': 1926, 'TSW': 1083, 'Magnetto': 723,
-              'LS': 1139, 'LegeArtis': 1138, 'LegeArtis Concept': 1140, 'Trebl': 532, 'FR replica': 1181,
-              'Yamato': 1145, 'N2O': 1720, 'PDW': 1182, 'CrossStreet': 1873, 'Yokatta': 1143, "NZ": 1134, 'Alcasta': 1130,
-              'Race Ready' : 1128, 'Arrivo': 1939, 'Antera': 64, 'Next': 1788, 'X-Race': 1874, 'Hayes Lemmerz' : 1884,
-              'Aero': 1875, 'Steger': 1879, 'Buffalo': 1882, 'ТЗСК': 1996, 'Harp': 1889, 'Off-Road Wheels': 1997,
-              'Khomen Wheels': 1968, 'LS FlowForming': 1139, 'Better': 1986, 'Lizardo': 1987, 'YST': 827, 'LS Forged': 1998}
-
+#
+# categories = {'Inverno': 1988, 'Jantsa': 1989,  'rFR': 1181, 'RADIUS': 1990, 'ГАЗ': 1991, 'LF Works': 1992,
+#               'Remain': 1993, 'rtr': 1994, 'BLACK RHINO': 1995, 'BEYERN': 1897, 'REDBOURNE': 1901, 'LUMARAI': 1898,
+#               'COVENTRY': 1903, 'VICTOR': 1893, 'Accuride': 1972, 'Asterro': 1974, 'Lemmerz/Maxion': 1973,
+#               'Maxion': 1973, 'Tracston': 1975, 'Alutec': 1736, 'ANTERA': 64, 'ATS': 1081, 'BBS': 1737, 'Borbet': 1738,
+#               'Carwel': 1969, 'FONDMETAL': 1084, 'iFree': 628, 'KHOMEN': 1968, 'MAK': 1739, 'MANDRUS': 1887,
+#               'NEO': 1786, 'REPLAY': 1221, 'Tech-Line': 1735, 'Venti': 1718, 'КиК': 1782, 'Евродиск': 62,
+#               'MOMO': 1785, 'MSW': 1885, 'Neo': 1786, 'OZ': 55, 'Replay': 1221, 'Rial': 1777, 'RST': 1960,
+#               'Sparco': 1970, 'Tech Line': 1735,'K&K': 1782, 'OE': 1883, 'Скад': 1926, 'TSW': 1083, 'Magnetto': 723,
+#               'LS': 1139, 'LegeArtis': 1138, 'LegeArtis Concept': 1140, 'Trebl': 532, 'FR replica': 1181,
+#               'Yamato': 1145, 'N2O': 1720, 'PDW': 1182, 'CrossStreet': 1873, 'Yokatta': 1143, "NZ": 1134, 'Alcasta': 1130,
+#               'Race Ready' : 1128, 'Arrivo': 1939, 'Antera': 64, 'Next': 1788, 'X-Race': 1874, 'Hayes Lemmerz' : 1884,
+#               'Aero': 1875, 'Steger': 1879, 'Buffalo': 1882, 'ТЗСК': 1996, 'Harp': 1889, 'Off-Road Wheels': 1997,
+#               'Khomen Wheels': 1968, 'LS FlowForming': 1139, 'Better': 1986, 'Lizardo': 1987, 'YST': 827, 'LS Forged': 1998}
+from categories import categories_summer, categories_wheels, categories_winter, categories_allseason
 
 def write(smth):
-    with open('log.txt', 'a') as file:
+    # with open('log.txt', 'a') as file:
+    with open('/usr/local/bin/fuck_debian/tyres_wheels/log.txt', 'a') as file:
         how_time = datetime.datetime.now()
         file.write(str(how_time) + '-' + smth + '\n')
 
@@ -59,7 +60,8 @@ def is_in_stocks(dictionary):
 
 
 def write_pictures_data(listt):
-    with open('dict_images.json', "w") as file:
+    # with open('dict_images.json', "w") as file:
+    with open('/usr/local/bin/fuck_debian/tyres_wheels/dict_images.json', "w") as file:
         json.dump(listt, file)
 
 
@@ -84,7 +86,7 @@ def standart_product(dictionary, in_stock):
         # check category wheels and tyres
         category_id = dictionary.get('category_id')
         if category_id is None:
-            category_id = categories[vendor]
+            category_id = categories_wheels[vendor]
         price = dictionary.get('price_b2b')
         if price is None:
             price = dictionary['price']['rrc'] - 400
@@ -221,6 +223,8 @@ def create_connection():
     try:
         connx = mysql.connector.connect(user='root', database='db1000koles',
                                       password='toor_Pass1!', host='localhost')  #password='12345678',
+        # connx = mysql.connector.connect(user='kolesru', database='kolesru',
+        #                                 password='9fUev3XGWb18glvs', host='localhost')
     except ConnectionError as error:
         print(f'We have ERROR CREATE_CONN {error}')
 
@@ -233,7 +237,7 @@ def make_query_get_id(connection, query, data_query):
         cursor.execute(query, data_query)
         connection.commit()
         lastrow_id = cursor.lastrowid
-        print("Query executed successfully from make_query_get_id")
+        #print("Query executed successfully from make_query_get_id")
         #connection.close()
     except Exception as e:
         print(f"The error MAKE_QUERY'{e}' occurred")
@@ -247,7 +251,7 @@ def make_query(connection, query, data_query):
     try:
         cursor.execute(query, data_query)
         connection.commit()
-        print("Query executed successfully from make_query")
+        #print("Query executed successfully from make_query")
         #connection.close()
     except Exception as e:
         print(f"The error '{data_query}'MAKE_QUERY WITHOUT ID'{e}' occurred")
@@ -304,13 +308,14 @@ def check_is_exist(product_code, categoryID):
 def data_products():
     get_wheels()  # Получаем данные с сайта в виде списка словарей
     get_tyres_csv()
-    with open('data_product.json', 'r') as file:
+    with open('/usr/local/bin/fuck_debian/tyres_wheels/data_product.json', 'r') as file:
+    # with open('data_product.json', 'r') as file:
         data_product = json.load(file)
 
     print(datetime.datetime.now(), 'file read')
     return data_product
 
-
+#is need compare price from different vendor?
 # def data_product_compare(smth_dict, smth_list):
 #     if smth_dict['vendorCode'] != smth_list[2]:
 #         result = False
@@ -351,120 +356,6 @@ def data_products():
 # data_from = data_products()
 # data_from = get_tyres_csv()
 
-# ij_data = []
-# count = 0
-# for data_product in data_from:
-#     try:
-#         category = data_product.get('category')
-#         quantity = is_in_stocks(data_product)
-#         if category in [1, 4, 5, 7]:  # and quantity >= 4: ###wheels only
-#             # try:
-#             data = product(data_product, quantity)
-#             if data is not False:
-#                 is_exist = check_is_exist(data[0][6], data[0][0])
-#                 if is_exist is None and quantity >= 4:
-#                     cursor.execute(add_product, data[0])
-#                     product_id = cursor.lastrowid
-#                     ij_data.append(prepare_get_image(product_id, data[1]))
-#                     # print("pictures -", product_id, data[1][0])
-#                     cursor.execute(add_pictures, [product_id, data[1][0]])
-#                     picture_id = cursor.lastrowid
-#                     proxy_data = [picture_id, product_id]
-#                     cursor.execute(add_product_picture, proxy_data)
-#                     write_pictures_data(ij_data)
-#                     dict_options = params_data(data_product)
-#                     data_options = params_options(dict_options)
-#                     for option in data_options:
-#                         cursor.execute(add_options, option)
-#                 elif is_exist is not None:
-#                     category_id = categories[data[0][7]]
-#                     product_code = data[0][6]
-#                     price_for_site = data[0][3]
-#                     if quantity >= 4 and [is_exist[1], is_exist[2]] != [quantity, data[0][3]]:
-#                         # print(is_exist[1], is_exist[2], 'quantity2 -', quantity, data[0][3])
-#                         enabled = 1
-#                         new_data = [quantity, enabled, category_id, product_code, price_for_site]
-#                         cursor.execute(update, new_data)
-#                     elif quantity <= 4 and is_exist[1] != quantity:
-#                         # print(is_exist[1], 'quantity3 -', quantity)
-#                         enabled = 0
-#                         new_data = [quantity, enabled, category_id, product_code, price_for_site]
-#                         cursor.execute(update, new_data)
-#
-#             # except mysql.connector.Error as err:
-#             #     write("Something went wrong connector: {}".format(err))
-#             #     write(str(data_product))
-#             #     print ("Something went wrong connector: {}".format(err))
-#             #     print (str(data_product))
-#             #     continue
-#             # except KeyError as e:
-#             #     write("Something went wrong KeyError: {}".format(e))
-#             #     write(str(data_product))
-#             #     print ("Something went wrong KeyError: {}".format(e))
-#             #     print (str(data_product))
-#             #     continue
-#
-#         elif category == 12:  # and quantity >= 4: ##category_id = 12  --it is tyres
-#             try:
-#                 data = product(data_product, quantity)
-#                 print('1111', data[0][6], data[0][3], quantity, data[0][0])
-#                 is_exist = check_is_exist(data[0][6], data[0][0])
-#                 if is_exist is None and quantity >= 4:
-#                     cursor.execute(add_product, data[0])
-#                     product_id = cursor.lastrowid
-#                     ij_data.append(prepare_get_image(product_id, data[1]))
-#                     # print("pictures -", product_id, data[1][0])
-#                     cursor.execute(add_pictures, [product_id, data[1][0]])
-#                     picture_id = cursor.lastrowid
-#                     proxy_data = [picture_id, product_id]
-#                     cursor.execute(add_product_picture, proxy_data)
-#                     write_pictures_data(ij_data)
-#                     #dict_options = params_data(data_product)
-#
-#                     data_options_tyres = params_options_tyres(data_product)
-#                     for option in data_options_tyres:
-#                         cursor.execute(add_options, option)
-#                 elif is_exist is not None:
-#                     category_id = data[0][0]  # because we get data from csv and has category_id
-#                     product_code = data[0][6]
-#                     price_for_site = data[0][3]
-#                     if quantity >= 4 and [is_exist[1], is_exist[2]] != [quantity, data[0][3]]:
-#                         # print(is_exist[1], is_exist[2], 'quantity2 -', quantity, data[0][3])
-#                         enabled = 1
-#                         new_data = [quantity, enabled, category_id, product_code, price_for_site]
-#                         cursor.execute(update, new_data)
-#                     elif quantity <= 4 and is_exist[1] != quantity:
-#                         # print(is_exist[1], 'quantity3 -', quantity)
-#                         enabled = 0
-#                         new_data = [quantity, enabled, category_id, product_code, price_for_site]
-#                         cursor.execute(update, new_data)
-#
-#             except mysql.connector.Error as err:
-#                 write("S_thing went wrong connector tyres: {}".format(err))
-#                 write(str(data_product))
-#                 print("S_thing went wrong connector tyres: {}".format(err))
-#                 print(str(data_product))
-#                 continue
-#             except KeyError as e:
-#                 write("S_thing went wrong KeyError tyres---: {}".format(e))
-#                 write(str(data_product))
-#                 print("S_thing went wrong KeyError tyres---: {}".format(e))
-#                 print(str(data_product))
-#                 continue
-#
-#         else:
-#             # print('pass', category)
-#             continue
-#
-#     except KeyError as e:
-#         write("Something went wrong KeyError2: {}".format(e))
-#         write(str(data_product))
-#         # print("Something went wrong KeyError2: {}".format(e))
-#         # print(str(data_product))
-#         count += 1
-#         continue
-#
-# # print(data_product[:5], sep='\n')
 #
 # # Make sure data is committed to the database
 # cnx.commit()
@@ -509,25 +400,25 @@ def check_and_write():
 
 
                 elif is_exist is not None:
-                    category_id = categories[data[0][7]]
+                    category_id = categories_wheels[data[0][7]]
                     product_code = data[0][6]
                     price_for_site = data[0][3]
                     if quantity >= 4 and [is_exist[1], is_exist[2]] != [quantity, data[0][3]]:
                         print(is_exist[1], is_exist[2], 'quantity2 -', quantity, data[0][3])
                         enabled = 1
-                        new_data = [quantity, enabled, category_id, product_code, price_for_site]
+                        new_data = [price_for_site, quantity, enabled, category_id, product_code]
                         make_query(connection, update, new_data)  #cursor.execute(update, new_data)
                     elif quantity <= 4 and is_exist[1] != quantity:
                         # print(is_exist[1], 'quantity3 -', quantity)
                         enabled = 0
-                        new_data = [quantity, enabled, category_id, product_code, price_for_site]
-                        make_query(update, new_data)  #cursor.execute(update, new_data)
+                        new_data = [price_for_site, quantity, enabled, category_id, product_code]
+                        make_query(connection, update, new_data)  #cursor.execute(update, new_data)
 
 
         elif category == 12:  # and quantity >= 4: ##category_id = 12  --it is tyres
             try:
                 data = standart_product(data_product, quantity)
-                print('tires', data[0][6], data[0][3], quantity, data[0][0])
+                #print('tires', data[0][6], data[0][3], quantity, data[0][0])
                 is_exist = check_is_exist(data[0][6], data[0][0])
                 if is_exist is None and quantity >= 4:
                       #cursor.execute(add_product, data[0])
@@ -551,12 +442,12 @@ def check_and_write():
                     if quantity >= 4 and [is_exist[1], is_exist[2]] != [quantity, data[0][3]]:
                         # print(is_exist[1], is_exist[2], 'quantity2 -', quantity, data[0][3])
                         enabled = 1
-                        new_data = [quantity, enabled, category_id, product_code, price_for_site]
+                        new_data = [price_for_site, quantity, enabled, category_id, product_code]
                         make_query(connection, update, new_data)  #cursor.execute(update, new_data)
                     elif quantity <= 4 and is_exist[1] != quantity:
                         # print(is_exist[1], 'quantity3 -', quantity)
                         enabled = 0
-                        new_data = [quantity, enabled, category_id, product_code, price_for_site]
+                        new_data = [price_for_site, quantity, enabled, category_id, product_code]
                         make_query(connection, update, new_data)  #cursor.execute(update, new_data)
 
             except mysql.connector.Error as err:
@@ -622,7 +513,7 @@ def check_write_json(data_from_json):
                     make_query(connection, add_options, option)
 
             elif is_exist is not None:
-                category_id = categories[data_product[0][7]]
+                category_id = categories_wheels[data_product[0][7]]
                 product_code = data_product[0][6]
                 price_for_site = data_product[0][3]
                 if quantity >= 4 and [is_exist[1], is_exist[2]] != [quantity, data_product[0][3]]:

@@ -2,7 +2,7 @@ import pytz
 
 from xml.dom import minidom
 from datetime import datetime
-from read_json import processing_json
+from read_json import process_json_list
 
 
 category_parent = {'Строительство и ремонт': 1, "Товары для дома": 2}
@@ -141,7 +141,7 @@ def create_sp():
         offerChild.appendChild(countOfferChild)
 
 
-    need_data = processing_json()
+    need_data = process_json_list()
     print(type(need_data), len(need_data))
     cnt = 0
     for row in need_data:

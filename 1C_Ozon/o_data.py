@@ -2,7 +2,7 @@ import pytz
 import json
 from xml.dom import minidom
 from datetime import datetime
-from read_json import processing_request, processing_json
+from read_json import process_json_list
 
 # warehouses = {21405051875000: "Октябрьский малый", 23012928587000: "Октябрьский крупногабарит", 23138678478000: "Октябрьский новый крупногабаритный", 23990969841000: "Основной склад - Курьеры", 23997026419000: "Осн склад Курьеры некрупный груз до 25кг",
 #               1020000039316000: "RFBS наш склад Деловые Линии", 1020000068495000: "НАША ДОСТАВКА Москва и МО", 1020000075732000: "RFBS наш склад СДЭК"}
@@ -133,7 +133,7 @@ def o_create():
         # offerChild.appendChild(minQuantityOfferChild)
 
 
-    need_data = processing_json()  #get_need_data()
+    need_data = process_json_list()  #get_need_data()
     #print(len(need_data), type(need_data))
     count = 0
     for value in need_data:  #our_data[10:]:
@@ -173,12 +173,12 @@ def o_create():
 
     xml_str = root.toprettyxml(indent="\t")
     #for development
-    # save_path_file = "ozon_data.xml"
+    save_path_file = "ozon_data.xml"
     #for production
-    save_path_file = "/var/www/html/2c/ozon_data.xml"
+    # save_path_file = "/var/www/html/2c/ozon_data.xml"
 
     with open(save_path_file, "w") as f:
         f.write(xml_str)
 
 
-#o_create()
+o_create()

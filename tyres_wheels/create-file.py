@@ -173,9 +173,9 @@ xml_root.appendChild(productChild)
 
 xml_str = root.toprettyxml(indent="\t")
 #for development
-save_path_file = "yandex.xml"
+# save_path_file = "yandex.xml"
 #for production
-#save_path_file = "/home/ivanovka/data/www/1000koles.ru/pictures/yandex.xml"
+save_path_file = "/home/ivanovka/data/www/1000koles.ru/pictures/yandex.xml"
 
 with open(save_path_file, "w") as f:
     f.write(xml_str)
