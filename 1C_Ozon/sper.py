@@ -4,6 +4,7 @@ from datetime import datetime
 from read_json import read_json_sper
 from cred import test_token_sper, token_sper
 
+url = 'https://partner.sbermegamarket.ru/api/merchantIntegration/v1/offerService/'
 
 def stocks_update():
     data_from = read_json_sper()
@@ -19,24 +20,29 @@ def stocks_update():
     send_data = {
     "meta": {},
     "data": {
-        "token": test_token_sper,
+        "token": token_sper,
         "stocks": stocks_sb
         }
     }
-    print('send', send_data)
+    print('create_send_stocks_sb', len(stocks_sb))
+
     return send_data
 
-
-def send_stocks():
+def send_stocks_sb():
     data = stocks_update()
-    url = 'https://partner.sbermegamarket.ru/api/merchantIntegration/v1/offerService/'
     headers = {'Content-type': 'application/json'
                }
     metod = 'stock/update'
     url_address = url + metod #+ '?login=' + login_lm + '&password=' + pass_lm
     answer = requests.post(url_address, headers=headers, data=json.dumps(data))
     
-    print(answer)
+    print('send_stocks_sb', answer, answer.text)
 
-
-#send_stocks()
+#send_stocks_sb()
+test_url = 'http://localhost:5500/response'
+async def post_smth_sb(metod, data):
+    headers = {'Content-type': 'application/json'}
+    # target_url = test_url  #TODO for TEST ONLY
+    target_url = url + metod  #TODO for PRODUCTION
+    response = requests.post(target_url, headers=headers, data=json.dumps(data))
+    print('post_smth_sb', response, response.text, target_url, metod)

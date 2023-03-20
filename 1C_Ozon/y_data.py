@@ -26,7 +26,7 @@ def create_dbs():
     # date = datetime.datetime.now(datetime.timezone.utc).isoformat()
     date = datetime.now(pytz.timezone("Africa/Nairobi")).replace(microsecond=0).isoformat()
     #
-    #print(date)
+    #printt(date)
     xml_root = root.createElement('yml_catalog')
     root.appendChild(xml_root)
     xml_root.setAttribute('date', date)
@@ -143,7 +143,7 @@ def create_dbs():
 
 
     need_data = process_json_list()
-    print(type(need_data), len(need_data))
+    #print(type(need_data), len(need_data))
     cnt = 0
     for row in need_data:
         if 'YM.НашадостСклОкт' in row[4]:
@@ -175,9 +175,9 @@ def create_dbs():
 
     xml_str = root.toprettyxml(indent="\t")
     #for development
-    save_path_file = "yandex-dbs.xml"
+    # save_path_file = "yandex-dbs.xml"
     #for production
-    # save_path_file = "/var/www/html/2c/yandex-dbs.xml"
+    save_path_file = "/var/www/html/stm/yandex-dbs.xml"
 
     with open(save_path_file, "w") as f:
         f.write(xml_str)
@@ -279,7 +279,7 @@ def create_fbs():
 
 
     need_data = process_json_list()
-    print(type(need_data), len(need_data))
+    #print(type(need_data), len(need_data))
     cnt = 0
     for row in need_data:
         if 'YM.СТМ' in row[4]:
@@ -314,9 +314,9 @@ def create_fbs():
 
     xml_str = root.toprettyxml(indent="\t")
     #for development
-    save_path_file = "yandex-fbs.xml"
+    # save_path_file = "yandex-fbs.xml"
     #for production
-    # save_path_file = "/var/www/html/2c/yandex-fbs.xml"
+    save_path_file = "/var/www/html/stm/yandex-fbs.xml"
 
     with open(save_path_file, "w") as f:
         f.write(xml_str)
@@ -327,7 +327,7 @@ def create_expresso():
 
     # date = datetime.datetime.now(datetime.timezone.utc).isoformat()
     date = datetime.now(pytz.timezone("Africa/Nairobi")).replace(microsecond=0).isoformat()
-    #print(date)
+    #printt(date)
     xml_root = root.createElement('yml_catalog')
     root.appendChild(xml_root)
     xml_root.setAttribute('date', date)
@@ -434,7 +434,7 @@ def create_expresso():
 
 
     need_data = process_json_list()
-    #print(type(need_data), len(need_data))
+    #printt(type(need_data), len(need_data))
     cnt = 0
     for row in need_data:
         if 'YM.СклЭкспресс' in row[4]:
@@ -469,14 +469,14 @@ def create_expresso():
 
     xml_str = root.toprettyxml(indent="\t")
     #for development
-    save_path_file = "yandex-exp.xml"
+    # save_path_file = "yandex-exp.xml"
     #for production
-    # save_path_file = "/var/www/html/2c/yandex-exp.xml"
+    save_path_file = "/var/www/html/stm/yandex-exp.xml"
 
     with open(save_path_file, "w") as f:
         f.write(xml_str)
 
 #
-create_dbs()
-create_fbs()
-create_expresso()
+# create_dbs()
+# create_fbs()
+# create_expresso()

@@ -1,3 +1,5 @@
+import json
+
 proxy_sper = {
   "data": {
     "merchantId": 5046,
@@ -6,6 +8,30 @@ proxy_sper = {
         "shipmentId": "946032218",
         "shipmentDate": "2021-02-17T09:34:03+03:00",
         "items": [
+          {
+            "itemIndex": "1",
+            "goodsId": "100023763738",
+            "offerId": "3951",
+            "itemName": "Вертикальный пылесос Kitfort  KT-535-2 White",
+            "price": 11990,
+            "finalPrice": 5995,
+            "discounts": [
+              {
+                "discountType": "BPG20",
+                "discountDescription": "BPG20",
+                "discountAmount": 1424
+              },
+              {
+                "discountType": "LOY",
+                "discountDescription": "Скидка БР",
+                "discountAmount": 4571
+              }
+            ],
+            "quantity": 1,
+            "taxRate": "20",
+            "reservationPerformed": True,
+            "isDigitalMarkRequired": False
+          },
           {
             "itemIndex": "1",
             "goodsId": "100023763738",
@@ -57,10 +83,192 @@ proxy_sper = {
   }
 }
 
-proxy_lm = {
+proxy_lm = [
+  {
+    "id": "MP703473-001",
+    "pickup": {
+      "deliveryServiceId": 123600,
+      "deliveryServiceName": "Леруа Мерлен сервис доставки",
+      "warehouseId": "1200",
+      "timeInterval": "Invalid Interval",
+      "pickupDate": "2022-12-14"
+    },
+    "products": [
+      {
+        "lmId": "90115665",
+        "vendorCode": "OW29.50.12",
+        "price": 5860,
+        "qty": 3,
+        "comissionRate": 0
+      },
+      {
+        "lmId": "90121362",
+        "vendorCode": "OWLM200103",
+        "price": 5860,
+        "qty": 2,
+        "comissionRate": 0
+      }
+    ],
+    "deliveryCost": 0,
+    "parcelPrice": 5860,
+    "creationDate": "2022-12-14",
+    "promisedDeliveryDate": "2022-12-22",
+    "calculatedWeight": 4.8,
+    "calculatedLength": 707,
+    "calculatedHeight": 156,
+    "calculatedWidth": 686
+  },
+  {
+    "id": "MP7703472-001",
+    "pickup": {
+      "deliveryServiceId": 123600,
+      "deliveryServiceName": "Леруа Мерлен сервис доставки",
+      "warehouseId": "1200",
+      "timeInterval": "Invalid Interval",
+      "pickupDate": "2022-12-14"
+    },
+    "products": [
+      {
+        "lmId": "90115665",
+        "vendorCode": "OWLM200103",
+        "price": 5860,
+        "qty": 3,
+        "comissionRate": 0
+      },
+      {
+        "lmId": "90121362",
+        "vendorCode": "OW23.40.00",
+        "price": 5860,
+        "qty": 3,
+        "comissionRate": 0
+      }
+    ],
+    "deliveryCost": 0,
+    "parcelPrice": 5860,
+    "creationDate": "2022-12-14",
+    "promisedDeliveryDate": "2022-12-22",
+    "calculatedWeight": 4.8,
+    "calculatedLength": 707,
+    "calculatedHeight": 156,
+    "calculatedWidth": 686
+  },
+  {
+    "id": "MP7703471-001",
+    "pickup": {
+      "deliveryServiceId": 123600,
+      "deliveryServiceName": "Леруа Мерлен сервис доставки",
+      "warehouseId": "1200",
+      "timeInterval": "Invalid Interval",
+      "pickupDate": "2022-12-14"
+    },
+    "products": [
+      {
+        "lmId": "90115665",
+        "vendorCode": "OW23.40.00",
+        "price": 5860,
+        "qty": 3,
+        "comissionRate": 0
+      },
+      {
+        "lmId": "90121362",
+        "vendorCode": "OWLM200103",
+        "price": 5860,
+        "qty": 3,
+        "comissionRate": 0
+      }
+    ],
+    "deliveryCost": 0,
+    "parcelPrice": 5860,
+    "creationDate": "2022-12-14",
+    "promisedDeliveryDate": "2022-12-22",
+    "calculatedWeight": 4.8,
+    "calculatedLength": 707,
+    "calculatedHeight": 156,
+    "calculatedWidth": 686
+  }
+]
+
+proxy_onon = {
+    "result": {
+        "posting_number": "57195475-0050-3",
+        "order_id": 438764970,
+        "order_number": "57195475-0050",
+        "status": "awaiting_packaging",
+        "delivery_method": {
+            "id": 18114520187000,
+            "name": "Ozon Логистика самостоятельно, Москва",
+            "warehouse_id": 18114520187000,
+            "warehouse": "Москва основной",
+            "tpl_provider_id": 24,
+            "tpl_provider": "Ozon Логистика"
+            },
+        "tracking_number": "",
+        "tpl_integration_type": "ozon",
+        "in_process_at": "2021-11-20T09:14:16Z",
+        "shipment_date": "2021-11-23T10:00:00Z",
+        "delivering_date": None,
+        "provider_status": "",
+        "delivery_price": "",
+        "cancellation": {
+            "cancel_reason_id": 0,
+            "cancel_reason": "",
+            "cancellation_type": "",
+            "cancelled_after_ship": False,
+            "affect_cancellation_rating": False,
+            "cancellation_initiator": ""
+            },
+        "customer": None,
+        "addressee": None,
+        "products": [
+            {
+            "currency_code": "RUB",
+            "price": "2279.0000",
+            "offer_id": "OWLT190301",
+            "name": "Кофе ароматизированный \"Шоколадный апельсин\" 250 гр",
+            "sku": 180550365,
+            "quantity": 1,
+            "mandatory_mark": [],
+            "dimensions": {
+                "height": "40.00",
+                "length": "240.00",
+                "weight": "260",
+                "width": "140.00"
+                }
+            },
+            {
+                "currency_code": "RUB",
+                "price": "777.0000",
+                "offer_id": "ИМOWLT190402",
+                "name": "Кофе ароматизированный \"Шоколадный апельсин\" 250 гр",
+                "sku": 180550365,
+                "quantity": 1,
+                "mandatory_mark": [],
+                "dimensions": {
+                    "height": "40.00",
+                    "length": "240.00",
+                    "weight": "260",
+                    "width": "140.00"
+                }
+            }
+        ],
+        "barcodes": None,
+        "analytics_data": None,
+        "financial_data": None,
+        "additional_data": [],
+        "is_express": False,
+        "requirements": {
+            "products_requiring_gtd": [],
+            "products_requiring_country": []
+            },
+        "product_exemplars": None
+        }
+    }
+
+
+proxy_lm_2 = {
    "id":"MP1703473-001",
    "pickup":{},
-   "products":[
+   "products": [
       {
          "lmId":"90115665",
          "vendorCode":"BT2834B",
@@ -315,3 +523,20 @@ proxy_wb_orders = {
       }
    ]
 }
+
+ozon_wh_id = {'OZ.ОктМал': (921405051875000,"Октябрьский малый"),'OZ.ОктКГnew': (23138678478000, "Октябрьский новый крупногабаритный"),
+              'OZ.ОснКурьер': (23990969841000, "Основной склад - Курьеры"),'OZ.ОснКурьердо25': (23997026419000, "Осн склад Курьеры некрупный груз до 25кг"),
+                'OZ.RFBSнашсклДЛ': (1020000039316000, "RFBS наш склад Деловые Линии"),'OZ.НашадостМиМО': (1020000068495000, "НАША ДОСТАВКА Москва и МО"),
+               'OZ.RFBSНашсклСДЭК' : (1020000075732000, "RFBS наш склад СДЭК"), "OZ.ДостКГ": (23012928587000, "Новая доставка Крупный груз")}
+
+warehouses_id = {21405051875000: "Октябрьский малый", 23012928587000: "Октябрьский крупногабарит", 23138678478000: "Октябрьский новый крупногабаритный",
+                 23990969841000: "Основной склад - Курьеры", 23997026419000: "Осн склад Курьеры некрупный груз до 25кг",
+               1020000039316000: "RFBS наш склад Деловые Линии", 1020000068495000: "НАША ДОСТАВКА Москва и МО", 1020000075732000: "RFBS наш склад СДЭК"}
+
+# def convert(string):
+#     data = json.dumps(string)
+#     print(data)
+# # pr = [{'id': 'MP1703473-001', 'pickup': {'deliveryServiceId': 123600, 'deliveryServiceName': 'Леруа Мерлен сервис доставки', 'warehouseId': '1200', 'timeInterval': 'Invalid Interval', 'pickupDate': '2022-12-14'}, 'products': [{'lmId': '90115665', 'vendorCode': 'BT2834B', 'price': 5860, 'qty': 3, 'comissionRate': 0}, {'lmId': '90121362', 'vendorCode': 'HPUV65ELC', 'price': 5860, 'qty': 3, 'comissionRate': 0}], 'deliveryCost': 0, 'parcelPrice': 5860, 'creationDate': '2022-12-14', 'promisedDeliveryDate': '2022-12-22', 'calculatedWeight': 4.8, 'calculatedLength': 707, 'calculatedHeight': 156, 'calculatedWidth': 686}, {'id': 'MP1703472-001', 'pickup': {'deliveryServiceId': 123600, 'deliveryServiceName': 'Леруа Мерлен сервис доставки', 'warehouseId': '1200', 'timeInterval': 'Invalid Interval', 'pickupDate': '2022-12-14'}, 'products': [{'lmId': '90115665', 'vendorCode': 'BT2834B', 'price': 5860, 'qty': 3, 'comissionRate': 0}, {'lmId': '90121362', 'vendorCode': 'HPUV65ELC', 'price': 5860, 'qty': 3, 'comissionRate': 0}], 'deliveryCost': 0, 'parcelPrice': 5860, 'creationDate': '2022-12-14', 'promisedDeliveryDate': '2022-12-22', 'calculatedWeight': 4.8, 'calculatedLength': 707, 'calculatedHeight': 156, 'calculatedWidth': 686}, {'id': 'MP1703471-001', 'pickup': {'deliveryServiceId': 123600, 'deliveryServiceName': 'Леруа Мерлен сервис доставки', 'warehouseId': '1200', 'timeInterval': 'Invalid Interval', 'pickupDate': '2022-12-14'}, 'products': [{'lmId': '90115665', 'vendorCode': 'BT2834B', 'price': 5860, 'qty': 3, 'comissionRate': 0}, {'lmId': '90121362', 'vendorCode': 'HPUV65ELC', 'price': 5860, 'qty': 3, 'comissionRate': 0}], 'deliveryCost': 0, 'parcelPrice': 5860, 'creationDate': '2022-12-14', 'promisedDeliveryDate': '2022-12-22', 'calculatedWeight': 4.8, 'calculatedLength': 707, 'calculatedHeight': 156, 'calculatedWidth': 686}]
+# pr = {'message_type': 'TYPE_NEW_POSTING', 'seller_id': 90963, 'warehouse_id': 1020000075732000, 'posting_number': '13223249-0059-1', 'in_process_at': '2023-03-18T03:56:36Z', 'products': [{'sku': 789880982, 'quantity': 1}]}
+# convert(pr)
+

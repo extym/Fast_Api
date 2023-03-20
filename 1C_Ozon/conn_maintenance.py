@@ -24,7 +24,7 @@ UNIQUE (id_mp)
 create_delivered_orders_table = """
 CREATE TABLE IF NOT EXISTS fresh_orders (
 id SERIAL PRIMARY KEY,
-id_MP varchar NOT NULL,
+id_mp varchar NOT NULL,
 our_Id varchar,
 date_Added varchar,
 date_Modifed varchar,
@@ -65,7 +65,7 @@ query_write_order = ("INSERT INTO fresh_orders "
 #                      "VALUES (%s, %s, NOW(), NOW(), %s, %s, %s, %s, %s, %s)")
 
 query_read_full_order = (" SELECT * from fresh_orders, order_items "
-                         " WHERE id_MP = %s and shop_name = %s ")
+                         " WHERE id_mp = %s and shop_name = %s ")
 
 query_write_items = ("INSERT INTO order_items "
     "(id_mp, our_order_id, shop_Name, "
@@ -73,10 +73,14 @@ query_write_items = ("INSERT INTO order_items "
                      "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)")
 
 query_read_items = (" SELECT * from order_items "
-                    " WHERE id_MP = %s and shop_name = %s ")
+                    " WHERE id_ip = %s and shop_name = %s ")
 
 read_new_order = (" SELECT * from fresh_orders "
                     " WHERE our_status = 'NEW' ")
+
+read_order_items = (" SELECT * from order_items "
+                    " WHERE id_mp = %s and shop_name = %s ")
+
 
 update_send_data_order = (" UPDATE fresh_orders SET dateSendData = NOW(), dateModifed = NOW(), ourStatus = 'SEND_TO_1C' "
                           " WHERE id_MP = %s and shop_name = %s ")

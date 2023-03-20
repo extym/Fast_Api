@@ -4,8 +4,8 @@ from xml.dom import minidom
 from datetime import datetime
 from read_json import process_json_list
 
-# warehouses = {21405051875000: "Октябрьский малый", 23012928587000: "Октябрьский крупногабарит", 23138678478000: "Октябрьский новый крупногабаритный", 23990969841000: "Основной склад - Курьеры", 23997026419000: "Осн склад Курьеры некрупный груз до 25кг",
-#               1020000039316000: "RFBS наш склад Деловые Линии", 1020000068495000: "НАША ДОСТАВКА Москва и МО", 1020000075732000: "RFBS наш склад СДЭК"}
+warehouses_id = {21405051875000: "Октябрьский малый", 23012928587000: "Октябрьский крупногабарит", 23138678478000: "Октябрьский новый крупногабаритный", 23990969841000: "Основной склад - Курьеры", 23997026419000: "Осн склад Курьеры некрупный груз до 25кг",
+               1020000039316000: "RFBS наш склад Деловые Линии", 1020000068495000: "НАША ДОСТАВКА Москва и МО", 1020000075732000: "RFBS наш склад СДЭК"}
 
 warehouses = {'OZ.ОктМал': "Октябрьский малый",'OZ.ОктКГnew': "Октябрьский новый крупногабаритный",
               'OZ.ОснКурьер': "Основной склад - Курьеры",'OZ.ОснКурьердо25': "Осн склад Курьеры некрупный груз до 25кг",
@@ -66,7 +66,7 @@ def o_create():
 
     # date = datetime.datetime.now(datetime.timezone.utc).isoformat()
     date = datetime.now(pytz.timezone("Africa/Nairobi")).replace(microsecond=0).isoformat()
-    #print(date)
+    #printt(date)
     xml_root = root.createElement('yml_catalog')
     root.appendChild(xml_root)
     xml_root.setAttribute('date', date)
@@ -103,7 +103,7 @@ def o_create():
         outletsChild = root.createElement('outlets')
 
         for outlet_name in outlet:  #outlets:   #outlets -  maybe dictionary, where key=warehouse_id, value=warehouse_in_stock
-            #print(outlet_name)
+            #printt(outlet_name)
             outletOfferChild = root.createElement('outlet')
             outletOfferChild.setAttribute('instock', f'{quantity}')  #f'{outlets[key]}')
             outletOfferChild.setAttribute('warehouse_name', f'{outlet_name}')
@@ -134,7 +134,7 @@ def o_create():
 
 
     need_data = process_json_list()  #get_need_data()
-    #print(len(need_data), type(need_data))
+    #printt(len(need_data), type(need_data))
     count = 0
     for value in need_data:  #our_data[10:]:
         #id_from_1c = value[0]
@@ -151,11 +151,9 @@ def o_create():
             count += 1
             create_offer(str(offer_id), outlets, str(quantity))  #(offer_id, price, oldprice, min_price, outlet)
 
-    #print('in xml', count, 'products')
+    #printt('in xml', count, 'products')
 
-
-
-    print(count)
+    print('list_items_xz', count)
 
     #create_offer(offer_id, price, oldprice, min_price, outlet)
 

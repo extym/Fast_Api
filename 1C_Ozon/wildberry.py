@@ -68,7 +68,7 @@ def token_generator(size=12, chars=string.ascii_uppercase + string.digits):
 
 def make_send_data():
     data = read_json_wb()
-    print(len(data), data)
+    print('make_send_data', len(data))
     warehouse = {}
     for string in wh:
         stocks = []
@@ -86,12 +86,12 @@ def make_send_data():
             if string['name_1C'] in row[4].keys():
                 warehouse[w_house] = {'stocks': stocks}
 
-    #print(len(stocks), warehouse)
+    #printt(len(stocks), warehouse)
     return warehouse
 
-#make_send_data()
+# make_send_data()
 
-def send_stocks():
+def send_stocks_wb():
     data = make_send_data()
     for key, value in data.items():
         metod = '/api/v3/stocks/'
@@ -100,11 +100,11 @@ def send_stocks():
                    'Authorization': wb_apikey }
         answer = requests.put(target, data=json.dumps(value), headers=headers)
         re_data = answer.text
-        print(key, '----', answer)
-        print(key, '----', re_data)
+
+        print('send_stocks_wb', key, answer, re_data)
 
 
-send_stocks()
+# send_stocks_wb()
 
 def get_new_supply_wb(next):
     headers = {'Content-type': 'application/json',
@@ -118,7 +118,7 @@ def get_new_supply_wb(next):
     response = requests.get(url, params=params, headers=headers)
     data = response.json()
     next_page = data['next']  #32899717
-    print(response, data)
+    print('get_new_supply_wb', response, data)
     return response, data, next_page
 
 
@@ -135,7 +135,7 @@ def get_orders_from_supply_wb(supply_id):
     response = requests.get(url, headers=headers)
     data = response.json()
 
-    print(response, len(data), data)
+    print('get_orders_from_supply_wb', response, len(data), data)
     return response, data
 
 # get_new_orders_wb("WB-GI-41149707")
@@ -150,13 +150,13 @@ def get_new_orders_wb():
     response = requests.get(url, headers=headers)
     data = response.json()
 
-    print(response, len(data), data)
+    print('get_new_orders_wb', response, len(data), data)
     return data
 
 
 async def processing_orders_wb():
     orders = proxy_wb_orders["orders"]   #get_new_orders_wb().get("orders")
-    print(orders)
+    #print(orders)
     if orders[0].get("id") is not None:
         for order in orders:
             id_mp = order["id"]
@@ -184,7 +184,7 @@ def get_wh():
     link = 'https://suppliers-api.wildberries.ru/api/v2/warehouses'
     answer = requests.get(link, headers=headers)
     text = answer.text
-    print(answer)
-    print(text)
+    #print(answer)
+    print('get_wh', text)
 
 # get_wh()

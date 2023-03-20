@@ -13,7 +13,7 @@ def create_connection():
             host='localhost',
             port=5432
         )
-        print("Connection to PostgreSQl DB successfully")
+        print("Connection to DB successfully")
 
     except OperationalError as error:
         print(f'The ERROR "{error}" occurred')
@@ -86,13 +86,21 @@ def query_read_order(query):
     return data
 
 
-def get_single_rows():
+def get_one_order():
     connection = create_connection()
+    result, proxy = None, []
     try:
         cursor = connection.cursor()
         cursor.execute(read_new_order)
         result = cursor.fetchone()
         print("Fetching single row", result)
+        if result is not None:
+            data = (result[1], result[7])
+            print("Fetching single row-------",data)
+            cursor.execute(read_order_items, data)
+            items = cursor.fetchall()
+            proxy  = [item for item in items]
+
         cursor.close()
 
     except psycopg2.Error as error:
@@ -100,9 +108,9 @@ def get_single_rows():
     finally:
         if connection:
             connection.close()
-            print("The Sqlite connection is closed")
+            print("The Sql connection is closed")
 
-    return result
+    return result, proxy
 # connection = create_connection()
 # create_database_query = "CREATE DATABASE stm_app"
 # create_database(connection, create_database_query)

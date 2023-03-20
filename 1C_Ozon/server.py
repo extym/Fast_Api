@@ -9,41 +9,53 @@ from flask import Flask, request
 from gevent.pywsgi import WSGIServer
 import pytz
 from datetime import datetime, timedelta
-from read_json import process_json_dict,  read_order_json, read_json_sper
+from read_json import process_json_dict,  read_order_json, read_json_sper, read_json_ids
 from our_request import data_psh, data_pshh
-
-token_market_dbs = 'BA00000126859FCF'
-token_market_fbs = ''
+from cred import token_market_dbs, tokens_market, token_market_fbs_exp, token_sper
+from ozon import read_skus, product_info_price
+from sper import post_smth_sb
 #from cred import token_market_dbs, token_market_fbs
-
 import urllib3
 urllib3.disable_warnings()
 
 
 #time = datetime.now(pytz.timezone("Africa/Nairobi")).replace(microsecond=0).isoformat()
-#print(time)  #for development
+#printt(time)  #for development
 
 
 def write_json(smth_json):
-    # with open('test_json.json', 'w') as file:
-    with open('/var/www/html/stm/test_json.json', 'w') as file:
-        json.dump(smth_json, file)
+    try:
+        with open('/var/www/html/stm/test_json.json', 'w') as file:
+            json.dump(smth_json, file)
+    except Exception:
+        with open('test_json.json', 'w') as file:
+            json.dump(smth_json, file)
 
 
 def write_smth_date():
-    # f = open('test_txt.txt', 'r+')
-    f = open('/var/www/html/stm/test_txt.txt', 'w')
-    time = datetime.now(pytz.timezone("Africa/Nairobi")).isoformat()
-    f.write(str(time) + '\n')
-    f.close()
+    try:
+        f = open('/var/www/html/stm/test_txt.txt', 'w')
+        time = datetime.now(pytz.timezone("Africa/Nairobi")).isoformat()
+        f.write(str(time) + '\n')
+        f.close()
+    except:
+        f = open('test_txt.txt', 'w')
+        time = datetime.now(pytz.timezone("Africa/Nairobi")).isoformat()
+        f.write(str(time) + '\n')
+        f.close()
 
 
 def write_smth(smth):
     time = datetime.now(pytz.timezone("Africa/Nairobi")).isoformat()
     # f = open('no_test.txt', 'a')
-    f = open('/var/www/html/stm/no_test.txt', 'a')
-    f.write(str(time) + str(smth) + '\n')
-    f.close()
+    try:
+        f = open('/var/www/html/stm/no_test.txt', 'a')
+        f.write(str(time) + str(smth) + '\n')
+        f.close()
+    except:
+        f = open('no_test.txt', 'a')
+        f.write(str(time) + str(smth) + '\n')
+        f.close()
 
 
 # write_smth(' start ')
@@ -51,9 +63,14 @@ def write_smth(smth):
 
 def write_fake(smth):
     time = datetime.now(pytz.timezone("Africa/Nairobi")).isoformat()
-    f = open('fake_json.txt', 'a')
-    f.write(str(time) + str(smth) + '\n')
-    f.close()
+    try:
+        f = open('/var/www/html/stm/fake_json.txt', 'a')
+        f.write(str(time) + str(smth) + '\n')
+        f.close()
+    except:
+        f = open('fake_json.txt', 'a')
+        f.write(str(time) + str(smth) + '\n')
+        f.close()
     # with open('fake_jon.json', 'w') as file:
     #     json.dump(smth, file)
 
@@ -86,27 +103,33 @@ def token_generator(size=10, chars=string.ascii_uppercase + string.digits):
 
 
 def create_data_for_1c(data):
-    list_items = data[12]
+    print('create_data_for_1c', data)
+    list_items = data[1]
     items_pr = []
-    # for item in list_items:
-    #     proxy = {}
-    #     proxy['shopSku'] = item['id_1c']
-    #     proxy['count'] = item['count']
-    #     proxy['price'] = item['price']
-    #     items_pr.append(proxy)
+    for item in list_items:
+        proxy = {}
+        proxy['shopSku'] = item[5]
+        proxy['count'] = item[6]
+        proxy['price'] = item[7]
+        items_pr.append(proxy)
+
+    status = data[0][9]
+    if status == "NEW":
+        status = 'accept'
+
     data_re = {
         "order": {
-            "shop": data[6],
-            "businessId": data[2],
-            "id": data[1],
-            "paymentType": data[10],
-            "delivery": data[13],
-            "status": data[8],
-            "date": data[7],
+            "shop": data[0][7],
+            "businessId": data[0][2],
+            "id": data[0][1],
+            "paymentType": data[0][10],
+            "delivery": data[0][13],
+            "status": status,
+            "date": data[0][8],
             "items": items_pr
         }
     }
-    print('data_re', data_re)
+    print('create_data_re_for_1c', data_re)
     return data_re
 
 
@@ -118,7 +141,7 @@ def check_stocks(skus, warehouse_id):
     proxy_list = []
     for sku in skus:
         if sku in data_stocks:
-            count = data_stocks[sku].get('stock')
+            count = data_stocks[sku][2]  #.get('stock')
             if count is None:
                 count = 0
             data = {
@@ -184,7 +207,7 @@ def check_is_accept_ym(list_items):
     data = process_json_dict()
     result_global = False
     cnt = 0
-    print('check_is_accept_ym', list_items)
+    #printt('check_is_accept_ym', list_items)
     for item in list_items:
         shop_sku = item['shopSku']
         if shop_sku in data.keys():
@@ -200,7 +223,7 @@ def check_is_accept_ym(list_items):
 
     if cnt == len(list_items):
         result_global = True
-    #print('check_is_accept_ym_222222222', count, len(list_items))
+    #printt('check_is_accept_ym_222222222', count, len(list_items))
     return result_global, list_items
 
 
@@ -220,7 +243,7 @@ def check_is_accept_sb(list_items):
 
     if cnt == len(list_items):
         result_global = True
-    print(result_global, list_items)
+    print('check_is_accept_sb', result_global, list_items)
     return result_global, list_items
 
 
@@ -269,11 +292,19 @@ def order_resp_sb(global_result, is_new):
     return data, id_create
 
 
-def make_cancel(order_id, shop):
+async def make_cancel_count(order_id, shop, list_items):
     #data  = execute_query(query_read_order, (order_id, shop))
-    execute_query(update_status_order, ('canceled', "NEW", order_id, shop))
+    await execute_query(update_status_order, ('canceled', "NEW", order_id, shop))
 
     # return created_id
+
+
+
+# def make_cancel(order_id, shop):
+#     #data  = execute_query(query_read_order, (order_id, shop))
+#     execute_query(update_status_order, ('canceled', "NEW", order_id, shop))
+#
+#     # return created_id
 
 
 def proxy_time():
@@ -331,19 +362,18 @@ def create_re_cart(items):
 #
 ##for sper
 def counter_items(items_list):
-    count = 1
-    if len(items_list) > 1:
-        proxy = items_list[0]['offerId']
-        for i in range(1, len(items_list)):
-            if items_list[i]['offerId'] == proxy:
-                count += 1
-                items_list[i - 1]['quantity'] = count
-                del items_list[i]
+    pr, lst = {}, []
+    for item in items_list:
+        proxy_offer_id = item['offerId']
+        pr[proxy_offer_id] = pr.get(proxy_offer_id, 0) + 1
+    for itemm in items_list:
+        if itemm["offerId"] in pr.keys():
+            value = pr.pop(itemm["offerId"])
+            itemm["quantity"] = value
+            lst.append(itemm)
 
-            else:
-                proxy = items_list[i]['offerId']
-    print(items_list)
-    return items_list
+    #printt('counter_items',lst)
+    return lst
 
 #
 # async def send_post(data):
@@ -383,14 +413,17 @@ def reformat_data_order(order, shop):
         )
 
     elif shop == 'Ozon':
+        time = order["in_process_at"].split('T')[0]
+
         result = (
-            order['order']["id"],
-            order['order']["our_id"],
-            order['order']["shop"],
-            order['order']["date"],
-            order['order']["status"],
-            order['order']["paymentType"],
-            order['order']["delivery"]
+            order['id'],
+            order["our_id"],
+            shop,
+            reverse_time(time),
+            order["status"],
+            order["our_status"],
+            "PREPAID",
+            order["delivery_method"]["warehouse_id"]
         )
 
     elif shop == 'Sber':
@@ -437,7 +470,7 @@ def reformat_data_items(order, shop):
         list_items = order['items']
         for item in list_items:
             proxy = (
-                order["id"],
+                order["posting_number"],
                 order["our_id"],
                 shop,
                 order["our_status"],
@@ -449,18 +482,31 @@ def reformat_data_items(order, shop):
             result.append(proxy)
 
     elif shop == 'Ozon':
-        result = (
-            order['order']["id"],
-            order['order']["our_id"],
-            order['order']["shop"],
-            order['order']["date"],
-            order['order']["status"],
-            order['order']["paymentType"],
-            order['order']["delivery"]
-        )
+        result = []
+        list_items = order['products']
+        # read_skus() -> {sku<str>: (product_id<int>, vendor_code<str>}
+        #items_skus = read_skus()
+        items_ids = read_json_ids() #ids 1C
+        for item in list_items:
+            sku = str(item["sku"])
+            #vendor_code = items_skus[sku][1]
+            vendor_code = item["offer_id"]
+            print('product_info_price', sku[0], vendor_code)
+            #price = product_info_price(items_skus[sku][0], vendor_code)
+            proxy = (
+                order["id"],
+                order["our_id"],
+                shop,
+                order["our_status"],
+                vendor_code,
+                items_ids[vendor_code][0], #1c
+                item["quantity"],
+                item["price"][:-2]  #price
+            )
+            result.append(proxy)
 
     elif shop == 'Sber':
-        list_items = order["items"]
+        list_items = order["count_items"]
         result = []
         for item in list_items:
             proxy = (
@@ -471,12 +517,34 @@ def reformat_data_items(order, shop):
                 item["offerId"],
                 item["id_1c"],
                 item["quantity"],
-                item["finalPrice"]
+                item["price"]
             )
             result.append(proxy)
 
     return result
 
+
+def confirm_data_sb(order): #TODO
+    list_items = order["shipments"][0]["items"]
+    proxy = []
+    for item in list_items:
+        it = {}
+        it["itemIndex"] = item["itemIndex"]
+        it["offerId"] = item["offerId"]
+        proxy.append(it)
+
+    result = {
+        'data': {
+            'token': token_sper,
+            'shipments': [{
+                'shipmentId': order["shipments"][0]["shipmentId"],
+                'orderCode': order['our_id'],
+                'items': proxy,
+            }]
+        }
+    }
+
+    return result
 
 
 app = Flask(__name__)
@@ -497,12 +565,12 @@ def get_json():
     ip_addr = request.environ.get('REMOTE_ADDR')  ## return ::ffff:46.21.252.7
     #'X-Forwarded-For': '46.21.252.7'
     addr = request.headers.get('X-Forwarded-For')
-    if str(ip_addr) == '::ffff:46.21.252.7' or addr == '46.21.252.7':
+    if ip_addr == '::ffff:46.21.252.7' or ip_addr == '46.21.252.7'\
+            or ip_addr == '62.76.102.53':
         request_data = request.get_json()
         write_json(request_data)
         write_smth_date()
 
-        print(request_data)
         response = app.response_class(
             status=200
         )
@@ -519,7 +587,7 @@ def get_json():
 @app.route('/order/accept', methods=['POST'])
 async def order_accept_ym():
     token = request.headers.get('Authorization')
-    if token == token_market_dbs or token == token_market_fbs:
+    if token in tokens_market:
         data_req = request.get_json()
         confirm_data = data_req["order"].get('fake')
         order = data_req["order"]
@@ -538,7 +606,7 @@ async def order_accept_ym():
                 ref_data = reformat_data_order(order, 'Yandex')
                 await execute_query(query_write_order, ref_data)
                 list_items = reformat_data_items(order, 'Yandex')
-                await execute_query(query_write_items, list_items)
+                await executemany_query(query_write_items, list_items)
                 response = app.response_class(
                     json.dumps(data[0]),
                     status=200,
@@ -563,7 +631,7 @@ async def order_accept_ym():
 @app.route('/cart', methods=['POST'])
 def cart_ym():
     token = request.headers.get('Authorization')
-    if token == token_market_dbs or token == token_market_fbs:
+    if token in tokens_market:
         request_data = request.get_json()
         cart = request_data.get('cart')
         # if cart is not None:
@@ -591,7 +659,7 @@ def cart_ym():
 @app.route('/orders', methods=['GET', 'POST'])
 def orders_ym():
     token = request.headers.get('Authorization')
-    if token == token_market_dbs or token == token_market_fbs:
+    if token in tokens_market:
         data = data_summary()  #TODO
         response = app.response_class(
             json.dumps(data),
@@ -609,7 +677,7 @@ def orders_ym():
 @app.route('/order/status', methods=['POST'])
 async def status_ym():
     token = request.headers.get('Authorization')
-    if token == token_market_dbs or token == token_market_fbs:
+    if token in tokens_market:
         request_data = request.get_json()
         order = request_data.get("order")
         order_id = order["id"]
@@ -641,8 +709,7 @@ def stocks_ym():
     write_smth('stocks')
       ## for debag
     token = request.headers.get('Authorization')
-
-    if token == token_market_dbs or token == token_market_fbs:
+    if token in tokens_market:
         req = request.get_json()
         warehouseId = req.get('warehouseId')
         skus = req.get('skus')
@@ -663,7 +730,7 @@ def stocks_ym():
 @app.route('/order/cancellation/notify', methods=['POST'])
 def order_cancell_ym():
     token = request.headers.get('Authorization')
-    if token == token_market_dbs or token == token_market_fbs:
+    if token in tokens_market:
         req_cancell = request.get_json()
         order = req_cancell.get('order')
         rewrite_order_status(order, "Yandex")
@@ -683,13 +750,15 @@ def order_cancell_ym():
 @app.route('/order/new', methods=['POST'])
 async def new_order_sb():
     token = request.headers.get('Basic auth')
-    if token == None:
+    print('from_order_new', token)
+    if token == None or token != None:
         data_req = request.get_json()
+        print('data_from_order_new', data_req)
         order = data_req["data"]
         pre_proxy = order["shipments"][0]["items"]
         proxy = counter_items(pre_proxy)
         stock = check_is_accept_sb(proxy)  # проверяем наличие for order
-        order["items"] = stock[1]
+        order["count_items"] = stock[1]
 
         if stock[0]:
             data = order_resp_sb(stock[0], True)
@@ -698,9 +767,9 @@ async def new_order_sb():
             ref_data = reformat_data_order(order, 'Sber')
             await execute_query(query_write_order, ref_data)
             data_items = reformat_data_items(order, 'Sber')
-            print(data_items)
             await executemany_query(query_write_items, data_items)
-
+            data_confirm = confirm_data_sb(order)
+            await post_smth_sb('order/confirm', data_confirm)
             response = app.response_class(
                 json.dumps(data[0]),
                 status=200,
@@ -733,8 +802,9 @@ async def order_cancel():
         order = data_req["data"]
         order_id = order["shipments"][0]['shipmentId']
         proxy = order["shipments"][0]["items"]
-        past_proxy = counter_items(proxy)
-        # make_cancel(order_id, "Sber")
+        ## cancel one vendor_code or mane
+        past_proxy = counter_items(proxy)   #TODO
+        await make_cancel_count(order_id, "Sber", past_proxy)
         data = ( "canceled", "NEW", order_id, "Sber" )
         await execute_query(update_status_order, data)
         re_data = order_resp_sb(True, False)
@@ -755,14 +825,14 @@ async def order_cancel():
 async def check_orders():
     ip_addr = request.environ.get('REMOTE_ADDR')  ## return ::ffff:46.21.252.7
     addr = request.headers.get('X-Forwarded-For')  # 'X-Forwarded-For': '46.21.252.7'
-    #print(ip_addr, addr)
-    if str(ip_addr) == '::ffff:46.21.252.7' or addr == '46.21.252.7':
-        data = get_single_rows()  #query_read_order(get_new_order))
-        if data is not None:
+    #printt(ip_addr, addr)
+    if ip_addr == '::ffff:46.21.252.7' or ip_addr == '46.21.252.7' or ip_addr == '54.86.50.139':  #POSTMAN
+        data = get_one_order()  #query_read_order(get_new_order))
+        if data[0] is not None:
             re_data = create_data_for_1c(data)
             response = json.dumps(re_data)
             await execute_query(rebase_order,
-                            ("SEND", data[0], data[1]))
+                            ("SEND", data[0][0], data[0][1]))
             write_smth(" SEND " + re_data["order"]["shop"]
                             + " " + re_data["order"]["id"])
         else:
@@ -775,8 +845,8 @@ async def check_orders():
             write_smth(" empty_data")
 
     elif addr == '62.76.102.53' or ip_addr == '62.76.102.53' or ip_addr == '::1':
-        data = get_single_rows()  #query_read_order(get_new_order))
-        if data is not None:
+        data = get_one_order()  #query_read_order(get_new_order))
+        if data[0] is not None:
             re_data = create_data_for_1c(data)
             response = json.dumps(re_data)
             write_smth(" test " + re_data["order"]["id"])
@@ -795,6 +865,67 @@ async def check_orders():
 
     return response
 
+
+common_comfirm_response = {"result": True}
+common_error = {'error': {
+      "code": "ERROR_UNKNOWN",
+      "message": "Неизвестный метод",
+      "details": None }}
+
+
+from proxy import proxy_onon
+@app.route('/api/on', methods=['GET', 'POST'])
+async def onon_push():
+    resp = request.get_json()
+    print('api_on_resp', resp)
+    if resp.get('message_type') == 'TYPE_PING':
+        time = resp["time"]
+        response = app.response_class(
+            json.dumps({ "version": "v.1",
+                   "name": "brain-trust.bot",
+                   "time": time }),
+            status=200
+        )
+
+    elif resp.get("message_type") == "TYPE_NEW_POSTING":
+        #our_id = token_generator()
+        id_mp = resp["posting_number"]
+        our_id = id_mp.replace('-', '')[:10]
+        order = product_info_price(id_mp)
+        #order = proxy_onon["result"]
+        order['our_id'], order['id'],  order['status'], order['our_status'] \
+            = id_mp, our_id, "NEW", "NEW"
+        ref_data = reformat_data_order(order, 'Ozon')
+        print('refdata', ref_data)
+        await execute_query(query_write_order, ref_data)
+        list_items = reformat_data_items(order, 'Ozon')
+        print('redata_items', list_items)
+        print('list_items_onon', list_items)
+        await executemany_query(query_write_items, list_items)
+
+        response = app.response_class(
+            json.dumps(common_comfirm_response),
+            status=200
+        )
+
+    elif resp.get("message_type") == "TYPE_POSTING_CANCELLED":
+        order_id = resp["posting_number"]
+        data = ("canceled", "NEW", order_id, "Ozon")
+        await execute_query(update_status_order, data)
+
+        response = app.response_class(
+            json.dumps(common_comfirm_response),
+            status=200
+        )
+
+    else:
+        response = app.response_class(
+            json.dumps(common_error),
+            status=400
+        )
+
+    print('api_on_response', response)
+    return response
 
 @app.route('/test', methods=['GET', 'POST'])
 def test():
@@ -836,11 +967,11 @@ def test():
 
 # Press the green button in the gutter to run the script.
 
-
 if __name__ == '__main__':
     # #Debug/Development
     ##run app in debug mode on port 5000
     # app.run(debug=True, host='0.0.0.0', port=5000)
     # Production
-    http_server = WSGIServer(('', 8800), app)
+    http_server = WSGIServer(('', 9900), app)
     http_server.serve_forever()
+

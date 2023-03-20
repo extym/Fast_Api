@@ -142,7 +142,7 @@ def create_sp():
 
 
     need_data = process_json_list()
-    print(type(need_data), len(need_data))
+    #print(type(need_data), len(need_data))
     cnt = 0
     for row in need_data:
         if 'SBMM.Сбермегамаркет' in row[4]:

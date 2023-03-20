@@ -66,7 +66,7 @@ import csv
 #             if row[0] is not None:
 #                 liist.append(row[0])
 # 
-#         #print(liist)
+#         #printt(liist)
 # 
 # read_shop_feed()
 
@@ -79,12 +79,12 @@ import csv
 #         for row in complete_data:
 #             if value[0] == row[0] and value[0] != '':
 #                 target[key] = row
-#                 #print(target[key])
+#                 #printt(target[key])
 #
 #     with open('target.json', 'w') as file:
 #         json.dump(target, file)
 #
-#     #print(target)
+#     #printt(target)
 #     print('target len  -', len(target))
 #     return target
 
@@ -117,10 +117,10 @@ import csv
 #         product_id = str(datas[i]['product_id'])
 #         index = l.index(product_id)
 #         offer_id = proxy[index][0]
-#         #print(type(product_id), type(proxy[index][1]))
+#         #printt(type(product_id), type(proxy[index][1]))
 #         if product_id == proxy[index][1]:
 #             datas[i]['offer_id'] = offer_id
-#     #print(datas[2])
+#     #printt(datas[2])
 #     write_file(datas)
 #
 # #get_ozon_sku()

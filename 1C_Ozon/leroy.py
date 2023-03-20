@@ -7,7 +7,10 @@ from read_json import read_json_lm
 import pytz
 import requests
 from conn import *
+from proxy import proxy_lm
 import asyncio
+
+test_url = 'http://localhost:5500/response'
 
 time = datetime.now(pytz.timezone("Africa/Nairobi")).replace(microsecond=0).isoformat()
 
@@ -24,8 +27,6 @@ def send_get_token():
     metod = 'marketplace/user/authbypassword'
     url_address = url + metod + '?login=' + login_lm + '&password=' + pass_lm
     answer = requests.get(url_address, headers=headers)
-    # print(str(time), type(answer))
-    print(str(time), answer)
     response = answer.json()
     print(str(time), response)
 
@@ -40,21 +41,14 @@ def get_assortment():
     metod = 'products/assortment'
     url_address = url + metod
     answer = requests.get(url_address, headers=headers)
-    # print(str(time), type(answer))
     response = answer.json()
     assortment = response['result']
     products = assortment['products']
-
-    # for row in products:
-    #     if row['productId'] in temp:
-    #         print(str(time), 'result', len(products), row)
-
-    #print(str(time), 'result', len(products), products)  #, products)
-
+    print(products)
     return products
 
 
-def send_stocks():
+def send_stocks_lm():
     url = 'https://api.leroymerlin.ru/marketplace/api/v1/'
     headers = {'Content-type': 'application/json',
                'apikey': f'{apikey_lm}',
@@ -64,13 +58,13 @@ def send_stocks():
     metod = 'products/stock'
     url_address = url + metod
     data = check_stocks()
-    print(data)
     answer = requests.post(url_address, data=json.dumps(data), headers=headers)
 
-    print(answer)
+    print('send_stocks_leroy', len(data["data"]["products"]),
+          answer, answer.json())
 
 
-def test_check_price():
+def check_price():
     data_read = read_json_lm()
     products = []
     market_data = get_assortment()
@@ -83,7 +77,7 @@ def test_check_price():
                 "marketplaceId": marketplaceId,
                 "price": price
             }
-            #print(proxy)
+            #printt(proxy)
             products.append(proxy)
 
     data = {"data":{"products": products}}
@@ -91,20 +85,19 @@ def test_check_price():
     return data
 
     
-def test_send_price():
+def send_price_lm():
     url = 'https://api.leroymerlin.ru/marketplace/api/v1/'
     headers = {'Content-type': 'application/json',
-               'apikey': f'{test_apikey_lm}',
-               'Authorization': f'Bearer {test_access_token}'
+               'apikey': f'{apikey_lm}',
+               'Authorization': f'Bearer {access_token}'
                }
 
     metod = 'products/price'
     url_address = url + metod
-    data = test_check_price()
-    print(data)
+    data = check_price()
     answer = requests.post(url_address, data=json.dumps(data), headers=headers)
     re = answer.json()
-    print(answer, re)
+    print('send_price_leroy', answer, re, data)
 
 
 
@@ -134,34 +127,35 @@ def check_stocks():
 
     return data
 
-def reformat_data_product(order, shop):
+def reformat_data_product(order, list_items,  shop):
+    result = []
     if shop == 'Leroy':
-        result = []
-        list_items = order["products"]
+
+        # list_items = order["products"]
         for item in list_items:
             proxy = (
-                order["id"],
-                order['our_id'],
+                order[0],
+                order[1],
                 shop,
-                order["our_status"],
-                item["offerId"],
-                item["id_ic"],
-                item["quantity"],
-                item["finalPrice"]
+                order[5],
+                item["vendorCode"],
+                item["id_1c"],
+                item["qty"],
+                item["price"]
             )
             result.append(proxy)
 
-    elif shop == 'WB':
-        result = (
-            order['order']["businessId"],
-            order['order']["id"],
-            order['order']["shop"],
-            order['order']["date"],
-            order['order']["status"],
-            order['order']["paymentType"],
-            order['order']["delivery"]
-        )
-
+    # elif shop == 'WB':
+    #     result = (
+    #         order['order']["businessId"],
+    #         order['order']["id"],
+    #         order['order']["shop"],
+    #         order['order']["date"],
+    #         order['order']["status"],
+    #         order['order']["paymentType"],
+    #         order['order']["delivery"]
+    #     )
+        print('reformat_data_product--', result)
     return result
 
 
@@ -177,28 +171,29 @@ def send_get_new_orders():
     response = requests.get(target_url, params=params, headers=headers)
     data = response.json()
 
-    print(len(data), data)
+    print('send_get_new_orders', len(data), data)
     return data
 
 
-def send_get_orders():
+def send_get_orders_lm():
     url = 'https://api-test.leroymerlin.ru/marketplace/merchants/v1'
     headers = {'Content-type': 'application/json',
                'x-api-key': f'{test_x_api_key}',
                'Authorization': f'Bearer {test_orders_jwt_lm}'
                }
     params = {"status": "created"}
-    metod = 'parcels'
+    metod = '/parcels'
     target_url = url + metod
     response = requests.get(target_url, headers=headers)
     data = response.json()
 
-    print(len(data), data)
+    print('send_get_orders_lm',len(data), data)
     return data
 
 # send_stocks()
-#send_get_new_orders()
+# send_get_new_orders()
 
+# send_get_orders_lm()
 
 def get_smth(metod):
     # url = 'https://api.leroymerlin.ru/marketplace/api/v1/'
@@ -239,6 +234,7 @@ def check_count_product(list_items):
         quantity = data.get(vendor_code, (0, 0, 0))[2]
         if quantity >= qty:
             item_result = True
+            item['id_1c'] = data.get(vendor_code)[0]
         else:
             item_result = False
         global_result.append(item_result)
@@ -246,8 +242,9 @@ def check_count_product(list_items):
     if False not in global_result:
         result = True
 
-    return result
+    res_dict = {item["vendorCode"]: data.get(item["vendorCode"])[0] for item in list_items}
 
+    return result, list_items, res_dict
 
 
 def confirm_orders(data):  #list orders,
@@ -255,8 +252,9 @@ def confirm_orders(data):  #list orders,
     for order in data:
         confirm = check_count_product(order["products"]) #check to stocks
         id_mp = order["id"]
-        if confirm:
-            our_id = token_generator()
+        if confirm[0]:
+            #our_id = token_generator()
+            our_id = id_mp.replace('-', '')[:10]
             shop_Name = 'Leroy'
             shipment_Date = order["creationDate"]  ##add one day?
             status = order.get("status", "CREATED")
@@ -264,33 +262,39 @@ def confirm_orders(data):  #list orders,
             payment_Type = "PREPAID"
             delivery = order.get("deliveryServiceName")
             order_summ = order.get("parcelPrice")
-            order = ((id_mp, our_id, shop_Name, shipment_Date,
-                     status, our_status, payment_Type, delivery), True)
+            order_data = (our_id, id_mp, shop_Name, shipment_Date,
+                     status, our_status, payment_Type, delivery)
+            list_items = reformat_data_product(order_data, confirm[1], 'Leroy')
+            order = (order_data, True, list_items)
+
         else:
-            order = (id_mp, (None), False)
+            order = (id_mp, False, [])
+        print(proxy)
         proxy.append(order)
 
     return proxy
 
 async def get_new_orders_lm():
-    #data = send_get_new_orders()  # commented for test ONLY
-
-    data = send_get_orders()       #for test ONLY
+    data = send_get_new_orders()  # TODO commented for test ONLY
+    #data = proxy_lm                    #for test ONLY
+    #data = send_get_orders_lm()       #for test ONLY
     result = confirm_orders(data)
     for order in result:
         if order[1]:
-            await post_smth('/parcels/' + order[0][0] + ':confirm', None)  #TODO make async def post_smth
+            await post_smth('/parcels/' + order[0][0] + ':confirm', None)  #TODO for PROD use Required
             await execute_query(query_write_order, order[0])
+            print('get_new_orders_lm---', order)
+            await executemany_query(query_write_items, order[2])
         else:
-            resp = get_smth('/parcels/' + order[0][0] + '/statuses') #for test ONLY
-            # await post_smth('/parcels/' + order[0] + ':cancel', None)
-            print('get_status', resp, resp.json())
-    print(len(data), '--- check', len(result), result)
+            #resp = get_smth('/parcels/' + order[0][0] + '/statuses') #for test ONLY
+            await post_smth('/parcels/' + order[0][0] + ':cancel', None) #TODO for PROD use Required
+            #print('get_new_orders_lm', resp, resp.json())
+    print(len(data), '--- get_new_orders_lm', len(result), result)
 
 
 # send_get_token()
-# get_assortment()
-send_stocks()
-test_send_price()
+get_assortment()
+# send_stocks_lm()
+send_price_lm()
 # check_stocks()
-# asyncio.run(get_new_orders_lm())
+#asyncio.run(get_new_orders_lm())
