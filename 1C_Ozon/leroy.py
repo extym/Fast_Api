@@ -2,7 +2,7 @@ import json
 import random
 import string
 from datetime import datetime
-from cred import apikey_lm, login_lm, pass_lm, test_apikey_lm, test_access_token, access_token, test_x_api_key, test_orders_jwt_lm
+from cred import apikey_lm, login_lm, pass_lm, test_apikey_lm, lm_access_token, access_token, test_x_api_key, test_orders_jwt_lm
 from read_json import read_json_lm
 import pytz
 import requests
@@ -11,6 +11,8 @@ from proxy import proxy_lm
 import asyncio
 
 test_url = 'http://localhost:5500/response'
+remote_test_url = 'https://api-test.leroymerlin.ru/marketplace/merchants/v1'
+url_orders = 'https://api.leroymerlin.ru/marketplace/merchants/v1'
 
 time = datetime.now(pytz.timezone("Africa/Nairobi")).replace(microsecond=0).isoformat()
 
@@ -44,8 +46,10 @@ def get_assortment():
     response = answer.json()
     assortment = response['result']
     products = assortment['products']
-    print(products)
+    print('get_assortment', products)
     return products
+
+# get_assortment()
 
 
 def send_stocks_lm():
@@ -98,12 +102,6 @@ def send_price_lm():
     answer = requests.post(url_address, data=json.dumps(data), headers=headers)
     re = answer.json()
     print('send_price_leroy', answer, re, data)
-
-
-
-    
-# test_check_price()
- # temp = ['ИМOWLT190303', 'OW29.50.12', 'OWLB191038']
 
 
 def check_stocks():
@@ -160,20 +158,20 @@ def reformat_data_product(order, list_items,  shop):
 
 
 def send_get_new_orders():
-    url = 'https://api-test.leroymerlin.ru/marketplace/merchants/v1'
+
     headers = {'Content-type': 'application/json',
-               'x-api-key': f'{test_x_api_key}',
-               'Authorization': f'Bearer {test_orders_jwt_lm}'
+               'x-api-key': f'{apikey_lm}',
+               'Authorization': f'Bearer {lm_access_token}'
                }
     params = {"status": "created"}
     metod = '/parcels'
-    target_url = url + metod
-    response = requests.get(target_url, params=params, headers=headers)
+    target_url = url_orders + metod
+    response = requests.get(target_url, params=params, headers=headers)  # params=params,
     data = response.json()
-
-    print('send_get_new_orders', len(data), data)
+    print('send_get_new_orders', response.status_code,  len(data), data)
     return data
 
+# send_get_new_orders()
 
 def send_get_orders_lm():
     url = 'https://api-test.leroymerlin.ru/marketplace/merchants/v1'
@@ -257,7 +255,7 @@ def confirm_orders(data):  #list orders,
             our_id = id_mp.replace('-', '')[:10]
             shop_Name = 'Leroy'
             shipment_Date = order["creationDate"]  ##add one day?
-            status = order.get("status", "CREATED")
+            status = order.get("status", "accept")
             our_status = 'NEW'
             payment_Type = "PREPAID"
             delivery = order.get("deliveryServiceName")
@@ -269,9 +267,9 @@ def confirm_orders(data):  #list orders,
 
         else:
             order = (id_mp, False, [])
-        print(proxy)
-        proxy.append(order)
 
+        proxy.append(order)
+        print(' confirm order', proxy)
     return proxy
 
 async def get_new_orders_lm():
@@ -288,13 +286,14 @@ async def get_new_orders_lm():
         else:
             #resp = get_smth('/parcels/' + order[0][0] + '/statuses') #for test ONLY
             await post_smth('/parcels/' + order[0][0] + ':cancel', None) #TODO for PROD use Required
-            #print('get_new_orders_lm', resp, resp.json())
+            print('get_new_orders_lm not confirm', order[0][0])
     print(len(data), '--- get_new_orders_lm', len(result), result)
 
 
 # send_get_token()
-get_assortment()
-# send_stocks_lm()
-send_price_lm()
+# get_assortment()
+# # send_stocks_lm()
+# send_price_lm()
 # check_stocks()
-#asyncio.run(get_new_orders_lm())
+# asyncio.run(get_new_orders_lm())
+# send_get_token()

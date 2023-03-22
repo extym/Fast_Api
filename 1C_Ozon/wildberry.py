@@ -1,7 +1,7 @@
 import random
 import string
 import asyncio
-from read_json import read_json_wb
+from read_json import read_json_wb, read_json_ids
 import requests
 import json
 from cred import wb_apikey
@@ -153,10 +153,16 @@ def get_new_orders_wb():
     print('get_new_orders_wb', response, len(data), data)
     return data
 
+async def get_id_1c(vendor_code):
+    data = read_json_ids()
+    if vendor_code in data.keys():
+        id_1c = data[vendor_code][0]
+
+    return id_1c
 
 async def processing_orders_wb():
-    orders = proxy_wb_orders["orders"]   #get_new_orders_wb().get("orders")
-    #print(orders)
+    # orders = proxy_wb_orders["orders"]    # FOR TEST ONLY TODO
+    orders = get_new_orders_wb().get("orders")
     if orders[0].get("id") is not None:
         for order in orders:
             id_mp = order["id"]
@@ -166,17 +172,24 @@ async def processing_orders_wb():
             status = "created"
             our_status = "NEW"
             payment_Type = "PREPAID"
-            delivery = order.get("supplyId", 'Need')
-            list_items = order["skus"]
-            summ_orger = order["price"] / 100
+            delivery = order.get("deliveryType", 'Not_Know')
+            # list_items = order["skus"]
+            summ_order = order["price"] / 100
+            vendor_code = order["article"]
+            quantity = order.get("quantity", 1)
+            id_1c = await get_id_1c(vendor_code)
             result = (id_mp, our_id, shop_Name, shipment_Date,
                          status, our_status, payment_Type, delivery)
             await execute_query(query_write_order, result)
+            items_data = (id_mp, our_id, shop_Name, "NEW", vendor_code,
+                          id_1c, quantity, summ_order)
+            print('items_data', items_data)
+            await executemany_query(query_write_items, [items_data])
         print(f"Write {len(orders)} orders WB")
 
     print("Recieved orders WB", len(orders))
 
-#asyncio.run(processing_orders_wb())
+# asyncio.run(processing_orders_wb())
 
 def get_wh():
     headers = {'Content-type': 'application/json',

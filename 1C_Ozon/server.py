@@ -103,7 +103,7 @@ def token_generator(size=10, chars=string.ascii_uppercase + string.digits):
 
 
 def create_data_for_1c(data):
-    print('create_data_for_1c', data)
+    #print('create_data_for_1c', data)
     list_items = data[1]
     items_pr = []
     for item in list_items:
@@ -826,10 +826,11 @@ async def check_orders():
     ip_addr = request.environ.get('REMOTE_ADDR')  ## return ::ffff:46.21.252.7
     addr = request.headers.get('X-Forwarded-For')  # 'X-Forwarded-For': '46.21.252.7'
     #printt(ip_addr, addr)
-    if ip_addr == '::ffff:46.21.252.7' or ip_addr == '46.21.252.7' or ip_addr == '54.86.50.139':  #POSTMAN
+    if ip_addr == '::ffff:46.21.252.7' or ip_addr == '46.21.252.7':  # or ip_addr == '54.86.50.139':  #POSTMAN
         data = get_one_order()  #query_read_order(get_new_order))
         if data[0] is not None:
             re_data = create_data_for_1c(data)
+            print("SEND order", re_data)
             response = json.dumps(re_data)
             await execute_query(rebase_order,
                             ("SEND", data[0][0], data[0][1]))

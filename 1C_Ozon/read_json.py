@@ -18,7 +18,7 @@ def process_json_list():
         id_1c = keys
         vendor_code = value[0]
         price = value[1].get(u'Цена')  #["\u0426\u0435\u043d\u0430"]
-        quantity = value[2].get(u'Остаток', 0) - value[2].get(u'Резерв', 0)
+        quantity = value[2].get(u'Остаток', 0)  #  - value[2].get(u'Резерв', 0)
         if quantity < 0:
             quantity = 0
         outlets = value[4]
@@ -40,7 +40,7 @@ def process_json_dict():
         id_1c = keys
         vendor_code = value[0]
         price = value[1].get(u'Цена')  #["\u0426\u0435\u043d\u0430"]
-        quantity = value[2].get(u'Остаток', 0) - value[2].get(u'Резерв', 0)
+        quantity = value[2].get(u'Остаток', 0) #- value[2].get(u'Резерв', 0)
         if quantity < 0:
             quantity = 0
         outlets = value[4]
@@ -62,7 +62,7 @@ def read_json_wb():
             vendor_code = value[0]
             price = value[1].get(u'Цена')  #["\u0426\u0435\u043d\u0430"]
             outlets = value[4]
-            quantity = value[2].get(u'Остаток', 0) - value[2].get(u'Резерв', 0)
+            quantity = value[2].get(u'Остаток', 0) # - value[2].get(u'Резерв', 0)
             if quantity < 0:
                 quantity = 0
             proxy = (id_1c, vendor_code, price, quantity, outlets)
@@ -84,7 +84,7 @@ def read_json_lm():
             id_1c = keys
             vendor_code = value[0]
             price = value[1].get(u'Цена')  #["\u0426\u0435\u043d\u0430"]
-            quantity = value[2].get(u'Остаток', 0) - value[2].get(u'Резерв', 0)
+            quantity = value[2].get(u'Остаток', 0) # - value[2].get(u'Резерв', 0)
             if quantity < 0:
                 quantity = 0
             proxy = (id_1c, price, quantity) # id_1C, vendor_vode (SKU), price, quantity
@@ -131,8 +131,8 @@ def read_json_on():
         id_1c = key
         vendor_code = value[0]
         price = value[1].get(u'Цена')  # ["\u0426\u0435\u043d\u0430"]
-        quantity = value[2].get(u'Остаток', 0) - value[2].get(u'Резерв', 0)
-        if quantity < 0:
+        quantity = value[2].get(u'Остаток', 0) # - value[2].get(u'Резерв', 0)
+        if quantity is None:
             quantity = 0
         in_outlets = [ozon_wh_id[out][0] for out in ozon_wh_id if out in outlets]
         proxy = (id_1c, price, quantity, in_outlets)
@@ -153,8 +153,8 @@ def read_json_sper():
             id_1c = key
             vendor_code = value[0]
             price = value[1].get(u'Цена')  #["\u0426\u0435\u043d\u0430"]
-            quantity = value[2].get(u'Остаток', 0) - value[2].get(u'Резерв', 0)
-            if quantity < 0:
+            quantity = value[2].get(u'Остаток', 0) # - value[2].get(u'Резерв', 0)
+            if quantity is None:
                 quantity = 0
             proxy = (id_1c, vendor_code, price, quantity) # id_1C, vendor_vode (SKU), price, quantity
             #result_dict[vendor_code] = proxy
@@ -170,8 +170,8 @@ def read_json_ids():
         id_1c = key
         vendor_code = value[0]
         price = value[1].get(u'Цена')
-        quantity = value[2].get(u'Остаток', 0) - value[2].get(u'Резерв', 0)
-        if quantity < 0:
+        quantity = value[2].get(u'Остаток', 0)  # - value[2].get(u'Резерв', 0)
+        if quantity is None:
             quantity = 0
         result_dict[vendor_code] = (id_1c, price, quantity)
 

@@ -65,8 +65,8 @@ def post_get_smth(metod):
 #post_get_smth(metod_get_list_products)
 
 
-wh = ['OZ.RFBSнашсклДЛ', 'OZ.RFBSНашсклСДЭК', 'OZ.НашадостМиМО',
-      'OZ.ОктКГnew', 'OZ.ОснКурьер', 'OZ.ДостКГ']
+# wh = ['OZ.RFBSнашсклДЛ', 'OZ.RFBSНашсклСДЭК', 'OZ.НашадостМиМО',
+#       'OZ.ОктКГnew', 'OZ.ОснКурьер', 'OZ.ДостКГ']
 
 
 def get_product_info(product_id, offer_id):

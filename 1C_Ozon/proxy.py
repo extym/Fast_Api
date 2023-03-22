@@ -294,6 +294,13 @@ proxy_lm_2 = {
    "calculatedWidth":686
 }
 
+proxy_status = ['Pickup_our_wh',
+                'Our_delivery_to_client',
+                'Our_delivery_to_service',
+                'Service_from_our_wh',
+                'Delivery_service_desicion']
+
+
 proxy_ym = {
   "order":
   {
@@ -436,7 +443,7 @@ proxy_wb_orders = {
          "prioritySc":[
 
          ],
-         "id":698387374,
+         "id":698387374-2,
          "warehouseId":664706,
          "nmId":143537174,
          "chrtId":242393399,
@@ -461,7 +468,7 @@ proxy_wb_orders = {
          "prioritySc":[
 
          ],
-         "id":698399204,
+         "id":698399204-2,
          "warehouseId":664706,
          "nmId":145721888,
          "chrtId":245485480,
@@ -486,7 +493,7 @@ proxy_wb_orders = {
          "prioritySc":[
             "Коледино"
          ],
-         "id":698491674,
+         "id":698491674-1,
          "warehouseId":664706,
          "nmId":145721887,
          "chrtId":245485479,

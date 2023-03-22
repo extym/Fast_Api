@@ -8,8 +8,12 @@ from ozon import send_stocks_on
 from wildberry import send_stocks_wb
 from leroy import send_stocks_lm, get_new_orders_lm, send_price_lm
 from sper import send_stocks_sb
-def job():
+from wildberry import processing_orders_wb
+def job_lm():
     asyncio.run(get_new_orders_lm())
+
+def job_wb():
+    asyncio.run(processing_orders_wb())
 
 # schedule.every(151).seconds.do(job)
 schedule.every(1799).seconds.do(create_dbs)
@@ -21,7 +25,8 @@ schedule.every(10).minutes.do(send_price_lm)
 schedule.every(595).seconds.do(send_stocks_on)
 schedule.every(590).seconds.do(send_stocks_wb)
 schedule.every(585).seconds.do(send_stocks_sb)
-schedule.every(10).minutes.do(job)
+schedule.every(10).minutes.do(job_lm)
+schedule.every(10).minutes.do(job_wb)
 #
 while True:
     schedule.run_pending()
