@@ -1,13 +1,13 @@
 import json
 import random
 import string
-from datetime import datetime
-from cred import apikey_lm, login_lm, pass_lm, test_apikey_lm, lm_access_token, access_token, test_x_api_key, test_orders_jwt_lm
+from datetime import datetime, timedelta
+from cred import apikey_lm, login_lm, pass_lm, x_api_key, test_apikey_lm, lm_access_token, access_token, test_x_api_key, test_orders_jwt_lm
 from read_json import read_json_lm
 import pytz
 import requests
 from conn import *
-from proxy import proxy_lm
+from proxy import proxy_lm, proxy_lm_1
 import asyncio
 
 test_url = 'http://localhost:5500/response'
@@ -18,6 +18,16 @@ time = datetime.now(pytz.timezone("Africa/Nairobi")).replace(microsecond=0).isof
 
 def token_generator(size=12, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
+
+
+def proxy_time_1():
+    dt = datetime.now().date() + timedelta(days=1)
+    d = str(dt).split('-')
+    d.reverse()
+    pt = '-'.join(d)
+
+    return pt
+
 
 def send_get_token():
     url = 'https://api.leroymerlin.ru/'
@@ -46,7 +56,7 @@ def get_assortment():
     response = answer.json()
     assortment = response['result']
     products = assortment['products']
-    print('get_assortment', products)
+    print('get_assortment', len(products))
     return products
 
 # get_assortment()
@@ -101,7 +111,7 @@ def send_price_lm():
     data = check_price()
     answer = requests.post(url_address, data=json.dumps(data), headers=headers)
     re = answer.json()
-    print('send_price_leroy', answer, re, data)
+    print('send_price_leroy', len(data), answer, re)
 
 
 def check_stocks():
@@ -153,7 +163,7 @@ def reformat_data_product(order, list_items,  shop):
     #         order['order']["paymentType"],
     #         order['order']["delivery"]
     #     )
-        print('reformat_data_product--', result)
+        #print('reformat_data_product--', result)
     return result
 
 
@@ -206,15 +216,27 @@ def get_smth(metod):
 
     return response
 
-async def post_smth(metod, data):
+def check_is_exist(id_mp, shop):
+    data = check_order(query_read_order, (id_mp, shop))
+    # print('check_is_exist', data, id_mp, shop)
+    if len(data) > 0:
+        result = True
+    else:
+        result = False
+
+    return result
+
+# check_is_exist('MP2713064-001', 'Leroy')
+
+async def empty_post_smth(metod):
     # url = 'https://api.leroymerlin.ru/marketplace/api/v1/'
     url = 'https://api-test.leroymerlin.ru/marketplace/merchants/v1/'   #TODO for test ONLY
     headers = {'Content-type': 'application/json',
-               'x-api-key': f'{test_x_api_key}',
-               'Authorization': f'Bearer {test_orders_jwt_lm}'
+               'x-api-key': f'{x_api_key}',
+               'Authorization': f'Bearer {lm_access_token}'
                }
     target_url = url + metod
-    response = requests.post(target_url, headers=headers, data=json.dumps(data))
+    response = requests.post(target_url, headers=headers)
     print(response, response.json(), target_url)
     # return response
 
@@ -254,13 +276,13 @@ def confirm_orders(data):  #list orders,
             #our_id = token_generator()
             our_id = id_mp.replace('-', '')[:10]
             shop_Name = 'Leroy'
-            shipment_Date = order["creationDate"]  ##add one day?
+            shipment_Date = proxy_time_1()   #order["creationDate"]  ##add one day?
             status = order.get("status", "accept")
             our_status = 'NEW'
             payment_Type = "PREPAID"
             delivery = order.get("deliveryServiceName")
             order_summ = order.get("parcelPrice")
-            order_data = (our_id, id_mp, shop_Name, shipment_Date,
+            order_data = (id_mp, our_id, shop_Name, shipment_Date,
                      status, our_status, payment_Type, delivery)
             list_items = reformat_data_product(order_data, confirm[1], 'Leroy')
             order = (order_data, True, list_items)
@@ -273,21 +295,27 @@ def confirm_orders(data):  #list orders,
     return proxy
 
 async def get_new_orders_lm():
-    data = send_get_new_orders()  # TODO commented for test ONLY
-    #data = proxy_lm                    #for test ONLY
+    # data = proxy_lm_1              #for test ONLY
     #data = send_get_orders_lm()       #for test ONLY
+    data = send_get_new_orders()  # TODO commented for test ONLY
     result = confirm_orders(data)
     for order in result:
         if order[1]:
-            await post_smth('/parcels/' + order[0][0] + ':confirm', None)  #TODO for PROD use Required
-            await execute_query(query_write_order, order[0])
-            print('get_new_orders_lm---', order)
-            await executemany_query(query_write_items, order[2])
+            check = check_is_exist(order[0][0], 'Leroy')
+            if check:
+                print(order[0][0], 'Leroy', 'is_exist - ', check)
+                continue
+            else:
+                #await empty_post_smth('/parcels/' + order[0][0] + ':confirm')  #TODO for PROD use Required
+                await execute_query(query_write_order, order[0])
+                await executemany_query(query_write_items, order[2])
+                print('get_new_orders_lm---', order[0])
+
         else:
             #resp = get_smth('/parcels/' + order[0][0] + '/statuses') #for test ONLY
-            await post_smth('/parcels/' + order[0][0] + ':cancel', None) #TODO for PROD use Required
+            await empty_post_smth('/parcels/' + order[0][0] + ':cancel') #TODO for PROD use Required
             print('get_new_orders_lm not confirm', order[0][0])
-    print(len(data), '--- get_new_orders_lm', len(result), result)
+    print(len(data), '--- get_new_orders_lm', len(result))
 
 
 # send_get_token()

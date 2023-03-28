@@ -59,7 +59,7 @@ def post_get_smth(metod):
     result = data['result']['items']
     total = data['result']['total']
     last_id = data['result']['last_id']
-    print('post_get_smth_onon', result[0]) #{'product_id': 38010832, 'offer_id': 'OWLT190601', 'is_fbo_visible': True, 'is_fbs_visible': True, 'archived': False, 'is_discounted': False}
+    print('post_get_smth_onon', result[0])
     return result, total, last_id
 
 #post_get_smth(metod_get_list_products)
@@ -88,33 +88,27 @@ def create_data_stocks():
     data_read = read_json_on()  #{'OWLM200602': ('b9719989-e055-11ea-82ad-00155d58510a', 11500, 15)}
     result = []
     stocks = []
-    proxy_skus = {}
+    # proxy_skus = {}
     current_assortment = post_get_smth(metod_get_list_products)[0]
     for product in current_assortment:
-        try:
-            sku = get_product_info(product['product_id'], product['offer_id'])
-            proxy_skus[sku] = (product['product_id'], product['offer_id'])
-        except Exception as error:
-            print(f"create_data_stocks & get_product_info ".format(error))
-        finally:
-            proxy = {}
-            if product['offer_id'] in data_read.keys():
-                proxy['offer_id'] = product['offer_id']
-                proxy['product_id'] = product['product_id']
-                proxy['stock'] = data_read[product['offer_id']][2]
-                outlets = data_read[product['offer_id']][3]
-                for wh in outlets:
-                    proxy['warehouse_id'] = wh
-                    stocks.append(proxy)
+        proxy = {}
+        if product['offer_id'] in data_read.keys():
+            proxy['offer_id'] = product['offer_id']
+            proxy['product_id'] = product['product_id']
+            proxy['stock'] = data_read[product['offer_id']][2]
+            outlets = data_read[product['offer_id']][3]
+            for wh in outlets:
+                proxy['warehouse_id'] = wh
+                pr = proxy.copy()
+                stocks.append(pr)
 
     while len(stocks) >= 100:
         result.append(stocks[:100])
         del stocks[:100]
+        # print(len(stocks))
     else:
         result.append(stocks)
 
-    write_json_skus(proxy_skus)
-    print('create_data_skus_onon', len(proxy_skus))
     print('create_data_stocks_onon_x100', len(result))
     return result
 
@@ -147,11 +141,16 @@ def send_stocks_on():
         # print(ans)
         result = answer["result"]
         for row in result:
-            if len(row["errors"]) > 0:
+            if len(row["errors"]) > 0 and row['warehouse_id'] != 23012928587000: #TODO temporary 'warehouse_id': 23012928587000
                 print('error from send_stocks_on', row)
+            # elif row['updated'] == False:
+            #     print('error update from send_stocks_on', row)
+            # elif row['offer_id'] == 'OWLINSTTI.OWLT190101':
+            #     print('SUCCES update from send_stocks_on', row)
         proxy.append(answer)
-        sleep(1)
+        sleep(0.4)
 
+# send_stocks_on()
 
 def product_info_price(id_mp):  #product_id, offer_id
     # url = 'https://api-seller.ozon.ru/v4/product/info/prices'

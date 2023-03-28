@@ -68,22 +68,42 @@ def execute_query_return_id(connection, query, data):
     return lastrowid
 
 
-def query_read_order(query):
+def check_order(query, data):
     connection = create_connection()
-    connection.autocommit = True
     cursor = connection.cursor()
-    data = 'stop'
-    # try:
-    data = cursor.execute(query)
-    print("Query from query_read_order executed successfully")
-
-    # except OperationalError as err:
-    #     print(f"The ERROR from execute_query_return_id '{err}' occured ")
+    re_data = None
+    try:
+        cursor.execute(query, data)
+        re_data = cursor.fetchall()
+        print("Query from check_order executed successfully")
+    except OperationalError as err:
+        print(f"The ERROR from check_order '{err}' occured ")
 
     cursor.close()
     connection.close()
 
-    return data
+    return re_data
+
+
+def check_is_exist(query, data):
+    connection = create_connection()
+    cursor = connection.cursor()
+    result = False
+    try:
+        cursor.execute(query, data)
+        redata = cursor.fetchone()
+        print(f"Query from check_is_exist '{data[0]}' executed successfully")
+        if redata is not None:
+            result = True
+    except OperationalError as err:
+        print(f"The ERROR from check_order '{err}' occured ")
+
+    cursor.close()
+    connection.close()
+
+    return result
+
+# check_order( query_read_order, ("MP2713064-001", 'Leroy'))
 
 
 def get_one_order():

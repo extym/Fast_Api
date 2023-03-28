@@ -1,3 +1,4 @@
+from datetime import datetime,  timedelta
 import random
 import string
 import asyncio
@@ -66,6 +67,17 @@ wh = [{"name":"Обычный склад СТМ","id":664706, "name_1C": "WB.Н�
 def token_generator(size=12, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
+
+def proxy_time_1():
+    dt = datetime.now().date() + timedelta(days=1)
+    d = str(dt).split('-')
+    d.reverse()
+    pt = '-'.join(d)
+    print(pt)
+    return pt
+
+
+
 def make_send_data():
     data = read_json_wb()
     print('make_send_data', len(data))
@@ -103,8 +115,19 @@ def send_stocks_wb():
 
         print('send_stocks_wb', key, answer, re_data)
 
-
 # send_stocks_wb()
+
+
+def check_is_exist(id_mp, shop):
+    data = check_order(query_read_order, (id_mp, shop))
+    print(data, id_mp, shop)
+    if len(data) > 0:
+        result = True
+    else:
+        result = False
+
+    return result
+
 
 def get_new_supply_wb(next):
     headers = {'Content-type': 'application/json',
@@ -163,28 +186,32 @@ async def get_id_1c(vendor_code):
 async def processing_orders_wb():
     # orders = proxy_wb_orders["orders"]    # FOR TEST ONLY TODO
     orders = get_new_orders_wb().get("orders")
-    if orders[0].get("id") is not None:
+    if len(orders) > 0:
         for order in orders:
-            id_mp = order["id"]
+            id_mp = str(order["id"])
             our_id = token_generator()
             shop_Name = "WB"
-            shipment_Date = order["createdAt"] #TODO plus 1 day?
-            status = "created"
-            our_status = "NEW"
-            payment_Type = "PREPAID"
-            delivery = order.get("deliveryType", 'Not_Know')
-            # list_items = order["skus"]
-            summ_order = order["price"] / 100
-            vendor_code = order["article"]
-            quantity = order.get("quantity", 1)
-            id_1c = await get_id_1c(vendor_code)
-            result = (id_mp, our_id, shop_Name, shipment_Date,
-                         status, our_status, payment_Type, delivery)
-            await execute_query(query_write_order, result)
-            items_data = (id_mp, our_id, shop_Name, "NEW", vendor_code,
-                          id_1c, quantity, summ_order)
-            print('items_data', items_data)
-            await executemany_query(query_write_items, [items_data])
+            check = check_is_exist(id_mp, shop_Name)
+            if check:
+                continue
+            else:
+                shipment_Date = proxy_time_1()   #order["createdAt"] #TODO plus 1 day?
+                status = "CREATED"
+                our_status = "NEW"
+                payment_Type = "PREPAID"
+                delivery = order.get("deliveryType", 'Not_Know')
+                # list_items = order["skus"]
+                summ_order = order["price"] / 100
+                vendor_code = order["article"]
+                quantity = order.get("quantity", 1)
+                id_1c = await get_id_1c(vendor_code)
+                result = (id_mp, our_id, shop_Name, shipment_Date,
+                             status, our_status, payment_Type, delivery)
+                await execute_query(query_write_order, result)
+                items_data = (id_mp, our_id, shop_Name, "NEW", vendor_code,
+                              id_1c, quantity, summ_order)
+                print('items_data_WB', items_data)
+                await executemany_query(query_write_items, [items_data])
         print(f"Write {len(orders)} orders WB")
 
     print("Recieved orders WB", len(orders))

@@ -22,7 +22,7 @@ UNIQUE (id_mp)
 """
 
 create_delivered_orders_table = """
-CREATE TABLE IF NOT EXISTS fresh_orders (
+CREATE TABLE IF NOT EXISTS send_orders (
 id SERIAL PRIMARY KEY,
 id_mp varchar NOT NULL,
 our_Id varchar,
@@ -54,6 +54,27 @@ CREATE TABLE IF NOT EXISTS order_items (
     price varchar)
 """
 
+
+create_send_order_items = """
+CREATE TABLE IF NOT EXISTS send_order_items (
+    id_mp varchar NOT NULL,
+    FOREIGN KEY (id_mp)
+        REFERENCES send_orders (id_mp)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+    our_order_id varchar,
+    shop_name TEXT NOT NULL,
+    our_status TEXT NOT NULL, 
+    vendor_code varchar NOT NULL,
+    id_1c varchar NOT NULL,
+    quantity varchar NOT NULL, 
+    price varchar)
+"""
+
+
+query_read_order = (" SELECT * from fresh_orders "
+                         " WHERE id_mp = %s and shop_name = %s ")
+
+
 query_write_order = ("INSERT INTO fresh_orders "
     "(id_mp, our_id, date_Added, date_Modifed, shop_Name, "
                      "shipment_Date, status, our_status, payment_Type, delivery)"
@@ -64,8 +85,8 @@ query_write_order = ("INSERT INTO fresh_orders "
 #                      "shipment_Date, status, our_status, payment_Type, delivery)"
 #                      "VALUES (%s, %s, NOW(), NOW(), %s, %s, %s, %s, %s, %s)")
 
-query_read_full_order = (" SELECT * from fresh_orders, order_items "
-                         " WHERE id_mp = %s and shop_name = %s ")
+query_rm_full_order = (" SELECT * from fresh_orders, order_items "
+                         " WHERE id_mp = %s")
 
 query_write_items = ("INSERT INTO order_items "
     "(id_mp, our_order_id, shop_Name, "
@@ -85,10 +106,26 @@ read_order_items = (" SELECT * from order_items "
 update_send_data_order = (" UPDATE fresh_orders SET dateSendData = NOW(), dateModifed = NOW(), ourStatus = 'SEND_TO_1C' "
                           " WHERE id_MP = %s and shop_name = %s ")
 
+
 update_status_order = (" UPDATE fresh_orders "
                        "SET status = %s, our_status = %s "
+                       "WHERE id_MP = %s and shop_name = %s ")
+
+
+update_status_order_reverse_id = (" UPDATE fresh_orders "
+                       "SET status = %s, our_status = %s "
+                       "WHERE our_id = %s and shop_name = %s ")
+
+
+rewrite_status_order = (" UPDATE fresh_orders "
+                       "SET status = %s "
                        "WHERE id_MP = %s and shop_name = %s ")
 
 rebase_order = (" UPDATE fresh_orders "
                "SET our_status = %s "
                "WHERE id = %s and id_MP = %s ")
+
+
+strong_rebase_order = (" INSERT INTO send_orders "
+    "(id_mp, our_order_id, shop_Name, our_status, vendor_code, id_1c, quantity, price)"
+    "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)")
