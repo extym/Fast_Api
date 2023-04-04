@@ -173,15 +173,17 @@ def create_sp():
     xml_root.appendChild(productChild)
 
     xml_str = root.toprettyxml(indent="\t", encoding="UTF-8")
-    #for development
-    save_path_file = "sber.xml"
-    #for production
-    # save_path_file = "/var/www/html/2c/sber.xml"
+    try:
+        save_path_file = "sber.xml"
+        with open(save_path_file, "wb") as f:
+            f.write(xml_str)
+    except:
+        save_path_file = "/var/www/html/2c/sber.xml"
 
-    with open(save_path_file, "wb") as f:
-        f.write(xml_str)
+        with open(save_path_file, "wb") as f:
+            f.write(xml_str)
 
 
 
 
-create_sp()
+# create_sp()

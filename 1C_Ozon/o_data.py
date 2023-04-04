@@ -171,12 +171,19 @@ def o_create():
 
     xml_str = root.toprettyxml(indent="\t")
     #for development
-    save_path_file = "ozon_data.xml"
+    try:
+        save_path_file = "/var/www/html/stm/ozon_data.xml"
+        with open(save_path_file, "w") as f:
+            f.write(xml_str)
+    except:
+        save_path_file = "ozon_data.xml"
+        with open(save_path_file, "w") as f:
+            f.write(xml_str)
     #for production
-    # save_path_file = "/var/www/html/2c/ozon_data.xml"
+    #
 
     with open(save_path_file, "w") as f:
         f.write(xml_str)
 
 
-o_create()
+# o_create()

@@ -7,8 +7,8 @@ import requests
 
 # r = requests.get('http://super-good.ml/test_json.json')
 # data = r.json()
-
-link = 'http://stm-json.i-bots.ru/test_json.json'
+link = 'http://super-good.ml/test_json.json'
+# link = 'http://stm-json.i-bots.ru/test_json.json'
 #processing TEST data from json (proxy file) for price & etc.
 def process_json_list():
     r = requests.get(link)

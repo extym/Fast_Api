@@ -14,6 +14,7 @@ from our_request import data_psh, data_pshh
 from cred import token_market_dbs, tokens_market, token_market_fbs_exp, token_sper
 from ozon import read_skus, product_info_price
 from sper import post_smth_sb, check_is_accept_sb
+from time import sleep
 #from cred import token_market_dbs, token_market_fbs
 import urllib3
 urllib3.disable_warnings()
@@ -113,7 +114,8 @@ def create_data_for_1c(data):
         items_pr.append(proxy)
 
     status = data[0][9]
-    if status == "NEW" or status.upper() == 'CREATED':
+    statuses = ['PROCESSING', 'ACCEPTED', 'CREATED', "NEW"]
+    if status.upper() in statuses:
         status = 'accept'
 
     data_re = {
@@ -208,6 +210,23 @@ def data_summary():
         data_orders = json.load(file)
 
     return data_orders
+
+
+def day_for_stm(string):
+    datta = datetime.strptime(string, '%Y-%m-%d')
+    dat = datta.weekday()
+    dtt = datta.strftime('%d-%m-%Y')
+    if 1 <= dat <= 4:
+        dtt = (datta - timedelta(1)).strftime('%d-%m-%Y')
+    elif dat == 5:
+        proxy = datta + timedelta(2)
+        dtt = proxy.strftime('%d-%m-%Y')
+    elif dat == 6:
+        proxy = datta + timedelta(1)
+        dtt = proxy.strftime('%d-%m-%Y')
+
+    #print('datta',dat,  dtt)
+    return dtt
 
 
 def check_is_accept_ym(list_items):
@@ -394,13 +413,14 @@ def reverse_time(time):
 #"Yandex", "Ozon", "Sber", "Leroy", "WB"
 
 def reformat_data_order(order, shop):
+    day = reverse_time(order["delivery"]["shipments"][0]["shipmentDate"])
     result = None
     if shop == 'Yandex':
         result = (
             order["id"],
             order["our_id"],
             shop,   #order["shop"],
-            order["delivery"]["shipments"][0]["shipmentDate"],
+            day_for_stm(day),
             order["status"],
             order["our_status"],
             order["paymentType"],
@@ -414,7 +434,7 @@ def reformat_data_order(order, shop):
             order['id'],
             order["our_id"],
             shop,
-            reverse_time(time),
+            day_for_stm(time), #reverse_time()
             order["status"],
             order["our_status"],
             "PREPAID",
@@ -422,12 +442,12 @@ def reformat_data_order(order, shop):
         )
 
     elif shop == 'Sber':
-        time = order["shipments"][0]["shipmentDate"].split('T')[0]
+        time = order["shipping"]["shippingDate"].split('T')[0]
         result = (
             order["shipments"][0]["shipmentId"],
             order['our_id'],
             shop,  #order["shop"],
-            reverse_time(time),
+            day_for_stm(time),  #reverse_time(time),
             order["status"],
             order["our_status"],
             "PREPAID",  #order['data'].get("paymentType"),
@@ -465,14 +485,14 @@ def reformat_data_items(order, shop):
         list_items = order['items']
         for item in list_items:
             proxy = (
-                order["posting_number"],
+                order["id"],
                 order["our_id"],
                 shop,
                 order["our_status"],
                 item["offerId"],
-                item["id_ic"],
+                item["id_1c"],
                 item["count"],
-                item["price"]
+                item["price"] + item.get("subsidy")
             )
             result.append(proxy)
 
@@ -593,10 +613,11 @@ async def order_accept_ym():
         proxy = order['items']
         our_id = token_generator()
         stock = check_is_accept_ym(proxy)  # проверяем наличие for order
+        print('fak', stock[1])
         if stock[0]:
             data = order_resp_ym(our_id, stock[0])
             response = app.response_class(
-            json.dumps(data[0]),
+            json.dumps(data),
             status=200,
             content_type='application/json'
             )
@@ -604,18 +625,28 @@ async def order_accept_ym():
                 order['our_id'], order['status'], order['our_status']\
                     = our_id, "ACCEPTED", "NEW"
                 ref_data = reformat_data_order(order, 'Yandex')
-                await execute_query(query_write_order, ref_data)
-                list_items = reformat_data_items(order, 'Yandex')
-                await executemany_query(query_write_items, list_items)
-                response = app.response_class(
-                    json.dumps(data[0]),
-                    status=200,
-                    content_type='application/json'
-                )
+                check_is = check_is_exist(query_read_order, (str(order['id']), 'Yandex'))
+                if check_is:
+                    response = app.response_class(
+                        json.dumps(data),
+                        status=200,
+                        content_type='application/json'
+                    )
+                else:
+                    await execute_query(query_write_order, ref_data)
+                    order['items'] = stock[1]
+                    list_items = reformat_data_items(order, 'Yandex')
+                    print('list_items', list_items)
+                    await executemany_query(query_write_items, list_items)
+                    response = app.response_class(
+                        json.dumps(data),
+                        status=200,
+                        content_type='application/json'
+                    )
         else:
             data = order_resp_ym(order, False)
             response = app.response_class(
-                json.dumps(data[0]),
+                json.dumps(data),
                 status=200,
                 content_type='application/json'
             )
@@ -750,7 +781,7 @@ def order_cancell_ym():
 @app.route('/order/new', methods=['POST'])
 async def new_order_sb():
     token = request.headers.get('Basic auth')
-    print('from_order_new', token)
+    print('from_order_new_token', token)
     if token == None or token != None:
         data_req = request.get_json()
         print('data_from_order_new', data_req)
@@ -892,6 +923,7 @@ async def onon_push():
         our_id = token_generator()
         id_mp = resp["posting_number"]
         # our_id = id_mp.replace('-', '')[:10]
+        sleep(1)
         order = product_info_price(id_mp)
         print('new_order_onon', order)
         order['our_id'], order['id'],  order['status'], order['our_status'] \
@@ -916,6 +948,12 @@ async def onon_push():
         print('cencelled_order_onon', order_id)
         response = app.response_class(
             json.dumps(common_comfirm_response),
+            status=200
+        )
+        
+    elif resp.get("message_type") != None:
+        response = app.response_class(
+            json.dumps(common_error),
             status=200
         )
 

@@ -76,7 +76,21 @@ def proxy_time_1():
     print(pt)
     return pt
 
+def day_for_stm(string):
+    datta = datetime.strptime(string, '%Y-%m-%d')
+    dat = datta.weekday()
+    dtt = datta.strftime('%d-%m-%Y')
+    if 1 <= dat <= 4:
+        dtt = (datta - timedelta(1)).strftime('%d-%m-%Y')
+    elif dat == 5:
+        proxy = datta + timedelta(2)
+        dtt = proxy.strftime('%d-%m-%Y')
+    elif dat == 6:
+        proxy = datta + timedelta(1)
+        dtt = proxy.strftime('%d-%m-%Y')
 
+    #print('datta',dat,  dtt)
+    return dtt
 
 def make_send_data():
     data = read_json_wb()

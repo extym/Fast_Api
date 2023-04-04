@@ -2,7 +2,7 @@ import json
 import requests
 from datetime import datetime
 from read_json import read_json_sper
-from cred import test_token_sper, token_sper
+from cred import token_sper
 
 url = 'https://partner.sbermegamarket.ru/api/merchantIntegration/v1/offerService/'
 
@@ -35,7 +35,7 @@ def send_stocks_sb():
                }
     metod = 'stock/update'
     url_address = url + metod #+ '?login=' + login_lm + '&password=' + pass_lm
-    answer = requests.post(url_address, headers=headers, data=json.dumps(data))
+    answer = requests.post(url_address, headers=headers, json=data)
     
     print('send_stocks_sb', answer, answer.text)
 
@@ -67,5 +67,4 @@ async def post_smth_sb(metod, data):
     # target_url = test_url  #TODO for TEST ONLY
     target_url = url + metod  #TODO for PRODUCTION
     response = requests.post(target_url, headers=headers, data=json.dumps(data))
-    print(''
-          'post_smth_sb', response, response.text, target_url, metod)
+    print('post_smth_sb', response, response.text, target_url, metod)

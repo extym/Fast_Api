@@ -1,4 +1,6 @@
 import csv
+import datetime
+
 # wh_ozon = {'casual':[], 'kgt': []}
 
 # wh_ozon = {'casual': ['OWLM200201', 'OWLM200300', 'OWLB191000', 'OWLB191022', 'OWLB191015', 'ИМRUNN50', 'ИМRUNN40', 'OWLM200302', 'OWLM200100', 'OWLM200301', 'OWLM200202', 'OWLT190301/2', 'OWLT190303/2', 'OWLT190402/2', 'OWLT190702/2', 'OWLT200901/2', 'OWLT190901/2', 'OWLB191032', 'OWLB191033', 'OWLB191034', 'OWLB191035', 'OWLB191036', 'OWLB191037', 'OWLB191038', 'OWLB191039', 'OWLB191044', 'OWLB191045', 'OWLB191046', 'ИМALS80', 'OWLT190305'],
@@ -158,3 +160,32 @@ import csv
 # dt = dt.replace(tzinfo=ZoneInfo('Africa/Nairobi')).isoformat()
 # print(dt)
 # # print(dt.isoformat())
+from datetime import date, timedelta
+# d = datetime.datetime.today().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=-1)
+# print(d)
+# dat = date.today() + timedelta(-1)
+#
+# string = "2023-03-28"
+# dt = datetime.datetime.strptime("2023-03-28", '%Y-%m-%d')   # '%d-%m-%Y'
+# print(dat)
+# print(dt.date() == dat)
+# print(d == dt)
+# print(date.today().weekday())
+
+# def day_for_stm(string):
+#     datta = datetime.datetime.strptime(string, '%Y-%m-%d')
+#     dat = datta.weekday()
+#     dtt = datta.strftime('%d-%m-%Y')
+#     if 1 <= dat <= 4:
+#         dtt = (datta - timedelta(1)).strftime('%d-%m-%Y')
+#     elif dat == 5:
+#         proxy = datta + timedelta(2)
+#         dtt = proxy.strftime('%d-%m-%Y')
+#     elif dat == 6:
+#         proxy = datta + timedelta(1)
+#         dtt = proxy.strftime('%d-%m-%Y')
+#
+#     #print('datta',dat,  dtt)
+#     return dtt
+
+# day_for_stm("2023-03-30")

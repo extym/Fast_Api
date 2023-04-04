@@ -85,7 +85,7 @@ def get_product_info(product_id, offer_id):
     return result
 
 def create_data_stocks():
-    data_read = read_json_on()  #{'OWLM200602': ('b9719989-e055-11ea-82ad-00155d58510a', 11500, 15)}
+    data_read = read_json_on()
     result = []
     stocks = []
     # proxy_skus = {}
@@ -98,18 +98,21 @@ def create_data_stocks():
             proxy['stock'] = data_read[product['offer_id']][2]
             outlets = data_read[product['offer_id']][3]
             for wh in outlets:
-                proxy['warehouse_id'] = wh
-                pr = proxy.copy()
-                stocks.append(pr)
+                if wh != 23012928587000:   # TODO for TEST only
+                    proxy['warehouse_id'] = wh
+                    pr = proxy.copy()
+                    stocks.append(pr)
 
+                # if wh == 23012928587000:  # TODO for TEST only
+                #     print('stocks', stocks)
     while len(stocks) >= 100:
         result.append(stocks[:100])
         del stocks[:100]
-        # print(len(stocks))
+        #print('stocks', stocks)
     else:
         result.append(stocks)
 
-    print('create_data_stocks_onon_x100', len(result))
+    print('create_data_stocks_onon_x100', len(result))  #, result)
     return result
 
 # asyncio.run(create_data_stocks())
@@ -135,17 +138,18 @@ def send_stocks_on():
     proxy = []
     for row in pre_data:
         data = {'stocks': row }
+        # print('SEND_DATA', data)
         response = requests.post(link,  headers=headers, data=json.dumps(data))
         answer = response.json()
         #ans = response.text
         # print(ans)
         result = answer["result"]
         for row in result:
-            if len(row["errors"]) > 0 and row['warehouse_id'] != 23012928587000: #TODO temporary 'warehouse_id': 23012928587000
-                print('error from send_stocks_on', row)
-            # elif row['updated'] == False:
-            #     print('error update from send_stocks_on', row)
-            # elif row['offer_id'] == 'OWLINSTTI.OWLT190101':
+            if len(row["errors"]) > 0:  #and row['warehouse_id'] != 23012928587000: #TODO temporary 'warehouse_id': 23012928587000
+                print('ERROR from send_stocks_on', row)
+            elif row['updated'] == False:
+                print('ERROR update from send_stocks_on', row)
+            # elif row['updated'] == True:  # and row['warehouse_id'] != 23012928587000:
             #     print('SUCCES update from send_stocks_on', row)
         proxy.append(answer)
         sleep(0.4)
