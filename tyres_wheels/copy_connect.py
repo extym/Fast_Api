@@ -12,10 +12,14 @@ from categories import categories_summer, categories_wheels, categories_winter, 
 
 
 def write(smth):
-    # with open('log.txt', 'a') as file:
-    with open('/usr/local/bin/fuck_debian/tyres_wheels/log.txt', 'a') as file:
-        how_time = datetime.datetime.now()
-        file.write(str(how_time) + '-' + smth + '\n')
+    try:
+        with open('log.txt', 'a') as file:
+            how_time = datetime.datetime.now()
+            file.write(str(how_time) + '-' + smth + '\n')
+    except:
+        with open('/usr/local/bin/fuck_debian/tyres_wheels/log.txt', 'a') as file:
+            how_time = datetime.datetime.now()
+            file.write(str(how_time) + '-' + smth + '\n')
 
 
 # count quantity > 4 for sale
@@ -397,7 +401,7 @@ def check_and_write():
                 continue
             except KeyError as e:
                 write("S_thing went wrong KeyError tyres---: {}".format(e))
-                write(str(data_product))
+                write('KeyError tyres ' + str(data_product))
                 print("S_thing went wrong KeyError tyres---: {}".format(e))
                 print('ERROR_2', str(data_product))
                 continue
@@ -503,13 +507,13 @@ def check_write_json(data_from_json):
                 write("S_thing went wrong connector tyres: {}".format(err))
                 write(str(data_product))
                 print("S_thing went wrong connector tyres: {}".format(err))
-                print(str(data_product))
+                print('wrong connector tyres', str(data_product))
                 continue
             except KeyError as e:
                 write("S_thing went wrong KeyError tyres---: {}".format(e))
                 write(str(data_product))
                 print("S_thing went wrong KeyError tyres---: {}".format(e))
-                print(str(data_product))
+                print('wrong connector tyres3', str(data_product))
                 continue
 
         else:
@@ -623,13 +627,13 @@ def check_for_json():
                 write("S_thing went wrong connector tyres: {}".format(err))
                 write(str(data_product))
                 print("S_thing went wrong connector tyres: {}".format(err))
-                print(str(data_product))
+                print('ERROR KeyERROR tyres', str(data_product))
                 continue
             except KeyError as e:
                 write("S_thing went wrong KeyError tyres---: {}".format(e))
                 write(str(data_product))
                 print("S_thing went wrong KeyError tyres---: {}".format(e))
-                print(str(data_product))
+                print('ERROR KeyError tyres2', str(data_product))
                 continue
 
         else:

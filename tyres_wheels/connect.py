@@ -581,13 +581,13 @@ def check_write_json(data_from_json):
                 write("S_thing went wrong connector tyres: {}".format(err))
                 write(str(data_product))
                 print("S_thing went wrong connector tyres: {}".format(err))
-                print(str(data_product))
+                print('ERROR connector', str(data_product))
                 continue
             except KeyError as e:
                 write("S_thing went wrong KeyError tyres---: {}".format(e))
                 write(str(data_product))
                 print("S_thing went wrong KeyError tyres---: {}".format(e))
-                print(str(data_product))
+                print('ERROR connector2', str(data_product))
                 continue
 
         else:
@@ -709,13 +709,13 @@ def check_for_json():
                 write("S_thing went wrong connector tyres: {}".format(err))
                 write(str(data_product))
                 print("S_thing went wrong connector tyres: {}".format(err))
-                print(str(data_product))
+                print('ERROR connector3', str(data_product))
                 continue
             except KeyError as e:
                 write("S_thing went wrong KeyError tyres---: {}".format(e))
                 write(str(data_product))
                 print("S_thing went wrong KeyError tyres---: {}".format(e))
-                print(str(data_product))
+                print('ERROR KeyError', str(data_product))
                 continue
 
         else:

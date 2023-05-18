@@ -98,3 +98,241 @@ proxy_dicty = {'10220333': '2', '112233': '6', '113355': '6', '123416': '3', '15
                'wss49fh3itd67': '1', 'ykazatelinapriajeniia57420': '14', 'ykazatelivxod85860': '10', 'zapasnoiavxod46860': '10', 'zapretkuren220': '13',
                'zapretkurit200200': '13', 'zazemleno50100': '20', 'znakaptechka200': '13', 'znakognet872018': '10', 'znakpesok1092': '10', 'zvonitipripojsre36447': '10',
                'ИПР-55К': '2', 'ио102161': '5'}
+
+
+
+proxy_onon = {
+    "result": {
+        "posting_number": "57195475-0055-5",
+        "order_id": 438764970,
+        "order_number": "57195475-0050",
+        "status": "awaiting_packaging",
+        "delivery_method": {
+            "id": 18114520187000,
+            "name": "Ozon Логистика самостоятельно, Москва",
+            "warehouse_id": 18114520187000,
+            "warehouse": "Москва основной",
+            "tpl_provider_id": 24,
+            "tpl_provider": "Ozon Логистика"
+            },
+        "tracking_number": "",
+        "tpl_integration_type": "ozon",
+        "in_process_at": "2021-11-20T09:14:16Z",
+        "shipment_date": "2021-11-23T10:00:00Z",
+        "delivering_date": None,
+        "provider_status": "",
+        "delivery_price": "",
+        "cancellation": {
+            "cancel_reason_id": 0,
+            "cancel_reason": "",
+            "cancellation_type": "",
+            "cancelled_after_ship": False,
+            "affect_cancellation_rating": False,
+            "cancellation_initiator": ""
+            },
+        "customer": None,
+        "addressee": None,
+        "products": [
+            {
+            "currency_code": "RUB",
+            "price": "2279.0000",
+            "offer_id": "342167",
+            "name": "Кофе ароматизированный \"Шоколадный апельсин\" 250 гр",
+            "sku": 180550365,
+            "quantity": 1,
+            "mandatory_mark": [],
+            "dimensions": {
+                "height": "40.00",
+                "length": "240.00",
+                "weight": "260",
+                "width": "140.00"
+                }
+            },
+            {
+                "currency_code": "RUB",
+                "price": "777.0000",
+                "offer_id": "112223",
+                "name": "Кофе ароматизированный \"Шоколадный апельсин\" 250 гр",
+                "sku": 180550365,
+                "quantity": 1,
+                "mandatory_mark": [],
+                "dimensions": {
+                    "height": "40.00",
+                    "length": "240.00",
+                    "weight": "260",
+                    "width": "140.00"
+                }
+            }
+        ],
+        "barcodes": None,
+        "analytics_data": None,
+        "financial_data": None,
+        "additional_data": [],
+        "is_express": False,
+        "requirements": {
+            "products_requiring_gtd": [],
+            "products_requiring_country": []
+            },
+        "product_exemplars": None
+        }
+    }
+
+
+proxy_create_onon = {
+  "items": [
+    {
+      "attributes": [
+        {
+          "complex_id": 0,
+          "id": 5076,
+          "values": [
+            {
+              "dictionary_value_id": 971082156,
+              "value": "Стойка для акустической системы"
+            }
+          ]
+        },
+        {
+          "complex_id": 0,
+          "id": 9048,
+          "values": [
+            {
+              "value": "Комплект защитных плёнок для X3 NFC. Темный хлопок"
+            }
+          ]
+        },
+        {
+          "complex_id": 0,
+          "id": 8229,
+          "values": [
+            {
+              "dictionary_value_id": 95911,
+              "value": "Комплект защитных плёнок для X3 NFC. Темный хлопок"
+            }
+          ]
+        },
+        {
+          "complex_id": 0,
+          "id": 85,
+          "values": [
+            {
+              "dictionary_value_id": 5060050,
+              "value": "Samsung"
+            }
+          ]
+        },
+        {
+          "complex_id": 0,
+          "id": 10096,
+          "values": [
+            {
+              "dictionary_value_id": 61576,
+              "value": "серый"
+            }
+          ]
+        }
+      ],
+      "barcode": "112772873170",
+      "category_id": 17033876,
+      "color_image": "",
+      "complex_attributes": [],
+      "currency_code": "RUB",
+      "depth": 10,
+      "dimension_unit": "mm",
+      "height": 250,
+      "images": [],
+      "images360": [],
+      "name": "Комплект защитных плёнок для X3 NFC. Темный хлопок",
+      "offer_id": "143210608",
+      "old_price": "1100",
+      "pdf_list": [],
+      "premium_price": "900",
+      "price": "1000",
+      "primary_image": "",
+      "vat": "0.1",
+      "weight": 100,
+      "weight_unit": "g",
+      "width": 150
+    }
+  ]
+}
+
+#
+# proxy_create_product = {
+#   "items": [
+#     {
+#       "attributes": [
+#         {
+#           "complex_id": 0,
+#           "id": 5076,
+#           "values": [
+#             {
+#               "dictionary_value_id": 971082156,
+#               "value": "Стойка для акустической системы"
+#             }
+#           ]
+#         },
+#         {
+#           "complex_id": 0,
+#           "id": 9048,
+#           "values": [
+#             {
+#               "value": "Комплект защитных плёнок для X3 NFC. Темный хлопок"
+#             }
+#           ]
+#         },
+#         {
+#           "complex_id": 0,
+#           "id": 8229,
+#           "values": [
+#             {
+#               "dictionary_value_id": 95911,
+#               "value": "Комплект защитных плёнок для X3 NFC. Темный хлопок"
+#             }
+#           ]
+#         },
+#         {
+#           "complex_id": 0,
+#           "id": 85,
+#           "values": [
+#             {
+#               "dictionary_value_id": 5060050,
+#               "value": "Samsung"
+#             }
+#           ]
+#         },
+#         {
+#           "complex_id": 0,
+#           "id": 10096,
+#           "values": [
+#             {
+#               "dictionary_value_id": 61576,
+#               "value": "серый"
+#             }
+#           ]
+#         }
+#       ],
+#       "barcode": barcode,
+#       "category_id": category_id,  #int
+#       "color_image": image_link,
+#       "complex_attributes": [],
+#       "currency_code": "RUB",
+#       "depth": depth,  #int
+#       "dimension_unit": "sm",
+#       "height": height,  #int
+#       "images": [image_link],
+#       "images360": [],
+#       "name": name,
+#       "offer_id": vendor_code,
+#       "old_price": old_price,
+#       "pdf_list": [],
+#       "premium_price": "",
+#       "price": price,
+#       "primary_image": image_link,
+#       "vat": "0.2",
+#       "weight": weight,  #int
+#       "weight_unit": "kg",
+#       "width": width    #int
+#     }
+#   ]
+# }

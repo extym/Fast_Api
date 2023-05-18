@@ -96,9 +96,9 @@ def params_opttyres():
         if option == 16:
             data_options_tyres.append((option, product_id, radius))
         elif option == 15:
-            data_options_tyres.append((option, product_id, width_tyres))
-        elif option == 14:
             data_options_tyres.append((option, product_id, h_profil))
+        elif option == 14:
+            data_options_tyres.append((option, product_id, width_tyres))
 
     return data_options_tyres
 
