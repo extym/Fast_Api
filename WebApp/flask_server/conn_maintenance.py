@@ -21,6 +21,20 @@ UNIQUE (id_mp)
 )
 """
 
+create_market_cred = """
+CREATE TABLE IF NOT EXISTS marketplaces (
+id SERIAL PRIMARY KEY,
+user_id varchar NOT NULL,
+seller_id varchar NOT NULL, 
+shop_name TEXT NOT NULL,
+id_sell_mp TEXT NOT NULL,
+key_mp varchar NOT NULL,
+date_Added varchar,
+date_Modifed varchar,
+UNIQUE (id)
+)
+"""
+
 create_delivered_orders_table = """
 CREATE TABLE IF NOT EXISTS send_orders (
 id SERIAL PRIMARY KEY,
@@ -68,6 +82,19 @@ CREATE TABLE IF NOT EXISTS send_order_items (
     id_1c varchar NOT NULL,
     quantity varchar NOT NULL, 
     price varchar)
+"""
+
+
+create_users = """
+CREATE TABLE IF NOT EXISTS users (
+id SERIAL PRIMARY KEY,
+email varchar NOT NULL,
+password varchar NOT NULL, 
+name TEXT NOT NULL,
+date_Added varchar,
+date_Modifed varchar,
+UNIQUE (email)
+)
 """
 
 
@@ -129,3 +156,5 @@ rebase_order = (" UPDATE fresh_orders "
 strong_rebase_order = (" INSERT INTO send_orders "
     "(id_mp, our_order_id, shop_Name, our_status, vendor_code, id_1c, quantity, price)"
     "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)")
+
+

@@ -1,532 +1,96 @@
 {% extends "base-layout.html" %}
 
 {% block content  %}
-<div class='col-xl-12 col-lg-12 col-md-12 col-12'>
-<div class="page-title">
+ <!-- START CONTENT -->
+    <section id="main-content" class=" ">
+        <section class="wrapper main-wrapper" style=''>
+            <div class='col-xl-12 col-lg-12 col-md-12 col-12'>
+            <div class="page-title">
 
-    <div class="float-left">
-        <h1 class="title">{{ end_block }}</h1>                            </div>
-
-    <div class="float-right d-none">
-        <ol class="breadcrumb">
-            <li>
-                <a href="index.html"><i class="fa fa-home"></i>Home</a>
-            </li>
-            <li>
-                <a href="tables-basic.html">Tables</a>
-            </li>
-            <li class="active">
-                <strong>Responsive Tables</strong>
-            </li>
-        </ol>
-    </div>
-
-</div>
-</div>
-<div class="clearfix"></div>
-
-<div class="col-xl-12">
-<section class="box ">
-    <header class="panel_header">
-        <h2 class="title float-left">Сводная таблица заказов</h2>
-        <div class="actions panel_actions float-right">
-            <i class="box_toggle fa fa-chevron-down"></i>
-            <i class="box_setting fa fa-cog" data-toggle="modal" href="#section-settings"></i>
-            <i class="box_close fa fa-times"></i>
-        </div>
-    </header>
-    <div class="content-body">    <div class="row">
-            <div class="col-lg-12 col-md-12 col-12">
-
-                <div class="table-responsive" data-pattern="priority-columns">
-                    <table cellspacing="0" id="tech-companies-1" class="table table-small-font table-bordered table-striped">
-                        <thead>
-                            <tr>
-                                <th>Наименование</th>
-                                <th data-priority="1">Артикул</th>
-                                <th data-priority="2">Изображение</th>
-                                <th data-priority="1">МП</th>
-                                <th data-priority="3">Номер заказа</th>
-                                <th data-priority="3">Дата</th>
-                                <th data-priority="6">Цена</th>
-                                <th data-priority="6">Цена продажи</th>
-                                <th data-priority="6">Доставка</th>
-                                <th data-priority="5">Группа</th>
-                                <th data-priority="5">Подгруппа</th>
-                            </tr>
-                        </thead>
-                        {{ rows }}
-{#                        <tbody>#}
-{#                            <tr>#}
-{#                                <th>GOOG <span class="co-name">Google Inc.</span></th>#}
-{#                                <td>597.74</td>#}
-{#                                <td>12:12PM</td>#}
-{#                                <td>14.81 (2.54%)</td>#}
-{#                                <td>582.93</td>#}
-{#                                <td>597.95</td>#}
-{#                                <td>597.73 x 100</td>#}
-{#                                <td>597.91 x 300</td>#}
-{#                                <td>731.10</td>#}
-{#                                <td colspan="2">Spanning cell</td>#}
-{#                            </tr>#}
-{#                            <tr>#}
-{#                                <th>AAPL <span class="co-name">Apple Inc.</span></th>#}
-{#                                <td>378.94</td>#}
-{#                                <td>12:22PM</td>#}
-{#                                <td>5.74 (1.54%)</td>#}
-{#                                <td>373.20</td>#}
-{#                                <td>381.02</td>#}
-{#                                <td>378.92 x 300</td>#}
-{#                                <td>378.99 x 100</td>#}
-{#                                <td>505.94</td>#}
-{#                                <td colspan="2">Spanning cell</td>#}
-{#                            </tr>#}
-{#                            <tr>#}
-{#                                <th>AMZN <span class="co-name">Amazon.com Inc.</span></th>#}
-{#                                <td>191.55</td>#}
-{#                                <td>12:23PM</td>#}
-{#                                <td>3.16 (1.68%)</td>#}
-{#                                <td>188.39</td>#}
-{#                                <td>194.99</td>#}
-{#                                <td>191.52 x 300</td>#}
-{#                                <td>191.58 x 100</td>#}
-{#                                <td>240.32</td>#}
-{#                                <td colspan="2">Spanning cell</td>#}
-{#                            </tr>#}
-{#                            <tr>#}
-{#                                <th>ORCL <span class="co-name">Oracle Corporation</span></th>#}
-{#                                <td>31.15</td>#}
-{#                                <td>12:44PM</td>#}
-{#                                <td>1.41 (4.72%)</td>#}
-{#                                <td>29.74</td>#}
-{#                                <td>30.67</td>#}
-{#                                <td>31.14 x 6500</td>#}
-{#                                <td>31.15 x 3200</td>#}
-{#                                <td>36.11</td>#}
-{#                                <td colspan="2">Spanning cell</td>#}
-{#                            </tr>#}
-{#                            <tr>#}
-{#                                <th>MSFT <span class="co-name">Microsoft Corporation</span></th>#}
-{#                                <td>25.50</td>#}
-{#                                <td>12:27PM</td>#}
-{#                                <td>0.66 (2.67%)</td>#}
-{#                                <td>24.84</td>#}
-{#                                <td>25.37</td>#}
-{#                                <td>25.50 x 71100</td>#}
-{#                                <td>25.51 x 17800</td>#}
-{#                                <td>31.50</td>#}
-{#                                <td>Non-spanning</td>#}
-{#                                <td>Non-spanning</td>#}
-{#                            </tr>#}
-{#                            <tr>#}
-{#                                <th>CSCO <span class="co-name">Cisco Systems, Inc.</span></th>#}
-{#                                <td>18.65</td>#}
-{#                                <td>12:45PM</td>#}
-{#                                <td>0.97 (5.49%)</td>#}
-{#                                <td>17.68</td>#}
-{#                                <td>18.23</td>#}
-{#                                <td>18.65 x 10300</td>#}
-{#                                <td>18.66 x 24000</td>#}
-{#                                <td>21.12</td>#}
-{#                                <td>Non-spanning</td>#}
-{#                                <td>Non-spanning</td>#}
-{#                            </tr>#}
-{#                            <tr>#}
-{#                                <th>YHOO <span class="co-name">Yahoo! Inc.</span></th>#}
-{#                                <td>15.81</td>#}
-{#                                <td>12:25PM</td>#}
-{#                                <td>0.11 (0.67%)</td>#}
-{#                                <td>15.70</td>#}
-{#                                <td>15.94</td>#}
-{#                                <td>15.79 x 6100</td>#}
-{#                                <td>15.80 x 17000</td>#}
-{#                                <td>18.16</td>#}
-{#                                <td>Non-spanning</td>#}
-{#                                <td>Non-spanning</td>#}
-{#                            </tr>#}
-{#                            <!-- Repeat -->#}
-{#                            <tr>#}
-{#                                <th>GOOG <span class="co-name">Google Inc.</span></th>#}
-{#                                <td>597.74</td>#}
-{#                                <td>12:12PM</td>#}
-{#                                <td>14.81 (2.54%)</td>#}
-{#                                <td>582.93</td>#}
-{#                                <td>597.95</td>#}
-{#                                <td>597.73 x 100</td>#}
-{#                                <td>597.91 x 300</td>#}
-{#                                <td>731.10</td>#}
-{#                                <td colspan="2">Spanning cell</td>#}
-{#                            </tr>#}
-{#                            <tr>#}
-{#                                <th>AAPL <span class="co-name">Apple Inc.</span></th>#}
-{#                                <td>378.94</td>#}
-{#                                <td>12:22PM</td>#}
-{#                                <td>5.74 (1.54%)</td>#}
-{#                                <td>373.20</td>#}
-{#                                <td>381.02</td>#}
-{#                                <td>378.92 x 300</td>#}
-{#                                <td>378.99 x 100</td>#}
-{#                                <td>505.94</td>#}
-{#                                <td colspan="2">Spanning cell</td>#}
-{#                            </tr>#}
-{#                            <tr>#}
-{#                                <th>AMZN <span class="co-name">Amazon.com Inc.</span></th>#}
-{#                                <td>191.55</td>#}
-{#                                <td>12:23PM</td>#}
-{#                                <td>3.16 (1.68%)</td>#}
-{#                                <td>188.39</td>#}
-{#                                <td>194.99</td>#}
-{#                                <td>191.52 x 300</td>#}
-{#                                <td>191.58 x 100</td>#}
-{#                                <td>240.32</td>#}
-{#                                <td colspan="2">Spanning cell</td>#}
-{#                            </tr>#}
-{#                            <tr>#}
-{#                                <th>ORCL <span class="co-name">Oracle Corporation</span></th>#}
-{#                                <td>31.15</td>#}
-{#                                <td>12:44PM</td>#}
-{#                                <td>1.41 (4.72%)</td>#}
-{#                                <td>29.74</td>#}
-{#                                <td>30.67</td>#}
-{#                                <td>31.14 x 6500</td>#}
-{#                                <td>31.15 x 3200</td>#}
-{#                                <td>36.11</td>#}
-{#                                <td colspan="2">Spanning cell</td>#}
-{#                            </tr>#}
-{#                            <tr>#}
-{#                                <th>MSFT <span class="co-name">Microsoft Corporation</span></th>#}
-{#                                <td>25.50</td>#}
-{#                                <td>12:27PM</td>#}
-{#                                <td>0.66 (2.67%)</td>#}
-{#                                <td>24.84</td>#}
-{#                                <td>25.37</td>#}
-{#                                <td>25.50 x 71100</td>#}
-{#                                <td>25.51 x 17800</td>#}
-{#                                <td>31.50</td>#}
-{#                                <td>Non-spanning</td>#}
-{#                                <td>Non-spanning</td>#}
-{#                            </tr>#}
-{#                            <tr>#}
-{#                                <th>CSCO <span class="co-name">Cisco Systems, Inc.</span></th>#}
-{#                                <td>18.65</td>#}
-{#                                <td>12:45PM</td>#}
-{#                                <td>0.97 (5.49%)</td>#}
-{#                                <td>17.68</td>#}
-{#                                <td>18.23</td>#}
-{#                                <td>18.65 x 10300</td>#}
-{#                                <td>18.66 x 24000</td>#}
-{#                                <td>21.12</td>#}
-{#                                <td>Non-spanning</td>#}
-{#                                <td>Non-spanning</td>#}
-{#                            </tr>#}
-{#                            <tr>#}
-{#                                <th>YHOO <span class="co-name">Yahoo! Inc.</span></th>#}
-{#                                <td>15.81</td>#}
-{#                                <td>12:25PM</td>#}
-{#                                <td>0.11 (0.67%)</td>#}
-{#                                <td>15.70</td>#}
-{#                                <td>15.94</td>#}
-{#                                <td>15.79 x 6100</td>#}
-{#                                <td>15.80 x 17000</td>#}
-{#                                <td>18.16</td>#}
-{#                                <td>Non-spanning</td>#}
-{#                                <td>Non-spanning</td>#}
-{#                            </tr>#}
-{#                            <!-- Repeat -->#}
-{#                            <tr>#}
-{#                                <th>GOOG <span class="co-name">Google Inc.</span></th>#}
-{#                                <td>597.74</td>#}
-{#                                <td>12:12PM</td>#}
-{#                                <td>14.81 (2.54%)</td>#}
-{#                                <td>582.93</td>#}
-{#                                <td>597.95</td>#}
-{#                                <td>597.73 x 100</td>#}
-{#                                <td>597.91 x 300</td>#}
-{#                                <td>731.10</td>#}
-{#                                <td colspan="2">Spanning cell</td>#}
-{#                            </tr>#}
-{#                            <tr>#}
-{#                                <th>AAPL <span class="co-name">Apple Inc.</span></th>#}
-{#                                <td>378.94</td>#}
-{#                                <td>12:22PM</td>#}
-{#                                <td>5.74 (1.54%)</td>#}
-{#                                <td>373.20</td>#}
-{#                                <td>381.02</td>#}
-{#                                <td>378.92 x 300</td>#}
-{#                                <td>378.99 x 100</td>#}
-{#                                <td>505.94</td>#}
-{#                                <td colspan="2">Spanning cell</td>#}
-{#                            </tr>#}
-{#                            <tr>#}
-{#                                <th>AMZN <span class="co-name">Amazon.com Inc.</span></th>#}
-{#                                <td>191.55</td>#}
-{#                                <td>12:23PM</td>#}
-{#                                <td>3.16 (1.68%)</td>#}
-{#                                <td>188.39</td>#}
-{#                                <td>194.99</td>#}
-{#                                <td>191.52 x 300</td>#}
-{#                                <td>191.58 x 100</td>#}
-{#                                <td>240.32</td>#}
-{#                                <td colspan="2">Spanning cell</td>#}
-{#                            </tr>#}
-{#                            <tr>#}
-{#                                <th>ORCL <span class="co-name">Oracle Corporation</span></th>#}
-{#                                <td>31.15</td>#}
-{#                                <td>12:44PM</td>#}
-{#                                <td>1.41 (4.72%)</td>#}
-{#                                <td>29.74</td>#}
-{#                                <td>30.67</td>#}
-{#                                <td>31.14 x 6500</td>#}
-{#                                <td>31.15 x 3200</td>#}
-{#                                <td>36.11</td>#}
-{#                                <td colspan="2">Spanning cell</td>#}
-{#                            </tr>#}
-{#                            <tr>#}
-{#                                <th>MSFT <span class="co-name">Microsoft Corporation</span></th>#}
-{#                                <td>25.50</td>#}
-{#                                <td>12:27PM</td>#}
-{#                                <td>0.66 (2.67%)</td>#}
-{#                                <td>24.84</td>#}
-{#                                <td>25.37</td>#}
-{#                                <td>25.50 x 71100</td>#}
-{#                                <td>25.51 x 17800</td>#}
-{#                                <td>31.50</td>#}
-{#                                <td>Non-spanning</td>#}
-{#                                <td>Non-spanning</td>#}
-{#                            </tr>#}
-{#                            <tr>#}
-{#                                <th>CSCO <span class="co-name">Cisco Systems, Inc.</span></th>#}
-{#                                <td>18.65</td>#}
-{#                                <td>12:45PM</td>#}
-{#                                <td>0.97 (5.49%)</td>#}
-{#                                <td>17.68</td>#}
-{#                                <td>18.23</td>#}
-{#                                <td>18.65 x 10300</td>#}
-{#                                <td>18.66 x 24000</td>#}
-{#                                <td>21.12</td>#}
-{#                                <td>Non-spanning</td>#}
-{#                                <td>Non-spanning</td>#}
-{#                            </tr>#}
-{#                            <tr>#}
-{#                                <th>YHOO <span class="co-name">Yahoo! Inc.</span></th>#}
-{#                                <td>15.81</td>#}
-{#                                <td>12:25PM</td>#}
-{#                                <td>0.11 (0.67%)</td>#}
-{#                                <td>15.70</td>#}
-{#                                <td>15.94</td>#}
-{#                                <td>15.79 x 6100</td>#}
-{#                                <td>15.80 x 17000</td>#}
-{#                                <td>18.16</td>#}
-{#                                <td>Non-spanning</td>#}
-{#                                <td>Non-spanning</td>#}
-{#                            </tr>#}
-{#                            <!-- Repeat -->#}
-{#                            <tr>#}
-{#                                <th>GOOG <span class="co-name">Google Inc.</span></th>#}
-{#                                <td>597.74</td>#}
-{#                                <td>12:12PM</td>#}
-{#                                <td>14.81 (2.54%)</td>#}
-{#                                <td>582.93</td>#}
-{#                                <td>597.95</td>#}
-{#                                <td>597.73 x 100</td>#}
-{#                                <td>597.91 x 300</td>#}
-{#                                <td>731.10</td>#}
-{#                                <td colspan="2">Spanning cell</td>#}
-{#                            </tr>#}
-{#                            <tr>#}
-{#                                <th>AAPL <span class="co-name">Apple Inc.</span></th>#}
-{#                                <td>378.94</td>#}
-{#                                <td>12:22PM</td>#}
-{#                                <td>5.74 (1.54%)</td>#}
-{#                                <td>373.20</td>#}
-{#                                <td>381.02</td>#}
-{#                                <td>378.92 x 300</td>#}
-{#                                <td>378.99 x 100</td>#}
-{#                                <td>505.94</td>#}
-{#                                <td colspan="2">Spanning cell</td>#}
-{#                            </tr>#}
-{#                            <tr>#}
-{#                                <th>AMZN <span class="co-name">Amazon.com Inc.</span></th>#}
-{#                                <td>191.55</td>#}
-{#                                <td>12:23PM</td>#}
-{#                                <td>3.16 (1.68%)</td>#}
-{#                                <td>188.39</td>#}
-{#                                <td>194.99</td>#}
-{#                                <td>191.52 x 300</td>#}
-{#                                <td>191.58 x 100</td>#}
-{#                                <td>240.32</td>#}
-{#                                <td colspan="2">Spanning cell</td>#}
-{#                            </tr>#}
-{#                            <tr>#}
-{#                                <th>ORCL <span class="co-name">Oracle Corporation</span></th>#}
-{#                                <td>31.15</td>#}
-{#                                <td>12:44PM</td>#}
-{#                                <td>1.41 (4.72%)</td>#}
-{#                                <td>29.74</td>#}
-{#                                <td>30.67</td>#}
-{#                                <td>31.14 x 6500</td>#}
-{#                                <td>31.15 x 3200</td>#}
-{#                                <td>36.11</td>#}
-{#                                <td colspan="2">Spanning cell</td>#}
-{#                            </tr>#}
-{#                            <tr>#}
-{#                                <th>MSFT <span class="co-name">Microsoft Corporation</span></th>#}
-{#                                <td>25.50</td>#}
-{#                                <td>12:27PM</td>#}
-{#                                <td>0.66 (2.67%)</td>#}
-{#                                <td>24.84</td>#}
-{#                                <td>25.37</td>#}
-{#                                <td>25.50 x 71100</td>#}
-{#                                <td>25.51 x 17800</td>#}
-{#                                <td>31.50</td>#}
-{#                                <td>Non-spanning</td>#}
-{#                                <td>Non-spanning</td>#}
-{#                            </tr>#}
-{#                            <tr>#}
-{#                                <th>CSCO <span class="co-name">Cisco Systems, Inc.</span></th>#}
-{#                                <td>18.65</td>#}
-{#                                <td>12:45PM</td>#}
-{#                                <td>0.97 (5.49%)</td>#}
-{#                                <td>17.68</td>#}
-{#                                <td>18.23</td>#}
-{#                                <td>18.65 x 10300</td>#}
-{#                                <td>18.66 x 24000</td>#}
-{#                                <td>21.12</td>#}
-{#                                <td>Non-spanning</td>#}
-{#                                <td>Non-spanning</td>#}
-{#                            </tr>#}
-{#                            <tr>#}
-{#                                <th>YHOO <span class="co-name">Yahoo! Inc.</span></th>#}
-{#                                <td>15.81</td>#}
-{#                                <td>12:25PM</td>#}
-{#                                <td>0.11 (0.67%)</td>#}
-{#                                <td>15.70</td>#}
-{#                                <td>15.94</td>#}
-{#                                <td>15.79 x 6100</td>#}
-{#                                <td>15.80 x 17000</td>#}
-{#                                <td>18.16</td>#}
-{#                                <td>Non-spanning</td>#}
-{#                                <td>Non-spanning</td>#}
-{#                            </tr>#}
-{#                            <!-- Repeat -->#}
-{#                            <tr>#}
-{#                                <th>GOOG <span class="co-name">Google Inc.</span></th>#}
-{#                                <td>597.74</td>#}
-{#                                <td>12:12PM</td>#}
-{#                                <td>14.81 (2.54%)</td>#}
-{#                                <td>582.93</td>#}
-{#                                <td>597.95</td>#}
-{#                                <td>597.73 x 100</td>#}
-{#                                <td>597.91 x 300</td>#}
-{#                                <td>731.10</td>#}
-{#                                <td colspan="2">Spanning cell</td>#}
-{#                            </tr>#}
-{#                            <tr>#}
-{#                                <th>AAPL <span class="co-name">Apple Inc.</span></th>#}
-{#                                <td>378.94</td>#}
-{#                                <td>12:22PM</td>#}
-{#                                <td>5.74 (1.54%)</td>#}
-{#                                <td>373.20</td>#}
-{#                                <td>381.02</td>#}
-{#                                <td>378.92 x 300</td>#}
-{#                                <td>378.99 x 100</td>#}
-{#                                <td>505.94</td>#}
-{#                                <td colspan="2">Spanning cell</td>#}
-{#                            </tr>#}
-{#                            <tr>#}
-{#                                <th>AMZN <span class="co-name">Amazon.com Inc.</span></th>#}
-{#                                <td>191.55</td>#}
-{#                                <td>12:23PM</td>#}
-{#                                <td>3.16 (1.68%)</td>#}
-{#                                <td>188.39</td>#}
-{#                                <td>194.99</td>#}
-{#                                <td>191.52 x 300</td>#}
-{#                                <td>191.58 x 100</td>#}
-{#                                <td>240.32</td>#}
-{#                                <td colspan="2">Spanning cell</td>#}
-{#                            </tr>#}
-{#                            <tr>#}
-{#                                <th>ORCL <span class="co-name">Oracle Corporation</span></th>#}
-{#                                <td>31.15</td>#}
-{#                                <td>12:44PM</td>#}
-{#                                <td>1.41 (4.72%)</td>#}
-{#                                <td>29.74</td>#}
-{#                                <td>30.67</td>#}
-{#                                <td>31.14 x 6500</td>#}
-{#                                <td>31.15 x 3200</td>#}
-{#                                <td>36.11</td>#}
-{#                                <td colspan="2">Spanning cell</td>#}
-{#                            </tr>#}
-{#                            <tr>#}
-{#                                <th>MSFT <span class="co-name">Microsoft Corporation</span></th>#}
-{#                                <td>25.50</td>#}
-{#                                <td>12:27PM</td>#}
-{#                                <td>0.66 (2.67%)</td>#}
-{#                                <td>24.84</td>#}
-{#                                <td>25.37</td>#}
-{#                                <td>25.50 x 71100</td>#}
-{#                                <td>25.51 x 17800</td>#}
-{#                                <td>31.50</td>#}
-{#                                <td>Non-spanning</td>#}
-{#                                <td>Non-spanning</td>#}
-{#                            </tr>#}
-{#                            <tr>#}
-{#                                <th>CSCO <span class="co-name">Cisco Systems, Inc.</span></th>#}
-{#                                <td>18.65</td>#}
-{#                                <td>12:45PM</td>#}
-{#                                <td>0.97 (5.49%)</td>#}
-{#                                <td>17.68</td>#}
-{#                                <td>18.23</td>#}
-{#                                <td>18.65 x 10300</td>#}
-{#                                <td>18.66 x 24000</td>#}
-{#                                <td>21.12</td>#}
-{#                                <td>Non-spanning</td>#}
-{#                                <td>Non-spanning</td>#}
-{#                            </tr>#}
-{#                            <tr>#}
-{#                                <th>YHOO <span class="co-name">Yahoo! Inc.</span></th>#}
-{#                                <td>15.81</td>#}
-{#                                <td>12:25PM</td>#}
-{#                                <td>0.11 (0.67%)</td>#}
-{#                                <td>15.70</td>#}
-{#                                <td>15.94</td>#}
-{#                                <td>15.79 x 6100</td>#}
-{#                                <td>15.80 x 17000</td>#}
-{#                                <td>18.16</td>#}
-{#                                <td>Non-spanning</td>#}
-{#                                <td>Non-spanning</td>#}
-{#                            </tr>#}
-{#                        </tbody>#}
-                    </table>
+                <div class="float-left">
+                    <h1 class="title">{{ end_block }}</h1>
                 </div>
 
+                <div class="float-right d-none">
+                    <ol class="breadcrumb">
+                        <li>
+                            <a href="index.html"><i class="fa fa-home"></i>Home</a>
+                        </li>
+                        <li>
+                            <a href="tables-basic.html">Tables</a>
+                        </li>
+                        <li class="active">
+                            <strong>Responsive Tables</strong>
+                        </li>
+                    </ol>
+                </div>
 
             </div>
-        </div>
-    </div>
-</section></div>
+            </div>
 
+            <div class="clearfix"></div>
 
+            <div class="col-xl-12">
+                <section class="box ">
+                    <header class="panel_header">
+                        <h2 class="title float-left">Сводная таблица заказов</h2>
+                        <div class="actions panel_actions float-right">
+                            <i class="box_toggle fa fa-chevron-down"></i>
+                            <i class="box_setting fa fa-cog" data-toggle="modal" href="#section-settings"></i>
+                            <i class="box_close fa fa-times"></i>
+                        </div>
+                    </header>
+                    <div class="content-body">    <div class="row">
+                            <div class="col-lg-12 col-md-12 col-12">
+                                <div class="table-responsive" data-pattern="priority-columns">
+                                    <table cellspacing="0" id="tech-companies-1" class="table table-small-font table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Наименование</th>
+                                                <th data-priority="1">Артикул</th>
+                                                <th data-priority="1" >МП</th>
+                                                <th data-priority="3">Номер заказа</th>
+                                                <th data-priority="3">Дата</th>
+                                                <th data-priority="6">Цена</th>
+                                                <th data-priority="6">Цена продажи</th>
+                                                <th data-priority="6">Доставка</th>
+                                                <th data-priority="5">Группа</th>
+                                                <th data-priority="5">Подгруппа</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        {{ rows }}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
 
+        </section>
+    </section>
 
-{% endblock %}
 
 
         <!-- OTHER SCRIPTS INCLUDED ON THIS PAGE - START --> 
-{#        <script src="static/assets/plugins/responsive-tables/js/rwd-table.min.js" type="text/javascript"></script><!-- OTHER SCRIPTS INCLUDED ON THIS PAGE - END --> #}
-{##}
-{##}
-{#        <!-- CORE TEMPLATE JS - START --> #}
-{#        <script src="static/assets/js/scripts.js" type="text/javascript"></script> #}
-{#        <!-- END CORE TEMPLATE JS - END --> #}
-{##}
-{#        <!-- Sidebar Graph - START --> #}
-{#        <script src="static/assets/plugins/sparkline-chart/jquery.sparkline.min.js" type="text/javascript"></script>#}
-{#        <script src="static/assets/js/chart-sparkline.js" type="text/javascript"></script>#}
-{#        <!-- Sidebar Graph - END --> #}
+        <script src="static/assets/plugins/responsive-tables/js/rwd-table.min.js" type="text/javascript"></script><!-- OTHER SCRIPTS INCLUDED ON THIS PAGE - END -->
 
 
+        <!-- CORE TEMPLATE JS - START -->
+        <script src="static/assets/js/scripts.js" type="text/javascript"></script>
+        <!-- END CORE TEMPLATE JS - END -->
 
+        <!-- Sidebar Graph - START -->
+        <script src="static/assets/plugins/sparkline-chart/jquery.sparkline.min.js" type="text/javascript"></script>
+        <script src="static/assets/js/chart-sparkline.js" type="text/javascript"></script>
+        <!-- Sidebar Graph - END -->
+
+        <!-- CUSTOM -->
+        <script src="static/assets/js/jquery-3.4.1.min.js" type="text/javascript"></script>
+
+{% endblock %}
 
 
 

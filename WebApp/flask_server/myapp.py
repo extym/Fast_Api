@@ -26,6 +26,7 @@ app = Flask(__name__,
             static_folder='templates/static')  #,
            # template_folder='templates/')
 
+db = Data_base_connect()
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
@@ -119,10 +120,32 @@ def blank():
 def add_mp():
     if request.method == 'POST':
         result = request.form
-        seller_id = result['sellerId']
+        # seller_id = result['sellerId']
+        # name_mp = result['name']
+        # id_mp = result['id']
+        # key_mp = result['key']
+
+        # if "save_key" in result:
+        # seller_id = result['sellerId']
         name_mp = result['name']
-        id_mp = result['id']
+        id_mp = result['id_mp']
         key_mp = result['key']
+        print('result-post-', result)
+        shop_name = result['select_mp']
+        print(shop_name, name_mp, id_mp, key_mp)
+        # jsonData = request.get_json()
+        # print(jsonData)
+        xs = "xs"
+
+        db.insert_key_mp(xs,shop_name, name_mp, id_mp, key_mp)
+
+
+    else:
+
+        result = request.values
+
+        print('result--', result)
+    return unescape(render_template("form-validation.html", result=result, login=LOGIN, passw=PASSW))
 
 @app.route("/main_table", methods=['GET', 'POST'])
 def main_table():
@@ -165,13 +188,15 @@ def main_table():
     for row in raw_list_orders:
         print(len(raw_list_orders), row)
         order_id = row[1]
+        price = 1200
 
         rows += '<tr>' \
                 f'<td width = "130" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #f3f3f3;">{order_id}</td>' \
                 f'<td width = "140" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #f3f3f3;">{row[2]}</td>' \
-                f'<td width = "140" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #f3f3f3;">{row[3]}</td>' \
-                f'<td width = "120" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #f3f3f3;">{row[7]}</td>' \
-                f'<td width = "100" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #f3f3f3;">{row[8]}</td>' \
+                f'<td width = "140" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #f3f3f3;">{row[7]}</td>' \
+                f'<td width = "140" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #f3f3f3;">{row[2]}</td>' \
+                f'<td width = "120" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #f3f3f3;">{row[8]}</td>' \
+                f'<td width = "100" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #f3f3f3;">{price}</td>' \
                 f'<td width = "60" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #f3f3f3;">{row[9]}</td>' \
                 f'<td width = "60" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #f3f3f3;">{row[10]}</td>' \
                 f'<td width = "140" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #f3f3f3;">{row[11]}</td>' \

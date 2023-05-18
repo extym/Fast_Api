@@ -7,8 +7,8 @@ import requests
 
 # r = requests.get('http://super-good.ml/test_json.json')
 # data = r.json()
-link = 'http://super-good.ml/test_json.json'
-# link = 'http://stm-json.i-bots.ru/test_json.json'
+# link = 'http://super-good.ml/test_json.json'
+link = 'http://stm-json.i-bots.ru/test_json.json'
 #processing TEST data from json (proxy file) for price & etc.
 def process_json_list():
     r = requests.get(link)
@@ -19,8 +19,8 @@ def process_json_list():
         vendor_code = value[0]
         price = value[1].get(u'Цена')  #["\u0426\u0435\u043d\u0430"]
         quantity = value[2].get(u'Остаток', 0)  #  - value[2].get(u'Резерв', 0)
-        if quantity < 0:
-            quantity = 0
+        # if quantity < 0:
+        #     quantity = 0
         outlets = value[4]
         # outlets = [key for key in value[3].keys()]
         proxy = (id_1c, vendor_code, price, quantity, outlets) # id_1C, vendor_vode (SKU), price, quantity
@@ -41,8 +41,8 @@ def process_json_dict():
         vendor_code = value[0]
         price = value[1].get(u'Цена')  #["\u0426\u0435\u043d\u0430"]
         quantity = value[2].get(u'Остаток', 0) #- value[2].get(u'Резерв', 0)
-        if quantity < 0:
-            quantity = 0
+        # if quantity < 0:
+        #     quantity = 0
         outlets = value[4]
         # outlets = [key for key in value[3].keys()]
         proxy[vendor_code] = (id_1c, price, quantity, outlets) # id_1C, vendor_vode (SKU), price, quantity
@@ -50,6 +50,9 @@ def process_json_dict():
         result_dict.update(proxy)
 
     return result_dict
+
+# process_json_dict()
+
 
 def read_json_wb():
     r = requests.get(link)

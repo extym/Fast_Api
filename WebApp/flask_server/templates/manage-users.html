@@ -1,0 +1,1871 @@
+<!DOCTYPE html>
+<!-- saved from url=(0049){{dead_url}}/dashboard/account/manage-users -->
+<html lang="ru-RU"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><style data-tippy-stylesheet="">.tippy-box[data-animation=fade][data-state=hidden]{opacity:0}[data-tippy-root]{max-width:calc(100vw - 10px)}.tippy-box{position:relative;background-color:#333;color:#fff;border-radius:4px;font-size:14px;line-height:1.4;white-space:normal;outline:0;transition-property:transform,visibility,opacity}.tippy-box[data-placement^=top]>.tippy-arrow{bottom:0}.tippy-box[data-placement^=top]>.tippy-arrow:before{bottom:-7px;left:0;border-width:8px 8px 0;border-top-color:initial;transform-origin:center top}.tippy-box[data-placement^=bottom]>.tippy-arrow{top:0}.tippy-box[data-placement^=bottom]>.tippy-arrow:before{top:-7px;left:0;border-width:0 8px 8px;border-bottom-color:initial;transform-origin:center bottom}.tippy-box[data-placement^=left]>.tippy-arrow{right:0}.tippy-box[data-placement^=left]>.tippy-arrow:before{border-width:8px 0 8px 8px;border-left-color:initial;right:-7px;transform-origin:center left}.tippy-box[data-placement^=right]>.tippy-arrow{left:0}.tippy-box[data-placement^=right]>.tippy-arrow:before{left:-7px;border-width:8px 8px 8px 0;border-right-color:initial;transform-origin:center right}.tippy-box[data-inertia][data-state=visible]{transition-timing-function:cubic-bezier(.54,1.5,.38,1.11)}.tippy-arrow{width:16px;height:16px;color:#333}.tippy-arrow:before{content:"";position:absolute;border-color:transparent;border-style:solid}.tippy-content{position:relative;padding:5px 9px;z-index:1}</style><style>:root{--litepicker-container-months-color-bg: #fff;--litepicker-container-months-box-shadow-color: #ddd;--litepicker-footer-color-bg: #fafafa;--litepicker-footer-box-shadow-color: #ddd;--litepicker-tooltip-color-bg: #fff;--litepicker-month-header-color: #333;--litepicker-button-prev-month-color: #9e9e9e;--litepicker-button-next-month-color: #9e9e9e;--litepicker-button-prev-month-color-hover: #2196f3;--litepicker-button-next-month-color-hover: #2196f3;--litepicker-month-width: calc(var(--litepicker-day-width) * 7);--litepicker-month-weekday-color: #9e9e9e;--litepicker-month-week-number-color: #9e9e9e;--litepicker-day-width: 38px;--litepicker-day-color: #333;--litepicker-day-color-hover: #2196f3;--litepicker-is-today-color: #f44336;--litepicker-is-in-range-color: #bbdefb;--litepicker-is-locked-color: #9e9e9e;--litepicker-is-start-color: #fff;--litepicker-is-start-color-bg: #2196f3;--litepicker-is-end-color: #fff;--litepicker-is-end-color-bg: #2196f3;--litepicker-button-cancel-color: #fff;--litepicker-button-cancel-color-bg: #9e9e9e;--litepicker-button-apply-color: #fff;--litepicker-button-apply-color-bg: #2196f3;--litepicker-button-reset-color: #909090;--litepicker-button-reset-color-hover: #2196f3;--litepicker-highlighted-day-color: #333;--litepicker-highlighted-day-color-bg: #ffeb3b}.show-week-numbers{--litepicker-month-width: calc(var(--litepicker-day-width) * 8)}.litepicker{font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;font-size:0.8em;display:none}.litepicker button{border:none;background:none}.litepicker .container__main{display:-webkit-box;display:-ms-flexbox;display:flex}.litepicker .container__months{display:-webkit-box;display:-ms-flexbox;display:flex;-ms-flex-wrap:wrap;flex-wrap:wrap;background-color:var(--litepicker-container-months-color-bg);border-radius:5px;-webkit-box-shadow:0 0 5px var(--litepicker-container-months-box-shadow-color);box-shadow:0 0 5px var(--litepicker-container-months-box-shadow-color);width:calc(var(--litepicker-month-width) + 10px);-webkit-box-sizing:content-box;box-sizing:content-box}.litepicker .container__months.columns-2{width:calc((var(--litepicker-month-width) * 2) + 20px)}.litepicker .container__months.columns-3{width:calc((var(--litepicker-month-width) * 3) + 30px)}.litepicker .container__months.columns-4{width:calc((var(--litepicker-month-width) * 4) + 40px)}.litepicker .container__months.split-view .month-item-header .button-previous-month,.litepicker .container__months.split-view .month-item-header .button-next-month{visibility:visible}.litepicker .container__months .month-item{padding:5px;width:var(--litepicker-month-width);-webkit-box-sizing:content-box;box-sizing:content-box}.litepicker .container__months .month-item-header{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between;font-weight:500;padding:10px 5px;text-align:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;color:var(--litepicker-month-header-color)}.litepicker .container__months .month-item-header div{-webkit-box-flex:1;-ms-flex:1;flex:1}.litepicker .container__months .month-item-header div>.month-item-name{margin-right:5px}.litepicker .container__months .month-item-header div>.month-item-year{padding:0}.litepicker .container__months .month-item-header .reset-button{color:var(--litepicker-button-reset-color)}.litepicker .container__months .month-item-header .reset-button>svg{fill:var(--litepicker-button-reset-color)}.litepicker .container__months .month-item-header .reset-button *{pointer-events:none}.litepicker .container__months .month-item-header .reset-button:hover{color:var(--litepicker-button-reset-color-hover)}.litepicker .container__months .month-item-header .reset-button:hover>svg{fill:var(--litepicker-button-reset-color-hover)}.litepicker .container__months .month-item-header .button-previous-month,.litepicker .container__months .month-item-header .button-next-month{visibility:hidden;text-decoration:none;padding:3px 5px;border-radius:3px;-webkit-transition:color 0.3s, border 0.3s;transition:color 0.3s, border 0.3s;cursor:default}.litepicker .container__months .month-item-header .button-previous-month *,.litepicker .container__months .month-item-header .button-next-month *{pointer-events:none}.litepicker .container__months .month-item-header .button-previous-month{color:var(--litepicker-button-prev-month-color)}.litepicker .container__months .month-item-header .button-previous-month>svg,.litepicker .container__months .month-item-header .button-previous-month>img{fill:var(--litepicker-button-prev-month-color)}.litepicker .container__months .month-item-header .button-previous-month:hover{color:var(--litepicker-button-prev-month-color-hover)}.litepicker .container__months .month-item-header .button-previous-month:hover>svg{fill:var(--litepicker-button-prev-month-color-hover)}.litepicker .container__months .month-item-header .button-next-month{color:var(--litepicker-button-next-month-color)}.litepicker .container__months .month-item-header .button-next-month>svg,.litepicker .container__months .month-item-header .button-next-month>img{fill:var(--litepicker-button-next-month-color)}.litepicker .container__months .month-item-header .button-next-month:hover{color:var(--litepicker-button-next-month-color-hover)}.litepicker .container__months .month-item-header .button-next-month:hover>svg{fill:var(--litepicker-button-next-month-color-hover)}.litepicker .container__months .month-item-weekdays-row{display:-webkit-box;display:-ms-flexbox;display:flex;justify-self:center;-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;color:var(--litepicker-month-weekday-color)}.litepicker .container__months .month-item-weekdays-row>div{padding:5px 0;font-size:85%;-webkit-box-flex:1;-ms-flex:1;flex:1;width:var(--litepicker-day-width);text-align:center}.litepicker .container__months .month-item:first-child .button-previous-month{visibility:visible}.litepicker .container__months .month-item:last-child .button-next-month{visibility:visible}.litepicker .container__months .month-item.no-previous-month .button-previous-month{visibility:hidden}.litepicker .container__months .month-item.no-next-month .button-next-month{visibility:hidden}.litepicker .container__days{display:-webkit-box;display:-ms-flexbox;display:flex;-ms-flex-wrap:wrap;flex-wrap:wrap;justify-self:center;-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:center;-webkit-box-sizing:content-box;box-sizing:content-box}.litepicker .container__days>div,.litepicker .container__days>a{padding:5px 0;width:var(--litepicker-day-width)}.litepicker .container__days .day-item{color:var(--litepicker-day-color);text-align:center;text-decoration:none;border-radius:3px;-webkit-transition:color 0.3s, border 0.3s;transition:color 0.3s, border 0.3s;cursor:default}.litepicker .container__days .day-item:hover{color:var(--litepicker-day-color-hover);-webkit-box-shadow:inset 0 0 0 1px var(--litepicker-day-color-hover);box-shadow:inset 0 0 0 1px var(--litepicker-day-color-hover)}.litepicker .container__days .day-item.is-today{color:var(--litepicker-is-today-color)}.litepicker .container__days .day-item.is-locked{color:var(--litepicker-is-locked-color)}.litepicker .container__days .day-item.is-locked:hover{color:var(--litepicker-is-locked-color);-webkit-box-shadow:none;box-shadow:none;cursor:default}.litepicker .container__days .day-item.is-in-range{background-color:var(--litepicker-is-in-range-color);border-radius:0}.litepicker .container__days .day-item.is-start-date{color:var(--litepicker-is-start-color);background-color:var(--litepicker-is-start-color-bg);border-top-left-radius:5px;border-bottom-left-radius:5px;border-top-right-radius:0;border-bottom-right-radius:0}.litepicker .container__days .day-item.is-start-date.is-flipped{border-top-left-radius:0;border-bottom-left-radius:0;border-top-right-radius:5px;border-bottom-right-radius:5px}.litepicker .container__days .day-item.is-end-date{color:var(--litepicker-is-end-color);background-color:var(--litepicker-is-end-color-bg);border-top-left-radius:0;border-bottom-left-radius:0;border-top-right-radius:5px;border-bottom-right-radius:5px}.litepicker .container__days .day-item.is-end-date.is-flipped{border-top-left-radius:5px;border-bottom-left-radius:5px;border-top-right-radius:0;border-bottom-right-radius:0}.litepicker .container__days .day-item.is-start-date.is-end-date{border-top-left-radius:5px;border-bottom-left-radius:5px;border-top-right-radius:5px;border-bottom-right-radius:5px}.litepicker .container__days .day-item.is-highlighted{color:var(--litepicker-highlighted-day-color);background-color:var(--litepicker-highlighted-day-color-bg)}.litepicker .container__days .week-number{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;color:var(--litepicker-month-week-number-color);font-size:85%}.litepicker .container__footer{text-align:right;padding:10px 5px;margin:0 5px;background-color:var(--litepicker-footer-color-bg);-webkit-box-shadow:inset 0px 3px 3px 0px var(--litepicker-footer-box-shadow-color);box-shadow:inset 0px 3px 3px 0px var(--litepicker-footer-box-shadow-color);border-bottom-left-radius:5px;border-bottom-right-radius:5px}.litepicker .container__footer .preview-date-range{margin-right:10px;font-size:90%}.litepicker .container__footer .button-cancel{background-color:var(--litepicker-button-cancel-color-bg);color:var(--litepicker-button-cancel-color);border:0;padding:3px 7px 4px;border-radius:3px}.litepicker .container__footer .button-cancel *{pointer-events:none}.litepicker .container__footer .button-apply{background-color:var(--litepicker-button-apply-color-bg);color:var(--litepicker-button-apply-color);border:0;padding:3px 7px 4px;border-radius:3px;margin-left:10px;margin-right:10px}.litepicker .container__footer .button-apply:disabled{opacity:0.7}.litepicker .container__footer .button-apply *{pointer-events:none}.litepicker .container__tooltip{position:absolute;margin-top:-4px;padding:4px 8px;border-radius:4px;background-color:var(--litepicker-tooltip-color-bg);-webkit-box-shadow:0 1px 3px rgba(0,0,0,0.25);box-shadow:0 1px 3px rgba(0,0,0,0.25);white-space:nowrap;font-size:11px;pointer-events:none;visibility:hidden}.litepicker .container__tooltip:before{position:absolute;bottom:-5px;left:calc(50% - 5px);border-top:5px solid rgba(0,0,0,0.12);border-right:5px solid transparent;border-left:5px solid transparent;content:""}.litepicker .container__tooltip:after{position:absolute;bottom:-4px;left:calc(50% - 4px);border-top:4px solid var(--litepicker-tooltip-color-bg);border-right:4px solid transparent;border-left:4px solid transparent;content:""}
+</style><style></style><style>:root {
+  --litepicker-mobilefriendly-backdrop-color-bg: #000;
+}
+
+.litepicker-backdrop {
+  display: none;
+  background-color: var(--litepicker-mobilefriendly-backdrop-color-bg);
+  opacity: 0.3;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.litepicker-open {
+  overflow: hidden;
+}
+
+.litepicker.mobilefriendly[data-plugins*="mobilefriendly"] {
+  transform: translate(-50%, -50%);
+  font-size: 1.1rem;
+  --litepicker-container-months-box-shadow-color: #616161;
+}
+.litepicker.mobilefriendly-portrait {
+  --litepicker-day-width: 13.5vw;
+  --litepicker-month-width: calc(var(--litepicker-day-width) * 7);
+}
+.litepicker.mobilefriendly-landscape {
+  --litepicker-day-width: 5.5vw;
+  --litepicker-month-width: calc(var(--litepicker-day-width) * 7);
+}
+
+.litepicker[data-plugins*="mobilefriendly"] .container__months {
+  overflow: hidden;
+}
+
+.litepicker.mobilefriendly[data-plugins*="mobilefriendly"] .container__months .month-item-header {
+  height: var(--litepicker-day-width);
+}
+
+.litepicker.mobilefriendly[data-plugins*="mobilefriendly"] .container__days > div {
+  height: var(--litepicker-day-width);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.litepicker[data-plugins*="mobilefriendly"] .container__months .month-item {
+  transform-origin: center;
+}
+
+.litepicker[data-plugins*="mobilefriendly"] .container__months .month-item.touch-target-next {
+  animation-name: lp-bounce-target-next;
+  animation-duration: .5s;
+  animation-timing-function: ease;
+}
+
+.litepicker[data-plugins*="mobilefriendly"] .container__months .month-item.touch-target-prev {
+  animation-name: lp-bounce-target-prev;
+  animation-duration: .5s;
+  animation-timing-function: ease;
+}
+
+@keyframes lp-bounce-target-next {
+  from {
+    transform: translateX(100px) scale(0.5);
+  }
+  to {
+    transform: translateX(0px) scale(1);
+  }
+}
+
+@keyframes lp-bounce-target-prev {
+  from {
+    transform: translateX(-100px) scale(0.5);
+  }
+  to {
+    transform: translateX(0px) scale(1);
+  }
+}</style><style>.litepicker[data-plugins*="ranges"] > .container__main > .container__predefined-ranges {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background: var(--litepicker-container-months-color-bg);
+  box-shadow: -2px 0px 5px var(--litepicker-footer-box-shadow-color);
+  border-radius: 3px;
+}
+.litepicker[data-plugins*="ranges"][data-ranges-position="left"] > .container__main {
+  /* */
+}
+.litepicker[data-plugins*="ranges"][data-ranges-position="right"] > .container__main{
+  flex-direction: row-reverse;
+}
+.litepicker[data-plugins*="ranges"][data-ranges-position="right"] > .container__main > .container__predefined-ranges {
+  box-shadow: 2px 0px 2px var(--litepicker-footer-box-shadow-color);
+}
+.litepicker[data-plugins*="ranges"][data-ranges-position="top"] > .container__main {
+  flex-direction: column;
+}
+.litepicker[data-plugins*="ranges"][data-ranges-position="top"] > .container__main > .container__predefined-ranges {
+  flex-direction: row;
+  box-shadow: 2px 0px 2px var(--litepicker-footer-box-shadow-color);
+}
+.litepicker[data-plugins*="ranges"][data-ranges-position="bottom"] > .container__main {
+  flex-direction: column-reverse;
+}
+.litepicker[data-plugins*="ranges"][data-ranges-position="bottom"] > .container__main > .container__predefined-ranges {
+  flex-direction: row;
+  box-shadow: 2px 0px 2px var(--litepicker-footer-box-shadow-color);
+}
+.litepicker[data-plugins*="ranges"] > .container__main > .container__predefined-ranges button {
+  padding: 5px;
+  margin: 2px 0;
+}
+.litepicker[data-plugins*="ranges"][data-ranges-position="left"] > .container__main > .container__predefined-ranges button,
+.litepicker[data-plugins*="ranges"][data-ranges-position="right"] > .container__main > .container__predefined-ranges button{
+  width: 100%;
+  text-align: left;
+}
+.litepicker[data-plugins*="ranges"] > .container__main > .container__predefined-ranges button:hover {
+  cursor: default;
+  opacity: .6;
+}</style><style>:root {
+  --litepicker-multiselect-is-selected-color-bg: #2196f3;
+  --litepicker-multiselect-is-selected-color: #fff;
+  --litepicker-multiselect-hover-color-bg: #2196f3;
+  --litepicker-multiselect-hover-color: #fff;
+}
+
+.litepicker[data-plugins*="multiselect"] .container__days .day-item {
+  position: relative;
+  z-index: 1;
+}
+
+.litepicker[data-plugins*="multiselect"] .container__days .day-item:not(.is-locked):after {
+  content: '';
+  position: absolute;
+  width: 27px;
+  height: 27px;
+  top: 50%;
+  left: 50%;
+  z-index: -1;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.litepicker[data-plugins*="multiselect"] .container__days .day-item:not(.is-locked):hover {
+  box-shadow: none;
+  color: var(--litepicker-day-color);
+  font-weight: bold;
+}
+
+
+.litepicker[data-plugins*="multiselect"] .container__days .day-item.is-selected,
+.litepicker[data-plugins*="multiselect"] .container__days .day-item.is-selected:hover {
+  color: var(--litepicker-multiselect-is-selected-color);
+}
+
+.litepicker[data-plugins*="multiselect"] .container__days .day-item.is-selected:after {
+  color: var(--litepicker-multiselect-is-selected-color);
+  background-color: var(--litepicker-multiselect-is-selected-color-bg);
+}
+</style>
+        <!--<base href="">--><base href=".">
+        
+        <title></title>
+        <meta name="description" content="Updates and statistics">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        
+        <!--begin::Fonts-->
+        <link rel="preconnect" href="https://fonts.googleapis.com/">
+        <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+        <link href="./manage-users_files/css2" rel="stylesheet">
+        <!--end::Fonts-->
+
+        <link rel="shortcut icon" href="{{dead_url}}/web/images/logo/favicon.ico">
+
+        
+        
+<link href="./manage-users_files/plugins.bundle.css" rel="stylesheet">
+<link href="./manage-users_files/style.bundle.css" rel="stylesheet">
+<link href="./manage-users_files/overwrite.css" rel="stylesheet">
+<link href="./manage-users_files/fontawesome.css" rel="stylesheet">
+<link href="./manage-users_files/all.css" rel="stylesheet">
+<link href="./manage-users_files/style.css" rel="stylesheet">
+<link href="./manage-users_files/style(1).css" rel="stylesheet">
+<link href="./manage-users_files/style(2).css" rel="stylesheet">
+<script src="./manage-users_files/plugins.bundle.js"></script>
+<script src="./manage-users_files/scripts.bundle.js"></script>
+<script src="./manage-users_files/variables.js"></script>
+<script src="./manage-users_files/pjaxBlockContent.js"></script>
+<script src="./manage-users_files/selectpicker.js"></script>
+<script src="./manage-users_files/formHelper.js"></script>
+<script src="./manage-users_files/scrollPositionSaver.js"></script>
+<script src="./manage-users_files/urlHelper.js"></script>
+<script src="./manage-users_files/support.js"></script>
+<script src="./manage-users_files/tippy.js"></script>    </head>
+
+    <body id="kt_body" class="page-loading-enabled header-mobile-fixed subheader-enabled aside-enabled aside-fixed aside-secondary-enabled modal-open">
+    <script src="./manage-users_files/widget.js"></script>
+    
+<!--begin::Page loader-->
+		<div class="page-loader">
+			<div class="spinner spinner-primary"></div>
+		</div>
+
+		<!--end::Page Loader-->    
+<!--begin::Header Mobile-->
+<div id="kt_header_mobile" class="header-mobile">
+
+    <!--begin::Logo-->
+    <a href="{{dead_url}}/dashboard">
+<!--        <img alt="Logo" src="/web/images/logo/logo-1.svg" class="logo-default max-h-30px"/>-->
+        <img alt="Logo" src="./manage-users_files/logo-4-blue.png" class="img-fluid max-h-35px">
+    </a>
+
+    <!--end::Logo-->
+
+    <!--begin::Toolbar-->
+    <div class="d-flex align-items-center">
+        <button class="btn p-0 burger-icon burger-icon-left" id="kt_aside_mobile_toggle">
+            <span></span>
+        </button>
+    </div>
+
+    <!--end::Toolbar-->
+</div>
+
+<!--end::Header Mobile-->
+    <div class="d-flex flex-column flex-root">
+
+        <!--begin::Page-->
+        <div class="d-flex flex-row flex-column-fluid page">
+
+            
+<!--begin::Aside-->
+<div class="aside aside-left d-flex aside-fixed shadow" id="kt_aside">
+
+    <!--begin::Primary-->
+    <div class="aside-primary d-flex flex-column align-items-center flex-row-auto">
+
+        <!--begin::Brand-->
+        <div class="aside-brand d-flex flex-column align-items-center flex-column-auto py-5 py-lg-12">
+
+            <!--begin::Logo-->
+            <a href="{{dead_url}}/dashboard">
+                <!--                <img alt="Logo" src="/web/images/logo/logo-5.svg"/>-->
+<!--                <img alt="Logo" src="/web/images/logo/cg.png" class="img-fluid" style="max-width: 40px;"/>-->
+                <img alt="Logo" src="./manage-users_files/logo-2.png" class="img-fluid" style="max-width: 40px;">
+<!--                <img alt="Logo" src="/web/images/logo/logo-3.png" class="img-fluid" style="max-width: 60px;"/>-->
+<!--                <img alt="Logo" src="/web/images/logo/logo-4.png" class="img-fluid" style="max-width: 40px;"/>-->
+<!--                <img alt="Logo" src="/web/images/logo/white.png" class="img-fluid" style="max-width: 40px;"/>-->
+            </a>
+
+            <!--end::Logo-->
+        </div>
+
+        <!--end::Brand-->
+
+        <div class="aside-nav d-flex flex-column align-items-center flex-column-fluid py-5 scroll scroll-pull ps" style="height: 380px; overflow: hidden;">
+            <!--begin::Nav-->
+            <ul class="nav flex-column" role="tablist">
+
+                <li class="nav-item mb-3" data-toggle="tooltip" data-placement="right" data-container="body" data-boundary="window" title="" data-original-title="Личный кабинет">
+                    <a href="{{dead_url}}/dashboard/account/manage-users#" class="nav-link btn btn-icon btn-icon-white btn-hover-transparent-white active" data-toggle="tab" data-target="#navTab_account" role="tab">
+                        <i class="fa-duotone fa-user icon-lg"></i>
+                    </a>
+                </li>
+
+                <li class="nav-item mb-3" data-toggle="tooltip" data-placement="right" data-container="body" data-boundary="window" title="" data-original-title="Заказы и продажи">
+                    <a href="{{dead_url}}/dashboard/account/manage-users#" class="nav-link btn btn-icon btn-icon-white btn-hover-transparent-white " data-toggle="tab" data-target="#navTab_metric" role="tab">
+                        <i class="fa-duotone fa-chart-pie icon-lg"></i>
+                    </a>
+                </li>
+
+                <li class="nav-item mb-3" data-toggle="tooltip" data-placement="right" data-container="body" data-boundary="window" title="" data-original-title="Товары">
+                    <a href="{{dead_url}}/dashboard/account/manage-users#" class="nav-link btn btn-icon btn-icon-white btn-hover-transparent-white " data-toggle="tab" data-target="#navTab_product" role="tab">
+                        <i class="fa-duotone fa-box-taped icon-lg"></i>
+                    </a>
+                </li>
+
+                <li class="nav-item mb-3" data-toggle="tooltip" data-placement="right" data-container="body" data-boundary="window" title="" data-original-title="Инструменты">
+                    <a href="{{dead_url}}/dashboard/account/manage-users#" class="nav-link btn btn-icon btn-icon-white btn-hover-transparent-white " data-toggle="tab" data-target="#navTab_tools" role="tab">
+                        <i class="fa-duotone fa-circle-dollar icon-lg"></i>
+                    </a>
+                </li>
+
+                <li class="nav-item mb-3" data-toggle="tooltip" data-placement="right" data-container="body" data-boundary="window" title="" data-original-title="Планирование">
+                    <a href="{{dead_url}}/dashboard/account/manage-users#" class="nav-link btn btn-icon btn-icon-white btn-hover-transparent-white " data-toggle="tab" data-target="#navTab_planning" role="tab">
+                        <i class="fa-duotone fa-calendar-lines icon-lg"></i>
+                    </a>
+                </li>
+
+                <li class="nav-item mb-3" data-toggle="tooltip" data-placement="right" data-container="body" data-boundary="window" title="" data-original-title="Работа с отзывами">
+                    <a href="{{dead_url}}/dashboard/account/manage-users#" class="nav-link btn btn-icon btn-icon-white btn-hover-transparent-white " data-toggle="tab" data-target="#navTab_feedback" role="tab">
+                        <i class="fa-duotone fa-comments icon-lg"></i>
+                    </a>
+                </li>
+
+                
+            </ul>
+            <!--end::Nav-->
+            <div class="ps__rail-x" style="left: 0px; bottom: 0px;">
+                <div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div>
+            </div>
+            <div class="ps__rail-y" style="top: 0px; right: -2px;">
+                <div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 0px;"></div>
+            </div>
+        <div class="ps__rail-x" style="left: 0px; bottom: 0px;"><div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div></div><div class="ps__rail-y" style="top: 0px; right: -2px;"><div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 0px;"></div></div></div>
+
+        <!--begin::Footer-->
+        <div class="aside-footer d-flex flex-column align-items-center flex-column-auto py-4 py-lg-10">
+            <!--begin::Aside Toggle-->
+            <span class="aside-toggle btn btn-icon btn-primary btn-hover-primary shadow-sm" id="kt_aside_toggle" data-toggle="tooltip" data-placement="right" data-container="body" data-boundary="window" title="" data-original-title="Скрыть меню">
+                <i class="ki ki-bold-arrow-back icon-sm"></i>
+            </span>
+            <!--end::Aside Toggle-->
+
+            <span class="btn btn-icon btn-icon-white btn-hover-transparent-white mb-3 position-relative" data-toggle="modal" data-target="#modal_support">
+                <i class="socicon-whatsapp icon-lg"></i>
+            </span>
+
+            
+<a href="{{dead_url}}/dashboard/account/manage-users#" class="btn btn-icon btn-icon-white btn-hover-transparent-white mb-3 position-relative" id="kt_quick_panel_toggle">
+    <span class="svg-icon svg-icon-xl"><!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/keen/releases/2021-04-21-040700/theme/demo5/dist/../src/media/svg/icons/General/Notifications1.svg--><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <path d="M17,12 L18.5,12 C19.3284271,12 20,12.6715729 20,13.5 C20,14.3284271 19.3284271,15 18.5,15 L5.5,15 C4.67157288,15 4,14.3284271 4,13.5 C4,12.6715729 4.67157288,12 5.5,12 L7,12 L7.5582739,6.97553494 C7.80974924,4.71225688 9.72279394,3 12,3 C14.2772061,3 16.1902508,4.71225688 16.4417261,6.97553494 L17,12 Z" fill="#000000"></path>
+        <rect fill="#000000" opacity="0.3" x="10" y="16" width="4" height="4" rx="2"></rect>
+    </g>
+</svg><!--end::Svg Icon--></span>
+    </a>
+
+<div id="kt_quick_panel" class="offcanvas offcanvas-left pt-5 pb-10">
+
+    <!--begin::Header-->
+    <div class="offcanvas-header offcanvas-header-navs d-flex align-items-center justify-content-between mb-5" kt-hidden-height="43" style="">
+        <ul class="nav nav-bold nav-tabs nav-tabs-line nav-tabs-line-3x nav-tabs-primary flex-grow-1 px-10" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="{{dead_url}}/dashboard/account/manage-users#kt_quick_panel_logs">Уведомления</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="{{dead_url}}/dashboard/account/manage-users#kt_quick_panel_notifications">Новости</a>
+            </li>
+        </ul>
+        <div class="offcanvas-close mt-n1 pr-5">
+            <a href="{{dead_url}}/dashboard/account/manage-users#" class="btn btn-xs btn-icon btn-light btn-hover-primary" id="kt_quick_panel_close">
+                <i class="ki ki-close icon-xs text-muted"></i>
+            </a>
+        </div>
+    </div>
+
+    <!--end::Header-->
+
+    <!--begin::Content-->
+    <div class="offcanvas-content px-10">
+        <div class="tab-content">
+            <div class="tab-pane fade show pt-3 pr-5 mr-n5 active scroll ps" id="kt_quick_panel_logs" role="tabpanel" style="height: 655px; overflow: hidden;">
+
+                <!--begin::Section-->
+                <div class="mb-15">
+                    <h5 class="font-weight-bold mb-5">Последние уведомления</h5>
+
+                    <!--begin::Timeline-->
+                    <div class="timeline timeline-5">
+
+                                                    <span class="text-muted">Уведомлений нет</span>
+                                            </div>
+
+                    <!--end::Timeline-->
+                </div>
+
+                <!--end::Section-->
+            <div class="ps__rail-x" style="left: 0px; bottom: 0px;"><div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div></div><div class="ps__rail-y" style="top: 0px; right: 0px;"><div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 0px;"></div></div></div>
+
+            <div class="tab-pane fade pt-2 pr-5 mr-n5 scroll ps" id="kt_quick_panel_notifications" role="tabpanel" style="height: 655px; overflow: hidden;">
+                <h5 class="font-weight-bold mb-5">Последние новости</h5>
+
+                <div class="newsListWrapper">
+                                            <div class="actions mb-10">
+                            <a href="{{dead_url}}/dashboard/news" class="btn btn-light-primary w-100">Смотреть все новости</a>
+                        </div>
+
+                                                    <div class="item mb-10">
+                                <div class="imageWrapper mb-5">
+                                    <img src="./manage-users_files/telegram-reports.jpg" alt="" class="img-responsive rounded" style="max-height: 130px; object-fit: cover; width: 100%;">
+                                </div>
+
+                                <div class="meta d-flex align-items-center mb-2">
+                                    <span class="category label label label-inline label-light-info font-weight-bold mr-3">Новый функционал</span>
+                                    <span class="date font-weight-bold font-size-sm text-muted">02 марта 2023</span>
+                                </div>
+
+                                <h6 class="font-weight-bolder"><a href="{{dead_url}}/dashboard/news/view/1" class="text-hover-primary text-dark">Добавили новые отчеты в Telegram</a></h6>
+                                <p class="text-dark-50 font-size-sm">Добавили новые Telegram-отчеты, которые будут полезны каждому продавцу на Wildbe...</p>
+                            </div>
+                                                            </div>
+            <div class="ps__rail-x" style="left: 0px; bottom: 0px;"><div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div></div><div class="ps__rail-y" style="top: 0px; right: 0px;"><div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 0px;"></div></div></div>
+        </div>
+    </div>
+</div>
+
+                            <span href="#" class="btn btn-icon btn-icon-white btn-hover-transparent-white w-40px h-40px mb-3 mt-5" data-toggle="tab" data-target="#navTab_switchAccount" role="tab">
+                <div class="symbol symbol-30 bg-gray-100">
+                    <div class="symbol-label">
+                        <img src="./manage-users_files/profile.svg" class="h-75 align-self-end">
+                    </div>
+                    <i class="symbol-badge bg-success"></i>
+                </div>
+            </span>
+            
+            <!--begin::Quick Actions-->
+            <a href="{{dead_url}}/log-out" class="btn btn-icon btn-icon-white btn-transparent-white w-40px h-40px" data-toggle="tooltip" data-placement="right" data-container="body" data-boundary="window" title="" data-original-title="Выйти из системы">
+                <span class="svg-icon svg-icon-md"><!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/keen/releases/2021-04-21-040700/theme/demo5/dist/../src/media/svg/icons/Navigation/Sign-out.svg--><svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                        <rect x="0" y="0" width="24" height="24"></rect>
+                        <path d="M14.0069431,7.00607258 C13.4546584,7.00607258 13.0069431,6.55855153 13.0069431,6.00650634 C13.0069431,5.45446114 13.4546584,5.00694009 14.0069431,5.00694009 L15.0069431,5.00694009 C17.2160821,5.00694009 19.0069431,6.7970243 19.0069431,9.00520507 L19.0069431,15.001735 C19.0069431,17.2099158 17.2160821,19 15.0069431,19 L3.00694311,19 C0.797804106,19 -0.993056895,17.2099158 -0.993056895,15.001735 L-0.993056895,8.99826498 C-0.993056895,6.7900842 0.797804106,5 3.00694311,5 L4.00694793,5 C4.55923268,5 5.00694793,5.44752105 5.00694793,5.99956624 C5.00694793,6.55161144 4.55923268,6.99913249 4.00694793,6.99913249 L3.00694311,6.99913249 C1.90237361,6.99913249 1.00694311,7.89417459 1.00694311,8.99826498 L1.00694311,15.001735 C1.00694311,16.1058254 1.90237361,17.0008675 3.00694311,17.0008675 L15.0069431,17.0008675 C16.1115126,17.0008675 17.0069431,16.1058254 17.0069431,15.001735 L17.0069431,9.00520507 C17.0069431,7.90111468 16.1115126,7.00607258 15.0069431,7.00607258 L14.0069431,7.00607258 Z" fill="#000000" fill-rule="nonzero" opacity="0.3" transform="translate(9.006943, 12.000000) scale(-1, 1) rotate(-90.000000) translate(-9.006943, -12.000000) "></path>
+                        <rect fill="#000000" opacity="0.3" transform="translate(14.000000, 12.000000) rotate(-270.000000) translate(-14.000000, -12.000000) " x="13" y="6" width="2" height="12" rx="1"></rect>
+                        <path d="M21.7928932,9.79289322 C22.1834175,9.40236893 22.8165825,9.40236893 23.2071068,9.79289322 C23.5976311,10.1834175 23.5976311,10.8165825 23.2071068,11.2071068 L20.2071068,14.2071068 C19.8165825,14.5976311 19.1834175,14.5976311 18.7928932,14.2071068 L15.7928932,11.2071068 C15.4023689,10.8165825 15.4023689,10.1834175 15.7928932,9.79289322 C16.1834175,9.40236893 16.8165825,9.40236893 17.2071068,9.79289322 L19.5,12.0857864 L21.7928932,9.79289322 Z" fill="#000000" fill-rule="nonzero" transform="translate(19.500000, 12.000000) rotate(-90.000000) translate(-19.500000, -12.000000) "></path>
+                    </g>
+                </svg><!--end::Svg Icon--></span>
+            </a>
+            <!--end::Quick Actions-->
+
+        </div>
+        <!--end::Footer-->
+    </div>
+
+    <!--end::Primary-->
+
+    <!--begin::Secondary-->
+    <div class="aside-secondary d-flex flex-row-fluid">
+
+        <!--begin::Workspace-->
+        <div class="aside-workspace scroll scroll-push my-2 ps ps--active-y" style="height: 752px; overflow: hidden;">
+
+            <div class="tab-content">
+
+                <div class="tab-pane fade show active" id="navTab_account">
+                    <div class="aside-menu-wrapper flex-column-fluid px-3 px-lg-3 py-5" id="kt_aside_menu_wrapper">
+                        <div id="kt_aside_menu" class="aside-menu min-h-lg-800px" data-menu-vertical="1" data-menu-scroll="1">
+
+                            <h3 class="p-2 p-lg-6 my-1 my-lg-3">Личный кабинет</h3>
+
+                            <ul class="menu-nav">
+
+                                <li class="menu-section">
+                                    <h4 class="menu-text">Аккаунты Wildberries</h4>
+                                    <i class="menu-icon ki ki-bold-more-hor icon-md"></i>
+                                </li>
+                                <li class="menu-item" aria-haspopup="true">
+                                    <a href="{{dead_url}}/dashboard/keys" class="menu-link">
+                                    <span class="svg-icon menu-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                <polygon points="0 0 24 0 24 24 0 24"></polygon>
+                                                <path d="M18,14 C16.3431458,14 15,12.6568542 15,11 C15,9.34314575 16.3431458,8 18,8 C19.6568542,8 21,9.34314575 21,11 C21,12.6568542 19.6568542,14 18,14 Z M9,11 C6.790861,11 5,9.209139 5,7 C5,4.790861 6.790861,3 9,3 C11.209139,3 13,4.790861 13,7 C13,9.209139 11.209139,11 9,11 Z" fill="#000000" fill-rule="nonzero" opacity="0.3"></path>
+                                                <path d="M17.6011961,15.0006174 C21.0077043,15.0378534 23.7891749,16.7601418 23.9984937,20.4 C24.0069246,20.5466056 23.9984937,21 23.4559499,21 L19.6,21 C19.6,18.7490654 18.8562935,16.6718327 17.6011961,15.0006174 Z M0.00065168429,20.1992055 C0.388258525,15.4265159 4.26191235,13 8.98334134,13 C13.7712164,13 17.7048837,15.2931929 17.9979143,20.2 C18.0095879,20.3954741 17.9979143,21 17.2466999,21 C13.541124,21 8.03472472,21 0.727502227,21 C0.476712155,21 -0.0204617505,20.45918 0.00065168429,20.1992055 Z" fill="#000000" fill-rule="nonzero"></path>
+                                            </g>
+                                        </svg>
+                                    </span>
+                                        <span class="menu-text">Список аккаунтов</span></a>
+                                </li>
+
+                                <li class="menu-section">
+                                    <h4 class="menu-text">Мой аккаунт</h4>
+                                    <i class="menu-icon ki ki-bold-more-hor icon-md"></i>
+                                </li>
+                                <li class="menu-item d-none" aria-haspopup="true">
+                                    <a href="{{dead_url}}/dashboard/account" class="menu-link">
+                                        <span class="svg-icon menu-icon"><!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/keen/releases/2021-04-21-040700/theme/demo5/dist/../src/media/svg/icons/General/User.svg--><svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                <polygon points="0 0 24 0 24 24 0 24"></polygon>
+                                                <path d="M12,11 C9.790861,11 8,9.209139 8,7 C8,4.790861 9.790861,3 12,3 C14.209139,3 16,4.790861 16,7 C16,9.209139 14.209139,11 12,11 Z" fill="#000000" fill-rule="nonzero" opacity="0.3"></path>
+                                                <path d="M3.00065168,20.1992055 C3.38825852,15.4265159 7.26191235,13 11.9833413,13 C16.7712164,13 20.7048837,15.2931929 20.9979143,20.2 C21.0095879,20.3954741 20.9979143,21 20.2466999,21 C16.541124,21 11.0347247,21 3.72750223,21 C3.47671215,21 2.97953825,20.45918 3.00065168,20.1992055 Z" fill="#000000" fill-rule="nonzero"></path>
+                                            </g>
+                                        </svg><!--end::Svg Icon--></span>
+                                        <span class="menu-text">Обзор аккаунта</span></a>
+                                </li>
+                                <li class="menu-item" aria-haspopup="true">
+                                    <a href="{{dead_url}}/dashboard/account/manage-users" class="menu-link">
+                                        <span class="svg-icon menu-icon"><!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/keen/releases/2021-04-21-040700/theme/demo5/dist/../src/media/svg/icons/General/Shield-protected.svg--><svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                <rect x="0" y="0" width="24" height="24"></rect>
+                                                <path d="M4,4 L11.6314229,2.5691082 C11.8750185,2.52343403 12.1249815,2.52343403 12.3685771,2.5691082 L20,4 L20,13.2830094 C20,16.2173861 18.4883464,18.9447835 16,20.5 L12.5299989,22.6687507 C12.2057287,22.8714196 11.7942713,22.8714196 11.4700011,22.6687507 L8,20.5 C5.51165358,18.9447835 4,16.2173861 4,13.2830094 L4,4 Z" fill="#000000" opacity="0.3"></path>
+                                                <path d="M14.5,11 C15.0522847,11 15.5,11.4477153 15.5,12 L15.5,15 C15.5,15.5522847 15.0522847,16 14.5,16 L9.5,16 C8.94771525,16 8.5,15.5522847 8.5,15 L8.5,12 C8.5,11.4477153 8.94771525,11 9.5,11 L9.5,10.5 C9.5,9.11928813 10.6192881,8 12,8 C13.3807119,8 14.5,9.11928813 14.5,10.5 L14.5,11 Z M12,9 C11.1715729,9 10.5,9.67157288 10.5,10.5 L10.5,11 L13.5,11 L13.5,10.5 C13.5,9.67157288 12.8284271,9 12,9 Z" fill="#000000"></path>
+                                            </g>
+                                        </svg><!--end::Svg Icon--></span>
+                                        <span class="menu-text">Добавить сотрудника</span></a>
+                                </li>
+
+                                <li class="menu-item" aria-haspopup="true">
+                                    <a href="{{dead_url}}/dashboard/user-access" class="menu-link">
+                                        <span class="svg-icon menu-icon"><!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/keen/releases/2021-04-21-040700/theme/demo5/dist/../src/media/svg/icons/General/Lock.svg--><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                <mask fill="white">
+                                                    <use xlink:href="#path-1"></use>
+                                                </mask>
+                                                <g></g>
+                                                <path d="M7,10 L7,8 C7,5.23857625 9.23857625,3 12,3 C14.7614237,3 17,5.23857625 17,8 L17,10 L18,10 C19.1045695,10 20,10.8954305 20,12 L20,18 C20,19.1045695 19.1045695,20 18,20 L6,20 C4.8954305,20 4,19.1045695 4,18 L4,12 C4,10.8954305 4.8954305,10 6,10 L7,10 Z M12,5 C10.3431458,5 9,6.34314575 9,8 L9,10 L15,10 L15,8 C15,6.34314575 13.6568542,5 12,5 Z" fill="#000000"></path>
+                                            </g>
+                                        </svg><!--end::Svg Icon--></span>
+                                        <span class="menu-text">Доступ к аккаунту</span></a>
+                                </li>
+
+                                                                    <li class="menu-item" aria-haspopup="true">
+                                        <a href="{{dead_url}}/dashboard/event-log" class="menu-link">
+                                        <span class="svg-icon menu-icon"><!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/keen/releases/2021-04-21-040700/theme/demo5/dist/../src/media/svg/icons/General/Binocular.svg--><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                                <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                    <rect x="0" y="0" width="24" height="24"></rect>
+                                                    <path d="M12.8434797,16 L11.1565203,16 L10.9852159,16.6393167 C10.3352654,19.064965 7.84199997,20.5044524 5.41635172,19.8545019 C2.99070348,19.2045514 1.55121603,16.711286 2.20116652,14.2856378 L3.92086709,7.86762789 C4.57081758,5.44197964 7.06408298,4.00249219 9.48973122,4.65244268 C10.5421727,4.93444352 11.4089671,5.56345262 12,6.38338695 C12.5910329,5.56345262 13.4578273,4.93444352 14.5102688,4.65244268 C16.935917,4.00249219 19.4291824,5.44197964 20.0791329,7.86762789 L21.7988335,14.2856378 C22.448784,16.711286 21.0092965,19.2045514 18.5836483,19.8545019 C16.158,20.5044524 13.6647346,19.064965 13.0147841,16.6393167 L12.8434797,16 Z M17.4563502,18.1051865 C18.9630797,18.1051865 20.1845253,16.8377967 20.1845253,15.2743923 C20.1845253,13.7109878 18.9630797,12.4435981 17.4563502,12.4435981 C15.9496207,12.4435981 14.7281751,13.7109878 14.7281751,15.2743923 C14.7281751,16.8377967 15.9496207,18.1051865 17.4563502,18.1051865 Z M6.54364977,18.1051865 C8.05037928,18.1051865 9.27182488,16.8377967 9.27182488,15.2743923 C9.27182488,13.7109878 8.05037928,12.4435981 6.54364977,12.4435981 C5.03692026,12.4435981 3.81547465,13.7109878 3.81547465,15.2743923 C3.81547465,16.8377967 5.03692026,18.1051865 6.54364977,18.1051865 Z" fill="#000000"></path>
+                                                </g>
+                                            </svg><!--end::Svg Icon-->
+                                        </span>
+                                            <span class="menu-text">Журнал действий</span></a>
+                                    </li>
+                                
+                                <li class="menu-item d-none" aria-haspopup="true">
+                                    <a href="{{dead_url}}/order" class="menu-link">
+                                        <span class="svg-icon menu-icon"><!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/keen/releases/2021-04-21-040700/theme/demo5/dist/../src/media/svg/icons/Shopping/Wallet3.svg--><svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                <rect x="0" y="0" width="24" height="24"></rect>
+                                                <path d="M4,4 L20,4 C21.1045695,4 22,4.8954305 22,6 L22,18 C22,19.1045695 21.1045695,20 20,20 L4,20 C2.8954305,20 2,19.1045695 2,18 L2,6 C2,4.8954305 2.8954305,4 4,4 Z" fill="#000000" opacity="0.3"></path>
+                                                <path d="M18.5,11 L5.5,11 C4.67157288,11 4,11.6715729 4,12.5 L4,13 L8.58578644,13 C8.85100293,13 9.10535684,13.1053568 9.29289322,13.2928932 L10.2928932,14.2928932 C10.7456461,14.7456461 11.3597108,15 12,15 C12.6402892,15 13.2543539,14.7456461 13.7071068,14.2928932 L14.7071068,13.2928932 C14.8946432,13.1053568 15.1489971,13 15.4142136,13 L20,13 L20,12.5 C20,11.6715729 19.3284271,11 18.5,11 Z" fill="#000000"></path>
+                                                <path d="M5.5,6 C4.67157288,6 4,6.67157288 4,7.5 L4,8 L20,8 L20,7.5 C20,6.67157288 19.3284271,6 18.5,6 L5.5,6 Z" fill="#000000"></path>
+                                            </g>
+                                        </svg><!--end::Svg Icon--></span>
+                                        <span class="menu-text">Платежная информация</span></a>
+                                </li>
+
+                                <li class="menu-item menu-item-submenu" aria-haspopup="true" data-menu-toggle="hover">
+                                    <a href="javascript:;" class="menu-link menu-toggle">
+                                         <span class="svg-icon menu-icon"><!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/keen/releases/2021-04-21-040700/theme/demo5/dist/../src/media/svg/icons/General/Settings-2.svg--><svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                <rect x="0" y="0" width="24" height="24"></rect>
+                                                <path d="M5,8.6862915 L5,5 L8.6862915,5 L11.5857864,2.10050506 L14.4852814,5 L19,5 L19,9.51471863 L21.4852814,12 L19,14.4852814 L19,19 L14.4852814,19 L11.5857864,21.8994949 L8.6862915,19 L5,19 L5,15.3137085 L1.6862915,12 L5,8.6862915 Z M12,15 C13.6568542,15 15,13.6568542 15,12 C15,10.3431458 13.6568542,9 12,9 C10.3431458,9 9,10.3431458 9,12 C9,13.6568542 10.3431458,15 12,15 Z" fill="#000000"></path>
+                                            </g>
+                                        </svg><!--end::Svg Icon--></span>
+                                        <span class="menu-text">Настройки</span>
+                                        <i class="menu-arrow"></i>
+                                    </a>
+                                    <div class="menu-submenu">
+                                        <i class="menu-arrow"></i>
+                                        <ul class="menu-subnav">
+                                            <li class="menu-item menu-item-parent" aria-haspopup="true">
+                                                <span class="menu-link">
+                                                    <span class="menu-text">Настройки</span>
+                                                </span>
+                                            </li>
+                                            <li class="menu-item" aria-haspopup="true">
+                                                <a href="{{dead_url}}/dashboard/settings/warehouse" class="menu-link">
+                                                    <i class="menu-bullet menu-bullet-dot"><span></span></i>
+                                                    <span class="menu-text">Избранные склады</span></a>
+                                            </li>
+                                            <li class="menu-item" aria-haspopup="true">
+                                                <a href="{{dead_url}}/dashboard/settings/order" class="menu-link">
+                                                    <i class="menu-bullet menu-bullet-dot"><span></span></i>
+                                                    <span class="menu-text">Отображение заказов</span></a>
+                                            </li>
+                                            <li class="menu-item" aria-haspopup="true">
+                                                <a href="{{dead_url}}/dashboard/settings/report" class="menu-link">
+                                                    <i class="menu-bullet menu-bullet-dot"><span></span></i>
+                                                    <span class="menu-text">Отображение отчетов</span></a>
+                                            </li>
+                                            <li class="menu-item" aria-haspopup="true">
+                                                <a href="{{dead_url}}/dashboard/settings/product" class="menu-link">
+                                                    <i class="menu-bullet menu-bullet-dot"><span></span></i>
+                                                    <span class="menu-text">Отображение товаров</span></a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </li>
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade show " id="navTab_metric">
+                    <div class="aside-menu-wrapper flex-column-fluid px-3 px-lg-3 py-5" id="kt_aside_menu_wrapper">
+                        <div id="kt_aside_menu" class="aside-menu min-h-lg-800px" data-menu-vertical="1" data-menu-scroll="1">
+
+                            <h3 class="p-2 p-lg-6 my-1 my-lg-3">Метрики</h3>
+
+                            <ul class="menu-nav">
+                                <li class="menu-section">
+                                    <h4 class="menu-text">Основные метрики</h4>
+                                    <i class="menu-icon ki ki-bold-more-hor icon-md"></i>
+                                </li>
+                                <li class="menu-item" aria-haspopup="true">
+                                    <a href="{{dead_url}}/dashboard/order" class="menu-link">
+                                        <span class="svg-icon menu-icon"><!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/keen/releases/2021-04-21-040700/theme/demo5/dist/../src/media/svg/icons/Shopping/Chart-pie.svg--><svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                <rect x="0" y="0" width="24" height="24"></rect>
+                                                <path d="M4.00246329,12.2004927 L13,14 L13,4.06189375 C16.9463116,4.55399184 20,7.92038235 20,12 C20,16.418278 16.418278,20 12,20 C7.64874861,20 4.10886412,16.5261253 4.00246329,12.2004927 Z" fill="#000000" opacity="0.3"></path>
+                                                <path d="M3.0603968,10.0120794 C3.54712466,6.05992157 6.91622084,3 11,3 L11,11.6 L3.0603968,10.0120794 Z" fill="#000000"></path>
+                                            </g>
+                                        </svg><!--end::Svg Icon--></span>
+                                        <span class="menu-text">Заказы</span></a>
+                                </li>
+                                <li class="menu-item" aria-haspopup="true">
+                                    <a href="{{dead_url}}/dashboard/report" class="menu-link">
+                                        <span class="svg-icon menu-icon"><!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/keen/releases/2021-04-21-040700/theme/demo5/dist/../src/media/svg/icons/Shopping/Chart-bar2.svg--><svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                <rect x="0" y="0" width="24" height="24"></rect>
+                                                <rect fill="#000000" opacity="0.3" x="17" y="4" width="3" height="13" rx="1.5"></rect>
+                                                <rect fill="#000000" opacity="0.3" x="12" y="9" width="3" height="8" rx="1.5"></rect>
+                                                <path d="M5,19 L20,19 C20.5522847,19 21,19.4477153 21,20 C21,20.5522847 20.5522847,21 20,21 L4,21 C3.44771525,21 3,20.5522847 3,20 L3,4 C3,3.44771525 3.44771525,3 4,3 C4.55228475,3 5,3.44771525 5,4 L5,19 Z" fill="#000000" fill-rule="nonzero"></path>
+                                                <rect fill="#000000" opacity="0.3" x="7" y="11" width="3" height="6" rx="1.5"></rect>
+                                            </g>
+                                        </svg><!--end::Svg Icon--></span>
+                                        <span class="menu-text">Финансовые отчеты</span></a>
+                                </li>
+
+                                
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade show " id="navTab_product">
+
+                    <!--begin::Aside Menu-->
+                    <div class="aside-menu-wrapper flex-column-fluid px-3 px-lg-3 py-5" id="kt_aside_menu_wrapper">
+
+                        <!--begin::Menu Container-->
+                        <div id="kt_aside_menu" class="aside-menu min-h-lg-800px" data-menu-vertical="1" data-menu-scroll="1">
+
+                            <h3 class="p-2 p-lg-6 my-1 my-lg-3">Товары</h3>
+
+                            <ul class="menu-nav">
+
+                                <li class="menu-section">
+                                    <h4 class="menu-text">Инструменты</h4>
+                                    <i class="menu-icon ki ki-bold-more-hor icon-md"></i>
+                                </li>
+
+                                <li class="menu-item menu-item-submenu d-none" aria-haspopup="true" data-menu-toggle="hover">
+                                    <a href="{{dead_url}}/dashboard/price" class="menu-link">
+                  <span class="svg-icon menu-icon"><!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/keen/releases/2021-04-21-040700/theme/demo5/dist/../src/media/svg/icons/Shopping/Rouble.svg--><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect x="0" y="0" width="24" height="24"></rect>
+        <path d="M5.3618034,16.2763932 L5.8618034,15.2763932 C5.94649941,15.1070012 6.11963097,15 6.30901699,15 L16.190983,15 C16.4671254,15 16.690983,15.2238576 16.690983,15.5 C16.690983,15.5776225 16.6729105,15.6541791 16.6381966,15.7236068 L16.1381966,16.7236068 C16.0535006,16.8929988 15.880369,17 15.690983,17 L5.80901699,17 C5.53287462,17 5.30901699,16.7761424 5.30901699,16.5 C5.30901699,16.4223775 5.32708954,16.3458209 5.3618034,16.2763932 Z" fill="#000000" opacity="0.3"></path>
+        <path d="M8,3.716 L13.107,3.716 C14.042338,3.716 14.8856629,3.80033249 15.637,3.969 C16.3883371,4.13766751 17.0323306,4.41366475 17.569,4.797 C18.1056693,5.18033525 18.5196652,5.67099701 18.811,6.269 C19.1023348,6.86700299 19.248,7.58766245 19.248,8.431 C19.248,9.33567119 19.079335,10.0946636 18.742,10.708 C18.404665,11.3213364 17.9485029,11.8158315 17.3735,12.1915 C16.7984971,12.5671685 16.1276705,12.8393325 15.361,13.008 C14.5943295,13.1766675 13.781671,13.261 12.923,13.261 L10.692,13.261 L10.692,20 L8,20 L8,3.716 Z M12.716,10.823 C13.1913357,10.823 13.6436645,10.7885003 14.073,10.7195 C14.5023355,10.6504997 14.885665,10.5278342 15.223,10.3515 C15.560335,10.1751658 15.8286657,9.9336682 16.028,9.627 C16.2273343,9.3203318 16.327,8.92166912 16.327,8.431 C16.327,7.95566429 16.2273343,7.5685015 16.028,7.2695 C15.8286657,6.97049851 15.5641683,6.73666751 15.2345,6.568 C14.9048317,6.39933249 14.5291688,6.28816694 14.1075,6.2345 C13.6858312,6.18083307 13.2526689,6.154 12.808,6.154 L10.692,6.154 L10.692,10.823 L12.716,10.823 Z" fill="#000000"></path>
+    </g>
+</svg><!--end::Svg Icon--></span>
+                                        <span class="menu-text">Установка цен и скидок</span></a>
+                                </li>
+
+                                <li class="menu-item menu-item-submenu d-none" aria-haspopup="true" data-menu-toggle="hover">
+                                    <a href="{{dead_url}}/dashboard/promotion" class="menu-link">
+                                        <span class="svg-icon menu-icon"><!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/keen/releases/2021-04-21-040700/theme/demo5/dist/../src/media/svg/icons/Shopping/Sale2.svg--><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect x="0" y="0" width="24" height="24"></rect>
+        <polygon fill="#000000" opacity="0.3" points="12 20.0218549 8.47346039 21.7286168 6.86905972 18.1543453 3.07048824 17.1949849 4.13894342 13.4256452 1.84573388 10.2490577 5.08710286 8.04836581 5.3722735 4.14091196 9.2698837 4.53859595 12 1.72861679 14.7301163 4.53859595 18.6277265 4.14091196 18.9128971 8.04836581 22.1542661 10.2490577 19.8610566 13.4256452 20.9295118 17.1949849 17.1309403 18.1543453 15.5265396 21.7286168"></polygon>
+        <polygon fill="#000000" points="14.0890818 8.60255815 8.36079737 14.7014391 9.70868621 16.049328 15.4369707 9.950447"></polygon>
+        <path d="M10.8543431,9.1753866 C10.8543431,10.1252593 10.085524,10.8938719 9.13585777,10.8938719 C8.18793881,10.8938719 7.41737243,10.1252593 7.41737243,9.1753866 C7.41737243,8.22551387 8.18793881,7.45690126 9.13585777,7.45690126 C10.085524,7.45690126 10.8543431,8.22551387 10.8543431,9.1753866" fill="#000000" opacity="0.3"></path>
+        <path d="M14.8641422,16.6221564 C13.9162233,16.6221564 13.1456569,15.8535438 13.1456569,14.9036711 C13.1456569,13.9520555 13.9162233,13.1851857 14.8641422,13.1851857 C15.8138085,13.1851857 16.5826276,13.9520555 16.5826276,14.9036711 C16.5826276,15.8535438 15.8138085,16.6221564 14.8641422,16.6221564 Z" fill="#000000" opacity="0.3"></path>
+    </g>
+</svg><!--end::Svg Icon--></span>
+                                        <span class="menu-text">Участие в акции</span></a>
+                                </li>
+
+                                <li class="menu-item menu-item-submenu" aria-haspopup="true" data-menu-toggle="hover">
+                                    <a href="{{dead_url}}/dashboard/warehouse" class="menu-link">
+                                  <span class="svg-icon menu-icon"><!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/keen/releases/2021-04-21-040700/theme/demo5/dist/../src/media/svg/icons/Shopping/Loader.svg--><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect x="0" y="0" width="24" height="24"></rect>
+        <path d="M8,4 C8.55228475,4 9,4.44771525 9,5 L9,17 L18,17 C18.5522847,17 19,17.4477153 19,18 C19,18.5522847 18.5522847,19 18,19 L9,19 C8.44771525,19 8,18.5522847 8,18 C7.44771525,18 7,17.5522847 7,17 L7,6 L5,6 C4.44771525,6 4,5.55228475 4,5 C4,4.44771525 4.44771525,4 5,4 L8,4 Z" fill="#000000" opacity="0.3"></path>
+        <rect fill="#000000" opacity="0.3" x="11" y="7" width="8" height="8" rx="4"></rect>
+        <circle fill="#000000" cx="8" cy="18" r="3"></circle>
+    </g>
+</svg><!--end::Svg Icon--></span>
+                                        <span class="menu-text">Остаток товара</span></a>
+                                </li>
+
+                                <li class="menu-item menu-item-submenu d-none" aria-haspopup="true" data-menu-toggle="hover">
+                                    <a href="{{dead_url}}/dashboard/product" class="menu-link">
+                                        <span class="svg-icon menu-icon"><!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/keen/releases/2021-04-21-040700/theme/demo5/dist/../src/media/svg/icons/General/Search.svg--><svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                <rect x="0" y="0" width="24" height="24"></rect>
+                                                <path d="M14.2928932,16.7071068 C13.9023689,16.3165825 13.9023689,15.6834175 14.2928932,15.2928932 C14.6834175,14.9023689 15.3165825,14.9023689 15.7071068,15.2928932 L19.7071068,19.2928932 C20.0976311,19.6834175 20.0976311,20.3165825 19.7071068,20.7071068 C19.3165825,21.0976311 18.6834175,21.0976311 18.2928932,20.7071068 L14.2928932,16.7071068 Z" fill="#000000" fill-rule="nonzero" opacity="0.3"></path>
+                                                <path d="M11,16 C13.7614237,16 16,13.7614237 16,11 C16,8.23857625 13.7614237,6 11,6 C8.23857625,6 6,8.23857625 6,11 C6,13.7614237 8.23857625,16 11,16 Z M11,18 C7.13400675,18 4,14.8659932 4,11 C4,7.13400675 7.13400675,4 11,4 C14.8659932,4 18,7.13400675 18,11 C18,14.8659932 14.8659932,18 11,18 Z" fill="#000000" fill-rule="nonzero"></path>
+                                            </g>
+                                        </svg><!--end::Svg Icon--></span>
+                                        <span class="menu-text">Отслеживание позиций</span></a>
+                                </li>
+
+                                <li class="menu-item menu-item-submenu d-none" aria-haspopup="true" data-menu-toggle="hover">
+                                    <a href="{{dead_url}}/dashboard/calculator/profit" class="menu-link">
+                                          <span class="svg-icon menu-icon"><!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/keen/releases/2021-04-21-040700/theme/demo5/dist/../src/media/svg/icons/Shopping/Settings.svg--><svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                <rect opacity="0.200000003" x="0" y="0" width="24" height="24"></rect>
+                                                <path d="M4.5,7 L9.5,7 C10.3284271,7 11,7.67157288 11,8.5 C11,9.32842712 10.3284271,10 9.5,10 L4.5,10 C3.67157288,10 3,9.32842712 3,8.5 C3,7.67157288 3.67157288,7 4.5,7 Z M13.5,15 L18.5,15 C19.3284271,15 20,15.6715729 20,16.5 C20,17.3284271 19.3284271,18 18.5,18 L13.5,18 C12.6715729,18 12,17.3284271 12,16.5 C12,15.6715729 12.6715729,15 13.5,15 Z" fill="#000000" opacity="0.3"></path>
+                                                <path d="M17,11 C15.3431458,11 14,9.65685425 14,8 C14,6.34314575 15.3431458,5 17,5 C18.6568542,5 20,6.34314575 20,8 C20,9.65685425 18.6568542,11 17,11 Z M6,19 C4.34314575,19 3,17.6568542 3,16 C3,14.3431458 4.34314575,13 6,13 C7.65685425,13 9,14.3431458 9,16 C9,17.6568542 7.65685425,19 6,19 Z" fill="#000000"></path>
+                                            </g>
+                                        </svg><!--end::Svg Icon--></span>
+                                        <span class="menu-text">Калькулятор прибыли</span></a>
+                                </li>
+
+                                
+                                <li class="menu-section">
+                                    <h4 class="menu-text">Товары</h4>
+                                    <i class="menu-icon ki ki-bold-more-hor icon-md"></i>
+                                </li>
+
+
+                                <li class="menu-item menu-item-submenu" aria-haspopup="true" data-menu-toggle="hover">
+                                    <a href="{{dead_url}}/dashboard/product" class="menu-link">
+                                        <span class="svg-icon menu-icon"><!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/keen/releases/2021-04-21-040700/theme/demo5/dist/../src/media/svg/icons/Shopping/Box2.svg--><svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                <rect x="0" y="0" width="24" height="24"></rect>
+                                                <path d="M4,9.67471899 L10.880262,13.6470401 C10.9543486,13.689814 11.0320333,13.7207107 11.1111111,13.740321 L11.1111111,21.4444444 L4.49070127,17.526473 C4.18655139,17.3464765 4,17.0193034 4,16.6658832 L4,9.67471899 Z M20,9.56911707 L20,16.6658832 C20,17.0193034 19.8134486,17.3464765 19.5092987,17.526473 L12.8888889,21.4444444 L12.8888889,13.6728275 C12.9050191,13.6647696 12.9210067,13.6561758 12.9368301,13.6470401 L20,9.56911707 Z" fill="#000000"></path>
+                                                <path d="M4.21611835,7.74669402 C4.30015839,7.64056877 4.40623188,7.55087574 4.5299008,7.48500698 L11.5299008,3.75665466 C11.8237589,3.60013944 12.1762411,3.60013944 12.4700992,3.75665466 L19.4700992,7.48500698 C19.5654307,7.53578262 19.6503066,7.60071528 19.7226939,7.67641889 L12.0479413,12.1074394 C11.9974761,12.1365754 11.9509488,12.1699127 11.9085461,12.2067543 C11.8661433,12.1699127 11.819616,12.1365754 11.7691509,12.1074394 L4.21611835,7.74669402 Z" fill="#000000" opacity="0.3"></path>
+                                            </g>
+                                        </svg><!--end::Svg Icon--></span>
+                                        <span class="menu-text">Список товаров</span></a>
+                                </li>
+
+                            </ul>
+
+                            <!--end::Menu Nav-->
+                        </div>
+
+                        <!--end::Menu Container-->
+                    </div>
+
+                    <!--end::Aside Menu-->
+
+                    <!--end::List-->
+                </div>
+
+                <div class="tab-pane fade show " id="navTab_tools">
+                    <div class="aside-menu-wrapper flex-column-fluid px-3 px-lg-3 py-5" id="kt_aside_menu_wrapper">
+                        <div id="kt_aside_menu" class="aside-menu min-h-lg-800px" data-menu-vertical="1" data-menu-scroll="1">
+                            <h3 class="p-2 p-lg-6 my-1 my-lg-3">Инструменты</h3>
+
+                            <ul class="menu-nav">
+
+                                <li class="menu-section">
+                                    <h4 class="menu-text">Цены и скидки</h4>
+                                    <i class="menu-icon ki ki-bold-more-hor icon-md"></i>
+                                </li>
+
+                                <li class="menu-item menu-item-submenu" aria-haspopup="true" data-menu-toggle="hover">
+                                    <a href="{{dead_url}}/dashboard/price-adjustment" class="menu-link">
+                                       <span class="svg-icon menu-icon"><!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/keen/releases/2021-04-21-040700/theme/demo5/dist/../src/media/svg/icons/Shopping/Rouble.svg--><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect x="0" y="0" width="24" height="24"></rect>
+        <path d="M5.3618034,16.2763932 L5.8618034,15.2763932 C5.94649941,15.1070012 6.11963097,15 6.30901699,15 L16.190983,15 C16.4671254,15 16.690983,15.2238576 16.690983,15.5 C16.690983,15.5776225 16.6729105,15.6541791 16.6381966,15.7236068 L16.1381966,16.7236068 C16.0535006,16.8929988 15.880369,17 15.690983,17 L5.80901699,17 C5.53287462,17 5.30901699,16.7761424 5.30901699,16.5 C5.30901699,16.4223775 5.32708954,16.3458209 5.3618034,16.2763932 Z" fill="#000000" opacity="0.3"></path>
+        <path d="M8,3.716 L13.107,3.716 C14.042338,3.716 14.8856629,3.80033249 15.637,3.969 C16.3883371,4.13766751 17.0323306,4.41366475 17.569,4.797 C18.1056693,5.18033525 18.5196652,5.67099701 18.811,6.269 C19.1023348,6.86700299 19.248,7.58766245 19.248,8.431 C19.248,9.33567119 19.079335,10.0946636 18.742,10.708 C18.404665,11.3213364 17.9485029,11.8158315 17.3735,12.1915 C16.7984971,12.5671685 16.1276705,12.8393325 15.361,13.008 C14.5943295,13.1766675 13.781671,13.261 12.923,13.261 L10.692,13.261 L10.692,20 L8,20 L8,3.716 Z M12.716,10.823 C13.1913357,10.823 13.6436645,10.7885003 14.073,10.7195 C14.5023355,10.6504997 14.885665,10.5278342 15.223,10.3515 C15.560335,10.1751658 15.8286657,9.9336682 16.028,9.627 C16.2273343,9.3203318 16.327,8.92166912 16.327,8.431 C16.327,7.95566429 16.2273343,7.5685015 16.028,7.2695 C15.8286657,6.97049851 15.5641683,6.73666751 15.2345,6.568 C14.9048317,6.39933249 14.5291688,6.28816694 14.1075,6.2345 C13.6858312,6.18083307 13.2526689,6.154 12.808,6.154 L10.692,6.154 L10.692,10.823 L12.716,10.823 Z" fill="#000000"></path>
+    </g>
+</svg><!--end::Svg Icon--></span>
+                                        <span class="menu-text">Установка цен и скидок</span>
+                                    </a>
+                                </li>
+
+                                <li class="menu-item menu-item-submenu" aria-haspopup="true" data-menu-toggle="hover">
+                                    <a href="{{dead_url}}/dashboard/promotion" class="menu-link">
+                                        <span class="svg-icon menu-icon"><!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/keen/releases/2021-04-21-040700/theme/demo5/dist/../src/media/svg/icons/Shopping/Sale2.svg--><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect x="0" y="0" width="24" height="24"></rect>
+        <polygon fill="#000000" opacity="0.3" points="12 20.0218549 8.47346039 21.7286168 6.86905972 18.1543453 3.07048824 17.1949849 4.13894342 13.4256452 1.84573388 10.2490577 5.08710286 8.04836581 5.3722735 4.14091196 9.2698837 4.53859595 12 1.72861679 14.7301163 4.53859595 18.6277265 4.14091196 18.9128971 8.04836581 22.1542661 10.2490577 19.8610566 13.4256452 20.9295118 17.1949849 17.1309403 18.1543453 15.5265396 21.7286168"></polygon>
+        <polygon fill="#000000" points="14.0890818 8.60255815 8.36079737 14.7014391 9.70868621 16.049328 15.4369707 9.950447"></polygon>
+        <path d="M10.8543431,9.1753866 C10.8543431,10.1252593 10.085524,10.8938719 9.13585777,10.8938719 C8.18793881,10.8938719 7.41737243,10.1252593 7.41737243,9.1753866 C7.41737243,8.22551387 8.18793881,7.45690126 9.13585777,7.45690126 C10.085524,7.45690126 10.8543431,8.22551387 10.8543431,9.1753866" fill="#000000" opacity="0.3"></path>
+        <path d="M14.8641422,16.6221564 C13.9162233,16.6221564 13.1456569,15.8535438 13.1456569,14.9036711 C13.1456569,13.9520555 13.9162233,13.1851857 14.8641422,13.1851857 C15.8138085,13.1851857 16.5826276,13.9520555 16.5826276,14.9036711 C16.5826276,15.8535438 15.8138085,16.6221564 14.8641422,16.6221564 Z" fill="#000000" opacity="0.3"></path>
+    </g>
+</svg><!--end::Svg Icon--></span>
+                                        <span class="menu-text">Участие в акции</span></a>
+                                </li>
+
+                                <li class="menu-item menu-item-submenu" aria-haspopup="true" data-menu-toggle="hover">
+                                    <a href="{{dead_url}}/dashboard/price" class="menu-link">
+                                        <span class="svg-icon menu-icon"><!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/keen/releases/2021-04-21-040700/theme/demo5/dist/../src/media/svg/icons/Code/Time-schedule.svg--><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                                 <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                    <rect x="0" y="0" width="24" height="24"></rect>
+                                                    <path d="M12,21 C7.581722,21 4,17.418278 4,13 C4,8.581722 7.581722,5 12,5 C16.418278,5 20,8.581722 20,13 C20,17.418278 16.418278,21 12,21 Z" fill="#000000" opacity="0.3"></path>
+                                                    <path d="M13,5.06189375 C12.6724058,5.02104333 12.3386603,5 12,5 C11.6613397,5 11.3275942,5.02104333 11,5.06189375 L11,4 L10,4 C9.44771525,4 9,3.55228475 9,3 C9,2.44771525 9.44771525,2 10,2 L14,2 C14.5522847,2 15,2.44771525 15,3 C15,3.55228475 14.5522847,4 14,4 L13,4 L13,5.06189375 Z" fill="#000000"></path>
+                                                    <path d="M16.7099142,6.53272645 L17.5355339,5.70710678 C17.9260582,5.31658249 18.5592232,5.31658249 18.9497475,5.70710678 C19.3402718,6.09763107 19.3402718,6.73079605 18.9497475,7.12132034 L18.1671361,7.90393167 C17.7407802,7.38854954 17.251061,6.92750259 16.7099142,6.53272645 Z" fill="#000000"></path>
+                                                    <path d="M11.9630156,7.5 L12.0369844,7.5 C12.2982526,7.5 12.5154733,7.70115317 12.5355117,7.96165175 L12.9585886,13.4616518 C12.9797677,13.7369807 12.7737386,13.9773481 12.4984096,13.9985272 C12.4856504,13.9995087 12.4728582,14 12.4600614,14 L11.5399386,14 C11.2637963,14 11.0399386,13.7761424 11.0399386,13.5 C11.0399386,13.4872031 11.0404299,13.4744109 11.0414114,13.4616518 L11.4644883,7.96165175 C11.4845267,7.70115317 11.7017474,7.5 11.9630156,7.5 Z" fill="#000000"></path>
+                                                </g>
+                                            </svg><!--end::Svg Icon-->
+                                        </span>
+                                        <span class="menu-text">Временные правила</span>
+                                    </a>
+                                </li>
+
+                                <li class="menu-item menu-item-submenu" aria-haspopup="true" data-menu-toggle="hover">
+                                    <a href="{{dead_url}}/dashboard/track-product" class="menu-link">
+                                        <span class="svg-icon menu-icon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                                <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                    <rect x="0" y="0" width="24" height="24"></rect>
+                                                    <path d="M12.8434797,16 L11.1565203,16 L10.9852159,16.6393167 C10.3352654,19.064965 7.84199997,20.5044524 5.41635172,19.8545019 C2.99070348,19.2045514 1.55121603,16.711286 2.20116652,14.2856378 L3.92086709,7.86762789 C4.57081758,5.44197964 7.06408298,4.00249219 9.48973122,4.65244268 C10.5421727,4.93444352 11.4089671,5.56345262 12,6.38338695 C12.5910329,5.56345262 13.4578273,4.93444352 14.5102688,4.65244268 C16.935917,4.00249219 19.4291824,5.44197964 20.0791329,7.86762789 L21.7988335,14.2856378 C22.448784,16.711286 21.0092965,19.2045514 18.5836483,19.8545019 C16.158,20.5044524 13.6647346,19.064965 13.0147841,16.6393167 L12.8434797,16 Z M17.4563502,18.1051865 C18.9630797,18.1051865 20.1845253,16.8377967 20.1845253,15.2743923 C20.1845253,13.7109878 18.9630797,12.4435981 17.4563502,12.4435981 C15.9496207,12.4435981 14.7281751,13.7109878 14.7281751,15.2743923 C14.7281751,16.8377967 15.9496207,18.1051865 17.4563502,18.1051865 Z M6.54364977,18.1051865 C8.05037928,18.1051865 9.27182488,16.8377967 9.27182488,15.2743923 C9.27182488,13.7109878 8.05037928,12.4435981 6.54364977,12.4435981 C5.03692026,12.4435981 3.81547465,13.7109878 3.81547465,15.2743923 C3.81547465,16.8377967 5.03692026,18.1051865 6.54364977,18.1051865 Z" fill="#000000"></path>
+                                                </g>
+                                            </svg>
+                                        </span>
+                                        <span class="menu-text">Отслеживание цен</span>
+                                    </a>
+                                </li>
+
+                                <li class="menu-item menu-item-submenu d-none" aria-haspopup="true" data-menu-toggle="hover">
+                                    <a href="{{dead_url}}/dashboard/product" class="menu-link">
+                                        <span class="svg-icon menu-icon"><!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/keen/releases/2021-04-21-040700/theme/demo5/dist/../src/media/svg/icons/General/Search.svg--><svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                <rect x="0" y="0" width="24" height="24"></rect>
+                                                <path d="M14.2928932,16.7071068 C13.9023689,16.3165825 13.9023689,15.6834175 14.2928932,15.2928932 C14.6834175,14.9023689 15.3165825,14.9023689 15.7071068,15.2928932 L19.7071068,19.2928932 C20.0976311,19.6834175 20.0976311,20.3165825 19.7071068,20.7071068 C19.3165825,21.0976311 18.6834175,21.0976311 18.2928932,20.7071068 L14.2928932,16.7071068 Z" fill="#000000" fill-rule="nonzero" opacity="0.3"></path>
+                                                <path d="M11,16 C13.7614237,16 16,13.7614237 16,11 C16,8.23857625 13.7614237,6 11,6 C8.23857625,6 6,8.23857625 6,11 C6,13.7614237 8.23857625,16 11,16 Z M11,18 C7.13400675,18 4,14.8659932 4,11 C4,7.13400675 7.13400675,4 11,4 C14.8659932,4 18,7.13400675 18,11 C18,14.8659932 14.8659932,18 11,18 Z" fill="#000000" fill-rule="nonzero"></path>
+                                            </g>
+                                        </svg><!--end::Svg Icon--></span>
+                                        <span class="menu-text">Отслеживание позиций</span></a>
+                                </li>
+
+                                <li class="menu-item menu-item-submenu d-none" aria-haspopup="true" data-menu-toggle="hover">
+                                    <a href="{{dead_url}}/dashboard/warehouse" class="menu-link">
+                                  <span class="svg-icon menu-icon"><!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/keen/releases/2021-04-21-040700/theme/demo5/dist/../src/media/svg/icons/Shopping/Loader.svg--><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect x="0" y="0" width="24" height="24"></rect>
+        <path d="M8,4 C8.55228475,4 9,4.44771525 9,5 L9,17 L18,17 C18.5522847,17 19,17.4477153 19,18 C19,18.5522847 18.5522847,19 18,19 L9,19 C8.44771525,19 8,18.5522847 8,18 C7.44771525,18 7,17.5522847 7,17 L7,6 L5,6 C4.44771525,6 4,5.55228475 4,5 C4,4.44771525 4.44771525,4 5,4 L8,4 Z" fill="#000000" opacity="0.3"></path>
+        <rect fill="#000000" opacity="0.3" x="11" y="7" width="8" height="8" rx="4"></rect>
+        <circle fill="#000000" cx="8" cy="18" r="3"></circle>
+    </g>
+</svg><!--end::Svg Icon--></span>
+                                        <span class="menu-text">Остаток товара</span></a>
+                                </li>
+
+                                <li class="menu-section">
+                                    <h4 class="menu-text">Telegram отчеты</h4>
+                                    <i class="menu-icon ki ki-bold-more-hor icon-md"></i>
+                                </li>
+
+                                <li class="menu-item menu-item-submenu" aria-haspopup="true" data-menu-toggle="hover">
+                                    <a href="{{dead_url}}/dashboard/telegram/products-report" class="menu-link">
+                                            <span class="svg-icon menu-icon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                                <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                    <rect x="0" y="0" width="24" height="24"></rect>
+                                                    <path d="M16.3740377,19.9389434 L22.2226499,11.1660251 C22.4524142,10.8213786 22.3592838,10.3557266 22.0146373,10.1259623 C21.8914367,10.0438285 21.7466809,10 21.5986122,10 L17,10 L17,4.47708173 C17,4.06286817 16.6642136,3.72708173 16.25,3.72708173 C15.9992351,3.72708173 15.7650616,3.85240758 15.6259623,4.06105658 L9.7773501,12.8339749 C9.54758575,13.1786214 9.64071616,13.6442734 9.98536267,13.8740377 C10.1085633,13.9561715 10.2533191,14 10.4013878,14 L15,14 L15,19.5229183 C15,19.9371318 15.3357864,20.2729183 15.75,20.2729183 C16.0007649,20.2729183 16.2349384,20.1475924 16.3740377,19.9389434 Z" fill="#000000"></path>
+                                                    <path d="M4.5,5 L9.5,5 C10.3284271,5 11,5.67157288 11,6.5 C11,7.32842712 10.3284271,8 9.5,8 L4.5,8 C3.67157288,8 3,7.32842712 3,6.5 C3,5.67157288 3.67157288,5 4.5,5 Z M4.5,17 L9.5,17 C10.3284271,17 11,17.6715729 11,18.5 C11,19.3284271 10.3284271,20 9.5,20 L4.5,20 C3.67157288,20 3,19.3284271 3,18.5 C3,17.6715729 3.67157288,17 4.5,17 Z M2.5,11 L6.5,11 C7.32842712,11 8,11.6715729 8,12.5 C8,13.3284271 7.32842712,14 6.5,14 L2.5,14 C1.67157288,14 1,13.3284271 1,12.5 C1,11.6715729 1.67157288,11 2.5,11 Z" fill="#000000" opacity="0.3"></path>
+                                                </g>
+                                            </svg>
+                                        </span>
+                                        <span class="menu-text">Сводный товарный</span>
+                                    </a>
+                                </li>
+
+                                <li class="menu-item menu-item-submenu" aria-haspopup="true" data-menu-toggle="hover">
+                                    <a href="{{dead_url}}/dashboard/telegram/money-report" class="menu-link">
+                                        <i class="fa-duotone fa-comments-dollar menu-icon"></i>
+                                        <span class="menu-text">Отчет по прибыли<span class="label label-inline label-danger font-weight-bold ml-2">NEW</span></span>
+                                    </a>
+                                </li>
+
+                                <li class="menu-item menu-item-submenu" aria-haspopup="true" data-menu-toggle="hover">
+                                    <a href="{{dead_url}}/dashboard/telegram/suspicious-orders-report" class="menu-link">
+                                        <i class="fa-duotone fa-user-secret menu-icon"></i>
+                                        <span class="menu-text">Отслеживание выкупов<span class="label label-inline label-danger font-weight-bold ml-2">NEW</span></span>
+                                    </a>
+                                </li>
+
+                                <li class="menu-item menu-item-submenu" aria-haspopup="true" data-menu-toggle="hover">
+                                    <a href="{{dead_url}}/dashboard/telegram/remains-report" class="menu-link">
+                                        <i class="fa-solid fa-cart-circle-exclamation menu-icon"></i>
+                                        <span class="menu-text">Отчет по остаткам<span class="label label-inline label-danger font-weight-bold ml-2">NEW</span></span>
+                                    </a>
+                                </li>
+
+                                <li class="menu-section">
+                                    <h4 class="menu-text">Калькуляторы</h4>
+                                    <i class="menu-icon ki ki-bold-more-hor icon-md"></i>
+                                </li>
+
+                                <li class="menu-item menu-item-submenu" aria-haspopup="true" data-menu-toggle="hover">
+                                    <a href="{{dead_url}}/dashboard/calculator/profit" class="menu-link">
+                                          <span class="svg-icon menu-icon"><!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/keen/releases/2021-04-21-040700/theme/demo5/dist/../src/media/svg/icons/Shopping/Settings.svg--><svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                <rect opacity="0.200000003" x="0" y="0" width="24" height="24"></rect>
+                                                <path d="M4.5,7 L9.5,7 C10.3284271,7 11,7.67157288 11,8.5 C11,9.32842712 10.3284271,10 9.5,10 L4.5,10 C3.67157288,10 3,9.32842712 3,8.5 C3,7.67157288 3.67157288,7 4.5,7 Z M13.5,15 L18.5,15 C19.3284271,15 20,15.6715729 20,16.5 C20,17.3284271 19.3284271,18 18.5,18 L13.5,18 C12.6715729,18 12,17.3284271 12,16.5 C12,15.6715729 12.6715729,15 13.5,15 Z" fill="#000000" opacity="0.3"></path>
+                                                <path d="M17,11 C15.3431458,11 14,9.65685425 14,8 C14,6.34314575 15.3431458,5 17,5 C18.6568542,5 20,6.34314575 20,8 C20,9.65685425 18.6568542,11 17,11 Z M6,19 C4.34314575,19 3,17.6568542 3,16 C3,14.3431458 4.34314575,13 6,13 C7.65685425,13 9,14.3431458 9,16 C9,17.6568542 7.65685425,19 6,19 Z" fill="#000000"></path>
+                                            </g>
+                                        </svg><!--end::Svg Icon--></span>
+                                        <span class="menu-text">Калькулятор прибыли</span></a>
+                                </li>
+
+                                <li class="menu-section">
+                                    <h4 class="menu-text">Прочее</h4>
+                                    <i class="menu-icon ki ki-bold-more-hor icon-md"></i>
+                                </li>
+
+                                <li class="menu-item menu-item-submenu" aria-haspopup="true" data-menu-toggle="hover">
+                                    <a href="{{dead_url}}/dashboard/auto-withdrawal" class="menu-link">
+                                        <i class="fa-duotone fa-money-bill-transfer menu-icon"></i>
+                                        <span class="menu-text">Автовывод средств<span class="label label-inline label-danger font-weight-bold ml-2">NEW</span></span>
+                                    </a>
+                                </li>
+
+
+                                
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade show " id="navTab_planning">
+                    <div class="aside-menu-wrapper flex-column-fluid px-3 px-lg-3 py-5" id="kt_aside_menu_wrapper">
+                        <div id="kt_aside_menu" class="aside-menu min-h-lg-800px" data-menu-vertical="1" data-menu-scroll="1">
+                            <h3 class="p-2 p-lg-6 my-1 my-lg-3">Планирование</h3>
+
+                            <ul class="menu-nav">
+
+                                <li class="menu-section">
+                                    <h4 class="menu-text">Закупки и оплата</h4>
+                                    <i class="menu-icon ki ki-bold-more-hor icon-md"></i>
+                                </li>
+
+                                <li class="menu-item menu-item-submenu" aria-haspopup="true" data-menu-toggle="hover">
+                                    <a href="{{dead_url}}/dashboard/planning/purchase/list" class="menu-link">
+                                        <i class="fa-duotone fa-calendar-circle-plus menu-icon"></i>
+                                        <span class="menu-text">Планирование закупок</span>
+                                    </a>
+                                </li>
+
+                                <li class="menu-item menu-item-submenu" aria-haspopup="true" data-menu-toggle="hover">
+                                    <a href="{{dead_url}}/dashboard/planning/supplier/list" class="menu-link">
+                                        <i class="fa-duotone fa-users menu-icon"></i>
+                                        <span class="menu-text">Список поставщиков</span></a>
+                                </li>
+
+                                <li class="menu-item menu-item-submenu" aria-haspopup="true" data-menu-toggle="hover">
+                                    <a href="{{dead_url}}/dashboard/planning/expense/list" class="menu-link">
+                                        <i class="fa-duotone fa-money-bills-simple menu-icon"></i>
+                                        <span class="menu-text">График оплат</span></a>
+                                </li>
+
+                                <li class="menu-section">
+                                    <h4 class="menu-text">Заказы и продажи</h4>
+                                    <i class="menu-icon ki ki-bold-more-hor icon-md"></i>
+                                </li>
+
+                                <li class="menu-item menu-item-submenu disabled" aria-haspopup="true" data-menu-toggle="hover">
+                                    <a href="{{dead_url}}/dashboard/planning/purchases" class="menu-link">
+                                        <i class="fa-duotone fa-chart-simple menu-icon"></i>
+                                        <span class="menu-text">План продаж</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade show " id="navTab_feedback">
+                    <div class="aside-menu-wrapper flex-column-fluid px-3 px-lg-3 py-5" id="kt_aside_menu_wrapper">
+                        <div id="kt_aside_menu" class="aside-menu min-h-lg-800px" data-menu-vertical="1" data-menu-scroll="1">
+                            <h3 class="p-2 p-lg-6 my-1 my-lg-3">Работа с отзывами</h3>
+
+                            <ul class="menu-nav">
+
+                                <li class="menu-section">
+                                    <h4 class="menu-text">Отзывы</h4>
+                                    <i class="menu-icon ki ki-bold-more-hor icon-md"></i>
+                                </li>
+
+                                <li class="menu-item menu-item-submenu" aria-haspopup="true" data-menu-toggle="hover">
+                                    <a href="{{dead_url}}/dashboard/feedback/rule/list" class="menu-link">
+                                        <i class="fa-duotone fa-wand-magic-sparkles menu-icon"></i>
+                                        <span class="menu-text">Правила и ответы</span>
+                                    </a>
+                                </li>
+
+                                <li class="menu-item menu-item-submenu" aria-haspopup="true" data-menu-toggle="hover">
+                                    <a href="{{dead_url}}/dashboard/feedback/review/list" class="menu-link">
+                                        <i class="fa-duotone fa-comment-lines menu-icon"></i>
+                                        <span class="menu-text">Список отзывов</span></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade show " id="navTab_admin">
+                    <div class="aside-menu-wrapper flex-column-fluid px-3 px-lg-3 py-5" id="kt_aside_menu_wrapper">
+                        <div id="kt_aside_menu" class="aside-menu min-h-lg-800px" data-menu-vertical="1" data-menu-scroll="1">
+                            <h3 class="p-2 p-lg-6 my-1 my-lg-3">Администрирование</h3>
+
+                            <ul class="menu-nav">
+
+                                <li class="menu-section">
+                                    <h4 class="menu-text">Обновление данных</h4>
+                                    <i class="menu-icon ki ki-bold-more-hor icon-md"></i>
+                                </li>
+
+                                <li class="menu-item menu-item-submenu" aria-haspopup="true" data-menu-toggle="hover">
+                                    <a href="{{dead_url}}/dashboard/admin/warehouse" class="menu-link">
+                <span class="svg-icon menu-icon"><!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/keen/releases/2021-04-21-040700/theme/demo5/dist/../src/media/svg/icons/Shopping/Loader.svg--><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect x="0" y="0" width="24" height="24"></rect>
+        <path d="M8,4 C8.55228475,4 9,4.44771525 9,5 L9,17 L18,17 C18.5522847,17 19,17.4477153 19,18 C19,18.5522847 18.5522847,19 18,19 L9,19 C8.44771525,19 8,18.5522847 8,18 C7.44771525,18 7,17.5522847 7,17 L7,6 L5,6 C4.44771525,6 4,5.55228475 4,5 C4,4.44771525 4.44771525,4 5,4 L8,4 Z" fill="#000000" opacity="0.3"></path>
+        <rect fill="#000000" opacity="0.3" x="11" y="7" width="8" height="8" rx="4"></rect>
+        <circle fill="#000000" cx="8" cy="18" r="3"></circle>
+    </g>
+</svg><!--end::Svg Icon--></span>
+                                        <span class="menu-text">Логистика и приемка</span>
+                                    </a>
+                                </li>
+
+                                <li class="menu-item menu-item-submenu" aria-haspopup="true" data-menu-toggle="hover">
+                                    <a href="{{dead_url}}/dashboard/admin/commission" class="menu-link">
+                                        <span class="svg-icon menu-icon"><!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/keen/releases/2021-04-21-040700/theme/demo5/dist/../src/media/svg/icons/Shopping/Sale1.svg--><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect x="0" y="0" width="24" height="24"></rect>
+        <path d="M16.0322024,5.68722152 L5.75790403,15.945742 C5.12139076,16.5812778 5.12059836,17.6124773 5.75613416,18.2489906 C5.75642891,18.2492858 5.75672377,18.2495809 5.75701875,18.2498759 L5.75701875,18.2498759 C6.39304347,18.8859006 7.42424328,18.8859006 8.060268,18.2498759 C8.06056298,18.2495809 8.06085784,18.2492858 8.0611526,18.2489906 L18.3196731,7.9746922 C18.9505124,7.34288268 18.9501191,6.31942463 18.3187946,5.68810005 L18.3187946,5.68810005 C17.68747,5.05677547 16.6640119,5.05638225 16.0322024,5.68722152 Z" fill="#000000" fill-rule="nonzero"></path>
+        <path d="M9.85714286,6.92857143 C9.85714286,8.54730513 8.5469533,9.85714286 6.93006028,9.85714286 C5.31316726,9.85714286 4,8.54730513 4,6.92857143 C4,5.30983773 5.31316726,4 6.93006028,4 C8.5469533,4 9.85714286,5.30983773 9.85714286,6.92857143 Z M20,17.0714286 C20,18.6901623 18.6898104,20 17.0729174,20 C15.4560244,20 14.1428571,18.6901623 14.1428571,17.0714286 C14.1428571,15.4497247 15.4560244,14.1428571 17.0729174,14.1428571 C18.6898104,14.1428571 20,15.4497247 20,17.0714286 Z" fill="#000000" opacity="0.3"></path>
+    </g>
+</svg><!--end::Svg Icon--></span>
+                                        <span class="menu-text">Комиссия по категориям</span></a>
+                                </li>
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+
+                
+    <div class="tab-pane p-3 px-lg-7 py-lg-5 fade show" id="navTab_switchAccount">
+        <h3 class="p-2 p-lg-3 my-1 my-lg-3">Список профилей</h3>
+        <div class="list list-hover">
+            <a href="{{dead_url}}/dashboard/user-access/switch?id=167">
+                <div class="list-item hoverable p-2 p-lg-3 mb-2">
+                    <div class="d-flex align-items-center">
+                        <div class="symbol symbol-40 symbol-light mr-4">
+                        <span class="symbol-label bg-hover-white">
+                            <img src="./manage-users_files/profile.png" class="h-50 align-self-center">
+                        </span>
+
+                                                            <i class="symbol-badge symbol-badge-top bg-success"></i>
+                                                    </div>
+                        <div class="d-flex flex-column flex-grow-1 mr-2">
+                            <span class="text-dark-75 font-size-h6 mb-0">Основной профиль</span>
+                            <span class="text-muted text-hover-primary font-weight-bold">Андрей</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            
+        </div>
+    </div>
+
+                <!--end::Tab Pane-->
+            </div>
+
+            <!--end::Tab Content-->
+        <div class="ps__rail-x" style="left: 0px; bottom: 0px;"><div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div></div><div class="ps__rail-y" style="top: 0px; height: 752px; right: 5px;"><div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 300px;"></div></div></div>
+
+        <!--end::Workspace-->
+    </div>
+
+    <!--end::Secondary-->
+</div>
+
+<!--end::Aside-->
+
+
+<div class="modal fade pjax-block" id="modal_support" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Возникла проблема?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i aria-hidden="true" class="ki ki-close"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="userContactInfo mb-8">
+                        <label>ID вашего аккаунта</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="contactUserId" id="copyText" value="167" disabled="" style="max-width: 1000px">
+                            <div class="input-group-append">
+                                <button class="btn btn-secondary text-center" type="button" id="copyUserId" data-value="167"><i class="la la-copy pr-0"></i></button>
+                            </div>
+                        </div>
+                </div>
+                <p class="text">Если у вас возникли проблемы при работе с нашим сайтом, пожалуйста, напишите нам в удобном для вас мессенджере.</p>
+                <div class="actions">
+                    <a href="https://wa.me/79938901277?text=ID+%D0%BC%D0%BE%D0%B5%D0%B3%D0%BE+%D0%B0%D0%BA%D0%BA%D0%B0%D1%83%D0%BD%D1%82%D0%B0+%23167%0D%0A%0D%0A%D0%92%D0%BE%D0%B7%D0%BD%D0%B8%D0%BA%D0%BB%D0%B0+%D0%BF%D1%80%D0%BE%D0%B1%D0%BB%D0%B5%D0%BC%D0%B0+%D1%81+%D1%81%D0%B0%D0%B9%D1%82%D0%BE%D0%BC..." target="_blank" class="btn btn-lg btn-success mr-2"><i class="socicon-whatsapp mr-2"></i>Whatsapp</a>
+                    <a href="https://t.me/dednawb_support" target="_blank" class="btn btn-lg btn-primary"><i class="socicon-telegram mr-2"></i>Telegram</a>
+                </div>
+
+                <div class="separator separator-solid separator-border-1 mb-7 mt-7"></div>
+
+                <p class="text-muted">Также можете написать нам на support@dednawb.ru</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+            <!--begin::Wrapper-->
+            <div class="d-flex flex-column flex-row-fluid wrapper" id="kt_wrapper">
+
+                <!--begin::Content-->
+                <div class="content d-flex flex-column flex-column-fluid" id="kt_content">
+
+                    
+    <div class="subheader py-6 py-lg-8 subheader-transparent" id="kt_subheader">
+
+        <div class="container-fluid d-flex align-items-center justify-content-between flex-wrap flex-sm-nowrap">
+
+            <div class="d-flex align-items-center flex-wrap">
+
+                <div class="d-flex align-items-baseline flex-wrap mr-5">
+                    
+                                            <ul class="breadcrumb breadcrumb-transparent breadcrumb-dot font-weight-bold p-0 m-0 font-size-sm">
+                            <li class="breadcrumb-item text-muted"><a class="text-muted" href="{{dead_url}}/dashboard/account/manage-users">Добавление пользователей</a></li>                        </ul>
+                    
+                    <ul class="breadcrumb breadcrumb-transparent breadcrumb-dot font-weight-bold p-0 my-2 font-size-sm d-none">
+                        <li class="breadcrumb-item text-muted">
+                            <a href="{{dead_url}}/dashboard/account/manage-users" class="text-muted">Applications</a>
+                        </li>
+                        <li class="breadcrumb-item text-muted">
+                            <a href="{{dead_url}}/dashboard/account/manage-users" class="text-muted">Profile</a>
+                        </li>
+                        <li class="breadcrumb-item text-muted">
+                            <a href="{{dead_url}}/dashboard/account/manage-users" class="text-muted">Profile 3</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center flex-wrap">
+
+                
+    <div id="navTab_switchAccount" class="tab-pane">
+        <div class="btn btn-bg-white btn-text-dark-50 mr-2" style="height: 46px;">
+            <div class="d-flex align-items-center h-100">
+                <div class="symbol symbol-20 symbol-light mr-4">
+                    <img src="./manage-users_files/profile.png" class="h-50 align-self-center">
+                </div>
+                <span class="text-dark-75 font-size-md d-block">Андрей</span>
+            </div>
+        </div>
+    </div>
+
+                
+                
+<div id="currencyWidget">
+    <div class="currencyWidgetBtn">
+        <div class="btn btn-bg-white btn-text-dark-50 btn-hover-text-primary" id="currencyBtn">
+    <div class="item usd">
+        <div class="flag">
+            <img src="./manage-users_files/usa.png">
+
+                            <div class="status online"></div>
+                    </div>
+        <span class="value">81.33</span>
+    </div>
+    <div class="item cny">
+        <div class="flag">
+            <img src="./manage-users_files/china.png">
+
+                            <div class="status online"></div>
+                    </div>
+        <span class="value">11.71</span>
+    </div>
+</div>    </div>
+</div>
+
+<div class="currencyWidgetModal">
+    <div class="modal fade pjax-block" id="modal_currency" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Курсы валют</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i aria-hidden="true" class="ki ki-close"></i>
+                    </button>
+                </div>
+                <div class="widgetContent w-100">
+                    
+    <div class="modal-body">
+        <form id="currencyInfoForm">
+            <div class="currencySelect">
+                <div class="realRates">
+                    <div class="rateItem">
+                        <div class="flag">
+                            <img src="./manage-users_files/usa.png">
+                        </div>
+                        <div class="info">
+                            <div class="rate">
+                                <span class="value">81.33</span>
+                                                                    <div class="diff">
+                                        <i class="fa fa-chevron-down"></i>
+                                        <span class="diffValue text-danger">0.42%</span>
+                                    </div>
+                                                            </div>
+                            <span class="name text-muted">Доллар США</span>
+                        </div>
+                        <i class="fa fa-info-circle infoIcon" data-toggle="popover" data-placement="top" title="" data-html="true" data-content="&lt;div class=&#39;font-weight-bold&#39;&gt;&lt;div&gt;Текущий статус: &lt;span class=&#39;label label-inline label-sm font-weight-bold mb-1 label-light-danger&#39;&gt; Недоступно для торгов&lt;/span&gt;&lt;/div&gt;&lt;div class=&#39;font-weight-bold&#39;&gt;Дата обновления MOEX: 27 апр 19:15&lt;/div&gt;&lt;div class=&#39;separator separator-dashed mt-3 mb-3&#39;&gt;&lt;/div&gt;&lt;div class=&#39;mb-1&#39;&gt;Открытие: 81,67 руб.&lt;/div&gt;&lt;div class=&#39;mb-1&#39;&gt;Максимум: 81,99 руб.&lt;/div&gt;&lt;div&gt;Минимум: 81,18 руб.&lt;/div&gt;&lt;/div&gt;" data-original-title="Курс Доллара на Московской бирже"></i>
+                    </div>
+                    <div class="rateItem">
+                        <div class="flag">
+                            <img src="./manage-users_files/china.png">
+                        </div>
+                        <div class="info">
+                            <div class="rate">
+                                <span class="value">11.71</span>
+                                                                    <div class="diff">
+                                        <i class="fa fa-chevron-down"></i>
+                                        <span class="diffValue text-danger">0.51%</span>
+                                    </div>
+                                                            </div>
+                            <span class="name text-muted">Юань</span>
+                        </div>
+                        <i class="fa fa-info-circle infoIcon" data-toggle="popover" data-placement="top" title="" data-html="true" data-content="&lt;div class=&#39;font-weight-bold&#39;&gt;&lt;div&gt;Текущий статус: &lt;span class=&#39;label label-inline label-sm font-weight-bold mb-1 label-light-danger&#39;&gt; Недоступно для торгов&lt;/span&gt;&lt;/div&gt;&lt;div class=&#39;font-weight-bold&#39;&gt;Дата обновления MOEX: 27 апр 19:15&lt;/div&gt;&lt;div class=&#39;separator separator-dashed mt-3 mb-3&#39;&gt;&lt;/div&gt;&lt;div class=&#39;mb-1&#39;&gt;Открытие: 11,77 руб.&lt;/div&gt;&lt;div class=&#39;mb-1&#39;&gt;Максимум: 11,82 руб.&lt;/div&gt;&lt;div&gt;Минимум: 11,68 руб.&lt;/div&gt;&lt;/div&gt;" data-original-title="Курс Юаня на Московской бирже"></i>
+                    </div>
+                </div>
+
+                                    <div class="ownRates">
+                        <div class="artificialOverstatement">
+                            <div class="usdUp">
+                                <label class="form-label">Искусственное завышение курса доллара</label>
+
+                                <div class="switchInput">
+                                    <div class="switch switch-sm2 switch-icon">
+                                        <label>
+                                            <input type="checkbox" name="enableUsdMultiplier">
+                                            <span></span>
+                                        </label>
+                                    </div>
+
+                                    <input type="text" class="form-control" placeholder="Введите значение в процентах" name="usdMultiplier" disabled="" value="">
+                                </div>
+                            </div>
+
+                            <div class="cnyUp mt-8">
+                                <label class="form-label">Искусственное завышение курса юаня</label>
+
+                                <div class="switchInput">
+                                    <div class="switch switch-sm2 switch-icon">
+                                        <label>
+                                            <input type="checkbox" name="enableCnyMultiplier">
+                                            <span></span>
+                                        </label>
+                                    </div>
+
+                                    <input type="text" class="form-control" placeholder="Введите значение в процентах" name="cnyMultiplier" disabled="" value="">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Использовать реальный курс доллара</label>
+
+                            <div class="switchInput">
+                                <div class="switch switch-sm2 switch-icon">
+                                    <label>
+                                        <input type="checkbox" name="enableRealUsdRate" checked="">
+                                        <span></span>
+                                    </label>
+                                </div>
+
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text text-muted font-weight-bold">Курс доллара</span>
+                                    </div>
+                                    <input type="text" class="form-control inactive" value="81.33" name="usdRate" readonly="">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mt-8">
+                            <label class="form-label">Использовать реальный курс юаня</label>
+
+                            <div class="switchInput">
+                                <div class="switch switch-sm2 switch-icon">
+                                    <label>
+                                        <input type="checkbox" name="enableRealCnyRate" checked="">
+                                        <span></span>
+                                    </label>
+                                </div>
+
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text text-muted font-weight-bold">Курс юаня</span>
+                                    </div>
+                                    <input type="text" class="form-control inactive" value="11.71" name="cnyRate" readonly="">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+        <button type="button" class="btn btn-primary" id="saveCurrency">Сохранить изменения</button>
+    </div>
+                </div>
+            </div>
+        </div>
+
+        <input type="hidden" name="currencyInfo" value="{&quot;realRate&quot;:{&quot;CNY&quot;:{&quot;code&quot;:&quot;CNY&quot;,&quot;moexAlias&quot;:&quot;CNYRUB_TOM&quot;,&quot;name&quot;:&quot;\u042e\u0430\u043d\u044c&quot;,&quot;value&quot;:&quot;11.71&quot;,&quot;open&quot;:&quot;11.77&quot;,&quot;high&quot;:&quot;11.82&quot;,&quot;low&quot;:&quot;11.68&quot;,&quot;tradingStatus&quot;:&quot;N&quot;,&quot;moexUpdateDate&quot;:&quot;2023-04-27 19:15:03&quot;,&quot;updateDate&quot;:&quot;2023-04-27 21:00:02&quot;,&quot;diffInPercent&quot;:-0.50977060322853207},&quot;USD&quot;:{&quot;code&quot;:&quot;USD&quot;,&quot;moexAlias&quot;:&quot;USD000UTSTOM&quot;,&quot;name&quot;:&quot;\u0414\u043e\u043b\u043b\u0430\u0440 \u0421\u0428\u0410&quot;,&quot;value&quot;:&quot;81.33&quot;,&quot;open&quot;:&quot;81.67&quot;,&quot;high&quot;:&quot;81.99&quot;,&quot;low&quot;:&quot;81.18&quot;,&quot;tradingStatus&quot;:&quot;N&quot;,&quot;moexUpdateDate&quot;:&quot;2023-04-27 19:15:04&quot;,&quot;updateDate&quot;:&quot;2023-04-27 21:00:02&quot;,&quot;diffInPercent&quot;:-0.41630953838619478}},&quot;userRate&quot;:null,&quot;userMultiplier&quot;:null,&quot;rate&quot;:{&quot;USD&quot;:&quot;81.33&quot;,&quot;CNY&quot;:&quot;11.71&quot;}}">
+    </div>
+</div>
+            </div>
+
+        </div>
+    </div>
+
+
+                    <div class="container-fluid">
+                        
+<div id="pageUserManageUsers">
+
+    <div id="userIndex_pjaxContainer" data-pjax-container="" data-pjax-push-state="" data-pjax-timeout="7000">
+    <div class="row">
+        <div class="col">
+            <div class="card card-custom gutter-b" id="manageUsersCard">
+                <div class="card-header">
+                    <div class="card-title">
+                        <h3 class="card-label">Список пользоваталей</h3>
+                    </div>
+                    <div class="card-toolbar">
+                        <span class="btn btn-light font-weight-bold mr-2" data-toggle="modal" data-target="#modal_roles"><i class="flaticon2-user-outline-symbol mr-1"></i>Права доступа</span>
+                        <span class="btn btn-primary font-weight-bold" id="openAddUserModal"><i class="flaticon-plus mr-1"></i>Добавить пользователя</span>
+                    </div>
+                </div>
+                <div class="card-body">
+
+                                            <div class="userLimits">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="progressWrapper">
+                                        <div class="limitInfo">
+                                            <span class="title">Лимит пользователей</span> <span class="value">0 из 10 добавлено</span>
+                                        </div>
+                                        <div class="progress">
+                                            <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        <span class="upgradeNtf text-muted d-none">Нужно больше пользователей? <u>Улучшите свою подписку</u></span>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                </div>
+                            </div>
+                        </div>
+                    
+                    <div class="usersTable mt-10">
+
+                        <div class="table-responsive">
+                            <table class="table dfx-table">
+                                <thead>
+                                <tr>
+                                    <th scope="col">Имя</th>
+                                    <th scope="col">Роль</th>
+                                    <th scope="col">Почта</th>
+                                    <th scope="col">Статус</th>
+                                    <th scope="col">Последняя активность</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    </div>
+    <!-- Modals -->
+    
+<div class="modal fade show" id="modal_addUser" tabindex="-1" role="dialog" aria-modal="true" style="display: block;">
+    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Добавление пользователя</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i aria-hidden="true" class="ki ki-close"></i>
+                </button>
+            </div>
+
+            <div class="ajaxContent">
+    <div class="modal-body">
+        <form id="addUserForm" action="{{dead_url}}/dashboard/account/load-add-user-form" method="POST">
+        <p class="mb-7">Добавить можно только незарегистрированного ранее пользователя. Если вам необходимо дать доступ уже зарегистрированому пользователю, то <a href="{{dead_url}}/dashboard/user-access" class="underline" data-pjax="0">перейдите на эту страницу.</a></p>
+
+        <div class="form-group row">
+            <div class="col-lg-12">
+                <div class="form-group field-adduserform-name required">
+<label class="control-label" for="adduserform-name">Имя пользователя</label>
+<input type="text" id="adduserform-name" class="form-control" name="AddUserForm[name]" placeholder="Введите имя пользователя" aria-required="true">
+
+<div class="help-block"></div>
+</div>            </div>
+
+            <div class="col-lg-12">
+                <div class="form-group field-adduserform-email required">
+<label class="control-label" for="adduserform-email">Email</label>
+<input type="text" id="adduserform-email" class="form-control" name="AddUserForm[email]" placeholder="Введите адрес эл. почты" aria-required="true">
+
+<div class="help-block"></div>
+</div>            </div>
+
+            <div class="col-lg-12">
+                <div class="form-group field-adduserform-role required">
+<label class="control-label" for="adduserform-role">Роль пользователя</label>
+<div class="dropdown bootstrap-select form-control show"><select id="adduserform-role" class="form-control selectpicker" name="AddUserForm[role]" aria-required="true" tabindex="null">
+<option value="owner" disabled="">Владелец аккаунта</option>
+<option value="admin">Администратор</option>
+<option value="manager">Менеджер</option>
+<option value="analyst">Ананлитик</option>
+</select><button type="button" tabindex="-1" class="btn dropdown-toggle btn-light" data-toggle="dropdown" role="combobox" aria-owns="bs-select-1" aria-haspopup="listbox" aria-expanded="true" data-id="adduserform-role" title="Администратор"><div class="filter-option"><div class="filter-option-inner"><div class="filter-option-inner-inner">Администратор</div></div> </div></button><div class="dropdown-menu show" x-placement="bottom-start" style="max-height: 255.8px; overflow: hidden; min-height: 133px; position: absolute; transform: translate3d(0px, 38px, 0px); top: 0px; left: 0px; will-change: transform;"><div class="inner show" role="listbox" id="bs-select-1" tabindex="-1" aria-activedescendant="bs-select-1-1" style="max-height: 243.8px; overflow-y: auto; min-height: 121px;"><ul class="dropdown-menu inner show" role="presentation" style="margin-top: 0px; margin-bottom: 0px;"><li class="disabled"><a role="option" class="dropdown-item disabled" id="bs-select-1-0" aria-disabled="true" tabindex="-1"><span class="text">Владелец аккаунта</span></a></li><li class="selected active"><a role="option" class="dropdown-item active selected" id="bs-select-1-1" tabindex="0" aria-setsize="3" aria-posinset="1" aria-selected="true"><span class="text">Администратор</span></a></li><li><a role="option" class="dropdown-item" id="bs-select-1-2" tabindex="0"><span class="text">Менеджер</span></a></li><li><a role="option" class="dropdown-item" id="bs-select-1-3" tabindex="0"><span class="text">Ананлитик</span></a></li></ul></div></div></div>
+
+<div class="help-block"></div>
+</div>            </div>
+
+            <div class="form-group field-adduserform-userid">
+
+<input type="hidden" id="adduserform-userid" class="form-control" name="AddUserForm[userId]">
+
+<div class="help-block"></div>
+</div>        </div>
+
+        <p class="text-muted">В ближайшее время пароль будет будет отправлен на эл. почту</p>
+
+        </form>    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+        <button type="submit" form="addUserForm" class="btn btn-primary confirm">Сохранить</button>
+    </div>
+<script src="./manage-users_files/yii.js"></script>
+<script src="./manage-users_files/yii.validation.js"></script>
+<script src="./manage-users_files/yii.activeForm.js"></script>
+<script>jQuery('#addUserForm').yiiActiveForm([{"id":"adduserform-name","name":"name","container":".field-adduserform-name","input":"#adduserform-name","validateOnChange":false,"validateOnBlur":false,"validate":function (attribute, value, messages, deferred, $form) {yii.validation.required(value, messages, {"message":"Необходимо заполнить «Имя пользователя»."});}},{"id":"adduserform-email","name":"email","container":".field-adduserform-email","input":"#adduserform-email","validateOnChange":false,"validateOnBlur":false,"validate":function (attribute, value, messages, deferred, $form) {yii.validation.required(value, messages, {"message":"Необходимо заполнить «Адрес эл. почты»."});yii.validation.email(value, messages, {"pattern":/^[a-zA-Z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+\/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$/,"fullPattern":/^[^@]*<[a-zA-Z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+\/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?>$/,"allowName":false,"message":"Значение «Адрес эл. почты» не является правильным email адресом.","enableIDN":false,"skipOnEmpty":1});}},{"id":"adduserform-role","name":"role","container":".field-adduserform-role","input":"#adduserform-role","validateOnChange":false,"validateOnBlur":false,"validate":function (attribute, value, messages, deferred, $form) {yii.validation.required(value, messages, {"message":"Необходимо заполнить «Роль пользователя»."});}},{"id":"adduserform-userid","name":"userId","container":".field-adduserform-userid","input":"#adduserform-userid","validateOnChange":false,"validateOnBlur":false,"validate":function (attribute, value, messages, deferred, $form) {yii.validation.number(value, messages, {"pattern":/^[+-]?\d+$/,"message":"Значение «User Id» должно быть целым числом.","skipOnEmpty":1});}}], {"validateOnSubmit":false});</script></div>
+
+        </div>
+    </div>
+</div>
+    
+<div class="modal fade" id="modal_updateInvited" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Редактирование пользователя</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i aria-hidden="true" class="ki ki-close"></i>
+                </button>
+            </div>
+
+            <div class="ajaxContent">
+                <div class="modal-body">
+                    <div class="d-flex justify-content-center pt-20 pb-20">
+                        <div class="spinner spinner-primary spinner-lg"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    
+<div class="modal fade" id="modal_roles" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Иерархия прав доступа</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i aria-hidden="true" class="ki ki-close"></i>
+                </button>
+            </div>
+
+            <div class="ajaxContent">
+                <div class="modal-body">
+                    <div class="table-responsive dfx-scrollbar-h">
+                        <table class="table dfx-table">
+                            <thead>
+                            <tr>
+                                <th scope="col">Действие</th>
+                                <th scope="col">Аналитик</th>
+                                <th scope="col">Менеджер</th>
+                                <th scope="col">Администратор</th>
+                                <th scope="col">Владелец</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>Редактирование товаров</td>
+                                <td><i class="la la-close text-danger"></i></td>
+                                <td><i class="la la-check text-success"></i></td>
+                                <td><i class="la la-check text-success"></i></td>
+                                <td><i class="la la-check text-success"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Редактирование аккаунтов WB</td>
+                                <td><i class="la la-close text-danger"></i></td>
+                                <td><i class="la la-check text-success"></i></td>
+                                <td><i class="la la-check text-success"></i></td>
+                                <td><i class="la la-check text-success"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Установка цен и скидок</td>
+                                <td><i class="la la-close text-danger"></i></td>
+                                <td><i class="la la-check text-success"></i></td>
+                                <td><i class="la la-check text-success"></i></td>
+                                <td><i class="la la-check text-success"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Создание и редактирование акций</td>
+                                <td><i class="la la-close text-danger"></i></td>
+                                <td><i class="la la-check text-success"></i></td>
+                                <td><i class="la la-check text-success"></i></td>
+                                <td><i class="la la-check text-success"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Создание и редактирование временных правил</td>
+                                <td><i class="la la-close text-danger"></i></td>
+                                <td><i class="la la-check text-success"></i></td>
+                                <td><i class="la la-check text-success"></i></td>
+                                <td><i class="la la-check text-success"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Редактирование остатка на своих складах</td>
+                                <td><i class="la la-close text-danger"></i></td>
+                                <td><i class="la la-check text-success"></i></td>
+                                <td><i class="la la-check text-success"></i></td>
+                                <td><i class="la la-check text-success"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Установка курса валют</td>
+                                <td><i class="la la-close text-danger"></i></td>
+                                <td><i class="la la-check text-success"></i></td>
+                                <td><i class="la la-check text-success"></i></td>
+                                <td><i class="la la-check text-success"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Ручная загрузка отчетов</td>
+                                <td><i class="la la-close text-danger"></i></td>
+                                <td><i class="la la-check text-success"></i></td>
+                                <td><i class="la la-check text-success"></i></td>
+                                <td><i class="la la-check text-success"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Редактирование расходов</td>
+                                <td><i class="la la-close text-danger"></i></td>
+                                <td><i class="la la-check text-success"></i></td>
+                                <td><i class="la la-check text-success"></i></td>
+                                <td><i class="la la-check text-success"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Пересчет заказов и отчетов</td>
+                                <td><i class="la la-close text-danger"></i></td>
+                                <td><i class="la la-close text-danger"></i></td>
+                                <td><i class="la la-check text-success"></i></td>
+                                <td><i class="la la-check text-success"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Просмотр журнала действий</td>
+                                <td><i class="la la-close text-danger"></i></td>
+                                <td><i class="la la-close text-danger"></i></td>
+                                <td><i class="la la-check text-success"></i></td>
+                                <td><i class="la la-check text-success"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Добавление и редактирование пользователей</td>
+                                <td><i class="la la-close text-danger"></i></td>
+                                <td><i class="la la-close text-danger"></i></td>
+                                <td><i class="la la-check text-success"></i></td>
+                                <td><i class="la la-check text-success"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Удаление аккаунтов Wildberries</td>
+                                <td><i class="la la-close text-danger"></i></td>
+                                <td><i class="la la-close text-danger"></i></td>
+                                <td><i class="la la-close text-danger"></i></td>
+                                <td><i class="la la-check text-success"></i></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Variables for JS -->
+    <input type="hidden" name="pjaxContainerId" value="#userIndex_pjaxContainer">
+</div>                    </div>
+                </div>
+
+                <!--end::Content-->
+
+                
+<!--begin::Footer-->
+
+<!--doc: add "bg-white" class to have footer with solod background color-->
+<div class="footer py-4 d-flex flex-lg-column" id="kt_footer">
+
+    
+    <!--end::Container-->
+</div>
+
+<!--end::Footer-->            </div>
+
+            <!--end::Wrapper-->
+        </div>
+
+        <!--end::Page-->
+    </div>
+
+    <!--[html-partial:include:{"file":"partials/_extras/offcanvas/quick-actions.html"}]/-->
+
+    <!--[html-partial:include:{"file":"partials/_extras/offcanvas/quick-user.html"}]/-->
+
+    <!--[html-partial:include:{"file":"partials/_extras/offcanvas/quick-panel.html"}]/-->
+
+    <!--[html-partial:include:{"file":"partials/_extras/chat.html"}]/-->
+
+    <!--[html-partial:include:{"file":"partials/_extras/scrolltop.html"}]/-->
+
+    <!--[html-partial:include:{"file":"partials/_extras/toolbar.html"}]/-->
+
+    <!--[html-partial:include:{"file":"partials/_extras/offcanvas/demo-panel.html"}]/-->
+
+    <!-- Widgets modals -->
+    
+<div class="modal fade" id="modal_recalculateResult" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Результат перерасчета данных</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i aria-hidden="true" class="ki ki-close"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+
+            </div>
+        </div>
+    </div>
+</div>
+    
+    <!-- No API-key notification widget -->
+    
+<div class="modal fade" id="modal_firstTutorial" tabindex="-1" aria-hidden="true" style="display: none;">
+
+    <input type="hidden" name="showFirstTutorialModal" value="1">
+    <input type="hidden" name="firstTutorialStep" value="1">
+
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="settingsSection">
+                <div class="modal-header">
+                    <h5 class="modal-title">Начало работы</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i aria-hidden="true" class="ki ki-close"></i>
+                    </button>
+                </div>
+
+                <div id="firstTutorialAjaxContent">
+                    
+<div class="modal-body">
+
+    
+    <div class="videoWrapper mb-10">
+        <span class="play" data-fancybox="" data-src="https://youtu.be/LPJeSAWHao4"><i class="fas fa-play"></i></span>
+        <img src="./manage-users_files/video.png" class="img-fluid">
+    </div>
+
+    <div class="startSteps">
+        <div class="timeline timeline-5">
+            <div class="timeline-items">
+                <!--begin::Item-->
+                <div class="timeline-item">
+                    <!--begin::Icon-->
+                    <div class="timeline-media bg-light-primary">
+                                         <span class="svg-icon svg-icon-primary svg-icon-md"><!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/keen/releases/2021-04-21-040700/theme/demo5/dist/../src/media/svg/icons/General/User.svg--><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                                <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                    <polygon points="0 0 24 0 24 24 0 24"></polygon>
+                                                    <path d="M12,11 C9.790861,11 8,9.209139 8,7 C8,4.790861 9.790861,3 12,3 C14.209139,3 16,4.790861 16,7 C16,9.209139 14.209139,11 12,11 Z" fill="#000000" fill-rule="nonzero" opacity="0.3"></path>
+                                                    <path d="M3.00065168,20.1992055 C3.38825852,15.4265159 7.26191235,13 11.9833413,13 C16.7712164,13 20.7048837,15.2931929 20.9979143,20.2 C21.0095879,20.3954741 20.9979143,21 20.2466999,21 C16.541124,21 11.0347247,21 3.72750223,21 C3.47671215,21 2.97953825,20.45918 3.00065168,20.1992055 Z" fill="#000000" fill-rule="nonzero"></path>
+                                                </g>
+                                            </svg>
+                                         </span>
+                    </div>
+                    <!--end::Icon-->
+
+                    <!--begin::Info-->
+                    <div class="timeline-desc timeline-desc-light-primary pt-0">
+                        <span class="font-weight-bolder text-primary font-size-lg">Добавьте аккаунты Wildberries</span>
+                        <p class="font-weight-bold text-dark-50">
+                            Добавьте информацию о своих аккаунтах на Wildberries, чтобы мы могли получить информацию о товарах
+                        </p>
+                    </div>
+                    <!--end::Info-->
+                </div>
+                <!--end::Item-->
+
+                <div class="timeline-item">
+                    <div class="timeline-media bg-light">
+                                          <span class="svg-icon svg-icon-md ">
+                                              <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                                <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                    <rect x="0" y="0" width="24" height="24"></rect>
+                                                    <path d="M4,9.67471899 L10.880262,13.6470401 C10.9543486,13.689814 11.0320333,13.7207107 11.1111111,13.740321 L11.1111111,21.4444444 L4.49070127,17.526473 C4.18655139,17.3464765 4,17.0193034 4,16.6658832 L4,9.67471899 Z M20,9.56911707 L20,16.6658832 C20,17.0193034 19.8134486,17.3464765 19.5092987,17.526473 L12.8888889,21.4444444 L12.8888889,13.6728275 C12.9050191,13.6647696 12.9210067,13.6561758 12.9368301,13.6470401 L20,9.56911707 Z" fill="#000000"></path>
+                                                    <path d="M4.21611835,7.74669402 C4.30015839,7.64056877 4.40623188,7.55087574 4.5299008,7.48500698 L11.5299008,3.75665466 C11.8237589,3.60013944 12.1762411,3.60013944 12.4700992,3.75665466 L19.4700992,7.48500698 C19.5654307,7.53578262 19.6503066,7.60071528 19.7226939,7.67641889 L12.0479413,12.1074394 C11.9974761,12.1365754 11.9509488,12.1699127 11.9085461,12.2067543 C11.8661433,12.1699127 11.819616,12.1365754 11.7691509,12.1074394 L4.21611835,7.74669402 Z" fill="#000000" opacity="0.3"></path>
+                                                </g>
+                                            </svg>
+                                          </span>
+                    </div>
+
+                    <div class="timeline-desc timeline-desc-light-secondary">
+                        <span class="font-weight-bolder text-muted">Загрузка данных о товарах</span>
+                        <p class="font-weight-bold text-muted pt-1 pb-2">
+                            Дождитесь, пока система загрузит информацию о ваших товарах. Обычно это занимает не более 15 минут
+                        </p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-media bg-light">
+                                          <span class="svg-icon svg-icon-md ">
+                                              <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                                    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                        <rect x="0" y="0" width="24" height="24"></rect>
+                                                        <path d="M5.3618034,16.2763932 L5.8618034,15.2763932 C5.94649941,15.1070012 6.11963097,15 6.30901699,15 L16.190983,15 C16.4671254,15 16.690983,15.2238576 16.690983,15.5 C16.690983,15.5776225 16.6729105,15.6541791 16.6381966,15.7236068 L16.1381966,16.7236068 C16.0535006,16.8929988 15.880369,17 15.690983,17 L5.80901699,17 C5.53287462,17 5.30901699,16.7761424 5.30901699,16.5 C5.30901699,16.4223775 5.32708954,16.3458209 5.3618034,16.2763932 Z" fill="#000000" opacity="0.3"></path>
+                                                        <path d="M8,3.716 L13.107,3.716 C14.042338,3.716 14.8856629,3.80033249 15.637,3.969 C16.3883371,4.13766751 17.0323306,4.41366475 17.569,4.797 C18.1056693,5.18033525 18.5196652,5.67099701 18.811,6.269 C19.1023348,6.86700299 19.248,7.58766245 19.248,8.431 C19.248,9.33567119 19.079335,10.0946636 18.742,10.708 C18.404665,11.3213364 17.9485029,11.8158315 17.3735,12.1915 C16.7984971,12.5671685 16.1276705,12.8393325 15.361,13.008 C14.5943295,13.1766675 13.781671,13.261 12.923,13.261 L10.692,13.261 L10.692,20 L8,20 L8,3.716 Z M12.716,10.823 C13.1913357,10.823 13.6436645,10.7885003 14.073,10.7195 C14.5023355,10.6504997 14.885665,10.5278342 15.223,10.3515 C15.560335,10.1751658 15.8286657,9.9336682 16.028,9.627 C16.2273343,9.3203318 16.327,8.92166912 16.327,8.431 C16.327,7.95566429 16.2273343,7.5685015 16.028,7.2695 C15.8286657,6.97049851 15.5641683,6.73666751 15.2345,6.568 C14.9048317,6.39933249 14.5291688,6.28816694 14.1075,6.2345 C13.6858312,6.18083307 13.2526689,6.154 12.808,6.154 L10.692,6.154 L10.692,10.823 L12.716,10.823 Z" fill="#000000"></path>
+                                                    </g>
+                                                </svg>
+                                          </span>
+                    </div>
+
+                    <div class="timeline-desc timeline-desc-light-secondary">
+                        <span class="font-weight-bolder text-muted">Укажите себестоимость</span>
+                        <p class="font-weight-bold text-muted pt-1 pb-2">
+                            Укажите себестоимость минимум для 50% товаров, после этого начнется загрузка статистики
+                        </p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-media bg-light">
+                                        <span class="svg-icon svg-icon-md ">
+                                            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                                <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                    <rect x="0" y="0" width="24" height="24"></rect>
+                                                    <path d="M4.00246329,12.2004927 L13,14 L13,4.06189375 C16.9463116,4.55399184 20,7.92038235 20,12 C20,16.418278 16.418278,20 12,20 C7.64874861,20 4.10886412,16.5261253 4.00246329,12.2004927 Z" fill="#000000" opacity="0.3"></path>
+                                                    <path d="M3.0603968,10.0120794 C3.54712466,6.05992157 6.91622084,3 11,3 L11,11.6 L3.0603968,10.0120794 Z" fill="#000000"></path>
+                                                </g>
+                                            </svg>
+                                        </span>
+                    </div>
+
+                    <div class="timeline-desc timeline-desc-light-secondary">
+                        <span class="font-weight-bolder text-muted">Загрузка заказов и отчетов</span>
+                        <p class="font-weight-bold text-muted pt-1 pb-2">
+                            В течение 15 минут система начнет загрузку заказов и отчетов за последние 2 недели
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div class="modal-footer">
+    <div class="d-flex w-100">
+        <div class="ml-auto">
+
+                            <button type="button" class="btn btn-lg btn-light mr-2" data-dismiss="modal">Позже</button>
+                <a href="{{dead_url}}/dashboard/keys" type="button" class="btn btn-lg btn-primary">Добавить аккаунты</a>
+                    </div>
+    </div>
+</div>                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <!--begin::Global Config(global config for global JS scripts)-->
+    <script>
+        var KTAppSettings = {
+            "breakpoints": {
+                "sm": 576,
+                "md": 768,
+                "lg": 992,
+                "xl": 1200,
+                "xxl": 1200
+            },
+            "colors": {
+                "theme": {
+                    "base": {
+                        "white": "#ffffff",
+                        "primary": "#8950FC",
+                        "secondary": "#E5EAEE",
+                        "success": "#1BC5BD",
+                        "info": "#8950FC",
+                        "warning": "#FFA800",
+                        "danger": "#F64E60",
+                        "light": "#F3F6F9",
+                        "dark": "#212121"
+                    },
+                    "light": {
+                        "white": "#ffffff",
+                        "primary": "#E1E9FF",
+                        "secondary": "#ECF0F3",
+                        "success": "#C9F7F5",
+                        "info": "#EEE5FF",
+                        "warning": "#FFF4DE",
+                        "danger": "#FFE2E5",
+                        "light": "#F3F6F9",
+                        "dark": "#D6D6E0"
+                    },
+                    "inverse": {
+                        "white": "#ffffff",
+                        "primary": "#ffffff",
+                        "secondary": "#212121",
+                        "success": "#ffffff",
+                        "info": "#ffffff",
+                        "warning": "#ffffff",
+                        "danger": "#ffffff",
+                        "light": "#464E5F",
+                        "dark": "#ffffff"
+                    }
+                },
+                "gray": {
+                    "gray-100": "#F3F6F9",
+                    "gray-200": "#ECF0F3",
+                    "gray-300": "#E5EAEE",
+                    "gray-400": "#D6D6E0",
+                    "gray-500": "#B5B5C3",
+                    "gray-600": "#80808F",
+                    "gray-700": "#464E5F",
+                    "gray-800": "#1B283F",
+                    "gray-900": "#212121"
+                }
+            },
+            "font-family": "Poppins"
+        };
+    </script>
+    <!--end::Global Config-->
+
+    <script src="./manage-users_files/yii.js"></script>
+<script src="./manage-users_files/yii.activeForm.js"></script>
+<script src="./manage-users_files/addUser.js"></script>
+<script src="./manage-users_files/actions.js"></script>
+<script src="./manage-users_files/jquery.pjax.js"></script>
+<script src="./manage-users_files/widget(1).js"></script>
+<script src="./manage-users_files/markAsViewed.js"></script>
+<script src="./manage-users_files/widget(2).js"></script>
+<script src="./manage-users_files/widget(3).js"></script>
+<script>jQuery(function ($) {
+jQuery(document).pjax("#userIndex_pjaxContainer a", {"push":true,"replace":false,"timeout":7000,"scrollTo":false,"container":"#userIndex_pjaxContainer"});
+jQuery(document).off("submit", "#userIndex_pjaxContainer form[data-pjax]").on("submit", "#userIndex_pjaxContainer form[data-pjax]", function (event) {jQuery.pjax.submit(event, {"push":true,"replace":false,"timeout":7000,"scrollTo":false,"container":"#userIndex_pjaxContainer"});});
+});</script>
+    
+    
+
+    
+<svg id="SvgjsSvg1001" width="2" height="0" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.dev" style="overflow: hidden; top: -100%; left: -100%; position: absolute; opacity: 0;"><defs id="SvgjsDefs1002"></defs><polyline id="SvgjsPolyline1003" points="0,0"></polyline><path id="SvgjsPath1004" d="M0 0 "></path></svg><div class="modal-backdrop fade show"></div></body></html>

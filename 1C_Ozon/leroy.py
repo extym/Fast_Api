@@ -74,11 +74,13 @@ def get_assortment():
     metod = 'products/assortment'
     url_address = url + metod
     answer = requests.get(url_address, headers=headers)
-    response = answer.json()
     print(answer.text)
-    assortment = response['result']
-    products = assortment['products']
-    print('get_assortment', len(products))
+    response = answer.json()
+    assortment = response.get('result')
+    products = assortment.get('products')
+
+    print('get_assortment_len', len(products))
+    print('get_assortment', products)
     return products
 
 # get_assortment()
@@ -109,6 +111,8 @@ def check_price():
         marketplaceId = prod['marketplaceId']
         if product_id in data_read.keys():  # or product_id in temp:
             price = data_read.get(product_id)[1]
+            if product_id in leroy.keys():  #make discount
+                price = price * (1 - leroy[product_id] / 100)
             proxy = {
                 "marketplaceId": marketplaceId,
                 "price": price
@@ -117,9 +121,10 @@ def check_price():
             products.append(proxy)
 
     data = {"data":{"products": products}}
-    #print('data----------------', data)
+    # print('data----------------', data)
     return data
 
+# check_price()
     
 def send_price_lm():
     url = 'https://api.leroymerlin.ru/marketplace/api/v1/'
@@ -344,8 +349,8 @@ async def get_new_orders_lm():
 
 # send_get_token()
 # get_assortment()
-# # send_stocks_lm()
-# send_price_lm()
+send_stocks_lm()
+send_price_lm()
 # check_stocks()
 # asyncio.run(get_new_orders_lm())
 # send_get_orders_lm()
