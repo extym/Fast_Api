@@ -22,7 +22,11 @@ urllib3.disable_warnings()
 
 #time = datetime.now(pytz.timezone("Africa/Nairobi")).replace(microsecond=0).isoformat()
 #printt(time)  #for development
+another_id = {'OWLT190101': 'а0026033', 'OWLM200300': 'а0027568', 'OWLT190304': 'а0027470',
+              'OWLT190403S': 'а0027471', 'OWLT190302': 'а0026027'}
 
+another_id_reverse = {'а0026033': 'OWLT190101', 'а0027568': 'OWLM200300','а0027470': 'OWLT190304',
+                      'а0027471': 'OWLT190403S', 'а0026027': 'OWLT190302'}
 
 def write_json(smth_json):
     try:
@@ -141,10 +145,16 @@ def check_stocks(skus, warehouse_id):
     data_stocks = process_json_dict()
     proxy_list = []
     for sku in skus:
+        if sku in another_id_reverse:
+            sku = another_id_reverse[sku]
+            print('SKU ', sku)
         if sku in data_stocks:
             count = data_stocks[sku][2]  #.get('stock')
             if count is None:
                 count = 0
+            if sku in another_id:
+                sku = another_id[sku]
+                print('another', sku)
             data = {
                 "sku": sku,
                 "warehouseId": warehouse_id,
@@ -161,21 +171,21 @@ def check_stocks(skus, warehouse_id):
     
     return {"skus": proxy_list}  #, proxy_list
 
+# def write_order(order, created_id, shop):
+#     data = read_order_json()
+#     print('write_order', type(order))
+#     order_id = order.get("id")
+#
+#     order['created_id'] = created_id
+#     if order_id not in data.keys():
+#         data[order_id] = order
+#     else:
+#         rewrite_status(order, shop)
+#     with open("orders.json", 'w') as file:
+#         json.dump(data, file)
+#
+#     # return order_id
 
-def write_order(order, created_id, shop):
-    data = read_order_json()
-    print('write_order', type(order))
-    order_id = order.get("id")
-
-    order['created_id'] = created_id
-    if order_id not in data.keys():
-        data[order_id] = order
-    else:
-        rewrite_status(order, shop)
-    with open("orders.json", 'w') as file:
-        json.dump(data, file)
-
-    # return order_id
 
 async def rewrite_status_order_db(order_id, status, shop):
     data = check_is_exist(query_read_order, (order_id, shop))
@@ -235,7 +245,7 @@ def check_is_accept_ym(list_items):
     cnt = 0
     #printt('check_is_accept_ym', list_items)
     for item in list_items:
-        shop_sku = item['shopSku']
+        shop_sku = item['offerId']   #item['shopSku']
         if shop_sku in data.keys():
             item_data = data.get(shop_sku)
             count = item_data[2]
@@ -323,11 +333,11 @@ def proxy_time():
 
 def proxy_time_1():
     dt = datetime.now().date() + timedelta(days=1)
-    d = str(dt).split('-')
-    d.reverse()
-    pt = '-'.join(d)
+    # d = str(dt).split('-')
+    # d.reverse()
+    # pt = '-'.join(d)
 
-    return pt
+    return dt
 
 
 def create_re_cart(items):
@@ -343,6 +353,7 @@ def create_re_cart(items):
         proxy_item['count'] = item['count']
         proxy_list.append(proxy_item)
 
+    day = str(proxy_time_1())
     data = {
        "cart":
        {
@@ -354,7 +365,7 @@ def create_re_cart(items):
             "type": "DELIVERY",
             "dates":
                {
-              "fromDate": proxy_time(),   #data['cart']["deliveryOptions"][0]["dates"]["fromDate"]
+              "fromDate": day_for_stm(day),   #data['cart']["deliveryOptions"][0]["dates"]["fromDate"]
                }
             }
         ],
@@ -413,9 +424,12 @@ def reverse_time(time):
 #"Yandex", "Ozon", "Sber", "Leroy", "WB"
 
 def reformat_data_order(order, shop):
-    day = reverse_time(order["delivery"]["shipments"][0]["shipmentDate"])
     result = None
     if shop == 'Yandex':
+        try:
+            day = reverse_time(order["delivery"]["shipments"][0]["shipmentDate"])
+        except:
+            day = reverse_time(order['delivery']['dates']['fromDate'])
         result = (
             order["id"],
             order["our_id"],
@@ -442,7 +456,7 @@ def reformat_data_order(order, shop):
         )
 
     elif shop == 'Sber':
-        time = order["shipping"]["shippingDate"].split('T')[0]
+        time = order["shipments"][0]["shipping"]["shippingDate"].split('T')[0]
         result = (
             order["shipments"][0]["shipmentId"],
             order['our_id'],

@@ -1,0 +1,375 @@
+<!--[if lt IE 7]> <html class="lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]> <html class="lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]> <html class="lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html lang="en"> <!--<![endif]-->
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Интеграция множества личных кабинетов с учетной записью Мой Склад</title>
+    <!--[if lt IE 9]><script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+    <style>
+        html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+
+body {
+  line-height: 1;
+}
+
+ol, ul {
+  list-style: none;
+}
+
+blockquote, q {
+  quotes: none;
+}
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: '';
+  content: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+body {
+  font: 13px/20px 'Lucida Grande', Tahoma, Verdana, sans-serif;
+  color: #404040;
+  background: #0ca3d2;
+}
+
+.container {
+  margin: 20px auto;
+  width: 960px;
+}
+
+.login {
+  position: relative;
+  margin: 100px auto 0 auto;
+  padding: 20px 20px 20px;
+  width: 960px;
+  background: white;
+  border-radius: 3px;
+  -webkit-box-shadow: 0 0 200px rgba(255, 255, 255, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 200px rgba(255, 255, 255, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+.login:before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  bottom: -8px;
+  left: -8px;
+  z-index: -1;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+}
+.login h1 {
+  margin: -20px -20px 21px;
+  line-height: 40px;
+  font-size: 15px;
+  font-weight: bold;
+  color: #555;
+  text-align: center;
+  text-shadow: 0 1px white;
+  background: #f3f3f3;
+  border-bottom: 1px solid #cfcfcf;
+  border-radius: 3px 3px 0 0;
+  background-image: -webkit-linear-gradient(top, whiteffd, #eef2f5);
+  background-image: -moz-linear-gradient(top, whiteffd, #eef2f5);
+  background-image: -o-linear-gradient(top, whiteffd, #eef2f5);
+  background-image: linear-gradient(to bottom, whiteffd, #eef2f5);
+  -webkit-box-shadow: 0 1px whitesmoke;
+  box-shadow: 0 1px whitesmoke;
+}
+.login p {
+  margin: 20px 0 0;
+}
+.login p:first-child {
+  margin-top: 0;
+}
+.login input[type=text], .login input[type=password] {
+  width: 278px;
+}
+.login p.remember_me {
+  float: left;
+  line-height: 31px;
+}
+.login p.remember_me label {
+  font-size: 12px;
+  color: #777;
+  cursor: pointer;
+}
+.login p.remember_me input {
+  position: relative;
+  bottom: 1px;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+.login p.submit {
+  text-align: right;
+}
+
+.login-help {
+  margin: 20px 0;
+  font-size: 11px;
+  color: white;
+  text-align: center;
+  text-shadow: 0 1px #2a85a1;
+}
+.login-help a {
+  color: #cce7fa;
+  text-decoration: none;
+}
+.login-help a:hover {
+  text-decoration: underline;
+}
+
+:-moz-placeholder {
+  color: #c9c9c9 !important;
+  font-size: 13px;
+}
+
+::-webkit-input-placeholder {
+  color: #ccc;
+  font-size: 13px;
+}
+
+input {
+  font-family: 'Lucida Grande', Tahoma, Verdana, sans-serif;
+  font-size: 14px;
+}
+
+input[type=text], input[type=password] {
+  margin: 5px;
+  padding: 0 10px;
+  width: 300px;
+  height: 34px;
+  color: #404040;
+  background: white;
+  border: 1px solid;
+  border-color: #c4c4c4 #d1d1d1 #d4d4d4;
+  border-radius: 2px;
+  outline: 5px solid #f3f3f3;
+  -moz-outline-radius: 3px;
+  -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+input[type=text]:focus, input[type=password]:focus {
+  border-color: #7dc9e2;
+  outline-color: #dceefc;
+  outline-offset: 0;
+}
+
+input[type=submit] {
+  padding: 0 18px;
+  height: 29px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #527881;
+  text-shadow: 0 1px #e3f1f1;
+  background: #cde5ef;
+  border: 1px solid;
+  border-color: #b4ccce #b3c0c8 #9eb9c2;
+  border-radius: 16px;
+  outline: 0;
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  background-image: -webkit-linear-gradient(top, #edf5f8, #cde5ef);
+  background-image: -moz-linear-gradient(top, #edf5f8, #cde5ef);
+  background-image: -o-linear-gradient(top, #edf5f8, #cde5ef);
+  background-image: linear-gradient(to bottom, #edf5f8, #cde5ef);
+  -webkit-box-shadow: inset 0 1px white, 0 1px 2px rgba(0, 0, 0, 0.15);
+  box-shadow: inset 0 1px white, 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+input[type=submit]:active {
+  background: #cde5ef;
+  border-color: #9eb9c2 #b3c0c8 #b4ccce;
+  -webkit-box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.2);
+  box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.2);
+}
+
+.lt-ie9 input[type=text], .lt-ie9 input[type=password] {
+  line-height: 34px;
+}
+
+@-webkit-keyframes slideOut{
+	0%{top:-30px; opacity: 0;}
+	100%{top:0px; opacity: 1;}
+}
+
+.my[type=submit] {
+    all: revert;
+    background: #cde5ef;
+    border: 1px solid;
+}
+.my[type=submit]:active {
+  text-shadow: 0 1px #e3f1f1;
+}
+.my[type=submit]:hover {
+  border-color: #9eb9c2 #b3c0c8 #b4ccce;
+}
+
+
+    </style>
+</head>
+
+<body>
+<section class="container">
+    <div class="login" align = "center">
+        <h1>Настройки селлера</h1>
+        <h1>{{status_text}}</h1>
+
+                <form action = "{{url}}" method="POST">
+                <input type="hidden" name="login" value="{{login}}">
+                <input type="hidden" name="passw" value="{{passw}}">
+                    <input type="hidden" name="seller_id" value="{{seller_id}}">
+
+                <table width = "900" style="border: 1px solid; border-color: #c4c4c4"  align="center">
+                    <tr>
+                        <td width = "300" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle">Выгружать заказы селлера</td>
+                        <td width = "600" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle"><input type="checkbox" name="active" {{active}}></td>
+                    </tr>
+                    <tr>
+                        <td width = "300" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3">Имя</td>
+                        <td width = "600" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3"><input type="text" name="name" value="{{name}}" style="width: 400px;" required="required"></td>
+                    </tr>
+                    <tr>
+                        <td width = "300" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3">API Ozon Token</td>
+                        <td width = "600" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3"><input type="password" name="token" value="{{token}}" style="width: 400px;" required="required"></td>
+                    </tr>
+                    <tr>
+                        <td width = "300" align="center" height = "40" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle">Организация в МС</td>
+                        <td width = "600" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle"><select name="organization">{{organizations}}</select></td>
+                    </tr>
+                    <tr>
+                        <td width = "300" align="center" height = "40" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle">Склад в МС</td>
+                        <td width = "600" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle"><select name="sklad">{{stores}}</select></td>
+                    </tr>
+                    <tr>
+                        <td width = "300" align="center" height = "40" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle">Цена в МС</td>
+                        <td width = "600" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle"><select name="price">{{prices}}</select></td>
+                    </tr>
+<!--                    <tr>-->
+<!--                        <td width = "300" align="center" height = "40" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle">Схема Ozon</td>-->
+<!--                        <td width = "600" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle"><select name="fb">{{fbs}}</select></td>-->
+<!--                    </tr>-->
+                    <tr>
+                        <td width = "300" align="center" height = "40" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle">Поле Даты доставки для Заказа МС</td>
+                        <td width = "600" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle"><select name="date_ozon_field">{{date_fields}}</select></td>
+                    </tr>
+                    <tr>
+                        <td width = "300" align="center" height = "40" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle">Склады в Ozon (если не выбран тип - склад не обрабатывается)</td>
+                        <td width = "600" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle">{{ozon_stores}}</td>
+                    </tr>
+                    <tr>
+                        <td width = "300" align="center" height = "40" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle">Статус Отмененного заказа в МС</td>
+                        <td width = "600" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle"><select name="cancell_status">{{cancell_states}}</select></td>
+                    </tr>
+                </table>
+                <br>
+                <table width = "900" style="border: 1px solid; border-color: #c4c4c4"  align="center">
+                    <tr>
+                        <td colspan="2" align="center" valign="middle" height="30" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align: middle"><b>Настройки склада типа fbs</b></td>
+                    </tr>
+                    <tr>
+                        <td width = "300" align="center" height = "40" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle">Контрагент селлера в МС</td>
+                        <td width = "600" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle"><select name="contragent" required style="max-width:400;">{{contragents}}</select></td>
+                    </tr>
+                    <tr>
+                        <td width = "300" align="center" height = "40" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle">Статус в МС</td>
+                        <td width = "600" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle"><select name="status">{{states}}</select></td>
+                    </tr>
+                    <tr>
+                        <td width = "300" align="center" height = "40" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle">Комментарий в Заказе МС (Можно использовать константы: {{fields}})</td>
+                        <td width = "600" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle"><textarea rows="7" cols="50" name="comment">{{comment}}</textarea></td>
+                    </tr>
+                    <tr>
+                        <td width = "300" align="center" height = "40" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle">Добавлять услугу Доставки в Заказ (если ничего не выбрано, то добавления не будет)</td>
+                        <td width = "600" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle"><select name="usluga" required style="max-width:400;">{{uslugi}}</select></td>
+                    </tr>
+                    <tr>
+                        <td width = "300" align="center" height = "40" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle">Выгружать цену услуги из МС (если не отмечено то из Сопоставления товаров)</td>
+                        <td width = "600" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle"><input type="checkbox" name="usluga_price_ms" value="1" {{usluga_price_ms_active}}></td>
+                    </tr>
+                </table>
+                <br>
+                <table width = "900" style="border: 1px solid; border-color: #c4c4c4"  align="center">
+                    <tr>
+                        <td colspan="2" align="center" valign="middle" height="30" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align: middle"><b>Настройки склада типа realfbs</b></td>
+                    </tr>
+                    <tr>
+                        <td width = "300" align="center" height = "40" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle">Контрагент селлера в МС</td>
+                        <td width = "600" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle"><select name="contragent_realfbs" required style="max-width:400;">{{contragents_realfbs}}</select></td>
+                    </tr>
+                    <tr>
+                        <td width = "300" align="center" height = "40" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle">Статус в МС</td>
+                        <td width = "600" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle"><select name="status_realfbs">{{states_realfbs}}</select></td>
+                    </tr>
+                    <tr>
+                        <td width = "300" align="center" height = "40" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle">Комментарий в Заказе МС (Можно использовать константы: {{fields}})</td>
+                        <td width = "600" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle"><textarea rows="7" cols="50" name="comment_realfbs">{{comment_realfbs}}</textarea></td>
+                    </tr>
+                    <tr>
+                        <td width = "300" align="center" height = "40" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle">Добавлять услугу Доставки в Заказ (если ничего не выбрано, то добавления не будет)</td>
+                        <td width = "600" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle"><select name="usluga_realfbs" required style="max-width:400;">{{uslugi_realfbs}}</select></td>
+                    </tr>
+                    <tr>
+                        <td width = "300" align="center" height = "40" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle">Выгружать цену услуги из МС (если не отмечено то из Сопоставления товаров)</td>
+                        <td width = "600" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle"><input type="checkbox" name="usluga_price_ms_realfbs" value="1" {{usluga_price_ms_active_realfbs}}></td>
+                    </tr>
+                </table>
+                    <br>
+                <table width = "900" style="border: 1px solid; border-color: #c4c4c4"  align="center">
+                    <tr>
+                        <td colspan="2" align="center" valign="middle" height="30" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align: middle"><input type="submit" value="Сохранить" name="save_seller" class="my"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" align="center" valign="middle" height="30" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align: middle"><input type="submit" value="Выгрузить товары селлера" name="products_seller" class="my"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" align="center" valign="middle" height="30" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align: middle"><a href="{{edit_seller_products_url}}?seller_id={{seller_id}}&login={{login}}&passw={{passw}}">Сопоставление товаров</a></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" align="center" valign="middle" height="30" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align: middle"><a href="{{index_url}}?login={{login}}&passw={{passw}}">Назад к списку селлеров</a></td>
+                    </tr>
+                </table>
+
+
+
+                </form>
+
+    </div>
+</section>
+
+<p align="center"><font size="2" color="#ffffff">© 2022</font></p>
+
+</body>
+</html>

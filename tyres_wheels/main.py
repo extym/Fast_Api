@@ -23,22 +23,20 @@ time_e = datetime.datetime.now().timestamp()
 name_img = str(round(time_e, 2)).replace('.', '-')
 #https://b2b.kolrad.ru/json/hannover/page0/contract944/?token=token&category[]=5
 count = 0
+
+# from get_data import post_smth
 # Получаем все данные по page
 def get_wheels():
     pages = get_pages()
     data_product = []
     for i in range(pages):
         try:
-            # links = address + 'page'+ str(i) + contract + 'token=' + Token + '&vendor=' + str(vendor)
-            # resp = requests.get(links, verify=False)
             params = {
                 "token": Token,
                 "vendor": 0
             }
             links = address + 'page' + str(i) + contract
             resp = requests.post(links, params=params, verify=False)
-            #text = resp.text
-            # data = json.loads(text)
             data = resp.json()
             page_data = data['offers']
             proxy = []
@@ -47,6 +45,7 @@ def get_wheels():
                     proxy.append(page_data[j])
 
             data_product.extend(proxy)
+            # post_smth(data_product, 0,'0')
             print(datetime.datetime.now(), '--', i, '--', len(page_data), '--', len(data_product), '--',  len(proxy))
 
         except Exception as error:
@@ -54,14 +53,14 @@ def get_wheels():
             continue
 
     print(datetime.datetime.now(), 'data_product2 - ', len(data_product))
-
+    # post_smth(data_product, 0, '0')
     mems = sys.getsizeof(data_product)
     print(mems / 1000, 'Kb')
 
-    # with open("data_product.json", "w") as write_file:
-    with open("/usr/local/bin/fuck_debian/tyres_wheels/data_product.json", "w") as write_file:
+    with open("data_product.json", "w") as write_file:
+    # with open("/usr/local/bin/fuck_debian/tyres_wheels/data_product.json", "w") as write_file:
         json.dump(data_product, write_file) # encode dict into JSON
-    resp.close()
+
     #return data_product
 
 
@@ -70,4 +69,5 @@ def get_wheels():
 
 
 # get_wheels()
+
 

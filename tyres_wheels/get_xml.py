@@ -31,7 +31,7 @@ WSDL_URL =  'http://api-b2b.4tochki.ru/WCF/ClientService.svc?wsdl'
 # WSDL_URL = 'https://1cfresh.com/a/sbm/2022888/ws/SiteExchange?wsdl'
 #
 time_now = datetime.datetime.now()
-print(time_now)
+# print(time_now)
 
 #try:
 wsdl = WSDL_URL
@@ -55,7 +55,7 @@ response = client.service.GetGoodsPriceRestByCode(**filter)
   # response is now a regular requests.Response object
   # assert response.status_code == 200
   # assert response.content
-print(response)
+# print(response)
 
 
 # for hist in [history.last_sent, history.last_received]:

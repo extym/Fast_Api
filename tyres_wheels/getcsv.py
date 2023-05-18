@@ -1,10 +1,12 @@
 import json
+import string
 import sys
+import random
 
 import wget
 import csv
 import datetime
-
+from copy_connect import check_write_json
 from categories import categories_summer, categories_wheels, categories_winter, categories_allseason
 
 
@@ -12,34 +14,26 @@ tn = datetime.datetime.now()
 ts = datetime.datetime.timestamp(tn) * 1000
 date = str(ts)[:13]
 type_data = ['wheels', 'tyres']
-url = 'https://duplo.shinservice.ru/xml/shinservice-b2b-tyres.csv?id=88964843&t=' + date
+url2 = 'https://duplo.shinservice.ru/xml/shinservice-b2b-tyres.csv?id=88964843&t=' + date
 url = 'https://duplo.shinservice.ru/xml/shinservice-b2b-wheels.csv?id=88964843&t=' + date
 #
-# result  = wget.download(url, out='./proxy_wheels.csv')
-# result  = wget.download(url, out='./proxy_tyres.csv')
-result  = wget.download(url, out='/usr/local/bin/fuck_debian/tyres_wheels/proxy_wheels.csv')
-result  = wget.download(url, out='/usr/local/bin/fuck_debian/tyres_wheels/proxy_tyres.csv')
+
+try:
+    result = wget.download(url, out='/usr/local/bin/fuck_debian/tyres_wheels/proxy_wheels.csv')
+    result2 = wget.download(url2, out='/usr/local/bin/fuck_debian/tyres_wheels/proxy_tyres.csv')
+except:
+    result = wget.download(url, out='./proxy_wheels.csv')
+    result2 = wget.download(url2, out='./proxy_tyres.csv')
+
+name = ['sku', 'title', 'brand_sku', 'gtin', 'season', 'brand', 'model', 'diameter', 'width', 'profile', 'load_index', 'speed_index', 'pins', 'runflat', 'homologation', 'production_year', 'sale', 'price', 'price_retail', 'price_msrp', 'photo_url', 'amount_total', 'amount_local', 'amount shopId 7', 'amount shopId 12', 'amount shopId 13', 'amount shopId 14', 'amount shopId 17', 'amount shopId 20', 'amount shopId 21', 'amount shopId 22', 'amount shopId 23', 'amount shopId 25', 'amount shopId 33', 'amount shopId 36', 'amount shopId 667', 'amount shopId 714', 'amount shopId 718', 'amount shopId 3012']
 
 listt = ['1251539', 'Headway 225/40 R18 SNOW-UHP HW508 92H', '3PN02254018E000002', '06930213605119', 'W', 'Headway', 'SNOW-UHP HW508', 'R18', '225', '40', '92', 'H', 'N', 'N', '', '', 'N', '5389', '6420', '6420',
 'https://www.shinservice.ru/catalog/headway/uhp-5081.jpg', '20', '19', '0', '0', '0', '4', '0', '2', '4', '4', '4', '4', '0', '4', '4', '0', '8', '4', '4', '8', '0', '4', '0', '4', '4', '4', '4', '0', '4', '0', '4', '4', '4', '4', '0', '4', '0', '0']
-print('index', listt.index('5389'))
-
-# def product_tyres(product_list, in_stock):
-#     name = product_list[2]
-#     description = 'very good'
-#     vendor = product_list[5]
-#     #category_vendor = categories[vendor]
-#     if product_list[4] == 'S':
-#         category_id = category_summer[vendor]
-#     elif product_list[4] == "W":
-#         category_id = category_winter[vendor]
-#     else:
-#         category_id = category_allseason[vendor]
-#     price = int(product_list[19]) - 400
-#     product_code = product_list[2]
+#print('index', listt.index('5389'))
 
 
-
+def id_generator(size=8, chars = string.ascii_lowercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
 
 # with open('./proxy_wheels (1).csv', 'r') as file:
 #     count = 0
@@ -55,84 +49,94 @@ print('index', listt.index('5389'))
 
 
 def get_data_csv():
-    # with open('./proxy_tyres (1).csv', 'r') as file:
-    with open('/usr/local/bin/fuck_debian/tyres_wheels/proxy_tyres (1).csv', 'r') as file:
+    with open('./proxy_tyres (1).csv', 'r') as file:
+    # with open('/usr/local/bin/fuck_debian/tyres_wheels/proxy_tyres (1).csv', 'r') as file:
         reader = csv.reader(file, delimiter = '\t')
         proxy = []
         for row in reader:
             proxy.append(row)
-    #print(type(row), '--------')
+    print(type(row), '--------',  len(proxy))
     return proxy
 
-    #
-    # print(row)
-    # print(liist)
-    # print('vendors_wheels', count)
+def count_price(string, size):
+    if string.isdigit():
+        if size[1:].isdigit() and int(size[1:]) <= 16:
+            price = int(string) * 1.12  # result float
+        elif size[1:].isdigit() and int(size[1:]) >= 17:
+            price = int(string) * 1.10
+        else:
+            price = int(string) * 1.10
+
+        price = round(price, 0)
+
+        return price
+
 
 #/usr/local/bin/fuck_debian/tyres_wheels/
 def get_tyres_csv():
-    # with open('data_product.json', 'r') as  read_file:
-    with open('/usr/local/bin/fuck_debian/tyres_wheels/data_product.json', 'r') as read_file:
-        proxy_data = json.load(read_file)
-        #print('proxy_data form get_tyres_csv----', type(proxy_data), len(proxy_data))
-        data = get_data_csv()
-        for i in range(1, len(data)):
-            liist = {}
-            if int(data[i][22]) >= 4:
-                try:
-                    if data[i][4] == 'S':
-                        liist['category_id'] = categories_summer[data[i][5]]
-                    elif data[i][4] == "W":
-                        liist['category_id'] = categories_winter[data[i][5]]
-                    else:
-                        liist['category_id'] = categories_allseason[data[i][5]]
-                    liist['category'] = 12
-                    liist['name'] = data[i][1]
-                    liist['description'] = data[i][1]
-
-                    liist['in_stock'] = int(data[i][22])
-                    liist['enabled'] = data[i][1]
-                    liist['vendorCode'] = data[i][2]
-                    liist['vendor'] = data[i][5]
-                    liist['diameter'] = data[i][7] #16
-                    liist['width'] = data[i][8] #14
-                    liist['profile'] = data[i][9] #15
-                    liist['sku'] = data[i][0]
-                    liist['season'] = data[i][4]
-                    liist['picture'] = '0.'  #data[i][19]  #image_link
-                    if data[i][17].isdigit():
-                        if liist['diameter'][1:].isdigit() and int(liist['diameter'][1:]) <= 16:
-                            price = int(data[i][17])  * 1.12   #result float
-                        elif liist['diameter'][1:].isdigit() and int(liist['diameter'][1:]) >= 17:
-                            price = int(data[i][17])  * 1.10
-                        else:
-                            price = int(data[i][17]) * 1.10
-                    else:
-                        liist['in_stock'] = 0
-
-                    liist['price_b2b'] = round(price, 0)
-                    if liist['in_stock'] != 0:
-                        proxy_data.append(liist)
-
-                except KeyError as error:
-                    print("Something went wrong KeyError from getcsv: {}".format(error))
-                    # write(str(data))
-                    print(str(data[i]))
-                    continue
+    proxy_data = []
+    data = get_data_csv()
+    for i in range(1, len(data)):
+        # try:
+        if data[i][1] == 'title':
+            continue
+        else:
+            in_stock = int(data[i][22])
+            if in_stock >= 4:
+                enabled = 1
             else:
+                enabled = 0
+            name = data[i][1]
+            vendor = data[i][5]
+            if vendor == 'Carwel':
+                description = name
+            elif vendor == '':
                 continue
+            if data[i][4] == 'S':
+                category_id = categories_summer[vendor]
+            elif data[i][4] == "W":
+                category_id = categories_winter[vendor]
+            else:
+                category_id = categories_allseason[vendor]
+            category = 12
+            description = data[i][1]
+            # check category wheels and tyres
+            product_code = data[i][2]
+            size = data[i][7] #16 'diameter'
+            width = data[i][8] #14
+            height = data[i][9] #15
+            sku = data[i][0]
+            image_url = data[i][20]  #image_link
+            name_picture = id_generator() + '.jpg'
+            image_tuple = (name_picture, image_url)
+            price = count_price(data[i][17], size)
+            koeff = 1
+            meta_d = 'летняя и зимняя резина ' + name + ' в интернет-магазине шин и дисков 1000koles.ru'
+            meta_k = 'летняя и зимняя резина, колеса, цена, купить, в Москве, в интернет-магазине'
+            meta_h1 = ' '
+            params = 1
+            options = {
+                'diameter': size,
+                'width': width,
+                'profile': height
+            }
+            result = ([category_id, name, description, price, in_stock, enabled, product_code, vendor, meta_d, meta_k,
+             params, koeff, meta_h1, category], image_tuple, options)
+            proxy_data.append(result)
+
+        # except KeyError as error:
+        #     print("Something went wrong KeyError from getcsv: {}".format(error))
+        #     # write(str(data))
+        #     print(str(data[i]))
+        #     continue
+
+    mem = sys.getsizeof(proxy_data)
+    #print('proxy_data', type(proxy_data), len(proxy_data), type(proxy_data[0]), len(proxy_data[0])) #, proxy_data[0])
+    print(mem / 1000, 'Kb--')
+    return proxy_data
 
 
-        # with open('data_product.json', 'w') as  write_file:
-        with open('/usr/local/bin/fuck_debian/tyres_wheels/data_product.json', 'w') as write_file:
-            json.dump(proxy_data, write_file)
-
-        # mem = sys.getsizeof(proxy_data)
-        #print(type(proxy_data), len(proxy_data), type(proxy_data[0]), len(proxy_data[0])) #, proxy_data[0])
-        # print(mem / 1000, 'Kb--')
-        # return proxy_data
-
-
-# mems = sys.getsizeof(get_tyres_csv())
-# print(mems / 1000, 'Kb')
-# get_tyres_csv()
+data = get_tyres_csv()
+mems = sys.getsizeof(data)
+print(mems / 1000, 'Kb')
+check_write_json(data)

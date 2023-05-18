@@ -189,3 +189,6 @@ from datetime import date, timedelta
 #     return dtt
 
 # day_for_stm("2023-03-30")
+# from datetime import datetime
+# dt = datetime.now().date() + timedelta(days=1)
+# print(dt, type(dt))

@@ -7,6 +7,7 @@ from read_json import read_json_lm
 import pytz
 import requests
 from conn import *
+from sales import leroy
 from proxy import proxy_lm, proxy_lm_1
 import asyncio
 
@@ -61,6 +62,7 @@ def send_get_token():
     response = answer.json()
     print(str(time), response)
 
+# send_get_token()
 
 def get_assortment():
     url = 'https://api.leroymerlin.ru/marketplace/api/v1/'
@@ -73,6 +75,7 @@ def get_assortment():
     url_address = url + metod
     answer = requests.get(url_address, headers=headers)
     response = answer.json()
+    print(answer.text)
     assortment = response['result']
     products = assortment['products']
     print('get_assortment', len(products))
@@ -196,6 +199,8 @@ def send_get_new_orders():
     metod = '/parcels'
     target_url = url_orders + metod
     response = requests.get(target_url, params=params, headers=headers)  # params=params,
+    answer = response.text
+    print(answer)
     data = response.json()
     print('send_get_new_orders', response.status_code,  len(data), data)
     return data
@@ -217,7 +222,7 @@ def send_get_orders_lm():
     print('send_get_orders_lm',len(data), data)
     return data
 
-# send_stocks()
+# send_stocks_lm()
 # send_get_new_orders()
 
 # send_get_orders_lm()

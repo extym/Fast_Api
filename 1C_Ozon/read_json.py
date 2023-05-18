@@ -57,7 +57,7 @@ def read_json_wb():
     result_list = []
     for keys, value in data.items():
         outlets = value[4]
-        if 'WB.НашсклСТМ'  in outlets.keys():  # or 'WB.СверхГБсклСТМ'  in outlets.keys():
+        if 'WB.НашсклСТМ'  in outlets.keys() or 'WB.СверхГБсклNEW'  in outlets.keys():
             id_1c = keys
             vendor_code = value[0]
             price = value[1].get(u'Цена')  #["\u0426\u0435\u043d\u0430"]

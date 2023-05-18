@@ -1,5 +1,5 @@
 import json
-from connect import check_and_write, check_write_json
+from copy_connect import check_and_write, check_write_json
 import requests
 import random
 import string
@@ -8,9 +8,9 @@ import string
 # #data = json.loads('https://b2b.4tochki.ru/export_data/M28420.json')  #'http://super-good.ml/test_json.json')
 from categories import categories_summer, categories_wheels, categories_winter, categories_allseason
 
-
+magic_link_json = 'https://b2b.4tochki.ru/export_data/M28420.json'
 ##WORK
-r = requests.get('https://b2b.4tochki.ru/export_data/M28420.json')
+r = requests.get(magic_link_json)
 data = r.json()
 
 wheels = data['rims']
@@ -122,7 +122,7 @@ def wheels_from_json(wheels):
 def tires_from_json(tyres):
     diction = []
     for prod in tyres:
-        print('tires_from_json', prod)
+        #print('tires_from_json', prod)
         in_stock = count(prod)
         if in_stock >= 4:
             enabled = 1
@@ -162,8 +162,9 @@ def tires_from_json(tyres):
             'profile': prod.get('height')
         }
 
-        result = [category_id, name, description, price, in_stock, enabled, product_code, vendor, meta_d, meta_k,
-                  params, koeff, meta_h1, category], image_tuple, options
+        result = ([category_id, name, description, price, in_stock, enabled,
+                   product_code, vendor, meta_d, meta_k,
+                  params, koeff, meta_h1, category], image_tuple, options)
         diction.append(result)
 
     # print('tires_from_json', diction)

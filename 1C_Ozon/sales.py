@@ -1,0 +1,18 @@
+
+leroy = {
+    'ИМRAG100':	5,
+    'ИМRAG85': 5,
+    'ИМMAL80': 10,
+    'ИМNYB80': 10,
+    'ИМRUNN60': 5,
+    'OW03.09.05': 10,
+    'OWLINSTNI.OWLT190403S': 5,
+    'OWLINSTNI.OWLT190304':	5,
+    'OWLINSTNI.OWLT190302':	5,
+    'OWLINSTTI.OWLT190403S': 5,
+    'OWLINSTTI.OWLT190304':	5,
+    'OWLINSTTI.OWLT190302':	5,
+    'ИМOWLT190901':	5,
+    'ИМSJEL80':	10,
+    'ИМSJEL100': 10
+}

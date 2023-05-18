@@ -10,7 +10,8 @@ categories_wheels = {'Inverno': 1988, 'Jantsa': 1989,  'rFR': 1181, 'RADIUS': 19
                   'Yamato': 1145, 'N2O': 1720, 'PDW': 1182, 'CrossStreet': 1873, 'Yokatta': 1143, "NZ": 1134, 'Alcasta': 1130,
                   'Race Ready' : 1128, 'Arrivo': 1939, 'Antera': 64, 'Next': 1788, 'X-Race': 1874, 'Hayes Lemmerz' : 1884,
                   'Aero': 1875, 'Steger': 1879, 'Buffalo': 1882, 'ТЗСК': 1996, 'Harp': 1889, 'Off-Road Wheels': 1997,
-                  'Khomen Wheels': 1968, 'LS FlowForming': 1139, 'Better': 1986, 'Lizardo': 1987, 'YST': 827, 'LS Forged': 1998}
+                  'Khomen Wheels': 1968, 'LS FlowForming': 1139, 'Better': 1986, 'Lizardo': 1987, 'YST': 827, 'LS Forged': 1998,
+                     'Race Ready Technology': 3000, 'SRW': 3000}
 
 categories_summer = {'Tunga': 1753, 'Bridgestone': 1756, 'Toyo': 1764, 'Kumho': 1924, 'Michelin': 1755, 'BFGoodrich': 1162,
                      'Nokian Tyres': 1754, 'Gislaved': 1985, 'Goodyear': 1154, 'Dunlop': 1228, 'Yokohama': 1757, 'Sava': 1855,
@@ -19,12 +20,12 @@ categories_summer = {'Tunga': 1753, 'Bridgestone': 1756, 'Toyo': 1764, 'Kumho': 
                      'Laufenn': 1750, 'Aosen': 1983, 'Headway': 1177, 'Kormoran': 1160, 'Nexen': 1150, 'Marshal': 1850, 'Formula': 1167,
                      'Kama': 933, 'Vredestein': 1839, 'Triangle': 1856, 'Altenzo': 1859, 'Compasal': 1871,
                      'GT Radial': 1766, 'Onyx': 2001, 'Sailun': 1225, 'Cachland': 1743, 'HiFly': 2002, 'Rapid': 1742, 'Roadhiker': 2005,
-                     'Goodride': 2003, 'Tracmax': 2004, 'Doublestar': 2006}
+                     'Goodride': 2003, 'Tracmax': 2004, 'Doublestar': 2006, 'Westlake':3002, 'Antares': 3003}
 
 categories_winter = {'Bridgestone': 1723, 'Toyo': 1770, 'Kumho': 1773, 'Michelin': 1976, 'BFGoodrich': 1214, 'Nokian Tyres': 1721,
                      'Gislaved': 1192, 'Goodyear': 1977, 'Dunlop': 1188, 'Yokohama': 1208, 'Sava': 1772, 'Continental':1210, 'Maxxis': 1776,
                      'Hankook': 1206, 'Pirelli': 1207, 'Cordiant': 1189, 'Tigar': 1771, 'Matador': 1732, 'Falken': 1978, 'Кама': 509,
                      'Viatti': 1195, 'Nitto': 1194, 'Sunfull': 1769, 'Delinte': 1980, 'Laufenn': 1913, 'Aosen': 1981, 'Headway': 1982,
                      'Dunlop JP': 1849, 'Kormoran': 1196, 'Marshal': 1191, 'Kama': 509, 'Nexen': 1213, 'Formula': 1197, 'Triangle': 859,
-                     'Altenzo': 1141, 'Onyx': 1999, 'GT Radial': 1200, 'Sailun': 1232, 'Cachland': 1767, 'HiFly': 2000}
+                     'Altenzo': 1141, 'Onyx': 1999, 'GT Radial': 1200, 'Sailun': 1232, 'Cachland': 1767, 'HiFly': 2000, 'General Tire': 3000}
 categories_allseason = {}

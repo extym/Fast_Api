@@ -1,8 +1,8 @@
 from xml.dom import minidom
 import datetime
 from prepare_data_export import get_need_data
-from connect import check_and_write
-
+# from copy_connect import check_and_write
+from copy_connect import check_and_write
 
 desk_carwel = 'Диски CARWEL- cовременный, динамично развивающийся бренд. Новейшее передовое оборудование и современные технологии по производству литых колесных дисков отвечающие самым высоким стандартам качества и надежности,является не единственным конкурентным преимуществом.'
 categories = { 'iFree' : 628, 'Carwel' : 1969,  'KHOMEN' : 1968,  'КиК' : 1782 , 'Скад'  : 1926}
@@ -12,7 +12,7 @@ check_and_write()
 root = minidom.Document()
 
 date = datetime.datetime.now(datetime.timezone.utc).isoformat()
-print(date)
+#print(date)
 xml_root = root.createElement('yml_catalog')
 root.appendChild(xml_root)
 xml_root.setAttribute('date', date)
@@ -68,17 +68,6 @@ for key in categories.keys():
     categoryChild.appendChild(textCategory)
     categoriesChild.appendChild(categoryChild)
 
-#ЭлементЫ внутри элемента <offer>.??????
-#<offer id="belaya-kofta-12345"> sku
-#<name>Ударная дрель Makita HP1630, 710 Вт</name>
-#<price>3870,50</price>
-#<offer id="12345-abcd">
-#<description>В комплекте с детским микроскопом есть все.</description>
-#<categoryId>743</categoryId>
-# <vendor>LEVENHUK</vendor>
-# <price>6498</price>
-# <count>23</count>
-# min-quantity
 
 
 offersChild = root.createElement('offers')
@@ -173,9 +162,9 @@ xml_root.appendChild(productChild)
 
 xml_str = root.toprettyxml(indent="\t")
 #for development
-# save_path_file = "yandex.xml"
+save_path_file = "yandex.xml"
 #for production
-save_path_file = "/home/ivanovka/data/www/1000koles.ru/pictures/yandex.xml"
+# save_path_file = "/home/ivanovka/data/www/1000koles.ru/pictures/yandex.xml"
 
 with open(save_path_file, "w") as f:
     f.write(xml_str)
