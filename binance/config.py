@@ -1,0 +1,12 @@
+mCur = 'USDT'
+mSum = 10
+mTimeout = 1
+mCommis = 0.001
+mProfit = 0.001
+mCount = 300
+# API_secret = 'bvJQezMbixjyuR7wOJ2LK6V1fvho8gmIWAL4xUiKvXhlhipXO8OMlEmlA82n4TVC'
+# API_key = 'PoSgSTZ1KRMllIJz4GALzBSA4hYlrhb52xvTGdvR6vJdVunI1Mivv9V2L7bV6gaG'
+# AP_key = '5W1VWMxcLEJr7uz6JBuLOCkzJZwoPJdyaAU57LOUGsCbikU0Lx9NM5Zcjd0eqWGF'
+# AP_secret = 'EPxprrqafxrYvnImlJZ0Mdd4aNp1QrwhsJR2E7omEwTzirmp5tGVSVQaTo2W9Cgq'
+API_secret = 'GBJ2Z0tfMXJa4CZ6hgVh3WwTADkoZNSEKRMZcCC7rnfJFMZVlNmrz90HmQjyCUax'
+API_key = 'vQLcWnGiomj7Fswa2fuxJvZqQusIMvKX1eRNn6tk2HrOaOgcto8fUmk3fqzl9F3P'

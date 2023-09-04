@@ -112,6 +112,7 @@ OZON_COMMENT_FIELDS = {
     'NAME': 'customer/name',
     'PHONE': 'customer/phone',
     'ADDRESS': 'customer/address/address_tail',
+    'CUSTOMER_COMMENT': 'customer/address/comment',
     'EMAIL': 'customer/customer_email',
 
     'LABEL_UP_CODE': 'label_up_code',

@@ -186,8 +186,8 @@ def sellers_today():
     # print('shipments_list_today', shipments_list_today)
     sellers_list_today = db.get_all_sellers_today(shipments_list_today)
     sell_dict = {s[3]: (s[2], s[4]) for s in sellers_list_today}
-    for seller in sellers_list_today:
-        print('seller', seller)
+    # for seller in sellers_list_today:
+    #     print('seller', seller)
     # logging.info('sellers_today', sell_dict)
 ###########################################################################
     # list_act_id = db.get_acts_today()  # TODO need its make?

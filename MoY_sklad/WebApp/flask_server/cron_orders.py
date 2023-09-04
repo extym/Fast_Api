@@ -218,10 +218,12 @@ if __name__ == '__main__':
 
         orders = ozon.get_orders_v2(OZON_ORDERS_HOURS, header)
         logging.info(f"Summary {len(orders)} orders in {OZON_ORDERS_HOURS} hours")
+
         # print(orders)
         # continue
         for order in orders:
-            # print(order)
+            logging.info('order__', order)
+            print('order__', order['posting_number'])
             # print(ozon.get_fbs_order(order['posting_number'], header))
             # continue
             if not order:
@@ -313,6 +315,7 @@ if __name__ == '__main__':
                 usluga_price_ms = usluga_price_ms_realfbs
                 try:
                     address = order['customer']['address']['address_tail']
+                    # customer_comment = order['customer']['address']['comment']
                     # print(address)
                 except:
                     address = None
@@ -467,6 +470,8 @@ if __name__ == '__main__':
                     if not isinstance(value, str):
                         value = ''
                     comment_copy = comment_copy.replace(field, value)
+
+            # logging.info('cron_orders comment_copy', comment_copy)
             ###########################################################
 
             if not order_id:
@@ -556,11 +561,15 @@ if __name__ == '__main__':
                         label = 1
                         if not ms.post_order_file(order_href, label_file_path):
                             label = 0
-
+            ########################### Try get customer comment from order ######################
+            try:
+                customer_comment = order['customer']['address']['comment'] ## test
+            except:
+                customer_comment = ''
             ########## Обновление БД #########
             for product in products:
-                # print(product)
-                db.insert_update_oder(seller_id, order_id, order, product, comment_copy, order_href, label, fbs)
+                print(product)
+                db.insert_update_oder(seller_id, order_id, order, product, comment, order_href, label, fbs)
                 logging.info(f"Order {order_id} / {posting_number} insert/update in BD")
 
     db.close()

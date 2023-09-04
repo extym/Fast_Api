@@ -10,7 +10,7 @@ import time
 import json
 import base64
 import os
-from settings import TRY, MS_HEADERS, SLEEP_TIME, MS_LAST_DOCUMENTS
+from settings import TRY, MS_HEADERS, SLEEP_TIME, MS_LAST_DOCUMENTS, LOCAL_MODE
 
 
 def requests_get(url, headers=MS_HEADERS):
@@ -364,10 +364,16 @@ def make_service_meta(service: Dict):
             }
     }
 
+if LOCAL_MODE:
+    link = 'http://127.0.0.1:5050/'  #'http://localhost:5050'
+else:
+    link = 'https://online.moysklad.ru/api/remap/1.2/entity'
+
 
 def post_order(contragent, products_meta, organization, comment, posting_number, store=None, project=None, sticker=None, moment=None, contract=None, status=None):
-    url = "https://online.moysklad.ru/api/remap/1.2/entity/customerorder"
-
+    # url = "https://online.moysklad.ru/api/remap/1.2/entity/customerorder"
+    method = '/customerorder/'
+    url = link + method
     data = {
         # "name": name,
         "description": comment,
@@ -435,8 +441,9 @@ def post_order(contragent, products_meta, organization, comment, posting_number,
     # return
 
     resp = requests.post(url, headers=MS_HEADERS, json=data)
-    # print(resp.text)
-    res_dict = json.loads(resp.text)
+    print(resp.text)
+    # res_dict = json.loads(resp.text)
+    res_dict = resp.json()
     if resp.ok:
         logging.info(f"MS ok add lead {res_dict['name']}") #FIXME
         return res_dict['name'], res_dict['id']
@@ -493,8 +500,9 @@ def get_usluga_price(href: str) -> str:
 
 
 def post_order_file(order_href: str, file_path: str) -> bool:
-    url = f"https://online.moysklad.ru/api/remap/1.2/entity/customerorder/{order_href}/files"
-
+    # url = f"https://online.moysklad.ru/api/remap/1.2/entity/customerorder/{order_href}/files"
+    method = f"/customerorder/{order_href}/files"
+    url = link + method
     filename = file_path.split('/')[-1]
     with open(file_path, 'rb') as outfile:
         res_content = outfile.read()
@@ -664,7 +672,9 @@ def get_demand_template(order_href: str) -> Dict:
 
 
 def post_demand(demand_dict: Dict) -> bool:
-    url = f"https://online.moysklad.ru/api/remap/1.2/entity/demand"
+    # url = f"https://online.moysklad.ru/api/remap/1.2/entity/demand"
+    method = '/demand'
+    url = link + method
     resp = requests.post(url, headers=MS_HEADERS, json=demand_dict)
     print(resp.text)
     return resp.ok
@@ -680,7 +690,9 @@ def post_demand_v2(demand_dict: Dict, state_href=None) -> bool:
               "mediaType" : "application/json"
             }
           }
-    url = f"https://online.moysklad.ru/api/remap/1.2/entity/demand"
+    # url = f"https://online.moysklad.ru/api/remap/1.2/entity/demand"
+    method = '/demand'
+    url = link + method
     resp = requests.post(url, headers=MS_HEADERS, json=demand_dict)
     # print(resp.text)
     return resp.ok

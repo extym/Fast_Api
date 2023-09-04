@@ -272,8 +272,8 @@ def get_order_transactions(posting_number):
             "transaction_type": "all"
         }
     }
-    OZON_HEADERS = {'Client-Id': str(OZON_HEADERS['Client-Id']), 'Api-Key': OZON_HEADERS['Api-Key'], 'Content-Type': OZON_HEADERS['Content-Type'], 'Accept' : OZON_HEADERS['Accept']}
-    resp = requests.post(url, headers=OZON_HEADERS, json=data)
+    OZON_HEADER = {'Client-Id': str(OZON_HEADERS['Client-Id']), 'Api-Key': OZON_HEADERS['Api-Key'], 'Content-Type': OZON_HEADERS['Content-Type'], 'Accept' : OZON_HEADERS['Accept']}
+    resp = requests.post(url, headers=OZON_HEADER, json=data)
     # print(resp.text)
     if not resp.ok:
         return {}
@@ -679,6 +679,29 @@ def get_act(sklad_id: int, headers=OZON_HEADERS):
         return None
 
 
+def get_act_document_sign(sklad_id: int, type: str, headers=OZON_HEADERS):
+    url = "https://api-seller.ozon.ru/v2/posting/fbs/digital/act/document-sign"
+    data = {
+        'delivery_method_id': sklad_id,
+        'type': type
+    }
+    headers = {'Client-Id': str(headers['Client-Id']), 'Api-Key': headers['Api-Key'], 'Content-Type': headers['Content-Type'], 'Accept' : headers['Accept']}
+    resp = requests.post(url, headers=headers, json=data)
+    print('get_act', resp.text)
+    if not resp.ok:
+        print("API error get_act_document_sign")
+        logging.warning('API get_act_document_sign not OK')
+        return None
+    try:
+        answer = resp.json()
+        result = answer['result']
+        return result
+    except Exception as err:
+        print("API error get_act_document_sign")
+        logging.error('get_act_document_sign {}'.format(err))
+        return None
+
+
 def get_act_today(sklad_id: int, headers=OZON_HEADERS):
     url = "https://api-seller.ozon.ru/v2/posting/fbs/act/create"
     data = {
@@ -740,7 +763,7 @@ def get_act_orders(code, headers=OZON_HEADERS):
     }
     headers = {'Client-Id': str(headers['Client-Id']), 'Api-Key': headers['Api-Key'], 'Content-Type': headers['Content-Type'], 'Accept' : headers['Accept']}
     resp = requests.post(url, headers=headers, json=data)
-    print(resp.text)
+    print('get_act_orders', resp.text)
     if not resp.ok:
         print("API error get_act_orders ", code, headers)
         return None
@@ -749,6 +772,28 @@ def get_act_orders(code, headers=OZON_HEADERS):
         return res_dict['result']['added_to_act']
     except:
         # print("API error")
+        return None
+
+
+def get_digital_act_status(code, headers=OZON_HEADERS):   #TODO
+    url = "https://api-seller.ozon.ru/v2/posting/fbs/digital/act/check-status"
+    data = {
+        "id": code
+    }
+    headers = {'Client-Id': str(headers['Client-Id']), 'Api-Key': headers['Api-Key'], 'Content-Type': headers['Content-Type'], 'Accept' : headers['Accept']}
+    resp = requests.post(url, headers=headers, json=data)
+    print('get_digital_act_orders', resp.text)
+    if not resp.ok:
+        print("API error get_digital_act_status ", code, headers)
+        logging.warning('get_digital_act_status not OK', code)
+        return None
+    try:
+        res_dict = resp.json()
+        status = res_dict['status']
+        return status
+    except Exception as er:
+        logging.error('get_digital_act_status {}'.format(er))
+        print("API error get_digital_act_status")
         return None
 
 
@@ -779,7 +824,29 @@ def get_act_by_code_v2(code, dir_path, headers=OZON_HEADERS):
     resp = requests.post(url, headers=headers, json=data)
     # print(resp.text)
     if not resp.ok:
+        print("API error get_act_by_code_v2")
+        return None
+    file_name = f"{code}.pdf"
+    try:
+        with open(os.path.join(dir_path, file_name), 'wb') as f:
+            f.write(resp.content)
+        return file_name
+    except:
         # print("API error")
+        return None
+
+
+def get_digital_act_by_code(code, dir_path, headers=OZON_HEADERS):    #TODO
+    url = "https://api-seller.ozon.ru/v2/posting/fbs/digital/act/get-pdf"
+    data = {
+        "id": code,
+        "doc_type": "act_of_acceptance"
+    }
+    header = {'Client-Id': str(headers['Client-Id']), 'Api-Key': headers['Api-Key'], 'Content-Type': headers['Content-Type'], 'Accept' : headers['Accept']}
+    resp = requests.post(url, headers=header, json=data)
+    # print(resp.text)
+    if not resp.ok:
+        print("API error get_digital_act_by_code")
         return None
     file_name = f"{code}.pdf"
     try:

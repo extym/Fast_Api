@@ -1,0 +1,329 @@
+[INFO:2023-04-14 21:48:17,244] <MAIN>: Подключение API успешно произведено
+[INFO:2023-04-14 21:48:17,654] <MAIN>: Время сервера: 2023.04.14 18:48:17.498 UTC
+[INFO:2023-04-14 21:48:26,410] <MAIN>: Найдена связка: 
+[INFO:2023-04-14 21:48:26,410] <MAIN>: USDTBUSD-[0.9998, False]
+[INFO:2023-04-14 21:48:26,411] <MAIN>: BUSDT-[0.03671, False]
+[INFO:2023-04-14 21:48:26,411] <MAIN>: TUSDT-[0.03668, False]
+[INFO:2023-04-14 21:48:26,411] <MAIN>: h =14791.519559682134
+[INFO:2023-04-14 21:48:30,144] <MAIN>: BUSDUSDT quoteVolume = 473312035.08050000 price = 0.99980000
+[INFO:2023-04-14 21:48:30,144] <MAIN>: Связка прочная.
+[INFO:2023-04-14 21:48:30,144] <MAIN>: Прибль закрытия:14783.447886897566
+[INFO:2023-04-14 21:48:30,145] <ORDER>: quantity= 20.0 price= [0.9998, False] symbol= BUSDUSDT
+[INFO:2023-04-14 21:48:30,146] <ORDER>: {'filterType': 'MIN_NOTIONAL', 'minNotional': '10.00000000', 'applyToMarket': True, 'avgPriceMins': 5}
+[INFO:2023-04-14 21:48:30,146] <ORDER>: step_size_q = 1.00000000 step_size_p = 0.00010000 symbol = BUSDUSDT quantity = 20.0 price = 0.99980000 side = BUY
+[ERROR:2023-04-14 21:48:30,563] <MAIN>
+Traceback (most recent call last):
+  File "/home/extym/current/binance/main.py", line 297, in <module>
+    circle(str(spar_name_first[ind]),
+  File "/home/extym/current/binance/main.py", line 99, in circle
+    response1 = order(symbol1, quantity, price1[0], side)
+  File "/home/extym/current/binance/main.py", line 42, in order
+    return bot.createOrder(
+  File "/home/extym/current/binance/binance.py", line 82, in wrapper
+    return self.call_api(**kwargs)
+  File "/home/extym/current/binance/binance.py", line 122, in call_api
+    raise Exception(response.text)
+Exception: {"code":-2014,"msg":"API-key format invalid."}
+[INFO:2023-04-14 21:57:22,848] <MAIN>: Подключение API успешно произведено
+[INFO:2023-04-14 21:57:23,359] <MAIN>: Время сервера: 2023.04.14 18:57:23.103 UTC
+[INFO:2023-04-14 21:57:30,791] <MAIN>: Найдена связка: 
+[INFO:2023-04-14 21:57:30,791] <MAIN>: USDTBUSD-[0.9998, False]
+[INFO:2023-04-14 21:57:30,791] <MAIN>: BUSDT-[0.03671, False]
+[INFO:2023-04-14 21:57:30,791] <MAIN>: TUSDT-[0.03669, False]
+[INFO:2023-04-14 21:57:30,791] <MAIN>: h =14787.482623307187
+[INFO:2023-04-14 21:57:34,456] <MAIN>: BUSDUSDT quoteVolume = 473012238.58470000 price = 0.99970000
+[INFO:2023-04-14 21:57:34,457] <MAIN>: Связка прочная.
+[INFO:2023-04-14 21:57:34,457] <MAIN>: Прибль закрытия:14787.482623307187
+[INFO:2023-04-14 21:57:34,460] <ORDER>: quantity= 20.0 price= [0.9998, False] symbol= BUSDUSDT
+[INFO:2023-04-14 21:57:34,461] <ORDER>: {'filterType': 'MIN_NOTIONAL', 'minNotional': '10.00000000', 'applyToMarket': True, 'avgPriceMins': 5}
+[INFO:2023-04-14 21:57:34,461] <ORDER>: step_size_q = 1.00000000 step_size_p = 0.00010000 symbol = BUSDUSDT quantity = 20.0 price = 0.99980000 side = BUY
+[ERROR:2023-04-14 21:57:35,039] <MAIN>
+Traceback (most recent call last):
+  File "main.py", line 297, in <module>
+    circle(str(spar_name_first[ind]),
+  File "main.py", line 99, in circle
+    response1 = order(symbol1, quantity, price1[0], side)
+  File "main.py", line 42, in order
+    return bot.createOrder(
+  File "/home/extym/current/binance/binance.py", line 82, in wrapper
+    return self.call_api(**kwargs)
+  File "/home/extym/current/binance/binance.py", line 122, in call_api
+    raise Exception(response.text)
+Exception: {"code":-2014,"msg":"API-key format invalid."}
+[INFO:2023-04-14 22:03:26,380] <MAIN>: Подключение API успешно произведено
+[INFO:2023-04-14 22:03:26,896] <MAIN>: Время сервера: 2023.04.14 19:03:26.617 UTC
+[INFO:2023-04-14 22:03:35,319] <MAIN>: Найдена связка: 
+[INFO:2023-04-14 22:03:35,319] <MAIN>: USDTBUSD-[0.9998, False]
+[INFO:2023-04-14 22:03:35,320] <MAIN>: BUSDT-[0.03656, False]
+[INFO:2023-04-14 22:03:35,320] <MAIN>: TUSDT-[0.03654, False]
+[INFO:2023-04-14 22:03:35,320] <MAIN>: h =14909.27087319998
+[INFO:2023-04-14 22:03:38,877] <MAIN>: BUSDUSDT quoteVolume = 472609369.25540000 price = 0.99980000
+[INFO:2023-04-14 22:03:38,878] <MAIN>: Связка прочная.
+[INFO:2023-04-14 22:03:38,878] <MAIN>: Прибль закрытия:14909.27087319998
+[INFO:2023-04-14 22:03:38,881] <ORDER>: quantity= 20.0 price= [0.9998, False] symbol= BUSDUSDT
+[INFO:2023-04-14 22:03:38,881] <ORDER>: {'filterType': 'MIN_NOTIONAL', 'minNotional': '10.00000000', 'applyToMarket': True, 'avgPriceMins': 5}
+[INFO:2023-04-14 22:03:38,882] <ORDER>: step_size_q = 1.00000000 step_size_p = 0.00010000 symbol = BUSDUSDT quantity = 20.0 price = 0.99980000 side = BUY
+[ERROR:2023-04-14 22:03:39,493] <MAIN>
+Traceback (most recent call last):
+  File "/home/extym/current/binance/main.py", line 297, in <module>
+    circle(str(spar_name_first[ind]),
+  File "/home/extym/current/binance/main.py", line 99, in circle
+    response1 = order(symbol1, quantity, price1[0], side)
+  File "/home/extym/current/binance/main.py", line 42, in order
+    return bot.createOrder(
+  File "/home/extym/current/binance/binance.py", line 82, in wrapper
+    return self.call_api(**kwargs)
+  File "/home/extym/current/binance/binance.py", line 122, in call_api
+    raise Exception(response.text)
+Exception: {"code":-2015,"msg":"Invalid API-key, IP, or permissions for action."}
+[INFO:2023-04-14 22:23:19,781] <MAIN>: Подключение API успешно произведено
+[INFO:2023-04-14 22:23:20,194] <MAIN>: Время сервера: 2023.04.14 19:23:20.002 UTC
+[INFO:2023-04-14 22:23:28,097] <MAIN>: Найдена связка: 
+[INFO:2023-04-14 22:23:28,097] <MAIN>: USDTBUSD-[0.9998, False]
+[INFO:2023-04-14 22:23:28,097] <MAIN>: BUSDT-[0.03654, False]
+[INFO:2023-04-14 22:23:28,097] <MAIN>: TUSDT-[0.03653, False]
+[INFO:2023-04-14 22:23:28,097] <MAIN>: h =14921.531429624729
+[INFO:2023-04-14 22:23:31,763] <MAIN>: BUSDUSDT quoteVolume = 470280621.35050000 price = 0.99980000
+[INFO:2023-04-14 22:23:31,763] <MAIN>: Связка прочная.
+[INFO:2023-04-14 22:23:31,763] <MAIN>: Прибль закрытия:14921.531429624729
+[INFO:2023-04-14 22:23:31,765] <ORDER>: quantity= 20.0 price= [0.9998, False] symbol= BUSDUSDT
+[INFO:2023-04-14 22:23:31,765] <ORDER>: {'filterType': 'MIN_NOTIONAL', 'minNotional': '10.00000000', 'applyToMarket': True, 'avgPriceMins': 5}
+[INFO:2023-04-14 22:23:31,766] <ORDER>: step_size_q = 1.00000000 step_size_p = 0.00010000 symbol = BUSDUSDT quantity = 20.0 price = 0.99980000 side = BUY
+[ERROR:2023-04-14 22:23:32,381] <MAIN>
+Traceback (most recent call last):
+  File "/home/extym/current/binance/main.py", line 297, in <module>
+    circle(str(spar_name_first[ind]),
+  File "/home/extym/current/binance/main.py", line 99, in circle
+    response1 = order(symbol1, quantity, price1[0], side)
+  File "/home/extym/current/binance/main.py", line 42, in order
+    return bot.createOrder(
+  File "/home/extym/current/binance/binance.py", line 82, in wrapper
+    return self.call_api(**kwargs)
+  File "/home/extym/current/binance/binance.py", line 122, in call_api
+    raise Exception(response.text)
+Exception: {"code":-2015,"msg":"Invalid API-key, IP, or permissions for action."}
+[INFO:2023-04-14 22:57:05,259] <MAIN>: Подключение API успешно произведено
+[INFO:2023-04-14 22:57:05,670] <MAIN>: Время сервера: 2023.04.14 19:57:05.49 UTC
+[INFO:2023-04-14 22:57:14,290] <MAIN>: Найдена связка: 
+[INFO:2023-04-14 22:57:14,290] <MAIN>: USDTBUSD-[0.9998, False]
+[INFO:2023-04-14 22:57:14,290] <MAIN>: BUSDT-[0.03673, False]
+[INFO:2023-04-14 22:57:14,290] <MAIN>: TUSDT-[0.03672, False]
+[INFO:2023-04-14 22:57:14,290] <MAIN>: h =14767.328712199096
+[INFO:2023-04-14 22:57:17,754] <MAIN>: BUSDUSDT quoteVolume = 469752868.77440000 price = 0.99970000
+[INFO:2023-04-14 22:57:17,754] <MAIN>: Связка прочная.
+[INFO:2023-04-14 22:57:17,754] <MAIN>: Прибль закрытия:14767.328712199096
+[INFO:2023-04-14 22:57:17,757] <ORDER>: quantity= 20.0 price= [0.9998, False] symbol= BUSDUSDT
+[INFO:2023-04-14 22:57:17,758] <ORDER>: {'filterType': 'MIN_NOTIONAL', 'minNotional': '10.00000000', 'applyToMarket': True, 'avgPriceMins': 5}
+[INFO:2023-04-14 22:57:17,758] <ORDER>: step_size_q = 1.00000000 step_size_p = 0.00010000 symbol = BUSDUSDT quantity = 20.0 price = 0.99980000 side = BUY
+[ERROR:2023-04-14 22:57:18,266] <MAIN>
+Traceback (most recent call last):
+  File "/home/extym/current/binance/main.py", line 297, in <module>
+    circle(str(spar_name_first[ind]),
+  File "/home/extym/current/binance/main.py", line 99, in circle
+    response1 = order(symbol1, quantity, price1[0], side)
+  File "/home/extym/current/binance/main.py", line 42, in order
+    return bot.createOrder(
+  File "/home/extym/current/binance/binance.py", line 82, in wrapper
+    return self.call_api(**kwargs)
+  File "/home/extym/current/binance/binance.py", line 122, in call_api
+    raise Exception(response.text)
+Exception: {"code":-2015,"msg":"Invalid API-key, IP, or permissions for action."}
+[INFO:2023-04-17 11:37:25,336] <MAIN>: Подключение API успешно произведено
+[INFO:2023-04-17 11:37:25,852] <MAIN>: Время сервера: 2023.04.17 08:37:25.626 UTC
+[INFO:2023-04-17 11:37:33,856] <MAIN>: Найдена связка: 
+[INFO:2023-04-17 11:37:33,856] <MAIN>: USDTBUSD-[0.9997, False]
+[INFO:2023-04-17 11:37:33,856] <MAIN>: BUSDT-[0.03612, False]
+[INFO:2023-04-17 11:37:33,856] <MAIN>: TUSDT-[0.03611, False]
+[INFO:2023-04-17 11:37:33,856] <MAIN>: h =15272.60736246876
+[INFO:2023-04-17 11:37:37,051] <MAIN>: BUSDUSDT quoteVolume = 319232027.28640000 price = 0.99970000
+[INFO:2023-04-17 11:37:37,051] <MAIN>: Связка прочная.
+[INFO:2023-04-17 11:37:37,052] <MAIN>: Прибль закрытия:15272.60736246876
+[INFO:2023-04-17 11:37:37,052] <ORDER>: quantity= 20.0 price= [0.9997, False] symbol= BUSDUSDT
+[INFO:2023-04-17 11:37:37,053] <ORDER>: {'filterType': 'MIN_NOTIONAL', 'minNotional': '10.00000000', 'applyToMarket': True, 'avgPriceMins': 5}
+[INFO:2023-04-17 11:37:37,053] <ORDER>: step_size_q = 1.00000000 step_size_p = 0.00010000 symbol = BUSDUSDT quantity = 20.0 price = 0.99970000 side = BUY
+[ERROR:2023-04-17 11:37:37,430] <MAIN>
+Traceback (most recent call last):
+  File "/home/extym/current/binance/main.py", line 297, in <module>
+    circle(str(spar_name_first[ind]),
+  File "/home/extym/current/binance/main.py", line 99, in circle
+    response1 = order(symbol1, quantity, price1[0], side)
+  File "/home/extym/current/binance/main.py", line 42, in order
+    return bot.createOrder(
+  File "/home/extym/current/binance/binance.py", line 82, in wrapper
+    return self.call_api(**kwargs)
+  File "/home/extym/current/binance/binance.py", line 122, in call_api
+    raise Exception(response.text)
+Exception: {"code":-2010,"msg":"Account has insufficient balance for requested action."}
+[ERROR:2023-04-17 11:44:10,692] <MAIN>
+Traceback (most recent call last):
+  File "/home/extym/current/binance/main.py", line 209, in <module>
+    if bot.ping() == {}:
+  File "/home/extym/current/binance/binance.py", line 82, in wrapper
+    return self.call_api(**kwargs)
+  File "/home/extym/current/binance/binance.py", line 117, in call_api
+    response = requests.request(method=self.methods[command]['method'], url=api_url,
+  File "/home/extym/current/binance/venv/lib/python3.8/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+  File "/home/extym/current/binance/venv/lib/python3.8/site-packages/requests/sessions.py", line 587, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/home/extym/current/binance/venv/lib/python3.8/site-packages/requests/sessions.py", line 701, in send
+    r = adapter.send(request, **kwargs)
+  File "/home/extym/current/binance/venv/lib/python3.8/site-packages/requests/adapters.py", line 489, in send
+    resp = conn.urlopen(
+  File "/home/extym/current/binance/venv/lib/python3.8/site-packages/urllib3/connectionpool.py", line 703, in urlopen
+    httplib_response = self._make_request(
+  File "/home/extym/current/binance/venv/lib/python3.8/site-packages/urllib3/connectionpool.py", line 449, in _make_request
+    six.raise_from(e, None)
+  File "<string>", line 3, in raise_from
+  File "/home/extym/current/binance/venv/lib/python3.8/site-packages/urllib3/connectionpool.py", line 444, in _make_request
+    httplib_response = conn.getresponse()
+  File "/usr/lib/python3.8/http/client.py", line 1348, in getresponse
+    response.begin()
+  File "/usr/lib/python3.8/http/client.py", line 316, in begin
+    version, status, reason = self._read_status()
+  File "/usr/lib/python3.8/http/client.py", line 277, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+  File "/usr/lib/python3.8/socket.py", line 669, in readinto
+    return self._sock.recv_into(b)
+  File "/usr/lib/python3.8/ssl.py", line 1241, in recv_into
+    return self.read(nbytes, buffer)
+  File "/usr/lib/python3.8/ssl.py", line 1099, in read
+    return self._sslobj.read(len, buffer)
+KeyboardInterrupt
+[INFO:2023-04-17 11:44:11,522] <MAIN>: Подключение API успешно произведено
+[INFO:2023-04-17 11:44:12,037] <MAIN>: Время сервера: 2023.04.17 08:44:11.852 UTC
+[INFO:2023-04-17 11:44:19,325] <MAIN>: Найдена связка: 
+[INFO:2023-04-17 11:44:19,325] <MAIN>: USDTBUSD-[0.9997, False]
+[INFO:2023-04-17 11:44:19,325] <MAIN>: BUSDT-[0.03618, False]
+[INFO:2023-04-17 11:44:19,325] <MAIN>: TUSDT-[0.03617, False]
+[INFO:2023-04-17 11:44:19,325] <MAIN>: h =3805.4801678063204
+[INFO:2023-04-17 11:44:22,892] <MAIN>: BUSDUSDT quoteVolume = 320113745.87660000 price = 0.99960000
+[INFO:2023-04-17 11:44:22,892] <MAIN>: Связка прочная.
+[INFO:2023-04-17 11:44:22,892] <MAIN>: Прибль закрытия:3805.4801678063204
+[INFO:2023-04-17 11:44:22,893] <ORDER>: quantity= 5.0 price= [0.9997, False] symbol= BUSDUSDT
+[INFO:2023-04-17 11:44:22,893] <ORDER>: {'filterType': 'MIN_NOTIONAL', 'minNotional': '10.00000000', 'applyToMarket': True, 'avgPriceMins': 5}
+[INFO:2023-04-17 11:44:22,893] <ORDER>: step_size_q = 1.00000000 step_size_p = 0.00010000 symbol = BUSDUSDT quantity = 5.0 price = 0.99970000 side = BUY
+[ERROR:2023-04-17 11:44:23,405] <MAIN>
+Traceback (most recent call last):
+  File "/home/extym/current/binance/main.py", line 297, in <module>
+    circle(str(spar_name_first[ind]),
+  File "/home/extym/current/binance/main.py", line 99, in circle
+    response1 = order(symbol1, quantity, price1[0], side)
+  File "/home/extym/current/binance/main.py", line 42, in order
+    return bot.createOrder(
+  File "/home/extym/current/binance/binance.py", line 82, in wrapper
+    return self.call_api(**kwargs)
+  File "/home/extym/current/binance/binance.py", line 122, in call_api
+    raise Exception(response.text)
+Exception: {"code":-1013,"msg":"Filter failure: MIN_NOTIONAL"}
+[INFO:2023-04-17 12:06:55,762] <MAIN>: Подключение API успешно произведено
+[INFO:2023-04-17 12:06:56,168] <MAIN>: Время сервера: 2023.04.17 09:06:56.106 UTC
+[INFO:2023-04-17 12:07:03,769] <MAIN>: Найдена связка: 
+[INFO:2023-04-17 12:07:03,770] <MAIN>: USDTBUSD-[0.9997, False]
+[INFO:2023-04-17 12:07:03,770] <MAIN>: BUSDT-[0.03618, False]
+[INFO:2023-04-17 12:07:03,770] <MAIN>: TUSDT-[0.03618, False]
+[INFO:2023-04-17 12:07:03,770] <MAIN>: h =3804.4269670965905
+[INFO:2023-04-17 12:07:07,393] <MAIN>: BUSDUSDT quoteVolume = 320195272.75230000 price = 0.99960000
+[INFO:2023-04-17 12:07:07,393] <MAIN>: Связка прочная.
+[INFO:2023-04-17 12:07:07,393] <MAIN>: Прибль закрытия:3804.4269670965905
+[INFO:2023-04-17 12:07:07,394] <ORDER>: quantity= 5.0 price= [0.9997, False] symbol= BUSDUSDT
+[INFO:2023-04-17 12:07:07,394] <ORDER>: {'filterType': 'MIN_NOTIONAL', 'minNotional': '10.00000000', 'applyToMarket': True, 'avgPriceMins': 5}
+[INFO:2023-04-17 12:07:07,394] <ORDER>: step_size_q = 1.00000000 step_size_p = 0.00010000 symbol = BUSDUSDT quantity = 5.0 price = 0.99970000 side = BUY
+[ERROR:2023-04-17 12:07:07,766] <MAIN>
+Traceback (most recent call last):
+  File "/home/extym/current/binance/main.py", line 297, in <module>
+    circle(str(spar_name_first[ind]),
+  File "/home/extym/current/binance/main.py", line 99, in circle
+    response1 = order(symbol1, quantity, price1[0], side)
+  File "/home/extym/current/binance/main.py", line 42, in order
+    return bot.createOrder(
+  File "/home/extym/current/binance/binance.py", line 82, in wrapper
+    return self.call_api(**kwargs)
+  File "/home/extym/current/binance/binance.py", line 122, in call_api
+    raise Exception(response.text)
+Exception: {"code":-1013,"msg":"Filter failure: MIN_NOTIONAL"}
+[INFO:2023-04-17 12:07:35,890] <MAIN>: Подключение API успешно произведено
+[INFO:2023-04-17 12:07:36,259] <MAIN>: Время сервера: 2023.04.17 09:07:36.181 UTC
+[ERROR:2023-04-17 12:07:37,380] <MAIN>
+Traceback (most recent call last):
+  File "/home/extym/current/binance/main.py", line 217, in <module>
+    response = requests.request(method='GET',
+  File "/home/extym/current/binance/venv/lib/python3.8/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+  File "/home/extym/current/binance/venv/lib/python3.8/site-packages/requests/sessions.py", line 587, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/home/extym/current/binance/venv/lib/python3.8/site-packages/requests/sessions.py", line 701, in send
+    r = adapter.send(request, **kwargs)
+  File "/home/extym/current/binance/venv/lib/python3.8/site-packages/requests/adapters.py", line 489, in send
+    resp = conn.urlopen(
+  File "/home/extym/current/binance/venv/lib/python3.8/site-packages/urllib3/connectionpool.py", line 703, in urlopen
+    httplib_response = self._make_request(
+  File "/home/extym/current/binance/venv/lib/python3.8/site-packages/urllib3/connectionpool.py", line 386, in _make_request
+    self._validate_conn(conn)
+  File "/home/extym/current/binance/venv/lib/python3.8/site-packages/urllib3/connectionpool.py", line 1042, in _validate_conn
+    conn.connect()
+  File "/home/extym/current/binance/venv/lib/python3.8/site-packages/urllib3/connection.py", line 363, in connect
+    self.sock = conn = self._new_conn()
+  File "/home/extym/current/binance/venv/lib/python3.8/site-packages/urllib3/connection.py", line 174, in _new_conn
+    conn = connection.create_connection(
+  File "/home/extym/current/binance/venv/lib/python3.8/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    sock.connect(sa)
+KeyboardInterrupt
+[INFO:2023-04-17 12:07:44,901] <MAIN>: Подключение API успешно произведено
+[INFO:2023-04-17 12:07:45,268] <MAIN>: Время сервера: 2023.04.17 09:07:45.188 UTC
+[INFO:2023-04-17 12:07:51,290] <MAIN>: Найдена связка: 
+[INFO:2023-04-17 12:07:51,290] <MAIN>: USDTBUSD-[0.9997, False]
+[INFO:2023-04-17 12:07:51,290] <MAIN>: BUSDT-[0.03618, False]
+[INFO:2023-04-17 12:07:51,290] <MAIN>: TUSDT-[0.03617, False]
+[INFO:2023-04-17 12:07:51,290] <MAIN>: h =15221.920671225282
+[INFO:2023-04-17 12:07:54,328] <MAIN>: BUSDUSDT quoteVolume = 320125564.86010000 price = 0.99970000
+[INFO:2023-04-17 12:07:54,329] <MAIN>: Связка прочная.
+[INFO:2023-04-17 12:07:54,329] <MAIN>: Прибль закрытия:15221.920671225282
+[INFO:2023-04-17 12:07:54,332] <ORDER>: quantity= 20.0 price= [0.9997, False] symbol= BUSDUSDT
+[INFO:2023-04-17 12:07:54,333] <ORDER>: {'filterType': 'MIN_NOTIONAL', 'minNotional': '10.00000000', 'applyToMarket': True, 'avgPriceMins': 5}
+[INFO:2023-04-17 12:07:54,333] <ORDER>: step_size_q = 1.00000000 step_size_p = 0.00010000 symbol = BUSDUSDT quantity = 20.0 price = 0.99970000 side = BUY
+[INFO:2023-04-17 12:07:54,837] <ORDER>: открываю первый ордер
+[INFO:2023-04-17 12:07:55,349] <ORDER>: ордер закрыт
+[INFO:2023-04-17 12:07:55,349] <ORDER>: Данные
+[INFO:2023-04-17 12:07:55,349] <ORDER>: quantity=19.8price=[0.03617, False]symbol=TBUSD
+[INFO:2023-04-17 12:07:55,350] <ORDER>: {'filterType': 'MIN_NOTIONAL', 'minNotional': '10.00000000', 'applyToMarket': True, 'avgPriceMins': 5}
+[INFO:2023-04-17 12:07:55,350] <ORDER>: step_size_q = 0.10000000 step_size_p = 0.00001000 symbol = TBUSD quantity = 19.80000000 price = 0.03617000 side = BUY
+[ERROR:2023-04-17 12:07:55,862] <MAIN>
+Traceback (most recent call last):
+  File "/home/extym/current/binance/main.py", line 297, in <module>
+    circle(str(spar_name_first[ind]),
+  File "/home/extym/current/binance/main.py", line 130, in circle
+    response2 = order(symbol2, quantity2, price2[0], side)
+  File "/home/extym/current/binance/main.py", line 42, in order
+    return bot.createOrder(
+  File "/home/extym/current/binance/binance.py", line 82, in wrapper
+    return self.call_api(**kwargs)
+  File "/home/extym/current/binance/binance.py", line 122, in call_api
+    raise Exception(response.text)
+Exception: {"code":-1013,"msg":"Filter failure: MIN_NOTIONAL"}
+[INFO:2023-04-17 12:27:48,550] <MAIN>: Подключение API успешно произведено
+[INFO:2023-04-17 12:27:49,107] <MAIN>: Время сервера: 2023.04.17 09:27:48.785 UTC
+[INFO:2023-04-17 12:27:56,327] <MAIN>: Найдена связка: 
+[INFO:2023-04-17 12:27:56,327] <MAIN>: USDTBUSD-[0.9997, False]
+[INFO:2023-04-17 12:27:56,327] <MAIN>: BUSDT-[0.03616, False]
+[INFO:2023-04-17 12:27:56,327] <MAIN>: TUSDT-[0.03613, False]
+[INFO:2023-04-17 12:27:56,327] <MAIN>: h =7623.617400972896
+[INFO:2023-04-17 12:27:59,552] <MAIN>: BUSDUSDT quoteVolume = 318914235.22170000 price = 0.99960000
+[INFO:2023-04-17 12:27:59,552] <MAIN>: Связка прочная.
+[INFO:2023-04-17 12:27:59,552] <MAIN>: Прибль закрытия:7623.617400972896
+[INFO:2023-04-17 12:27:59,553] <ORDER5>: quantity= 10.0 price= [0.9997, False] symbol= BUSDUSDT
+[INFO:2023-04-17 12:27:59,553] <ORDER1>: {'filterType': 'MIN_NOTIONAL', 'minNotional': '10.00000000', 'applyToMarket': True, 'avgPriceMins': 5}
+[INFO:2023-04-17 12:27:59,553] <ORDER2>: step_size_q = 1.00000000 step_size_p = 0.00010000 symbol = BUSDUSDT quantity = 10.0 price = 0.99970000 side = BUY
+[ERROR:2023-04-17 12:27:59,962] <MAIN>
+Traceback (most recent call last):
+  File "/home/extym/current/binance/main.py", line 298, in <module>
+    circle(str(spar_name_first[ind]),
+  File "/home/extym/current/binance/main.py", line 100, in circle
+    response1 = order(symbol1, quantity, price1[0], side)
+  File "/home/extym/current/binance/main.py", line 43, in order
+    return bot.createOrder(
+  File "/home/extym/current/binance/binance.py", line 82, in wrapper
+    return self.call_api(**kwargs)
+  File "/home/extym/current/binance/binance.py", line 122, in call_api
+    raise Exception(response.text)
+Exception: {"code":-1013,"msg":"Filter failure: MIN_NOTIONAL"}

@@ -1,0 +1,10 @@
+MYSQL_HOST = ''
+MYSQL_USER = ''
+MYSQL_PASW = ''
+MYSQL_DATABASE = ''
+LOGGING = False
+PUBLIC_DIR = './'
+LOG_FILE = 'log.txt'
+TEST_MODE = True
+LOGIN = 'login100500'
+PASSW = 'pass1qa'

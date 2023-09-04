@@ -204,12 +204,12 @@ class MsDatabase:
                 f"VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE `status` = %s, `shipment_date` = %s, `ms_order_id` = %s, `ms_order_href` = %s, `label` = %s, `fbs` = %s, `delivery_date_end` = %s",
                 (client_id, order['posting_number'], order['order_id'], order['status'], order['shipment_date'],
                  order['delivery_method']['warehouse_id'], ms_order_id, product['offer_id'], product['href'],
-                 product['quantity'], product['price'], '', ms_order_href, label, fbs, delivery_date_end,
+                 product['quantity'], product['price'], comment, ms_order_href, label, fbs, delivery_date_end,
                  order['status'], order['shipment_date'], ms_order_id, ms_order_href, label, fbs, delivery_date_end))
             self.conn.commit()
         except Exception as e:
             logging.warning(f'MySQL insert/update order error')
-            print(e)
+            logging.error('insert/update order error {}'.format(e))
             return False
         return True
 
@@ -309,7 +309,7 @@ class MsDatabase:
         # ms_date_list_from = ms_date_from.split('.')
         # mysql_date_from = f'"{ms_date_list_from[2]}-{ms_date_list_from[1]}-{ms_date_list_from[0]}"'
         # ms_date_list_to = ms_date_to.split('.')
-        # mysql_date_to = f'"{ms_date_list_to[2]}-{ms_date_list_to[1]}-{ms_date_list_to[0]}"'
+        # mysql_date_to = f'"{ms_date_list_to[2]}-{ms_date_list_to[1]}get_order_status-{ms_date_list_to[0]}"'
         mysql_timestamp_from = datetime.datetime.strptime(ms_date_from + ' 00:00:01', "%d.%m.%Y %H:%M:%S").timestamp()
         mysql_timestamp_to = datetime.datetime.strptime(ms_date_to + ' 23:59:59', "%d.%m.%Y %H:%M:%S").timestamp()
         # print(
@@ -437,6 +437,8 @@ class MsDatabase:
             self.conn.commit()
         except Exception as e:
             logging.warning(f'MySQL insert act table acts error')
+            logging.warning('MySQL insert act table acts error {}'.format(e))
+            logging.error('MySQL insert act table acts error {}'.format(e))
             print(e)
             return False
         return True
@@ -474,7 +476,7 @@ class MsDatabase:
             self.conn.commit()
         except Exception as e:
             logging.warning(f'MySQL insert file_name acts error')
-            logging.warning(e)
+            logging.warning("Error update_act {}".format(e))  ## and set file_name column maybe null
             return False
         return True
 

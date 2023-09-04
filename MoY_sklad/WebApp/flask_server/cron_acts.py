@@ -52,19 +52,22 @@ if __name__ == '__main__':
         seller = db.get_seller(seller_id)[0]
         header = ozon.get_header(seller[4], seller_id)
 
-        file_name = ozon.get_act_by_code_v2(act_id, PUBLIC_DIR + ACT_DIR, header)
+        # file_name = ozon.get_act_by_code_v2(act_id, PUBLIC_DIR + ACT_DIR, header)
+        file_name = ozon.get_digital_act_by_code(act_id, PUBLIC_DIR + ACT_DIR, header)
         file_name_edo = ozon.get_edo_act_by_code(act_id, PUBLIC_DIR + ACT_DIR, header)
-        if file_name_edo is None:
-            file_name_edo = ''
+        print('file_name_edo', file_name_edo)
+        # if file_name_edo is None:
+        #     file_name_edo = ''
             # time.sleep(2 * 60)
             # db.reconnect()
             # file_name_edo = ozon.get_edo_act_by_code(act_id, PUBLIC_DIR + ACT_DIR, header)
             # if file_name_edo is None:
             #     file_name_edo = ''
-        if file_name:
+        if file_name or file_name_edo:
             status = 'ready'
             if not exist_file and not file_name_edo:
                 status = 'wait'
+                file_name_edo = ''
             if not db.update_act(act_id, file_name, file_name_edo, status):
                 logging.warning(f"Act {act_id}, file {file_name}, file_name_edo {file_name_edo} - error writing in DB")
             else:
