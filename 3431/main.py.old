@@ -14,7 +14,7 @@ import datetime
 import requests
 from maintenance import shorter_data, read_xls
 import csv
-from avito import *
+from avito import get_creds, get_avito_current_chat, get_avito_current_chat_v2, make_data_for_avito, check_is_exist_message_answer
 from amo import *
 import urllib3
 import logging
@@ -42,7 +42,7 @@ refresh = creds.get('refresh')
 def check_allowed_filename(filename):
     result = '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED
     curr_name = filename.rsplit('.', 1)[1]
-
+    print(result)
     return result, curr_name
 
 
@@ -205,65 +205,6 @@ def write_incoming(proxy_tuple):
         file.write('\n')
 
 
-def check_is_exist_message_answer(msg_id, chat_id):
-    '''
-    data = {"chat_id": ["price", "link", "msg_id", avito_id: int, name(?), first_answer: bool]}
-    '''
-    data = read_links()
-    compare = False
-    first_answer = False
-    if data.get(chat_id):
-        try:
-            if data.get(chat_id)[2] == msg_id:
-                compare = True
-        except IndexError as err:
-            print("FUCK UP_msg_id {}".format(err), data.get(chat_id), chat_id)
-
-        try:
-            first_answer = data.get(chat_id)[5]
-        except IndexError as err:
-            print("FUCK UP_first_answer {}".format(err), data.get(chat_id), chat_id)
-
-    return compare, first_answer
-
-
-async def check_is_exist_message_answer_v2(msg_id, chat_id):
-    '''
-    data = {"chat_id": ["price", "link", "msg_id", avito_id: int, name(?), first_answer: bool]}
-    '''
-    # data = read_links()
-    data = await read_links_v4(chat_id)
-    compare = False
-    first_answer = False
-    rewrite_lead = False
-    # if data.get(chat_id):
-    if data:
-        try:
-            # if data.get(chat_id)[2] == msg_id:
-            if data[2] == msg_id:
-                compare = True
-        except IndexError as err:
-            print("FUCK UP_msg_id {}"
-                  .format(err), data.get(chat_id), chat_id)
-
-        try:
-            # first_answer = data.get(chat_id)[5]
-            first_answer = data[5]
-        except IndexError as err:
-            print("FUCK UP_first_answer {}"
-                  .format(err), data.get(chat_id), chat_id)
-
-        try:
-            # rewrite_lead = data.get(chat_id)[6]
-            rewrite_lead = data[6]
-        except IndexError as err:
-            print("FUCK UP_rewrite_lead {}"
-                  .format(err), data.get(chat_id), chat_id, rewrite_lead)
-
-    return compare, first_answer, rewrite_lead
-
-
-
 def make_lead(data):
     creds = get_creds()
     access_token = creds.get('access_token')
@@ -274,7 +215,7 @@ def make_lead(data):
     metod = '/api/v4/leads'
     link = url + metod
     answer = requests.post(link, headers=headers, json=data_send)
-    print(2345, answer.text)
+    print(answer.text)
 
     return answer.text
 
@@ -364,57 +305,35 @@ def get_data():
 async def avito_webhook():
     # headers = request.headers
     if request.headers.get('X-Avito-Messenger-Signature'):
-        hook = {}
         hook = request.get_json()
         logging.info('WE_GET_HOOK_from_avito' + str(hook))
-
-        author_id = hook.get('payload').get('value').get('author_id')
         chat_id = hook.get('payload').get('value').get('chat_id')
         msg_id = hook.get('payload').get('value').get('id')
-        # check = check_is_exist_message_answer(msg_id, chat_id)
-        check = await check_is_exist_message_answer_v2(msg_id, chat_id)
-        try:
-
-            ## system message from avito or our
-            if author_id == 1 or check[0]: # or (author_id in sender_ids and msg != bot_answer):
+        author_id = hook.get('payload').get('value').get('author_id')
+        check = check_is_exist_message_answer(msg_id, chat_id)
+        if not check[0] and author_id not in sender_ids:
+            try:
+                # await get_avito_current_chat(chat_id, hook)
+                await get_avito_current_chat_v2(hook, check)
+            except Exception as err:
+                logging.error('ERROR_SEND_DATA FOR MESSAGE TO AMO {}'.format(err) )
                 return app.response_class(
                     status=200
                 )
-
-            user_id = hook.get('payload').get('value').get('user_id')
-            msg = hook.get('payload').get('value').get('content').get('text')
-            # is_phone = await get_phone(msg)
-            ## our message or first
-            if author_id in sender_ids and msg == bot_answer:
-                chat_id = hook.get('payload').get('value').get('chat_id')
-                await rewrite_leads_v2(chat_id, user_id)
-                msg_id = hook.get('payload').get('value').get('id')
-                await re_write_link_v2(chat_id, msg_id)
-                # await get_avito_current_chat_v2(hook, (False, True))
-                return app.response_class(
-                    status=200
-                )
-
-            ## random message, not first, not our
-            else:
-                try:
-                    # logging.info('from_webhook_before_get_chat {} {} {} {}'.format
-                    #              (check, msg_id, chat_id, user_id))
-                    await get_avito_current_chat_v2(hook, check)
-                    return app.response_class(
-                        status=200
-                    )
-                except Exception as err:
-                    logging.error('ERROR_GET_AVITO_CURRENT_CHAT {} {} {} {} {}'.
-                                  format(err, check, msg_id, chat_id, user_id))
-                    return app.response_class(
-                        status=200
-                    )
-        except Exception as  error:
-            logging.error('Web_hook_fuckup {} {}'.format(error, hook))
-            return app.response_class(
-                status=200
-            )
+            return 'OK'
+        # elif not check[0] and author_id in sender_ids:
+        #     try:
+        #         # await get_avito_current_chat(chat_id, hook)
+        #         await get_avito_current_chat_v2(hook, check)
+        #     except Exception as err:
+        #         logging.error('ERROR_SEND_DATA FOR MESSAGE TO AMO {}'.format(err) )
+        #         return app.response_class(
+        #             status=200
+        #         )
+        #     return 'OK'
+        return app.response_class(
+            status=200
+        )
     else:
         print('WHOIS', request.get_data())
         print('WHOIS', request.headers)
@@ -428,15 +347,11 @@ async def avito_webhook():
 def check_status():
     if request.headers.get('X-Real-Ip') == '77.246.158.248':
         try:
-            hook_id = request.headers.get('PS-WEBHOOK_EVENT-ID')
             form = request.form.to_dict()
-            # status = form.get('status')
-            if form.get('status') != 'Размещено у поставщика':
-                logging.info('we get form {} {}'.format(hook_id, form))
-            if form.get('clientId') in ['715', '235', '710']:
-                pass
-                # make_pipeline(form)
-            # print('WE GET ORDER_form', form)
+            order = form.get('name')
+            print('WE GET ORDER_form', form, order)
+            # data = request.get_json()
+            # print('WR+GET_DATA ', data)
             # write_result(form)
 
         except:
@@ -451,57 +366,27 @@ def check_status():
 
 @app.route('/leads', methods=['get', 'post'])
 def get_new_leads_amo():
-    try:
-        headers = request.headers
-        data = request.get_json()
-        print('WE_GET_NEW_LEADS_from_AMO', data, headers)
-    except:
-        result = request.form.to_dict()
-        print(3333333, result, type(result))
-
-    return 'OK'
+    headers = request.headers
+    data = request.json
+    print('WE_GET_NEW_LEADS_from_AMO', data, headers)
 
 
 @app.route('/location/', methods=['GET', 'POST'])
 async def wait_amo_hook():
     if request.method == "POST":
-        data_json = request.get_json()
-        logging.info('WE_GET_DATA_FROM_AMO' + str(data_json))
         try:
-            # make_data_for_avito(data_json)
-            await make_data_for_avito_v2(data_json)
+            data_json = request.get_json()
+            logging.info('WE_GET_DATA_FROM_AMO' + str(data_json))
+            make_data_for_avito(data_json)
             # logging.info('WE_SEND_DATA_TO_AVITO' + str(data_json))
         except Exception as err:
-            logging.error('WHAT_is_FUCK_UP_error from endpoint location {}'.format(err))
+            logging.error('WHAT_is_FUCK_UP_error {}'.format(err))
 
         return app.response_class(
             status=200
         )
     else:
         return "we wait data"
-
-
-@app.route('/bonus', methods=['post'])
-async def bonus_hook():
-    if request.method == 'POST':
-        # try:
-        form = request.form.to_dict()
-        lead_id = form.get('leads[status][0][id]')
-        subdomain = form.get('account[subdomain]')
-        await make_bonus(subdomain, lead_id)
-        logging.info('Make_bonus', subdomain, lead_id)
-        # except:
-        #     print(55555555555, request.get_data(as_text=True))
-        response = app.response_class(
-            status=200
-        )
-    else:
-        print(33333333333, request.get_data(as_text=True))
-        response = app.response_class(
-            status=402
-        )
-
-    return response
 
 
 @app.route('/load/<name>')
@@ -533,7 +418,7 @@ def download():
                     with open(UPLOAD_FOLDER + filename, 'r', encoding=encode) as read_file:
                         reader = csv.reader(read_file, delimiter=';')
                         shorter_data(reader, 'csv')
-                        print(2323, encode)
+                        print(encode)
                         flash("File upload successfuly")
                         return redirect(request.url)
 
@@ -542,7 +427,7 @@ def download():
                     with open(UPLOAD_FOLDER + filename, 'r', encoding=encode) as read_file:
                         reader = csv.reader(read_file, delimiter=';')
                         shorter_data(reader)
-                        print(2323, encode)
+                        print(encode)
                         flash("File upload successfuly")
                         return redirect(request.url)
 

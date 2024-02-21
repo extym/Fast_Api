@@ -1,4 +1,4 @@
-from test_data import get_creds
+from avito import get_creds
 from cred import LOCAL_MODE
 import requests
 import csv
@@ -219,5 +219,20 @@ def read_xls(file):
     # print(type(proxy))
 
     return proxy
+
+
+def read_price():
+    file = open('file_price.csv', 'r')
+    reader = csv.reader(file)
+    data = []
+    for row in reader:
+        data.append(row[:6])
+
+    return json.dumps(data)
+
+
+
+
+
 
 # read_xls()
