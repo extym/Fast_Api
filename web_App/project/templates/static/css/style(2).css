@@ -1,0 +1,21 @@
+#currencyWidget {
+  height: 46px;
+}
+
+#taxTypeSwitchWidget {
+  height: 46px;
+}
+#taxTypeSwitchWidget .taxSwitchWrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+#taxTypeSwitchWidget .taxSwitchWrapper .name {
+  font-size: 1.1rem;
+}
+#taxTypeSwitchWidget .taxSwitchWrapper .name.active {
+  font-weight: 600;
+  color: #3699ff;
+}
+
+

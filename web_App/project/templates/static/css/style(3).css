@@ -1,0 +1,31 @@
+#modal_firstTutorial .videoWrapper {
+  position: relative;
+  border-radius: 0.42rem;
+  overflow: hidden;
+}
+#modal_firstTutorial .videoWrapper .play {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  width: 70px;
+  height: 70px;
+  cursor: pointer;
+  background: #3699ff;
+  box-shadow: rgba(0, 0, 0, 0.45) 0px 22px 70px 4px;
+  border-radius: 20px;
+  top: 50%;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+  transition: all 0.1s ease-in-out;
+}
+#modal_firstTutorial .videoWrapper .play i {
+  color: #fff;
+}
+#modal_firstTutorial .videoWrapper .play:hover {
+  width: 75px;
+  height: 75px;
+}
+
+
