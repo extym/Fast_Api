@@ -2,9 +2,14 @@ import asyncio
 import json
 
 import requests
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+from project.models import *
+
 from project.creds import *
 # from read_json import read_json_on
 from time import sleep
+from project import db
 
 common_error = {
     "error": {
@@ -14,8 +19,8 @@ common_error = {
     }
 }
 
-host = 'https://api-seller.ozon.ru'
-client_id = '90963'
+# host = 'https://api-seller.ozon.ru'
+# client_id = '90963'
 
 last_id = 'WzQ2MzcyNzEyNyw0NjM3MjcxMjdd'
 
@@ -168,7 +173,7 @@ def send_stocks_on():
 
 # send_stocks_on()
 
-def product_info_price(id_mp):  # product_id, offer_id
+def product_info_price(id_mp, seller_id):  # product_id, offer_id
     # url = 'https://api-seller.ozon.ru/v4/product/info/prices'
     # data = {"filter": {
     #             "offer_id": [offer_id],
@@ -177,6 +182,14 @@ def product_info_price(id_mp):  # product_id, offer_id
     #         },
     #         "last_id": "",
     #         "limit": 100}
+    api_key = db.session.execute(select(Marketplaces.key_mp)
+                                     .where(Marketplaces.seller_id == seller_id))
+    print(api_key, type(api_key))
+    headers = {
+        'Client-Id': seller_id,
+        'Api-Key': api_key,
+        'Content-Type': 'application/json'
+    }
     url = 'https://api-seller.ozon.ru/v3/posting/fbs/get'
     data = {
         "posting_number": id_mp,
@@ -186,12 +199,12 @@ def product_info_price(id_mp):  # product_id, offer_id
             "financial_data": False,
             "product_exemplars": False,
             "translit": False}}
-    resp = requests.post(url=url, headers=headers, json=data)
-    result = resp.json()
-    print('product_id_offer_id', result)
-    # price = result.get("result")["items"][0]["price"]["marketing_price"][:-2]
-    order = result.get("result")
-    return order
+    # resp = requests.post(url=url, headers=headers, json=data)
+    # result = resp.json()
+    # print('product_id_offer_id', result)
+    # # price = result.get("result")["items"][0]["price"]["marketing_price"][:-2]
+    # order = result.get("result")
+    # return order
 
 # get_product_info(38010832, "OWLT190601")
 # product_info_price("463727127", "OWLC19-014")
@@ -205,3 +218,5 @@ def product_info_price(id_mp):  # product_id, offer_id
 # # pr = [{'id': 'MP1703473-001', 'pickup': {'deliveryServiceId': 123600, 'deliveryServiceName': 'Леруа Мерлен сервис доставки', 'warehouseId': '1200', 'timeInterval': 'Invalid Interval', 'pickupDate': '2022-12-14'}, 'products': [{'lmId': '90115665', 'vendorCode': 'BT2834B', 'price': 5860, 'qty': 3, 'comissionRate': 0}, {'lmId': '90121362', 'vendorCode': 'HPUV65ELC', 'price': 5860, 'qty': 3, 'comissionRate': 0}], 'deliveryCost': 0, 'parcelPrice': 5860, 'creationDate': '2022-12-14', 'promisedDeliveryDate': '2022-12-22', 'calculatedWeight': 4.8, 'calculatedLength': 707, 'calculatedHeight': 156, 'calculatedWidth': 686}, {'id': 'MP1703472-001', 'pickup': {'deliveryServiceId': 123600, 'deliveryServiceName': 'Леруа Мерлен сервис доставки', 'warehouseId': '1200', 'timeInterval': 'Invalid Interval', 'pickupDate': '2022-12-14'}, 'products': [{'lmId': '90115665', 'vendorCode': 'BT2834B', 'price': 5860, 'qty': 3, 'comissionRate': 0}, {'lmId': '90121362', 'vendorCode': 'HPUV65ELC', 'price': 5860, 'qty': 3, 'comissionRate': 0}], 'deliveryCost': 0, 'parcelPrice': 5860, 'creationDate': '2022-12-14', 'promisedDeliveryDate': '2022-12-22', 'calculatedWeight': 4.8, 'calculatedLength': 707, 'calculatedHeight': 156, 'calculatedWidth': 686}, {'id': 'MP1703471-001', 'pickup': {'deliveryServiceId': 123600, 'deliveryServiceName': 'Леруа Мерлен сервис доставки', 'warehouseId': '1200', 'timeInterval': 'Invalid Interval', 'pickupDate': '2022-12-14'}, 'products': [{'lmId': '90115665', 'vendorCode': 'BT2834B', 'price': 5860, 'qty': 3, 'comissionRate': 0}, {'lmId': '90121362', 'vendorCode': 'HPUV65ELC', 'price': 5860, 'qty': 3, 'comissionRate': 0}], 'deliveryCost': 0, 'parcelPrice': 5860, 'creationDate': '2022-12-14', 'promisedDeliveryDate': '2022-12-22', 'calculatedWeight': 4.8, 'calculatedLength': 707, 'calculatedHeight': 156, 'calculatedWidth': 686}]
 # pr = {'message_type': 'TYPE_NEW_POSTING', 'seller_id': 90963, 'warehouse_id': 1020000075732000, 'posting_number': '13223249-0059-1', 'in_process_at': '2023-03-18T03:56:36Z', 'products': [{'sku': 789880982, 'quantity': 1}]}
 # convert(pr)
+
+

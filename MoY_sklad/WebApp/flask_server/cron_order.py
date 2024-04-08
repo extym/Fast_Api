@@ -19,7 +19,169 @@ from settings import MYSQL_HOST, MYSQL_USER, MYSQL_PASW, MYSQL_DATABASE, DB_DICT
     MS_FIELD_SOBRAN_BOOL, MS_FIELD_SOBRAN_INT, OZON_SLEEP_TIME
 
 
-if __name__ == '__main__':
+def check_divide_orders(list_postings, stores, divide_count): #check seller ordderress list
+    print('#' * 49)
+    print('11111', type(list_postings), len(list_postings))
+    count_quan = []
+    result = False
+    # position_count = len(posting['products'])
+
+    for posting in list_postings:   #posting is dict
+        count = 0
+        if posting.get('status') != 'awaiting_packaging':
+            continue
+        else:
+            store = posting.get('delivery_method')['warehouse_id']
+            # print("STORE_FROM_POSTING", store, type(store))
+            type_store = stores.get(str(store))
+            if type_store != 'fbs':
+                continue
+            else:
+                index = (0,)
+                for prods in posting['products']:
+                    quantity = prods['quantity']
+                    if quantity == divide_count: ##check need divide
+                        continue
+                    else:
+                        count += quantity       #count quantity all positions
+
+                if count > divide_count:  # and type_store == 'fbs':
+                    print('!' * 100)
+                    print('1_check_divide_orders', datetime.datetime.now(), 'products', len(posting['products']), 'quantity',
+                          posting['products'][0]['quantity'], posting['products'], posting.get('posting_number'))
+                    # posting_number = posting['posting_number']
+                    index = (list_postings.index(posting), count)
+                    count_quan.append(index)
+                    result = True
+
+                print('CHEcked_position_index_&_count', index)
+    return result, count_quan,
+
+
+def divide_order(posting_enum, header, divide_slice, total_count):
+    shipments = posting_enum['financial_data']['products']
+    total_proxy, prev_position = [], []
+    for position in shipments:
+        print('POSITION_FOR_DIVIDE', position)
+        count_product = position['quantity']
+        product_id = position['product_id']  #positon['financial_data']['products'][0]['product_id']
+
+        while total_count >= divide_slice:
+            if count_product >= divide_slice:  # division without remainder
+                proxy_pac = {
+                    'products': [
+                        {
+                            "product_id": product_id,
+                            "quantity": divide_slice
+                        }
+                    ]
+                }
+                total_proxy.append(proxy_pac)
+                count_product -= divide_slice
+                total_count -= divide_slice
+                if total_count == 0:
+                    break
+                print('count_prod--1', count_product, 'total_count--1', total_count, total_proxy)
+
+            elif count_product < divide_slice and len(prev_position) == 0 and count_product != 0:
+                prev_position = position.copy() #create and save remainder
+                prev_position['quantity'] = count_product
+                print('remainder---1111', count_product, 'total_count---1111', total_count)
+                continue
+
+            elif  count_product < divide_slice and len(prev_position) > 0 and count_product != 0:  #check remainder -> it's second and other division
+                prev_reminder = prev_position['quantity']
+                if prev_reminder + count_product >= divide_slice  and count_product != 0:
+                    proxy_pac = {
+                    'products': [
+                            {
+                                "product_id": prev_position['product_id'],
+                                "quantity": prev_reminder
+                            },
+                            {
+                                "product_id": product_id,
+                                "quantity": divide_slice - prev_reminder #if
+                            }
+                        ]
+                    }
+                    total_proxy.append(proxy_pac)
+                    count_product -= divide_slice - prev_reminder
+                    total_count -= divide_slice
+                    if total_count == 0:
+                        break
+                    prev_position.clear()
+                    prev_position = position.copy()  # REcreate and save remainder
+                    prev_position['quantity'] = count_product
+                    print('count_prod---333', count_product, 'total_count--333', total_count)
+
+                elif prev_reminder + count_product <= divide_slice  and count_product != 0:
+                    proxy_pac = {
+                        'products': [
+                            {
+                                "product_id": prev_position['product_id'],
+                                "quantity": prev_reminder
+                            },
+                            {
+                                "product_id": product_id,
+                                "quantity": count_product
+                            }
+                        ]
+                    }
+                    total_proxy.append(proxy_pac)
+                    count_product = 0
+                    total_count -= count_product - prev_reminder
+                    print('count_prod---444', count_product, 'total_count--444', total_count)
+
+        else:
+            proxy_pac = {
+                'products': [
+                    {
+                        "product_id": product_id,
+                        "quantity": count_product
+                    }
+                ]
+            }
+            total_proxy.append(proxy_pac)  #
+
+    data = {
+            "packages": total_proxy,
+                # {
+                #     "products": total_proxy
+                # }
+          # ],
+          "posting_number": posting_enum['posting_number'],
+          "with": {
+              "additional_data": True
+                }
+          }
+    print('DATA_DIVIDE', data)
+
+    re_data = ozon.divide_orders_v4(data, header)
+    if re_data[0]:
+        print('RESULT_DATA_DIVIDE', datetime.datetime.now(), data, 're_data', type(re_data), re_data)
+        return re_data[1]
+    else:
+        return 'INCORRECT_STATUS'
+
+
+# def send_discount(header, seller, products):
+#     list_target = [tpl for tpl in products if tpl[-1]]  ##TODO
+#     if len(list_target) > 0:
+#         for prods in list_target:
+#             data = {
+#                 "discount": prods[-1],
+#                 "product_id": prods[0]
+#                 }
+#             result = ozon.send_discount(data, header)
+#             if result:
+#                 print("All ride", prods[0])
+#             else:
+#                 print("ERRoorr ", prods[0], prods[5])
+
+
+# if __name__ == '__main__':
+
+def start_orders():
     ################ TESTS #################
     # with open('tmp', 'rb') as f:
     #     data = f.read()
@@ -124,6 +286,8 @@ if __name__ == '__main__':
         usluga_price_ms_realfbs = seller[20]
         price_id = seller[21]
         cancell_status = seller[22]
+        divide = seller[23]
+        divide_count = seller[24]
         if not price_id:
             price_id = MS_DEFAULT_PRICE
 
@@ -135,9 +299,9 @@ if __name__ == '__main__':
         #### STATUS last-mile
         raw_ozon_current_orders = db.get_last_orders_href(seller_id, status='delivering')
         ozon_current_orders_set = {i[0] for i in raw_ozon_current_orders}
-        # print(ozon_current_orders_set)
+
         ms_last_demand_orders = ms.get_last_orders_w_demand()
-        # print(ms_last_demand_orders)
+
         last_mile_orders = ozon_current_orders_set & ms_last_demand_orders
         for ms_href in last_mile_orders:
             raw_posting_number = db.get_order_posting_number_by_href(seller_id, ms_href)
@@ -174,8 +338,8 @@ if __name__ == '__main__':
                     proces_status_dict[posting_number] = 'delivered'
                     # time.sleep(OZON_SLEEP_TIME)
                     # db.reconnect()
-                else:
-                    logging.warning(f"KO changing status to delivered in order {posting_number} in Ozon")
+                # else:
+                #     logging.warning(f"KO changing status to delivered in order {posting_number} in Ozon")
             # logging.info(f"{posting_number} {shipment_date_str}")
             # print(posting_number, shipment_date_str)
 
@@ -217,17 +381,56 @@ if __name__ == '__main__':
             seller_stores = {}
 
         orders = ozon.get_orders_v2(OZON_ORDERS_HOURS, header)
+        # orders = ozon.get_orders_v3(OZON_ORDERS_HOURS, header)
         logging.info(f"Summary {len(orders)} orders in {OZON_ORDERS_HOURS} hours")
 
-        # print(orders)
+        for orde in orders:
+            print('ORRDERRS_BEFORE_CHECK_DIVIDE', name, divide, divide_count,
+                  orde.get('posting_number'), orde.get('status'))
+
         # continue
+        #
+        ##################CUSTOM DIVIDE###############
+        o_stores = seller[13]
+
+        if divide == 1:
+            # print('divide', seller_stores)
+            check = check_divide_orders(orders, seller_stores, divide_count)
+            if check[0]:
+                # raw_divide_orders = []
+                divide_posting_number, divided_post = [], []
+                print('check_len_orders', len(orders))
+                for i in check[1]: #we get [1]  list of typles index & count all positions
+                    oreder = orders.pop(i[0])
+                    raw_posting_list = divide_order(oreder, header, divide_count, i[1])
+                    print('CHECK!!!!', i, len(orders), oreder)
+                    if raw_posting_list != 'INCORRECT_STATUS':
+                        # raw_divide_orders.append(raw_posting_list)
+                        # raw_divide_orders.extend(raw_posting_list)
+                        print('RAW_divide_orders', raw_posting_list)
+                        logging.info(f'divide order  {oreder} to_list_divided {raw_posting_list}')
+                        if raw_posting_list is not None:
+                            for post in raw_posting_list:
+                                post_num = post.get('posting_number')
+                                divided_post = ozon.get_fbs_order_v4(post_num, header)
+                                divide_posting_number.append(divided_post)
+                print('FIN_CHECK', len(orders), len(divide_posting_number))
+                orders.extend(divide_posting_number)
+                # orders.append(divided_post)
+                print('LEN_ORDERS_&_DIVIDE_ORDERS', len(orders), len(divide_posting_number))
+
+        ##################CUSTOM DIVIDE###############
+
         for order in orders:
-            logging.info('order__', order)
-            print('order__', order['posting_number'])
+            # logging.info(f'order__ {order.get("posting_number"), order.get("status")}')
+            # print('order__type', type(order))
+            if isinstance(order, str):
+                print('ORDER_STRING', type(order), order)
             # print(ozon.get_fbs_order(order['posting_number'], header))
             # continue
             if not order:
                 continue
+
             posting_number = order['posting_number']
 
             logging.info("-" * 50)
@@ -370,12 +573,14 @@ if __name__ == '__main__':
             res_products = []
             products = []
             delive = 0
+            setted_discount = 0
 
             for product in order['products']:
                 elem_dict = {}
                 elem_dict['offer_id'] = product['offer_id']
 
-                raw_tmp = db.get_product_href_delive(seller_id, elem_dict['offer_id'])
+                # raw_tmp = db.get_product_href_delive(seller_id, elem_dict['offer_id'])
+                raw_tmp = db.get_product_href_delive_v2(seller_id, elem_dict['offer_id'])
                 try:
                     elem_dict['href'] = raw_tmp[0][0]
                 except:
@@ -389,6 +594,11 @@ if __name__ == '__main__':
                     elem_dict['delive'] = 0
                 if elem_dict['delive'] > delive:
                     delive = elem_dict['delive']
+
+                try:
+                    elem_dict['set_discount'] = int(raw_tmp[0][2])
+                except:
+                    continue
 
                 elem_dict['sku'] = product['sku']
                 elem_dict['name'] = product['name']
@@ -413,11 +623,12 @@ if __name__ == '__main__':
             # continue
 
             # res_products.append({'quantity': 1, 'price': elem_dict['delive'], 'href': usluga})
-            products_meta = ms.make_products_meta(res_products, reserve=True)
+            products_meta = ms.make_products_meta_v2(res_products, reserve=True)
+            # products_meta = ms.make_products_meta(res_products, reserve=True)
             if usluga and usluga != '0': #FIXME del and delive
                 usluga_meta = ms.make_service_meta({'quantity': 1, 'price': delive, 'href': usluga, 'vat': 0})
                 products_meta.append(usluga_meta)
-            # print(products_meta)
+            print('products_meta', products_meta)
 
             # order_name = f"{name}_{str(posting_number)}"
             if moment_date:
@@ -476,7 +687,9 @@ if __name__ == '__main__':
 
             if not order_id:
                 if address:
-                    order_id, order_href = ms.post_order(contragent_meta, products_meta, organization_meta, comment_copy, address, store=store, moment=moment, status=status_meta)
+                    order_id, order_href = ms.post_order(contragent_meta, products_meta, organization_meta,
+                                                         comment_copy, address, store=store, moment=moment,
+                                                         status=status_meta)
                 else:
                     order_id, order_href = ms.post_order(contragent_meta, products_meta, organization_meta,
                                                          comment_copy, posting_number, store=store, moment=moment,
@@ -568,11 +781,19 @@ if __name__ == '__main__':
                 customer_comment = ''
             ########## Обновление БД #########
             for product in products:
-                print(product)
-                db.insert_update_oder(seller_id, order_id, order, product, comment, order_href, label, fbs)
-                logging.info(f"Order {order_id} / {posting_number} insert/update in BD")
+                print('product_from_xs', product)
+                result = db.insert_update_oder(seller_id, order_id, order, product, comment, order_href, label, fbs)
+                if result:
+                    logging.info(f"Order {order_id} / {posting_number} insert/update in BD")
+                    print(f"Order {order_id} / {posting_number} insert/update in BD")
+                else:
+                    logging.error(f"ERROR Order {order_id} / {posting_number} insert/update in BD")
+                    print(f"ERROR Order {order_id} / {posting_number} insert/update in BD")
 
     db.close()
-    sys.exit(0)
+    # sys.exit(0)
+    print(datetime.datetime.now(), 'ONE_CIRCLE_MADE')
 
+
+start_orders()
     

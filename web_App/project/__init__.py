@@ -23,10 +23,10 @@ def create_app():
     app.config['USER_ENABLE_EMAIL'] = False
 
     db.init_app(app)
+
     login_manager = LoginManager()
     login_manager.login_view = "auth.login"
     login_manager.init_app(app)
-
 
     from .models import Users
     @login_manager.user_loader

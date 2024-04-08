@@ -4,18 +4,21 @@ import random
 import string
 from time import sleep
 
+import requests
+
+from project import db
 import pandas as pd
 #pip install openpyxl
-
-from flask import Blueprint, render_template, app, redirect
+from project.models import *
+from flask import Blueprint, render_template, app, redirect, make_response, Response
 from flask import request, flash
 from flask_login import current_user, login_required
 from werkzeug.utils import secure_filename
 
-from project.conn import execute_query, executemany_query
-from project.conn_maintenance import query_write_order, query_write_items, update_status_order_reverse_id
+from project.conn import *  # execute_query, executemany_query
+# from project.conn_maintenance import query_write_order, query_write_items, update_status_order_reverse_id
 from project import LOCAL_MODE
-from project.ozon import product_info_price, common_error
+from project.ozon import  common_error
 
 main = Blueprint('main', __name__)
 
@@ -138,6 +141,13 @@ def reformat_data_order(order, shop):
 
     return result
 
+def try_get_id_1c(offer_id):
+    # items_skus = read_skus()
+    # items_ids = read_json_ids()  # we wait dict[vendor_code] = (id_1c, price, quantity)
+    # id_1c = items_ids[vendor_code][0]  # 1c
+    pass
+
+    return None
 
 def reformat_data_items(order, shop):
     result = []
@@ -162,19 +172,22 @@ def reformat_data_items(order, shop):
         # read_skus() -> {sku<str>: (product_id<int>, vendor_code<str>}
         # items_skus = read_skus()
         # items_ids = read_json_ids()  # we wait dict[vendor_code] = (id_1c, price, quantity)
+        # id_1c = items_ids[vendor_code][0]  # 1c
+
         for item in list_items:
             sku = str(item["sku"])
             # vendor_code = items_skus[sku][1]
             vendor_code = item["offer_id"]
             print('product_info_price', sku[0], vendor_code)
             # price = product_info_price(items_skus[sku][0], vendor_code)
+            id_1c = try_get_id_1c(item["offer_id"])
             proxy = (
                 order["id"],
                 order["our_id"],
                 shop,
                 order["our_status"],
                 vendor_code,
-                # items_ids[vendor_code][0],  # 1c
+                id_1c,
                 item["quantity"],
                 item["price"][:-2]  # price
             )
@@ -201,7 +214,7 @@ def reformat_data_items(order, shop):
 
 @main.route('/')
 def index_main():
-    return render_template('start_page.html')
+    return render_template('ui-login.html')  # 'start_page.html')
 
 
 @main.route('/profile')
@@ -213,61 +226,69 @@ def profile():
     return render_template('hospital.html', name=name, uid=uid, role=role)  # index.html
 
 
-@main.route('/api/on', methods=['GET', 'POST'])
+@main.route('/api/on', methods=['POST'])
 async def onon_push():
     resp = request.get_json()
     print('api_on_resp', resp)
-    if resp.get('message_type') == 'TYPE_PING':
-        time = resp["time"]
-        response = app.response_class(
-            json.dumps({"version": "v.1",
-                        "name": "brain-trust.bot",
-                        "time": time}),
-            status=200
-        )
+    head = dict(request.headers)
+    print('resp_header', head)
+    if resp is not None:
+        if resp.get('message_type') == 'TYPE_PING':
+            time = resp["time"]
+            response = Response(
+                json.dumps({"version": "v.1",
+                            "name": "brain-trust.bot",
+                            "time": time}),
+                status=200
+            )
 
-    elif resp.get("message_type") == "TYPE_NEW_POSTING":
-        our_id = token_generator()
-        id_mp = resp["posting_number"]
-        # our_id = id_mp.replace('-', '')[:10]
-        sleep(1)
-        order = product_info_price(id_mp)
-        print('new_order_onon', order)
-        order['our_id'], order['id'], order['status'], order['our_status'] \
-            = id_mp, our_id, "NEW", "NEW"  # TODO change place id_mp & our_id
-        ref_data = reformat_data_order(order, 'Ozon')
-        # print('refdata', ref_data)
-        await execute_query(query_write_order, ref_data)
-        list_items = reformat_data_items(order, 'Ozon')
-        # print('redata_items', list_items)
-        # print('list_items_onon', list_items)
-        await executemany_query(query_write_items, list_items)
+        elif resp.get("message_type") == "TYPE_NEW_POSTING":
+            our_id = token_generator()
+            id_mp = resp["posting_number"]
+            seller_id = resp.get('seller_id')
+            # warehouse_id
+            # our_id = id_mp.replace('-', '')[:10]
+            sleep(1)
+            order = product_info_price(id_mp, str(seller_id))
+            print('new_order_onon', order)
+            order['our_id'], order['id'], order['status'], order['our_status'] \
+                = id_mp, our_id, "NEW", "NEW"  # TODO change place id_mp & our_id
+            ref_data = reformat_data_order(order, 'Ozon')
+            # print('refdata', ref_data)
+            await execute_query(query_write_order, ref_data)
+            list_items = reformat_data_items(order, 'Ozon')
 
-        response = app.response_class(
-            json.dumps(common_comfirm_response),
-            status=200
-        )
+            await executemany_query(query_write_items, list_items)
 
-    elif resp.get("message_type") == "TYPE_POSTING_CANCELLED":
-        order_id = resp["posting_number"]
-        data = ("canceled", "NEW", order_id, "Ozon")
-        await execute_query(update_status_order_reverse_id, data)
-        print('cencelled_order_onon', order_id)
-        response = app.response_class(
-            json.dumps(common_comfirm_response),
-            status=200
-        )
+            response = Response(
+                json.dumps(common_comfirm_response),
+                status=200
+            )
 
-    elif resp.get("message_type") != None:
-        response = app.response_class(
-            json.dumps(common_error),
-            status=200
-        )
+        elif resp.get("message_type") == "TYPE_POSTING_CANCELLED":
+            order_id = resp["posting_number"]
+            data = ("canceled", "NEW", order_id, "Ozon")
+            await execute_query(update_status_order_reverse_id, data)
+            print('cencelled_order_onon', order_id)
+            response = Response(
+                json.dumps(common_comfirm_response),
+                status=200
+            )
 
+        elif resp.get("message_type") != None:
+            response = Response(
+                json.dumps(common_error),
+                status=200
+            )
+
+        else:
+            response = Response(
+                json.dumps(common_error),
+                status=400
+            )
     else:
-        response = app.response_class(
-            json.dumps(common_error),
-            status=400
+        response = Response(
+            status=403
         )
 
     print('api_on_response', response)
@@ -305,3 +326,37 @@ def download():
 @main.route('/test', methods=['GET', 'POST'])
 def test():
     return 'OK'
+
+
+def product_info_price(id_mp, seller_id):  # product_id, offer_id
+    # url = 'https://api-seller.ozon.ru/v4/product/info/prices'
+    # data = {"filter": {
+    #             "offer_id": [offer_id],
+    #             "product_id": [str(product_id)],
+    #             "visibility": "ALL"
+    #         },
+    #         "last_id": "",
+    #         "limit": 100}
+    # api_key = db.session.execute(select(Marketplaces.key_mp)
+    #                                  .where(Marketplaces.seller_id == seller_id))
+    api_key = Marketplaces.query.filter_by(seller_id=seller_id).first().key_mp
+    headers = {
+        'Client-Id': seller_id,
+        'Api-Key': api_key,
+        'Content-Type': 'application/json'
+    }
+    url = 'https://api-seller.ozon.ru/v3/posting/fbs/get'
+    data = {
+        "posting_number": id_mp,
+        "with": {
+            "analytics_data": False,
+            "barcodes": False,
+            "financial_data": False,
+            "product_exemplars": False,
+            "translit": False}}
+    resp = requests.post(url=url, headers=headers, json=data)
+    result = resp.json()
+    print('product_id_offer_id', result)
+    # price = result.get("result")["items"][0]["price"]["marketing_price"][:-2]
+    order = result.get("result")
+    return order

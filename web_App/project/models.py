@@ -1,6 +1,7 @@
 from flask_login import UserMixin
 # from flask_user import UserMixin
 from project import db
+from sqlalchemy import ForeignKey
 
 
 class Users(db.Model, UserMixin):
@@ -26,6 +27,7 @@ class ConsultUsers(db.Model, UserMixin):
     date_modifed = db.Column(db.String(250))
 
 
+
 class Product(db.Model):
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
@@ -39,10 +41,12 @@ class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     articul_product = db.Column(db.String(250), unique=True)
     shop_name = db.Column(db.String(250))
-    company_id = db.Column(db.String(250))
+    store_id = db.Column(db.String(250))
     quantity = db.Column(db.Integer())
     reserved = db.Column(db.Integer())
-    price_product_base = db.Column(db.String(250))
+    price_product_base = db.Column(db.Integer())
+    final_price = db.Column(db.String(250))
+    old_price = db.Column(db.String(250))
     discount = db.Column(db.Double())
     description_product = db.Column(db.String(250))
     photo = db.Column(db.String(250))
@@ -64,12 +68,18 @@ class Product(db.Model):
     quantity_for_shop = db.Column(db.Integer())
     description_product_add = db.Column(db.String(500))
     uid_edit_user = db.Column(db.Integer())
-    final_price = db.Column(db.String(250))
-    attributes_product = db.relationship("AttributeProduct", uselist=False)
+    description_category_id = db.Column(db.Integer())
+    type_id = db.Column(db.Integer())
+    volume_weight = db.Column(db.Double())
+    barcode = db.Column(db.String(50))
+
+    # attributes_product = db.Column(db.Integer())   #'attributes_product.id')
 
 
-class AttributeProduct(db.Model):
-    id = db.Column(db.Integer, db.ForeignKey(Product.id), primary_key=True)
+class AttributesProduct(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    prod_id = db.Column(db.Integer)
+    articul_product = db.Column(db.String(250))
     depth = db.Column(db.String(250))
     width = db.Column(db.String(250))
     height = db.Column(db.String(250))
@@ -101,7 +111,7 @@ class AttributeProduct(db.Model):
     sku = db.Column(db.Integer())
     description_category_id = db.Column(db.Integer())
     type_id = db.Column(db.Integer())
-
+    volume_weight = db.Column(db.Double())
 
 
 class Sales(db.Model):
@@ -133,15 +143,38 @@ class Sales(db.Model):
 
 
 class Marketplaces(db.Model):
+
     id = db.Column(db.Integer(), primary_key=True)
     user_id = db.Column(db.String(50))
     seller_id = db.Column(db.String(50))
     name_mp = db.Column(db.String(50))
-    key_mp = db.Column(db.String(250))
+    key_mp = db.Column(db.String(1000))
     shop_name = db.Column(db.String(50))
-    shop_id = db.Column(db.String(50))
+    shop_id = db.Column(db.Integer())
     company_id = db.Column(db.String(50))
-    warehouses = db.Column(db.String(150))
+    warehouses = db.Column(db.Integer())
+    mp_discount = db.Column(db.Double())
+    mp_markup = db.Column(db.Double())
+    store_discount = db.Column(db.Double())
+    store_markup = db.Column(db.Double())
+
+
+class InternalImport(db.Model):
+
+    id = db.Column(db.Integer(), primary_key=True)
+    internal_import_mp_1 = db.Column(db.String(50))
+    internal_import_store_1 = db.Column(db.String(50))
+    internal_import_role_1 = db.Column(db.String(50))
+    internal_import_discount_1 = db.Column(db.Integer())
+    internal_import_markup_1 = db.Column(db.Integer())
+    internal_import_mp_2 = db.Column(db.String(50))
+    internal_import_store_2 = db.Column(db.String(50))
+    internal_import_role_2 = db.Column(db.String(50))
+    internal_import_discount_2 = db.Column(db.Integer())
+    internal_import_markup_2 = db.Column(db.Integer())
+    company_id = db.Column(db.String(50))
+    user_id = db.Column(db.String(50))
+
 
 
 #
