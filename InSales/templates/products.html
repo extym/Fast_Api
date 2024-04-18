@@ -6,7 +6,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Интеграция множества личных кабинетов с учетной записью Мой Склад</title>
+    <title>Интеграция множества личных кабинетов с учетной записью InSales</title>
     <!--[if lt IE 9]><script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
     <style>
         html, body, div, span, applet, object, iframe,
@@ -244,33 +244,33 @@ input[type=submit]:active {
 <body>
 <section class="container">
     <div class="login" align = "center">
-        <h1>Сопоставление товаров</h1>
+        <h1>Сопоставление категорий</h1>
         <h1>{{status_text}}</h1>
 
-                <form action = "{{url}}" method="POST">
+                <form action = "{{result_url}}" method="POST">
                 <input type="hidden" name="login" value="{{login}}">
                 <input type="hidden" name="passw" value="{{passw}}">
-                    <input type="hidden" name="seller_id" value="{{seller_id}}">
+                <input type="hidden" name="vendor_name" value="{{vendor_name}}">
 
                 <table  style="border: 1px solid; border-color: #c4c4c4"  align="center">
                     <tr>
-                        <td colspan="45" align="center" valign="middle" height="30" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align: middle"><a href="{{edit_seller_url}}?seller_id={{seller_id}}&login={{login}}&passw={{passw}}">Назад к настройкам селлера</a></td>
+                        <td colspan="45" align="center" valign="middle" height="30" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align: middle"><a href="{{index_url}}?vendor_name={{vendor_name}}&login={{login}}&passw={{passw}}">Назад к выбору вендоров</a></td>
                     </tr>
                     <tr>
-                        <td width = "550" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #a0a0a0;">Товар OZON</td>
-                        <td width = "450" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #a0a0a0;">Товар МС</td>
-                        <td width = "70" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #a0a0a0;">Доставка</td>
-                        <td width = "70" height = "40" align="center" placeholder="%" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #a0a0a0;">Скидка</td>
+                        <td width = "550" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #a0a0a0;">Товар сайта</td>
+                        <td width = "450" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #a0a0a0;">Товар вендора</td>
+<!--                        <td width = "170" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #a0a0a0;">Привязанная категория</td>-->
+                        <td width = "170" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #a0a0a0;">Привязанная категория</td>
                     </tr>
                     {{rows}}
                     <tr>
                         <td colspan="5" align="center" valign="middle" height="30" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align: middle"><input type="submit" value="Сохранить" name="save_products" class="my"></td>
                     </tr>
+<!--                    <tr>-->
+<!--                        <td colspan="5" align="center" valign="middle" height="30" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align: middle"><a href="{{edit_seller_url}}?vendor_name={{vendor_name}}&login={{login}}&passw={{passw}}">Назад к выбору вендоров</a></td>-->
+<!--                    </tr>-->
                     <tr>
-                        <td colspan="5" align="center" valign="middle" height="30" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align: middle"><a href="{{edit_seller_url}}?seller_id={{seller_id}}&login={{login}}&passw={{passw}}">Назад к настройкам селлера</a></td>
-                    </tr>
-                    <tr>
-                        <td colspan="5" align="center" valign="middle" height="30" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align: middle"><a href="{{index_url}}?login={{login}}&passw={{passw}}">Назад к списку селлеров</a></td>
+                        <td colspan="5" align="center" valign="middle" height="30" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align: middle"><a href="{{index_url}}?login={{login}}&passw={{passw}}">Назад к списку вендоров</a></td>
                     </tr>
 
                 </table>

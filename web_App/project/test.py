@@ -166,7 +166,7 @@ prod_lp = {"id": 580733565, "name": "Конфеты Raffaello миндаль и 
 #
 # print(os.getcwd())
 
-data = {"message_type": "TYPE_NEW_POSTING", "seller_id": 1278621, "warehouse_id": 1020000831545000, "posting_number": "38298883-0173-1", "in_process_at": "2024-04-04T14:12:59Z", "products": [{"sku": 1220491744, "quantity": 1}]}
+# data = {"message_type": "TYPE_NEW_POSTING", "seller_id": 172781, "warehouse_id": 1020001060644000, "posting_number": "46231993-0568-11", "in_process_at": "2024-04-09T05:08:35Z", "products": [{"sku": 1047250917, "quantity": 2}]}
 
 # datas = json.dumps(data)
 # print(datas)
@@ -184,4 +184,4 @@ def ping(link):
 
 
 # ping('https://samoesladkoe.i-bots.ru/api/on')
-ping('http://localhost:3000/api/on')
+# ping('http://localhost:3000/api/on')

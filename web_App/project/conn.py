@@ -1,7 +1,10 @@
+import datetime
+import os
+
 import psycopg2
 from psycopg2 import OperationalError
-# from project.conn_maintenance import *
 
+# from project.conn_maintenance import *
 
 
 create_fresh_orders_table = """
@@ -27,7 +30,6 @@ delivery varchar,
 UNIQUE (id_mp)
 )
 """
-
 
 create_market_cred = """
 CREATE TABLE IF NOT EXISTS marketplaces (
@@ -69,7 +71,6 @@ UNIQUE (id)
 )
 """
 
-
 create_delivered_orders_table = """
 CREATE TABLE IF NOT EXISTS send_orders (
 id SERIAL PRIMARY KEY,
@@ -88,7 +89,6 @@ delivery varchar
 )
 """
 
-
 create_order_items = """
 CREATE TABLE IF NOT EXISTS order_items (
     id_mp varchar NOT NULL,
@@ -103,7 +103,38 @@ CREATE TABLE IF NOT EXISTS order_items (
     quantity varchar NOT NULL, 
     price varchar)
 """
- 
+
+create_order_items_v2 = """
+CREATE TABLE IF NOT EXISTS order_items (
+    id SERIAL PRIMARY KEY,
+    mp_order_id varchar NOT NULL,
+    FOREIGN KEY (mp_order_id)
+        REFERENCES fresh_orders (id_mp)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+    shop_order_id varchar,
+    shop_name TEXT NOT NULL,
+    our_status text,
+    article varchar NOT NULL,
+    article_mp varchar,
+    name TEXT,
+    id_1c varchar,
+    shop_status TEXT, 
+    vendor_code varchar,
+    quantity varchar, 
+    price varchar,
+    add_price TEXT,
+    mp TEXT,
+    company_id TEXT,
+    photo varchar,
+    category TEXT,
+    shipment_date TEXT,
+    order_status TEXT,
+    delivery_type TEXT,
+    is_cancelled bool,
+    date_added varchar,
+    date_modifed varchar
+    )
+"""
 
 create_send_order_items = """
 CREATE TABLE IF NOT EXISTS send_order_items (
@@ -120,7 +151,6 @@ CREATE TABLE IF NOT EXISTS send_order_items (
     price varchar)
 """
 
-
 create_users = """
 CREATE TABLE IF NOT EXISTS users (
 id SERIAL PRIMARY KEY,
@@ -134,7 +164,6 @@ date_Modifed varchar,
 UNIQUE (email)
 )
 """
-
 
 create_consult_users = """
 CREATE TABLE IF NOT EXISTS consult_users (
@@ -150,7 +179,6 @@ date_Modifed varchar,
 UNIQUE (id)
 )
 """
-
 
 create_products = """
 CREATE TABLE IF NOT EXISTS products (
@@ -189,7 +217,6 @@ barcode TEXT,
 UNIQUE (articul_product, store_id)
 )
 """
-
 
 create_attributes_product = """
 CREATE TABLE IF NOT EXISTS  attributes_product (
@@ -232,7 +259,6 @@ CREATE TABLE IF NOT EXISTS  attributes_product (
     )
 """
 
-
 create_sales = """
 CREATE TABLE IF NOT EXISTS sales (
 id SERIAL PRIMARY KEY,
@@ -263,7 +289,6 @@ date_Modifed varchar,
 UNIQUE (id)
 )
 """
-
 
 create_products_old = """
 CREATE TABLE IF NOT EXISTS products (
@@ -299,7 +324,6 @@ final_price float4,
 UNIQUE (articul_product, store_id)
 )
 """
-
 
 create_attribute_product_old = """
 CREATE TABLE IF NOT EXISTS  attributes_product (
@@ -342,7 +366,6 @@ CREATE TABLE IF NOT EXISTS  attributes_product (
     )
 """
 
-
 create_products_2 = """
 CREATE TABLE IF NOT EXISTS products (
 id SERIAL PRIMARY KEY,
@@ -379,7 +402,6 @@ attributes_product INT,
 UNIQUE (articul_product, store_id)
 )
 """
-
 
 create_attributes_product_2 = """
 CREATE TABLE IF NOT EXISTS  attributes_product (
@@ -422,7 +444,6 @@ CREATE TABLE IF NOT EXISTS  attributes_product (
     )
 """
 
-
 # custom_create_all = [create_fresh_orders_table,
 #                      create_market_cred,
 #                      create_order_items,
@@ -434,67 +455,67 @@ CREATE TABLE IF NOT EXISTS  attributes_product (
 
 
 query_read_order = (" SELECT * from fresh_orders "
-                         " WHERE id_mp = %s and shop_name = %s ")
-
+                    " WHERE id_mp = %s and shop_name = %s ")
 
 query_write_order = ("INSERT INTO fresh_orders "
-    "(id_mp, our_id, date_Added, date_Modifed, shop_Name, "
+                     "(id_mp, our_id, date_Added, date_Modifed, shop_Name, "
                      "shipment_Date, status, our_status, payment_Type, delivery)"
                      "VALUES (%s, %s, NOW(), NOW(), %s, %s, %s, %s, %s, %s)")
 
-
 query_write_items = ("INSERT INTO order_items "
-    "(id_mp, our_order_id, shop_Name, "
-                     "our_status, vendor_code, id_1c, quantity, price)"
-                     "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)")
+                     "(id_mp, shop_order_id, shop_Name, "
+                     "our_status, vendor_code, id_1c, quantity, price, "
+                     "date_Added, date_Modifed)"
+                     "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
 
-# query_write_order_items = ("INSERT INTO order_items "
-#     "(id_mp, our_id, date_Added, date_Modifed, shop_Name, "
-#                      "shipment_Date, status, our_status, payment_Type, delivery)"
-#                      "VALUES (%s, %s, NOW(), NOW(), %s, %s, %s, %s, %s, %s)")
+query_write_items_v2 = ("INSERT INTO order_items "
+                        "(mp_order_id, shop_order_id, mp, shop_Name, order_status, "
+                        "our_status, vendor_code, id_1c, quantity, price, article, article_mp, "
+                        "date_Added, date_Modifed)"
+                        "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, now(), now())")
 
 query_rm_full_order = (" SELECT * from fresh_orders, order_items "
-                         " WHERE id_mp = %s")
-
+                       " WHERE id_mp = %s")
 
 query_read_items = (" SELECT * from order_items "
                     " WHERE id_ip = %s and shop_name = %s ")
 
 read_new_order = (" SELECT * from fresh_orders "
-                    " WHERE our_status = 'NEW' ")
-
+                  " WHERE our_status = 'NEW' ")
 
 read_order_items = (" SELECT * from order_items "
                     " WHERE id_mp = %s and shop_name = %s ")
 
-
-update_send_data_order = (" UPDATE fresh_orders SET dateSendData = NOW(), dateModifed = NOW(), ourStatus = 'SEND_TO_1C' "
-                          " WHERE id_MP = %s and shop_name = %s ")
-
+update_send_data_order = (
+    " UPDATE fresh_orders SET dateSendData = NOW(), dateModifed = NOW(), ourStatus = 'SEND_TO_1C' "
+    " WHERE id_MP = %s and shop_name = %s ")
 
 update_status_order = (" UPDATE fresh_orders "
                        "SET status = %s, our_status = %s "
                        "WHERE id_MP = %s and shop_name = %s ")
 
+update_status_order_items = (" UPDATE order_items "
+                       "SET order_status = %s, our_status = %s,"
+                             " date_modifed = NOW() "
+                       "WHERE mp_order_id = %s and shop_name = %s ")
 
 update_status_order_reverse_id = (" UPDATE fresh_orders "
-                       "SET status = %s, our_status = %s "
-                       "WHERE our_id = %s and shop_name = %s ")
-
+                                  "SET status = %s, our_status = %s "
+                                  "WHERE our_id = %s and shop_name = %s ")
 
 rewrite_status_order = (" UPDATE fresh_orders "
-                       "SET status = %s "
-                       "WHERE id_MP = %s and shop_name = %s ")
+                        "SET status = %s "
+                        "WHERE id_MP = %s and shop_name = %s ")
+
 
 
 rebase_order = (" UPDATE fresh_orders "
-               "SET our_status = %s "
-               "WHERE id = %s and id_MP = %s ")
-
+                "SET our_status = %s "
+                "WHERE id = %s and id_MP = %s ")
 
 strong_rebase_order = (" INSERT INTO send_orders "
-    "(id_mp, our_order_id, shop_Name, our_status, vendor_code, id_1c, quantity, price)"
-    "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)")
+                       "(id_mp, our_order_id, shop_Name, our_status, vendor_code, id_1c, quantity, price)"
+                       "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)")
 
 
 def create_connection():
@@ -530,6 +551,36 @@ async def execute_query(query, data):
     connection.close()
 
 
+async def execute_query_v3(query=None, query2=None, data=None):
+    connection = create_connection()
+    connection.autocommit = True
+    cursor = connection.cursor()
+    try:
+        if query:
+            cursor.execute(query, data)
+        if query2:
+            cursor.execute(query2, data)
+            print("Query from execute_query_v2 executed successfully")
+
+    except OperationalError as err:
+        print(f"The ERROR from execute_query '{err}' occured ")
+
+    cursor.close()
+    connection.close()
+
+
+async def execute_query_v2(query, data):
+    try:
+        with create_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(query, data)
+                print("Query from execute_query executed successfully")
+
+    except (OperationalError, psycopg2.DatabaseError) as err:
+        print(f"The ERROR from execute_query '{err}' occured ")
+
+
+
 async def executemany_query(query, data):
     connection = create_connection()
     connection.autocommit = True
@@ -543,6 +594,34 @@ async def executemany_query(query, data):
 
     cursor.close()
     connection.close()
+
+
+async def executemany_query_v2(query, data):
+    try:
+        with create_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.executemany(query, data)
+                print("Query from execute_many_query executed successfully")
+
+    except (OperationalError, psycopg2.DatabaseError) as err:
+        print(f"The ERROR from execute_many_query '{err}' occured ")
+
+
+async def write_order(query1: object = None, data1: object = None, query2: object = None, data2: object = None) -> object:
+    with create_connection() as connection:
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query1, data1)
+                print("Query from write_order executed successfully")
+        except OperationalError as err:
+            print(f"The ERROR from write_order '{err}' occured ")
+
+        try:
+            with connection.cursor() as cursor:
+                cursor.executemany(query2, data2)
+                print("Query from write_order executed successfully")
+        except OperationalError as err:
+            print(f"The ERROR from write_order '{err}' occured ")
 
 
 def execute_query_return_id(connection, query, data):
@@ -647,9 +726,12 @@ def maintenans_query(query):
     connection.close()
 
 
-query_join = "select * from fresh_orders join order_items oi on fresh_orders.id_mp = oi.id_mp where date_added<'%2023-05-29'"
-query_insert = "insert  INTO sales ( mp_order_id, shop_order_id, date_added, shop_name, shipment_date, order_status, shop_status, delivery_type, article, id_1c, quantity,  price )" \
-               "VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s )"
+query_join = "select * from fresh_orders join order_items oi on fresh_orders.id_mp = oi.mp_order_id where " \
+             "fresh_orders.date_added<'%2024-05-29'"
+query_insert = "insert  INTO sales ( mp_order_id, shop_order_id, date_added, shop_name, mp, shipment_date, " \
+               "order_status, shop_status, delivery_type, article, id_1c, quantity,  price, date_added, date_modifed )" \
+               "VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, now(), now() )"
+
 
 
 def rewrite_orders(query1, query2):
@@ -676,21 +758,116 @@ def rewrite_orders(query1, query2):
         return False
 
 
+def rewrite_orders_v2(query1, query2):
+    try:
+        connection = create_connection()
+        connection.autocommit = True
+        cursor = connection.cursor()
+        cursor.execute(query1)
+        data = cursor.fetchall()
+        # cursor.close()
+
+        # re_data_row = (id_mp, shop_id, date_added, mp_name, shipment_date, status, our_status, delivery_type, price)
+        re_data = [(i[0], i[2], i[2], i[7], i[8], i[9], i[10], i[16], i[24]) for i in data]
+
+        # re_data_row = (id_mp, shop_id, date_added, mp_name, shipment_date, status, our_status, delivery_type,
+        # vendor_code, id_ic, quantity, price)
+        all_data = [(i[0], i[1], i[2], i[2], i[7], i[8], i[9], i[10], i[16], i[21], i[22], i[23], i[24]) for i in data]
+
+        cursor.executemany(query2, all_data)
+
+        print(len(data[0]), data[0])
+        os.abort()
+        return True
+    except:
+        return False
+
+
+def rewrite_orders_v3():
+    HOUR = '09:00:00'
+    example = datetime.datetime.today().strftime(f"%Y-%m-%d {HOUR}")
+    need_date = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime(f"%Y-%m-%d {HOUR}")
+    # print(example, example > need_date)
+    # print(need_date, example > need_date)
+    # if example < need_date:  # it's current time more 09 AM
+    query_join_v2 = "select * from fresh_orders join order_items oi on fresh_orders.id_mp = oi.mp_order_id where " \
+                    f"fresh_orders.date_added< '{need_date}'"
+    # print(333, need_date, type(need_date))
+
+    try:
+        connection = create_connection()
+        connection.autocommit = True
+        cursor = connection.cursor()
+        cursor.execute(query_join_v2)
+        data = cursor.fetchall()
+
+        # re_data_row = (
+        # id_mp, shop_id, date_added, mp_name, shipment_date,
+        # status, our_status, delivery_type, price)
+        # re_data = [(i[0], i[2], i[2], i[7], i[8],
+        #             i[9], i[10], i[16], i[24]) for i in data]
+        # print(11, re_data)
+        # re_data_row = (
+        # id_mp, shop_id, date_added, mp_name, shipment_date, status,
+        # our_status, delivery_type,
+        # vendor_code, id_ic, quantity, price)
+        all_data = [(i[0], i[1], i[2], i[2], i[7], i[8],
+                     i[9], i[10], i[16], i[21], i[22],
+                     i[23], i[24]) for i in data]
+
+        # cursor.executemany(query_insert, all_data)
+
+        print(11, len(data), data[0])
+        print(22, len(all_data), all_data[0])
+        cursor.close()
+        return True
+    except:
+        return False
+
+
 
 custom_create_all = [create_fresh_orders_table,
                      create_market_cred,
-                     create_order_items,
+                     create_order_items_v2,
                      create_users,
                      create_products,
                      create_attributes_product,
                      create_sales,
-    create_internal_import
+                     create_internal_import
                      ]
+
+update_db = [
+    "alter table public.products alter column price_product_base type int using price_product_base::int",
+    "alter table public.marketplaces alter column key_mp type varchar(1000) using key_mp::varchar(1000)",
+    # "alter table order_items rename column our_order_id to shop_order_id",
+    "alter table order_items rename column id_mp to mp_order_id",
+    "alter table order_items add column article varchar",
+    "alter table order_items add column article_mp varchar",
+    "alter table order_items add column name varchar",
+    "alter table order_items add column mp varchar",
+    "alter table order_items add column company_id varchar",
+    "alter table order_items add column add_price text",
+    "alter table order_items add column photo varchar",
+    "alter table order_items add column category text",
+    "alter table order_items add column shipment_date text",
+    "alter table order_items add column order_status text",
+    "alter table order_items add column shop_status text",
+    "alter table order_items add column delivery_type varchar",
+    "alter table order_items add column delivery_point varchar",
+    "alter table order_items add column is_cancelled bool",
+    "alter table order_items add column date_added varchar",
+    "alter table order_items add column date_modifed varchar",
+    "alter table public.order_items add id integer",
+]
 
 # for query in custom_create_all:
 #     maintenans_query(query)
 
-# rewrite_orders(query_join, query_insert)
+# for query in update_db:
+#     maintenans_query(query)
+
+# print(rewrite_orders_v3())
+# print(rewrite_orders_v2(query_join, query_insert))
 # # rewrite_orders("select * from fresh_orders  where date_added<'%2023-03-29'")
 
 # maintenans_query(create_fresh_orders_table)

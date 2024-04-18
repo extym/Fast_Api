@@ -8,7 +8,7 @@ import requests
 
 from project import db
 import pandas as pd
-#pip install openpyxl
+# pip install openpyxl
 from project.models import *
 from flask import Blueprint, render_template, app, redirect, make_response, Response
 from flask import request, flash
@@ -18,16 +18,15 @@ from werkzeug.utils import secure_filename
 from project.conn import *  # execute_query, executemany_query
 # from project.conn_maintenance import query_write_order, query_write_items, update_status_order_reverse_id
 from project import LOCAL_MODE
-from project.ozon import  common_error
+from project.ozon import common_error
 
 main = Blueprint('main', __name__)
 
-
 common_comfirm_response = {"result": True}
 common_error = {'error': {
-      "code": "ERROR_UNKNOWN",
-      "message": "Неизвестный метод",
-      "details": None }}
+    "code": "ERROR_UNKNOWN",
+    "message": "Неизвестный метод",
+    "details": None}}
 
 
 def token_generator(size=10, chars=string.ascii_uppercase + string.digits):
@@ -61,7 +60,7 @@ def read_xls(files):
         proxy[row[0]] = int(row[2])
     print(type(proxy))
 
-    return proxy  #dict
+    return proxy  # dict
 
 
 def check_allowed_filename(filename):
@@ -141,13 +140,14 @@ def reformat_data_order(order, shop):
 
     return result
 
+
 def try_get_id_1c(offer_id):
     # items_skus = read_skus()
     # items_ids = read_json_ids()  # we wait dict[vendor_code] = (id_1c, price, quantity)
     # id_1c = items_ids[vendor_code][0]  # 1c
     pass
-
     return None
+
 
 def reformat_data_items(order, shop):
     result = []
@@ -178,18 +178,20 @@ def reformat_data_items(order, shop):
             sku = str(item["sku"])
             # vendor_code = items_skus[sku][1]
             vendor_code = item["offer_id"]
-            print('product_info_price', sku[0], vendor_code)
+            # print('product_info_price', sku[0], vendor_code)
             # price = product_info_price(items_skus[sku][0], vendor_code)
             id_1c = try_get_id_1c(item["offer_id"])
             proxy = (
-                order["id"],
+                order["posting_number"],
                 order["our_id"],
                 shop,
                 order["our_status"],
                 vendor_code,
                 id_1c,
                 item["quantity"],
-                item["price"][:-2]  # price
+                item["price"][:-2],
+                item['offer_id'],
+                item['sku']
             )
             result.append(proxy)
 
@@ -201,6 +203,69 @@ def reformat_data_items(order, shop):
                 order["shipments"][0]["shipmentId"],
                 order["our_id"],
                 shop,
+                order["our_status"],
+                item["offerId"],
+                item["id_1c"],
+                item["quantity"],
+                item["price"]
+            )
+            result.append(proxy)
+
+    return result
+
+
+def reformat_data_items_v2(order, shop_name, mp):
+    result = []
+    if mp == 'Yandex':
+        list_items = order['items']
+        for item in list_items:
+            proxy = (
+                order["id"],
+                order["our_id"],
+                mp,
+                order["our_status"],
+                item["offerId"],
+                item["id_1c"],
+                item["count"],
+                item["price"] + item.get("subsidy")
+            )
+            result.append(proxy)
+
+    elif mp == 'Ozon':
+        result = []
+        list_items = order['products']
+
+        for item in list_items:
+            sku = str(item["sku"])
+            # vendor_code = items_skus[sku][1]
+            vendor_code = item["offer_id"]
+            print('product_info_price', sku[0], vendor_code)
+            # price = product_info_price(items_skus[sku][0], vendor_code)
+            id_1c = try_get_id_1c(item["offer_id"])
+            proxy = (
+                order["id"],
+                order["our_id"],
+                mp,
+                shop_name,
+                order['status'],
+                order["our_status"],
+                vendor_code,
+                id_1c,
+                item["quantity"],
+                item["price"][:-2],
+                item['offer_id'],
+                item['sku']
+            )
+            result.append(proxy)
+
+    elif mp == 'Sber':
+        list_items = order["count_items"]
+        result = []
+        for item in list_items:
+            proxy = (
+                order["shipments"][0]["shipmentId"],
+                order["our_id"],
+                mp,
                 order["our_status"],
                 item["offerId"],
                 item["id_1c"],
@@ -228,10 +293,13 @@ def profile():
 
 @main.route('/api/on', methods=['POST'])
 async def onon_push():
+    ip_addr = request.environ.get('X-REAL-IP')
+    print('X-REAL-IP', ip_addr)
+    addr = request.headers.get('X-Forwarded-For')
+    print('X-Forwarded-For', addr)
     resp = request.get_json()
-    print('api_on_resp', resp)
-    head = dict(request.headers)
-    print('resp_header', head)
+    # head = dict(request.headers)
+    # print('resp_header', head)
     if resp is not None:
         if resp.get('message_type') == 'TYPE_PING':
             time = resp["time"]
@@ -245,20 +313,21 @@ async def onon_push():
         elif resp.get("message_type") == "TYPE_NEW_POSTING":
             our_id = token_generator()
             id_mp = resp["posting_number"]
-            seller_id = resp.get('seller_id')
-            # warehouse_id
-            # our_id = id_mp.replace('-', '')[:10]
-            sleep(1)
-            order = product_info_price(id_mp, str(seller_id))
-            print('new_order_onon', order)
-            order['our_id'], order['id'], order['status'], order['our_status'] \
-                = id_mp, our_id, "NEW", "NEW"  # TODO change place id_mp & our_id
-            ref_data = reformat_data_order(order, 'Ozon')
-            # print('refdata', ref_data)
-            await execute_query(query_write_order, ref_data)
-            list_items = reformat_data_items(order, 'Ozon')
-
-            await executemany_query(query_write_items, list_items)
+            seller_id = str(resp.get('seller_id'))
+            sleep(1.5)
+            order = product_info_price(id_mp, seller_id)
+            if order:
+                print('new_order_onon', order['posting_number'])
+                order['our_id'], order['id'], order['status'], order['our_status'] \
+                    = our_id, id_mp, "NEW", "NEW"  # TODO change place id_mp & our_id
+                shop_name = Marketplaces.query.filter_by(seller_id=seller_id).first().shop_name
+                ref_data = reformat_data_order(order, 'Ozon')
+                # list_items = reformat_data_items(order, 'Ozon')
+                list_items = reformat_data_items_v2(order, shop_name,  'Ozon')
+                await write_order(query1=query_write_order, data1=ref_data,
+                                  query2=query_write_items_v2, data2=list_items)
+                # await execute_query(query_write_order, ref_data)
+                # await executemany_query(query_write_items, list_items)
 
             response = Response(
                 json.dumps(common_comfirm_response),
@@ -268,7 +337,10 @@ async def onon_push():
         elif resp.get("message_type") == "TYPE_POSTING_CANCELLED":
             order_id = resp["posting_number"]
             data = ("canceled", "NEW", order_id, "Ozon")
-            await execute_query(update_status_order_reverse_id, data)
+            # await execute_query(update_status_order_reverse_id, data)
+            await execute_query_v3(query=update_status_order,
+                                   query2=update_status_order_items,
+                                   data=data)
             print('cencelled_order_onon', order_id)
             response = Response(
                 json.dumps(common_comfirm_response),
@@ -355,8 +427,16 @@ def product_info_price(id_mp, seller_id):  # product_id, offer_id
             "product_exemplars": False,
             "translit": False}}
     resp = requests.post(url=url, headers=headers, json=data)
+    # {'code': 5,
+    # 'message': 'Unknown posting number "55200317-0207-4"',
+    # 'details': []}
     result = resp.json()
     print('product_id_offer_id', result)
-    # price = result.get("result")["items"][0]["price"]["marketing_price"][:-2]
     order = result.get("result")
-    return order
+    if order:
+        return order
+    elif result.get('code') == 5:
+        # write_notice_order
+        return None
+    else:
+        return None

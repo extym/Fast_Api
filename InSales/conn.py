@@ -7,7 +7,7 @@ def create_connection():
     connection = None
     try:
         connection = psycopg2.connect(
-            database='stm_app',
+            database='insales',
             user='user_name',
             password='user_pass',
             host='localhost',
@@ -36,6 +36,64 @@ async def execute_query(query, data):
     connection.close()
 
 
+def execute_query_return(query, data: str):
+    connection = create_connection()
+    cursor = connection.cursor()
+    # try:
+    cursor.execute(query, data)
+    raw_list = cursor.fetchall()
+    print("Query from execute_query executed successfully", type(raw_list))
+    #
+    # except OperationalError as err:
+    #     print(f"The ERROR from execute_query '{err}' occured ")
+    #     result = []
+    cursor.close()
+    connection.close()
+    # print(raw_list)
+    return raw_list
+
+
+def execute_query_return_v2(query):
+    connection = create_connection()
+    cursor = connection.cursor()
+    # try:
+    cursor.execute(query)
+    raw_list = cursor.fetchall()
+    # print("Query from execute_query executed successfully", type(raw_list))
+    #
+    # except OperationalError as err:
+    #     print(f"The ERROR from execute_query '{err}' occured ")
+    #     result = []
+    cursor.close()
+    connection.close()
+    # print(raw_list)
+    return raw_list
+
+
+# execute_query_return(read_path_categories, ('netlab',))
+
+async def execute_query_update(data):
+    connection = create_connection()
+    connection.autocommit = True
+    cursor = connection.cursor()
+    for row in data:
+        try:
+            # print(row)
+            cursor.execute(query_write_site_categories_v2, row)
+            print("Query from execute_many_query executed successfully")
+            result = True
+        except OperationalError as err:
+                cursor.execute(query_update_site_categories, row)
+                print(f"The ERROR from execute_many_query '{err}' occured ")
+        else:
+            print('FUCK_UP_222')
+            result = False
+    cursor.close()
+    connection.close()
+
+    return result
+
+
 async def executemany_query(query, data):
     connection = create_connection()
     connection.autocommit = True
@@ -43,12 +101,14 @@ async def executemany_query(query, data):
     try:
         cursor.executemany(query, data)
         print("Query from execute_many_query executed successfully")
-
+        result = True
     except OperationalError as err:
         print(f"The ERROR from execute_many_query '{err}' occured ")
-
+        result = False
     cursor.close()
     connection.close()
+
+    return result
 
 
 def execute_query_return_id(connection, query, data):
@@ -150,6 +210,9 @@ def maintenans_query(query):
     cursor.close()
     connection.close()
 
-# maintenans_query(create_fresh_orders_table)
+# maintenans_query(create_product_table)
 # maintenans_query(create_order_items)
+# maintenans_query(create_vendors_table)
+# maintenans_query(create_site_categories_table)
+# maintenans_query(create_vendors_table_name)
 

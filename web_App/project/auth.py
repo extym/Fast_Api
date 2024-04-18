@@ -10,19 +10,17 @@ from flask_login import login_user, logout_user, login_required, current_user, U
 
 from html import unescape
 
-from sqlalchemy import func, select
-
+from sqlalchemy import func, select, update, join, values, text
+from sqlalchemy.sql.functions import sum
 from .database import Data_base_connect as Db
 from werkzeug.security import generate_password_hash, check_password_hash
-from .models import Users, ConsultUsers, Sales, Product, Marketplaces, InternalImport
+from .models import *
 from . import db, TEST_MODE
 from sqlalchemy.orm import Session, load_only
-from sqlalchemy import update
 
 from project.import_ozon import import_oson_data_prod
 # Pagination
 from flask_paginate import Pagination, get_page_parameter
-from contextlib import closing
 # # Redis
 from rq import Worker, Queue, Connection
 from project.worker import conn
@@ -73,7 +71,7 @@ def form_consult():
                                   phone=phone,
                                   company_id=company_id,
                                   current_user_id=foreigin_id,
-                                  role=current_user.role,
+                                  role=current_user.roles,
                                   date_added=now_date,
                                   date_modifed=now_date)
 
@@ -155,14 +153,12 @@ def add_mp():
         uid = current_user.id
         role = current_user.roles
         need_id = current_user.company_id
-        dt_bs = Db()
-        # print(3333333, need_id, type(need_id))
-        need_data = dt_bs.select_shop_name(need_id)
+        need_data = db.session.execute(select(Marketplaces.shop_name)
+                                       .where(Marketplaces.company_id == need_id))
         rows = []
         for row in need_data:
-            rows.extend(list(row))
-        # rows = [list(i) for i in need_data]
-
+            rows.extend(row)
+        # print(3333333, row, rows)
         return render_template('mp_settings.html', uid=uid, role=role, rows=rows)
 
 
@@ -249,10 +245,47 @@ def add_mp_post():
             shop_id = data.get('id_mp')
             key_mp = data.get('key')
             d_b = Db()
-            d_b.update_mp(uid, shop_id, shop_name, mp, key_mp, company_id)
+            d_b.update_mp(shop_name, mp, key_mp)
         print(*data.keys(), sep='\n')
     # if
     #     pass
+
+    return redirect('/add_mp')
+
+
+@auth.route('/edit_mp', methods=['POST'])  # /<int:uid>')
+@login_required
+def edit_mp_post():
+    data = request.form.to_dict()
+    uid = current_user.id
+    role = current_user.roles
+    company_id = current_user.company_id
+    print(11111111111, data)
+    if 'edit_name_mp' in data:
+        mp = data.get('edit_name_mp')
+        shop_name = data.get('edit_shop_names')
+        shop_id = data.get('id_mp')
+        key_mp = data.get('key')
+
+        if mp == 'Выбрать...':
+            flash('Укажите, пожалуйста, маркетплейс', 'error')
+            return redirect('/add_mp')
+
+        if shop_name == 'Выбрать':
+            flash('Укажите, пожалуйста, название магазина, желательно как на маркетплейсе', 'error')
+            return redirect('/add_mp')
+
+        if shop_name != 'Выбрать' and mp != 'Выбрать...' and key_mp:
+            print(1111, mp, shop_name, key_mp)
+            mp = data.get('edit_shop')
+            shop_name = data.get('edit_shop_name')
+            shop_id = data.get('id_mp')
+            key_mp = data.get('key')
+            d_b = Db()
+            d_b.update_mp(shop_name, mp, key_mp)
+
+            flash('Настройки удачно сохранены', 'success')
+            return redirect('/add_mp')
 
     return redirect('/add_mp')
 
@@ -352,7 +385,7 @@ def edit_store_post():
             shop_id = data.get('id_mp')
             key_mp = data.get('key')
             d_b = Db()
-            d_b.update_mp(uid, shop_id, shop_name, mp, key_mp, company_id)
+            d_b.update_mp(shop_name, mp, key_mp)
         print(*data.keys(), sep='\n')
 
     return redirect('/add_mp')
@@ -437,7 +470,10 @@ def user_settings():
     else:
         uid = current_user.id
         role = current_user.roles
-        return render_template('user-settings.html', uid=uid, role=role)
+        users = Users.query.filter_by(company_id=current_user.company_id).all()
+        rows = [row.name for row in users if row.name not in ('admin100500', 'Admin100500')]
+        # print(rows)
+        return render_template('user-settings.html', uid=uid, role=role, rows=rows)
 
 
 @auth.route('/user-settings', methods=['POST'])
@@ -451,7 +487,7 @@ def user_settings_post():
         user_email = data.get('user_email')
         user_password = data.get('Password')
         now_date = datetime.datetime.strftime(datetime.datetime.now(), '%H:%M %d/%m/%Y')
-        company_id = request.form.get('cabinetID')
+        company_id = current_user.company_id  # request.form.get('cabinetID')
         user = Users.query.filter_by(email=user_email).first()
 
         if user:
@@ -462,7 +498,7 @@ def user_settings_post():
             new_user = Users(email=user_email,
                              name=user_name,
                              company_id=company_id,
-                             role=user_role,
+                             roles=user_role,
                              date_added=now_date,
                              date_modifed=now_date,
                              password=generate_password_hash(user_password, method='scrypt')
@@ -473,6 +509,37 @@ def user_settings_post():
             flash('Настройки удачно сохранены', 'success')
         else:
             flash('Заполните, пожалуйста, все поля')
+
+    if 'edit_user_role' in data:
+        user_role = data.get('edit_user_role')
+        exist_user_name = data.get('edit_user_exist')
+        user_email = data.get('user_email')
+        user_password = data.get('Password')
+        now_date = datetime.datetime.strftime(datetime.datetime.now(), '%H:%M %d/%m/%Y')
+        company_id = current_user.company_id  # request.form.get('cabinetID')
+        user = Users.query.filter_by(name=exist_user_name).first()
+        if user_role != '' and user.roles != user_role:
+            smth = update(Users).where(Users.name == exist_user_name)\
+                .where(Users.company_id == company_id)\
+                .values({'roles': user_role, 'date_modifed': now_date})
+            db.session.execute(smth)
+            flash("Роль пользователя успешно изменена")
+        if user_email != '':
+            smth = update(Users).where(Users.name == exist_user_name)\
+                .where(Users.company_id == company_id)\
+                .values({'email': user_email, 'date_modifed': now_date})
+            db.session.execute(smth)
+            flash("Емайл пользователя успешно изменена")
+        if user_password != '':
+            smth = update(Users).where(Users.name == exist_user_name)\
+                .where(Users.company_id == company_id)\
+                .values({'password': generate_password_hash(user_password, method='scrypt'),
+                         'date_modifed': now_date})
+            db.session.execute(smth)
+            flash("Пароль пользователя успешно изменен")
+
+        db.session.commit()
+        db.session.close()
 
     return redirect('/user-settings')
 
@@ -582,8 +649,8 @@ def edit_product_post():
             # print(rows_shops, type(rows_shops))
             rows = [row[0] for row in rows_shops]
             # prod = Product.query.filter_by(articul_product="12345").first().__dict__
-            print(22222, *product.items(), sep='\n')  # ' sep=' = prod.get(""),\n')
-            print(33333, product)
+            # print(22222, *product.items(), sep='\n')  # ' sep=' = prod.get(""),\n')
+            # print(33333, product)
 
             return render_template('/product-edit-add.html', product=product, rows=rows)
 
@@ -726,10 +793,9 @@ def products_page(page=1):
         my_query = db.func.count(Product.id)
         all_product = db.session.execute(my_query).scalar()
         max_page = all_product // limit
-        raw_list_products = db.session.query(Product).paginate(page=page, per_page=30, error_out=False)
+        raw_list_products = db.session.query(Product) \
+            .paginate(page=page, per_page=30, error_out=False)
         for row in raw_list_products.items:
-            print(8888888, row)
-
             rows += '<tr>' \
                     f'<td>{row.name_product}</td>' \
                     f'<td >{row.articul_product}</td>' \
@@ -743,8 +809,10 @@ def products_page(page=1):
                     f'<td >{row.status_in_shop}</td>' \
                     f'</tr>'
 
-        return unescape(render_template('tables-products.html', rows=rows, role=role,
-                                        raw_list_products=raw_list_products, max_page=max_page))
+        return unescape(render_template('tables-products.html',
+                                        rows=rows, role=role,
+                                        raw_list_products=raw_list_products,
+                                        max_page=max_page))
 
 
 @auth.route('/shops')
@@ -799,7 +867,7 @@ def sales_page(page=1):
         total_sales = db.session.execute(my_query).scalar()
         max_page = total_sales // limit
         for row in sales.items:
-            print(row)
+            # print(row)
             rows += '<tr>' \
                     f'<td>{row.shop_order_id}</td>' \
                     f'<td >{row.article}</td>' \
@@ -818,24 +886,31 @@ def sales_page(page=1):
                                         sales=sales))
 
 
-@auth.route('/users-table')
+@auth.route('/sales_today', methods=['GET', 'POST'])
+@auth.route('/sales_today/sales_today', methods=['GET', 'POST'])
+@auth.route('/sales_today/sales_today/<int:page>', methods=['GET', 'POST'])
 @login_required
-def users_table():
+def sales_today(page=1):
     if not current_user.is_authenticated:
         return redirect(url_for('main.index_main'))
     else:
+        uid = current_user.id
         role = current_user.roles
-        data = []
         rows = ''
-
-        # raw_list_orders = db.session.query(Sales).paginate(page=page, per_page=30, error_out=False).items
-        for row in data:
-            user_id = ''
-
+        limit = 30
+        # sales_today = db.session.query(SalesToday) \
+        #     .paginate(page=page, per_page=limit, error_out=False)
+        sales_today = db.session.query(SalesToday) \
+            .paginate(page=page, per_page=limit, error_out=False)
+        my_query = db.func.count(SalesToday.id)
+        total_sales_today = db.session.execute(my_query).scalar()
+        max_page = total_sales_today // limit
+        for row in sales_today.items:
+            # print(row)
             rows += '<tr>' \
-                    f'<td>{user_id}</td>' \
+                    f'<td>{row.shop_order_id}</td>' \
                     f'<td >{row.article}</td>' \
-                    f'<td >{row.shop_order_id}</td>' \
+                    f'<td >{row.article_mp}</td>' \
                     f'<td >{row.quantity}</td>' \
                     f'<td >{row.price}</td>' \
                     f'<td >{row.shop_name}</td>' \
@@ -845,7 +920,131 @@ def users_table():
                     f'<td >{row.category}</td>' \
                     f'</tr>'
 
-        return unescape(render_template('users-table.html', rows=rows, role=role))
+        return unescape(render_template('table-sales-today.html',
+                                        rows=rows, role=role,
+                                        max_page=max_page,
+                                        total_sales_today=total_sales_today,
+                                        sales_today=sales_today))
+
+
+@auth.route('/assembly_sales', methods=['GET', 'POST'])
+@auth.route('/assembly_sales/assembly_sales', methods=['GET', 'POST'])
+@auth.route('/assembly_sales/assembly_sales/<int:page>', methods=['GET', 'POST'])
+@login_required
+def assembly_sales(page=1):
+    if not current_user.is_authenticated:
+        return redirect(url_for('main.index_main'))
+    else:
+        uid = current_user.id
+        role = current_user.roles
+        rows = ''
+        limit = 30
+        HOUR = '09:00:00'
+        example = (datetime.datetime.today() - datetime.timedelta(days=1)).strftime(f"%Y-%m-%d {HOUR}")
+        # print(333333333333, example, type(example))
+        my_query = db.func.count(SalesToday.id)
+        total_assembly_sales = db.session.execute(my_query).scalar()
+        max_page = total_assembly_sales // limit
+
+        # assembly_orders = db.session.query(SalesToday) \
+        #     .where(SalesToday.date_added > example) \
+        #     .order_by(SalesToday.article_mp) \
+        #     .paginate(page=page, per_page=limit, error_out=False)
+
+        assembly_orders = db.session.query(SalesToday.article_mp,
+                                           SalesToday.shop_name,
+                                           SalesToday.article,
+                                           SalesToday.order_status,
+                                           func.sum(SalesToday.quantity).label('total_sales')) \
+            .group_by(SalesToday.article_mp,
+                      SalesToday.shop_name,
+                      SalesToday.article,
+                      SalesToday.order_status) \
+            .where(SalesToday.date_added > example) \
+            .order_by(SalesToday.article_mp) \
+            .paginate(page=page, per_page=limit, error_out=False)
+
+        # print(333333, assembly)
+        # print(assembly)
+
+        for row in assembly_orders.items:
+            # print(11111111111, row)
+
+            s_today = (select(Product.photo)
+                       .where(Product.articul_product == row.article)
+                       .where(Product.shop_name == row.shop_name))
+
+            photo = db.session.execute(s_today).first()
+            # print(111, photo)
+            if photo is None:
+                photo = ('нет фото',)
+
+            # if row.shipment_date is not None:
+            #     shipment_date = str(row.shipment_date).split(" ")
+            # else:
+            #     shipment_date = row.shipment_date
+            #
+            # rows += '<tr>' \
+            #         f'<td ><img class="img-fluid" src="{photo[0]}" alt="" style="max-width:50px;"></td>' \
+            #         f'<td>{row.shop_order_id}</td>' \
+            #         f'<td >{row.article}</td>' \
+            #         f'<td >{row.shop_name}</td>' \
+            #         f'<td >{row.quantity}</td>' \
+            #         f'<td >{str(row.date_added).rsplit(".")[0]}</td>' \
+            #         f'<td >{shipment_date}</td>' \
+            #         f'<td >{row.order_status}</td>' \
+            #         f'</tr>'
+
+            rows += '<tr>' \
+                    f'<td ><img class="img-fluid" src="{photo[0]}" alt="" style="max-width:50px;"></td>' \
+                    f'<td>{row.article}</td>' \
+                    f'<td >{row.shop_name}</td>' \
+                    f'<td >{row.total_sales}</td>' \
+                    f'<td >{row.order_status}</td>' \
+                    f'</tr>'
+
+        return unescape(render_template('table-assembly-sales.html',
+                                        rows=rows, role=role,
+                                        max_page=max_page,
+                                        total_assembly_sales=total_assembly_sales,
+                                        assembly_sales=assembly_orders))
+
+
+@auth.route('/users-table')
+@auth.route('/users-table/users-table', methods=['GET', 'POST'])
+@auth.route('/users-table/users-table/<int:page>', methods=['GET', 'POST'])
+@login_required
+def users_table(page=1):
+    if not current_user.is_authenticated:
+        return redirect(url_for('main.index_main'))
+    else:
+        company_id = current_user.company_id
+        role = current_user.roles
+        data = []
+        rows = ''
+        limit = 10
+        raw_list_orders = db.session.query(Users) \
+            .filter_by(company_id=company_id) \
+            .paginate(page=page, per_page=30, error_out=False).items
+        my_query = db.func.count(Users.id)
+        total_users = db.session.execute(my_query).scalar()
+        max_page = total_users // limit
+        for row in raw_list_orders:
+            if row.name == 'admin100500' or row.name == 'Admin100500':
+                continue
+            else:
+                rows += '<tr>' \
+                        f'<td>{row.name}</td>' \
+                        f'<td >{row.email}</td>' \
+                        f'<td >{row.roles}</td>' \
+                        f'<td >{row.date_added}</td>' \
+                        f'<td >{row.date_modifed}</td>' \
+                        f'</tr>'
+
+        return unescape(render_template('users-table.html',
+                                        rows=rows, role=role,
+                                        max_page=max_page,
+                                        total_users=total_users))
 
 
 # @auth.route('/add-product')
@@ -861,7 +1060,7 @@ def page_not_found(error):
     if not current_user.is_authenticated:
         return redirect(url_for('main.index_main'))
     else:
-    # role = current_user.roles
+        # role = current_user.roles
         return render_template("blank-2.html", title='404'), 404
 
 

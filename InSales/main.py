@@ -3,14 +3,53 @@ import json
 import logging
 from html import unescape
 from flask import Flask, request, flash, redirect, render_template, url_for
+from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
+import pandas as pd
+
+from maintenance import update_categories_from_site, update_categories_from_site_v2, execute_query_update
 from psql import PgDatabase
+from creds import secret_key, vendors
 from settings import *
+from conn import executemany_query
+from conn_maintenance import query_update_from_file
+
 
 if LOCAL_MODE:
+    UPLOAD_FOLDER = './'
     PUBLIC_DIR = './'
 else:
     PUBLIC_DIR = '/home/userbe/profit/'
+    UPLOAD_FOLDER = '/var/www/html/load/'
+
+ALLOWED = {'csv', 'xls', 'xlsx'}
+
+
+def check_allowed_filename(filename):
+    result = '.' in filename and filename.rsplit('.')[1] in ALLOWED
+    curr_name = filename.rsplit('.')[1]
+    vendor = filename.rsplit('.')[0]
+    return result, curr_name, vendor
+
+
+def compare_id(tuple_data):
+    return tuple_data[0]
+
+
+def read_xls(file, vendor_name):
+    f = pd.read_excel(file)
+    dataframe = pd.DataFrame(f).values
+    proxy = list()
+    for row in dataframe:
+        try:
+            key = str(row[0]).split(' / ')[1].split(': ')[1]
+            proxy.append((row[1], int(row[2]), int(key), vendor_name))
+            print(22222, row)
+        except Exception as error:
+            print(111111111, row, ' fuck_up- {}'.format(error))
+            continue
+
+    return proxy
 
 
 def get_all_site_cats():
@@ -27,6 +66,7 @@ app = Flask(__name__,
             template_folder='templates',
             static_folder='templates/static'
             )
+app.secret_key = secret_key
 
 # @app.route('/login', methods=['GET', 'POST'])
 # def login():
@@ -59,7 +99,7 @@ app = Flask(__name__,
 
 
 @app.route("/index", methods=['GET', 'POST'])
-def index():
+async def index():
     headers = request.headers
     ip_addr = request.environ.get('REMOTE_ADDR')
     print('ip_addr_index', ip_addr)
@@ -102,40 +142,34 @@ def index():
 
 
     ######################## Отображение таблицы селлеров ###########################
-
+    result_status_text = ''
     sellers = ''
     # sellers_list = db.get_all_sellers()
-    url_categoies_href = f"{url_categories}?login={login}&passw={passw}&vendor_name={vendor_name}"
-    # site_categories = db.get_seller_id_category()
-    # #print(type(site_categories))
-    # proxy, shipments_list_today = [], []
-    # for cd in site_categories:
-    #     cd = list(cd)
-    #     proxy.extend(cd)
-    #     shipments_list_today = tuple(set(proxy))
+    url_categories_href = f"{url_categories}?login={login}&passw={passw}&vendor_name={vendor_name}"
       ##################################################################################
-    # if request.method == 'POST':
-    result = request.form
-    result_status_text = ''
+    if request.method == 'POST':
+        result = request.form
+
+        if result.get('get_categories') and vendor_name:
+            await update_categories_from_site(vendor_name)
+            result_status_text = 'Some update'
 
 
 
     ######################################################################
 
-    # db.close()
     acts_today_href = f"<a href='{URL} + {PUBLIC_DIR} + 'acts_not_assembled_day/all_acts_today.pdf' target='_blank'>Акты сегодня</a>"
     # not_ass_labels = f"<a href='{URL}labels_not_assembled/all_labels.pdf' target='_blank'>Все этикетки</a>"
     not_ass_labels_day = f"<a href='{URL}labels_not_assembled_day/all_labels_day.pdf' target='_blank'>Этикетки сегодня</a>"
 
     return unescape(
-        render_template("index.html", url_today=url_categoies_href, url=url, login=LOGIN, passw=PASSW, sellers=sellers,
-                        status=status, acts_today_href=acts_today_href, vendor_name=vendor_name,
-                        result_status_text=result_status_text, index_url=url,
-                        status_text=status_text))  #contragents=contragents, name=name, rows=rows,
+        render_template("index.html", url_today=url_categories_href, url=url, login=LOGIN, passw=PASSW, sellers=sellers,
+                        status=status,  vendor_name=vendor_name, index_url=url,  status_text=status_text, result_status_text=result_status_text))
+                    #contragents=contragents, name=name, rows=rows,result_status_text=result_status_text, acts_today_href=acts_today_href,
 
 
 @app.route("/edit_vendor_products", methods=['GET', 'POST'])
-def edit_vendor_products():
+async def edit_vendor_products():
     headers = request.headers
     ip_addr = request.environ.get('REMOTE_ADDR')
     print('ip_addr_edit_vendors', ip_addr)
@@ -151,6 +185,7 @@ def edit_vendor_products():
     db = PgDatabase(host=MYSQL_HOST, user=MYSQL_USER, password=MYSQL_PASW, database=MYSQL_DATABASE)
     url_categories = url_for('edit_vendor_products', _external=True)
     url = url_for('index', _external=True)
+    upload_url = url_for('upload_file', _external=True)
     index_url = url_for('index', _external=True)
     result_url = url_for('resutl_edit_vendor', _external=True)
 
@@ -164,7 +199,7 @@ def edit_vendor_products():
         vendor_name = request.values.get('vendor_name')
 
 
-    if request.method == 'POST' or request.method == 'GET':
+    if request.method == 'POST':
         result = request.form
         login = result['login']
         passw = result['passw']
@@ -175,41 +210,10 @@ def edit_vendor_products():
 
         errors = 0
         jobs = 0
-        # if result.get('get_categoies'):
+        if result.get('get_categories') and vendor_name:
+            await update_categories_from_site_v2(vendor_name)
+            result_status_text = 'Some update'
 
-        if result.get('save_products'):
-            site_categories = db.get_seller_id_category_v2(vendor_name)
-            for category in site_categories:
-                category_id = category[0]
-                site_category_id = category[3]
-
-                # ms_id = str(category[4])
-                new_vendor_id = result.get(str(category_id))
-
-
-                try:
-                    new_category_id = result.get(str(category_id) + '_price')  #int(result.get(str(category_id) + '_price'))
-                except:
-                    new_category_id = 0
-
-                if new_category_id and new_category_id != site_category_id:
-                    print('how-how', vendor_name, category_id, new_category_id)
-                    try:
-                        if not db.update_site_delive(vendor_name, category_id, new_category_id):
-                            errors += 1
-                        jobs += 1
-                    except:
-                        pass
-                    # print(vendor_name, category_id, new_vendor_id)
-
-                    # print('category', category)
-
-        if errors:
-            status_text = f"При обновлении связей категорий возникло {errors} ошибок"
-        elif jobs:
-            status_text = f"Обновлены связи {jobs} категорий"
-        else:
-            status_text = f"Связи категорий без изменений"
 
     if TEST_MODE:
         login = LOGIN
@@ -227,10 +231,14 @@ def edit_vendor_products():
     rows = ''
     # ozon_products = db.get_products(vendor_name)
     # site_categodies = db.get_seller_id_category()
+
     site_categodies = db.get_seller_id_category_v2(vendor_name)
-    # vendor_categories = db.get_vendor_id_categoies(vendor_name)
-    vendor_categories = db.get_vendor_id_categoies_v2(vendor_name)
-    for category in site_categodies:
+    print(site_categodies, sep="/n")
+    categories = sorted(site_categodies, key=compare_id)
+    vendor_categories = db.get_vendor_id_categoies(vendor_name)
+    print(7777777, vendor_categories)
+    # vendor_categories = db.get_vendor_id_categoies_v2(vendor_name)
+    for category in categories:
         # try:
         category_id = category[0]
         insales_id = category[3]
@@ -240,16 +248,7 @@ def edit_vendor_products():
         site_category_id = category[11]
         if not site_category_id:
             site_category_id = '0'
-        # if vendor_name == 'netlab':
-        #     delive = category[10]
-        # elif vendor_name == '3logic':
-        #     delive = category[11]
-        # else:
-        #     delive = ''
-        # if category[6]:
-        #     discount = category[6]
-        # else:
-        #     discount = '0'
+
 
         vendor_categories_text = ''
         for elem in vendor_categories:
@@ -274,7 +273,7 @@ def edit_vendor_products():
 
     return unescape(
         render_template("products.html", url_categories=url_categories,  login=LOGIN, passw=PASSW, vendor_name=vendor_name,
-                        status_text=status_text, index_url=index_url, rows=rows, result_url=result_url)) #edit_seller_url=edit_seller_url, index_url=index_url,
+                        status_text=status_text, index_url=index_url, rows=rows, result_url=result_url, upload_url=upload_url)) #edit_seller_url=edit_seller_url, index_url=index_url,
 
 
 
@@ -311,7 +310,7 @@ def resutl_edit_vendor():
         login = result['login']
         passw = result['passw']
         vendor_name = result.get('vendor_name')
-        # print('result_name_2', result)
+        print('result_name_2', result)
         # print('vendor_name', vendor_name)
         ############################ Сохранение селлера #################################
 
@@ -327,15 +326,12 @@ def resutl_edit_vendor():
                 line_id = category[0]
                 site_category_id = category[3]
                 new_vendor_id = result.get(str(line_id))
-
+                current_category_id = category[11]
                 try:
                     new_category_id = result.get(str(line_id) + '_price')
-                    # print(111111111111, new_category_id)
                 except:
                     new_category_id = '0'
-
-                if new_category_id != [0] and new_category_id != site_category_id:
-                    # print(333333333333333333, new_category_id)
+                if new_category_id and new_category_id != current_category_id:   #site_category_id:
                     try:
                         if not db.update_site_delive_v2(vendor_name, line_id, new_category_id):
                             errors += 1
@@ -356,6 +352,39 @@ def resutl_edit_vendor():
         render_template("products.html", url=url, login=LOGIN, passw=PASSW, vendor_name=vendor_name,
                         status_text=status_text, index_url=index_url, result_url=result_url
                         ))  # edit_seller_url=edit_seller_url, index_url=index_url,
+
+
+@app.route("/upload", methods=['GET', 'POST'])
+async def upload_file():
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            flash('Невозможно прочитать файл')
+            return redirect(request.url)
+        file = request.files['file']
+
+        if file.filename == '':
+            flash('Файл не выбран')
+            return redirect(request.url)
+
+        vendor = file.filename.split('-')[0].strip().replace('3', '').lower()
+        print(vendor)
+        if vendor not in vendors:
+            flash('Vendor not found')
+            return redirect(request.url)
+
+        check = check_allowed_filename(file.filename)
+        if file and check[0]:
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(UPLOAD_FOLDER, filename))
+
+        if check[1] == 'xlsx' and vendor:
+            data = read_xls(file, vendor)
+            await executemany_query(query_update_from_file, data)
+
+            flash('Файл excel загружен')
+            return redirect(request.url)
+
+    return render_template('file.html')
 
 
 # Press the green button in the gutter to run the script.

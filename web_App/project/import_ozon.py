@@ -14,7 +14,7 @@ from sqlalchemy.orm import Session
 from project.models import *
 from project.creds import *
 from project.database import Data_base_connect as Db
-from sqlalchemy import insert, create_engine, select, update
+from sqlalchemy import insert, create_engine, select, update, text
 import traceback  # Used for printing the full traceback | Better for debug.
 from psycopg2 import errors
 from psycopg2._psycopg import IntegrityError
@@ -22,6 +22,7 @@ from psycopg2._psycopg import IntegrityError
 UniqueViolation = errors.lookup('23505')
 
 engine = create_engine("postgresql+psycopg2://user_name:user_pass@localhost/stm_app")
+
 
 def write_smth(smth):
     time = datetime.now(pytz.timezone("Africa/Nairobi")).isoformat()
@@ -437,198 +438,360 @@ def get_product_list():
 
 def get_product_list_v2(seller_id=None, shop_name=None, company_id=None):
     metod = 'https://api-seller.ozon.ru/v2/product/list'
-    stmt = []
+    stmt, row, items = [], [], []
     if seller_id:
-        stmt = select(Marketplaces.key_mp, Marketplaces.shop_name)\
+        stmt = select(Marketplaces.key_mp, Marketplaces.shop_name) \
             .where(Marketplaces.seller_id == seller_id).where(Marketplaces.company_id == company_id)
     elif shop_name:
-        stmt = select(Marketplaces.key_mp, Marketplaces.shop_id)\
+        stmt = select(Marketplaces.key_mp, Marketplaces.shop_id) \
             .where(Marketplaces.shop_name == shop_name).where(Marketplaces.company_id == company_id)
-    # with Session(engine) as session:
-    #     for row in session.execute(stmt):
-    #         print(row)
-
-    session = Session(engine)
-    row = session.execute(stmt).first()
-    # print(stmt)
-    # print(row[0], row[1])
-
+    with Session(engine) as session:
+        row = session.execute(stmt).first()
     # os.abort()
-
-    api_key = row[0]
+    if row:
+        api_key = row[0]
+    else:
+        api_key = ''
     headers = {
         "Client-Id": seller_id,
         "Api-Key": api_key
     }
     last_id = ""
-    data = {
-        "filter": {
-            "visibility": "ALL"
-        },
-        "last_id": last_id,
-        "limit": 1000
-    }
-    answer = requests.post(url=metod, headers=headers, json=data)
-    assortment = answer.json()
+    requesting = True
+    while requesting:
+        data = {
+            "filter": {
+                "visibility": "ALL"
+            },
+            "last_id": last_id,
+            "limit": 1000
+        }
+        try:
+            answer = requests.post(url=metod, headers=headers, json=data)
+            if answer.ok:
+                assortment = answer.json()
+                proxy = assortment.get('result').get('items')
+                last_id = assortment.get('result').get('last_id')
+                if len(proxy) > 999:
+                    items.extend(proxy)
+                    print(888888888888888, len(items))
+                else:
+                    requesting = False
+                    items.extend(proxy)
+            else:
+                print('We are sleep and got {}'.format(answer.text))
+                time.sleep(1)
+                continue
+        except:
+            time.sleep(1)
+            continue
+    print(7777777777, len(items))
+    return items
 
-    return assortment.get('result').get('items')
 
-
-
-def get_product_info(product_id=None, offer_id=None):
+def get_product_info(product_id=None, offer_id=None, seller_data=None):
     metod = 'https://api-seller.ozon.ru/v2/product/info'
     headers_lp = {
-        "Client-Id": '1278621',
-        "Api-Key": '7857dda7-bdb2-4340-9502-3ee73c78118e'
+        "Client-Id": seller_data[0],
+        "Api-Key": seller_data[1]
     }
     data = {
         "offer_id": offer_id,
         "product_id": product_id,
         "sku": 0
     }
+    result = None
     answer = requests.post(metod, headers=headers_lp, json=data)
+    if answer.ok:
+        result = answer.json()
+    else:
+        print('Some_Error_from_get_product_info {} '.format(answer.text))
 
-    return answer.json()
+    return result
 
 
-
-def import_oson_data_prod(user_id=None,  shop_name=None, company_id=None):
+def import_oson_data_prod(user_id=None, shop_name=None, company_id=None):
     # seller_id = db.session.execute(select(Marketplaces.seller_id)
     #                                .where(Marketplaces.shop_name == shop_name)).first()
+    try:
+        seller_data = db.session.execute(select(Marketplaces.seller_id, Marketplaces.key_mp)
+                                         .where(Marketplaces.shop_name == shop_name)).first()
 
-    seller_id = db.session.execute(select(Marketplaces.seller_id)
-                                   .where(Marketplaces.shop_name == shop_name)).first()
+        current_products = get_product_list_v2(seller_id=seller_data[0], company_id=company_id)
 
-    # print(333333333333, seller_id, type(seller_id[0]))
-    current_products = get_product_list_v2(seller_id=seller_id[0], company_id=company_id)
+        time_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        uid_edit_user = user_id
+        count = 1
+        for prod in current_products:
+            data = get_product_info(prod.get("product_id"), prod.get("offer_id"), seller_data)
+            # print(444444444444444444444, count)
 
-    # company_id = ""  # user.company_id
-    time_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    uid_edit_user = user_id
-    for prod in current_products:
-        data_prod = get_product_info(prod.get("product_id"), prod.get("offer_id")).get('result')
-        # print(444444444444444444444, prod, data_prod)
+            if data:
+                data_prod = data.get('result')
+                product = {
+                    'articul_product': "00" + str(data_prod.get("offer_id")),
+                    'shop_name': shop_name,  # data_prod.get(""),
+                    'store_id': seller_data[0],
+                    'quantity': data_prod.get("stocks").get('present'),
+                    'price_product_base': '0',
+                    'discount': 0.0,
+                    'description_product': data_prod.get(""),
+                    'photo': data_prod.get("primary_image"),
+                    'id_1c': "",
+                    'date_added': time_now,
+                    'date_modifed': time_now,
+                    'selected_mp': 'oson',
+                    'name_product': data_prod.get("name"),
+                    'status_mp': 'enabled',
+                    'images_product': data_prod.get("images"),
+                    'price_add_k': 0.0,
+                    'discount_mp_product': 0.0,
+                    'set_shop_name': data_prod.get("name"),
+                    'external_sku': data_prod.get("sku"),
+                    'alias_prod_name': data_prod.get("name"),
+                    'status_in_shop': data_prod.get("status").get("state_name"),
+                    'uid_edit_user': uid_edit_user,
+                    'final_price': data_prod.get('price'),
+                    'description_category_id': data_prod.get("description_category_id"),
+                    'volume_weight': data_prod.get("volume_weight"),
+                    'type_id': data_prod.get("type_id"),
+                    'barcode': data_prod.get("barcode")
+                }
 
-        if data_prod:
-            product = {
-                'articul_product': data_prod.get("offer_id"),
-                'shop_name': data_prod.get(""),
-                'store_id': seller_id[0],
-                'quantity': data_prod.get("stocks").get('present'),
-                'price_product_base': '0',
-                'discount': 0.0,
-                'description_product': data_prod.get(""),
-                'photo': data_prod.get("primary_image"),
-                'id_1c': "",
-                'date_added': time_now,
-                'date_modifed': time_now,
-                'selected_mp': 'oson',
-                'name_product': data_prod.get("name"),
-                'status_mp': 'enabled',
-                'images_product': data_prod.get("images"),
-                'price_add_k': 0.0,
-                'discount_mp_product': 0.0,
-                'set_shop_name': data_prod.get("name"),
-                'external_sku': data_prod.get("sku"),
-                'alias_prod_name': data_prod.get("name"),
-                'status_in_shop': data_prod.get("status").get("state_name"),
-                'uid_edit_user': uid_edit_user,
-                'final_price': data_prod.get('price'),
-                'description_category_id': data_prod.get("description_category_id"),
-                'volume_weight': data_prod.get("volume_weight"),
-                'type_id': data_prod.get("type_id"),
-                'barcode': data_prod.get("barcode")
+                count_error = 0
+                with Session(engine) as session:
+                    session.begin()
+                    smth = insert(Product).values(product)
+                    try:
+                        session.execute(smth)
+                        time.sleep(0.1)
+                        count += 1
+                        # print(555555555555)
+                    except sqlalchemy.exc.IntegrityError as error:
+                        session.rollback()
+                        session.begin()
+                        update_prod = update(Product).where(Product.articul_product == product.get('articul_product')) \
+                            .where(Product.store_id == product.get('store_id')) \
+                            .values(product)
+                        session.execute(update_prod)
+                        count_error += 1
+                        # print(22222222222222, count_error)
+                    finally:
+                        session.commit()
+
+                # os.abort()
+                count += 1
+
+            else:
+                time.sleep(0.1)
+                continue
+
+        print('Successfully import {} from {} store'.format(count, shop_name))
+        return {'success': count}
+    except Exception as error:
+        return {'errors': error}
+
+
+def make_import_ozon(donor=None, recipient=None, k=1):
+    if donor is not None and recipient is not None:
+        pass
+
+
+def check_import_limit(seller_id):
+    pass
+
+
+def make_internal_import_oson(donor=None, recipient=None, k=1, sourse=None):
+    # metod = 'https://api-seller.ozon.ru/v3/product/import'
+    metod = 'https://api-seller.ozon.ru/v1/product/import-by-sku'
+    if donor is not None and recipient is not None:
+        data = []
+        with Session(engine) as session:
+            session.begin()
+            recipient_data = session.execute(select(Marketplaces.seller_id,
+                                                    Marketplaces.key_mp)
+                                             .where(Marketplaces.shop_name == recipient)).first()
+            product_data = session.query(Product).filter_by(shop_name=donor).all()
+            # product_data = session.execute(select(Product).where(Product.shop_name == donor)).all()
+            # product_data = session.execute(text(f"SELECT * FROM products WHERE products.shop_name ='{donor}' ")).all()
+            # print(33, recipient_data, product_data)
+        if product_data:
+            for row in product_data:
+                # print(22222, row.external_sku)
+                # os.abort()
+                price = int(row.price_product_base) * k
+                old_price = price * 4
+                item = {
+                    'name': row.name_product,
+                    'articul_product': row.articul_product,
+                    'price': price,
+                    'old_price': old_price,
+                    'external_sku': row.external_sku,
+                    'vat': '0',  # TODO make it's not magic num
+                    'currency_code': 'RUB'
+                }
+                data.append(item)
+
+            header = {
+                'Client-Id': recipient_data[0],
+                'Api-Key': recipient_data[1],
+                'Content-Type': 'application/json'
             }
 
-            # product_atrr = {
-            #     'articul_product': data_prod.get("offer_id"),
-            #     'category_id_oson': data_prod.get("category_id"),
-            #     'sku': data_prod.get("sku"),
-            #     'description_category_id': data_prod.get("description_category_id"),
-            #     'volume_weight': data_prod.get("volume_weight"),
-            #     'type_id': data_prod.get("type_id"),
-            #     'barcode': data_prod.get("barcode")
-            # }
+            if sourse is None:
+                print('Client-Id {}'. format(header.get('Client-Id')))
+                os.abort()
+            else:
+                answer = requests.post(url=metod,
+                                       headers=header,
+                                       json=data)
+                if answer.ok:
+                    data_json = answer.json()
+                # answer = True
+                # data_json = {"result": {
+                #     "task_id": 176594213,
+                #     "unmatched_sku_list": [1093855209,
+                #                            1006367092,
+                #                            1006367006,
+                #                            1006367113,
+                #                            1006367076,
+                #                            1006367113,
+                #                            1006354790]
+                #     }
+                # }
+                # if answer:
+                    result = data_json.get('result')
+                    if result:
+                        sku_list = result.get('unmatched_sku_list')
+                        count, count_error = 0, 0
+                        for product in product_data:
+                            new_prod = {
+                                'articul_product': product.articul_product,
+                                'shop_name': recipient,
+                                'store_id': recipient_data[0],
+                                'quantity': product.quantity,
+                                'reserved': product.reserved,
+                                'price_product_base': product.price_product_base,
+                                'final_price': product.final_price,
+                                'old_price': product.old_price,
+                                'discount': product.discount,
+                                'description_product': product.description_product,
+                                'photo': product.photo,
+                                'id_1c': product.id_1c,
+                                'date_added': datetime.now(),
+                                'date_modifed': datetime.now(),
+                                'selected_mp': product.selected_mp,
+                                'name_product': product.name_product,
+                                'status_mp': product.status_mp,
+                                'images_product': product.images_product,
+                                'price_add_k': product.price_add_k,
+                                'discount_mp_product': product.discount_mp_product,
+                                'set_shop_name': product.set_shop_name,
+                                'external_sku': product.external_sku,
+                                'alias_prod_name': product.alias_prod_name,
+                                'status_in_shop': product.status_in_shop,
+                                'shop_k_product': product.shop_k_product,
+                                'discount_shop_product': product.discount_shop_product,
+                                'quantity_for_shop': product.quantity_for_shop,
+                                'description_product_add': product.description_product_add,
+                                'uid_edit_user': product.uid_edit_user,
+                                'description_category_id': product.description_category_id,
+                                'type_id': product.type_id,
+                                'volume_weight': product.volume_weight,
+                                'barcode': product.barcode
+                            }
+                            if int(product.external_sku) in sku_list:
 
-            count = 0
-            count_error = 0
-            # with engine.begin() as conn:
-            #     smth = insert(Product).values(product)
-            #     smth2 = insert(AttributeProduct).values(product_atrr)
-            #     try:
-            #         conn.execute(smth)
-            #         conn.execute(smth2)
-            #         conn.commit()
-            #         time.sleep(0.1)
-            #         count += 1
-            #         print(555555555555, count)
-            #     except sqlalchemy.exc.IntegrityError as error:
-            #         conn.rollback()
-            #         alter = insert(AttributeProduct).values(product_atrr)
-            #         conn.execute(alter)
-            #         update_prod = update(Product).values({'external_sku': data_prod.get("sku")})
-            #         conn.execute(update_prod)
-            #
-            #         print(22222222222222, error)
-            with Session(engine) as session:
-                session.begin()
-                smth = insert(Product).values(product)
-                try:
-                    session.execute(smth)
-                    # session.flush()
-                    time.sleep(0.1)
-                    count += 1
-                    # print(555555555555)
-                except sqlalchemy.exc.IntegrityError as error:
-                    session.rollback()
-                    session.begin()
-                    # alter = insert(AttributesProduct).values(product_atrr)
-                    # session.execute(alter)
-                    update_prod = update(Product).where(Product.articul_product == product.get('articul_product'))\
-                        .where(Product.store_id == product.get('store_id'))\
-                        .values(product)
-                    session.execute(update_prod)
-                    count_error += 1
-                    print(22222222222222,count_error, error)
-                finally:
-                    session.commit()
+                                print(3333, product.shop_name, product.id, product.external_sku)
+                                # print(777777777, *product.as_dict(), sep=':,\n')
+                                with Session(engine) as session:
+                                    session.begin()
+                                    smth = insert(Product).values(new_prod)
+                                try:
+                                    session.execute(smth)
+                                    count += 1
+                                    print('We are write {} product'.format(count))
+                                except sqlalchemy.exc.IntegrityError as error:
+                                    session.rollback()
+                                    ## TODO We need know is nessasery update product
+                                    # session.begin()
+                                    # update_prod = update(Product)\
+                                    #     .where( Product.articul_product == new_prod.get('articul_product')) \
+                                    #     .where(Product.store_id == new_prod.get('store_id')) \
+                                    #     .values(new_prod)
+                                    # session.execute(update_prod)
+                                    count_error += 1
+                                    print(22222222222222, count_error)
+                                    continue
+                                finally:
+                                    session.commit()
+
+                            else:
+                                # print(5555, product.external_sku)
+                                continue
+
+                        return "Всё ок", count, len(result), count_error
+
+                else:
+                    return "Что-то пошло не так", \
+                        answer.status_code, \
+                        answer.text
 
 
-            # os.abort()
+# print(make_internal_import_oson(donor='ImportGoods', recipient='Ф-фторник'))
 
 
-def product_info_price(id_mp, seller_id):  # product_id, offer_id
-    # url = 'https://api-seller.ozon.ru/v4/product/info/prices'
-    # data = {"filter": {
-    #             "offer_id": [offer_id],
-    #             "product_id": [str(product_id)],
-    #             "visibility": "ALL"
-    #         },
-    #         "last_id": "",
-    #         "limit": 100}
-    api_key = db.session.execute(select(Marketplaces.key_mp)
-                                     .where(Marketplaces.seller_id == seller_id))
-    print(api_key, type(api_key))
-    headers = {
-        'Client-Id': seller_id,
-        'Api-Key': api_key,
-        'Content-Type': 'application/json'
-    }
-    url = 'https://api-seller.ozon.ru/v3/posting/fbs/get'
-    data = {
-        "posting_number": id_mp,
-        "with": {
-            "analytics_data": False,
-            "barcodes": False,
-            "financial_data": False,
-            "product_exemplars": False,
-            "translit": False}}
-    # resp = requests.post(url=url, headers=headers, json=data)
-    # result = resp.json()
-    # print('product_id_offer_id', result)
-    # # price = result.get("result")["items"][0]["price"]["marketing_price"][:-2]
-    # order = result.get("result")
-    # return order
+def make_send_price_data(data, seller_id=None, headers=None):
+    # metod = 'https://api-seller.ozon.ru/v1/product/import/prices'
+    prices, proxy = [], {}
+    for row in data:
+        proxy.clear()
+        proxy = {
+            # "auto_action_enabled": "UNKNOWN",
+            "currency_code": "RUB",
+            # "min_price": "800",
+            "offer_id": row.get("offer_id"),
+            "old_price": "0",
+            "price": "1448",
+            "price_strategy_enabled": "UNKNOWN",
+            "product_id": 1386
+        }
+        prices.append(proxy)
+
+    return prices
+
+# def product_info_price(id_mp, seller_id):  # product_id, offer_id
+#     # url = 'https://api-seller.ozon.ru/v4/product/info/prices'
+#     # data = {"filter": {
+#     #             "offer_id": [offer_id],
+#     #             "product_id": [str(product_id)],
+#     #             "visibility": "ALL"
+#     #         },
+#     #         "last_id": "",
+#     #         "limit": 100}
+#     api_key = db.session.execute(select(Marketplaces.key_mp)
+#                                      .where(Marketplaces.seller_id == seller_id))
+#     print(api_key, type(api_key))
+#     headers = {
+#         'Client-Id': seller_id,
+#         'Api-Key': api_key,
+#         'Content-Type': 'application/json'
+#     }
+#     url = 'https://api-seller.ozon.ru/v3/posting/fbs/get'
+#     data = {
+#         "posting_number": id_mp,
+#         "with": {
+#             "analytics_data": False,
+#             "barcodes": False,
+#             "financial_data": False,
+#             "product_exemplars": False,
+#             "translit": False}}
+#     # resp = requests.post(url=url, headers=headers, json=data)
+#     # result = resp.json()
+#     # print('product_id_offer_id', result)
+#     # # price = result.get("result")["items"][0]["price"]["marketing_price"][:-2]
+#     # order = result.get("result")
+#     # return order
 
 
 # product_info_price('34253142-0058-7', 1713959)

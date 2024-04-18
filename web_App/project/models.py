@@ -32,11 +32,6 @@ class Product(db.Model):
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
-    # def update(self, update_dictionary: dict):
-    #     for col_name in self.__table__.columns.keys():
-    #         if col_name in update_dictionary:
-    #             setattr(self, col_name, update_dictionary[col_name])
-
     __tablename__ = 'products'
     id = db.Column(db.Integer, primary_key=True)
     articul_product = db.Column(db.String(250), unique=True)
@@ -142,6 +137,34 @@ class Sales(db.Model):
     date_modifed = db.Column(db.String(250))
 
 
+class SalesToday(db.Model):
+    __tablename__='order_items'
+    id = db.Column(db.Integer, primary_key=True)
+    shop_order_id = db.Column(db.String(250))
+    mp_order_id = db.Column(db.String(250), primary_key=True)
+    article = db.Column(db.String(250))
+    article_mp = db.Column(db.String(250))
+    id_1c = db.Column(db.String(250))
+    name = db.Column(db.String(250))
+    shop_name = db.Column(db.String(250))
+    mp = db.Column(db.String(250))
+    company_id = db.Column(db.String(250))
+    quantity = db.Column(db.Integer())
+    price = db.Column(db.String(250))
+    add_price = db.Column(db.String(250))
+    # discount = db.Column(db.Double())
+    photo = db.Column(db.String(250))
+    category = db.Column(db.String(250))
+    shipment_date = db.Column(db.String(250))
+    order_status = db.Column(db.String(250))
+    shop_status = db.Column(db.String(250))
+    delivery_type = db.Column(db.String(250))
+    delivery_point = db.Column(db.String(250))
+    is_cancelled = db.Column(db.Boolean())
+    date_added = db.Column(db.String(250))
+    date_modifed = db.Column(db.String(250))
+
+
 class Marketplaces(db.Model):
 
     id = db.Column(db.Integer(), primary_key=True)
@@ -157,6 +180,8 @@ class Marketplaces(db.Model):
     mp_markup = db.Column(db.Double())
     store_discount = db.Column(db.Double())
     store_markup = db.Column(db.Double())
+    date_added = db.Column(db.String(50))
+    date_modifed = db.Column(db.String(50))
 
 
 class InternalImport(db.Model):

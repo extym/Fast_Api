@@ -6,7 +6,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Интеграция множества личных кабинетов с учетной записью Мой Склад</title>
+    <title>Интеграция множества личных кабинетов с учетной записью InSales</title>
     <!--[if lt IE 9]><script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
     <style>
         html, body, div, span, applet, object, iframe,
@@ -253,56 +253,60 @@ input[type=submit]:active {
                 <input type="hidden" name="login" value="{{login}}">
                 <input type="hidden" name="passw" value="{{passw}}">
 
-                <table width = "950" style="border: 1px solid; border-color: #c4c4c4" align = "center">
-                    <tr>
-                      <td colspan="4" align="center" valign="middle" height="30" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align: middle;">
-                        <b>Выгрузка этикеток</b>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td width = "200" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3;"><!--a href='http://185.41.161.50/labels_not_assembled/all_labels.pdf' target='_blank'>Все этикетки</a-->{{not_ass_labels_day}}</td>
-                      <td width = "200" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3;"><!--a href='http://185.41.161.50/labels_not_assembled_day/all_labels_day.pdf' target='_blank'>Этикетки сегодня</a-->{{acts_today_href}}</td>
-                    </tr>
-                </table>
-                <br>
+                    <table width = "950" style="border: 1px solid; border-color: #c4c4c4" align = "center">
                     <table width = "950" style="border: 1px solid; border-color: #c4c4c4" align = "center">
                     <tr>
                       <td colspan="4" align="center" valign="middle" height="30" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align: middle;">
-                        <b>Сегодня</b>
+                        <b>Заказать категории</b>
                       </td>
                     </tr>
                     <tr>
-                        <td align="center" valign="middle" height="30" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align: middle"><input type="submit" value="Заказать свежий акт" name="create_act" class="my"></td>
-                        <td align="center" valign="middle" height="30" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align: middle"><input type="submit" value="Обновить страницу" name="blank" class="my"></td>
+                        <td align="center" valign="middle" height="30" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align: middle"><input type="submit" value="Сопоставить категории" class="my"></td>
+                        <td align="center" valign="middle" height="30" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align: middle"><input type="submit" value="Заказать категории" name="get_categories" class="my"></td>
                     </tr>
                     <tr>
-                      <td width = "200" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3;"><a href='{{url}}?login={{login}}&passw={{passw}}' target='_blank'>Назад к списку селлеров</a></td>
-                      <td width = "200" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3;"><a href='{{url_today}}' target='_blank'>Cеллеры сегодня</a></td>
+<!--                      <td width = "200" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3;"><a href='{{url}}?login={{login}}&passw={{passw}}' target='_blank'>Назад к списку селлеров</a></td>-->
+<!--                      <td width = "200" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3;"><a href='{{url_categories}}' target='_blank'>Сопоставить категории</a></td>-->
+                    <td width = "200" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3;">
+                        <form method="post" action="{{url_categories}}">
+                          <label for="vendor_name">Выберите вендора:</label>
+                          <select id="vendor_name" name="vendor_name">
+                              <option value="">Select..</option>
+                              <option value="netlab">Netlab</option>
+                              <option value="logic">3Logic</option>
+                              <option value="ocs">OCS</option>
+                              <option value="marvel">Marvel</option>
+                              <option value="treolan">Treolan</option>
+                              <option value="merlion">Merlion</option>
+                          </select>
+                        </form>
+                    </td>
+                    <td width = "200" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3;"><a href='{{upload_url}}?login={{login}}&passw={{passw}}' target='_blank'></a>Обновить страницу</td>
                     </tr>
                 </table>
-                <table width="950" style="border: 1px solid; border-color: #c4c4c4" align="center">
-                    <tr>
-                        <td colspan="8" align="center" valign="middle" height="30" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align: middle">Панель селлеров</td>
-                    </tr>
-                    <br>
+<!--                <table width="950" style="border: 1px solid; border-color: #c4c4c4" align="center">-->
+<!--                    <tr>-->
+<!--                        <td colspan="8" align="center" valign="middle" height="30" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align: middle">Панель селлеров</td>-->
+<!--                    </tr>-->
+<!--                    <br>-->
 
-                    <form action = "{{url}}" method="POST">
-                    <input type="hidden" name="login" value="{{login}}">
-                    <input type="hidden" name="passw" value="{{passw}}">
-                        <tr>
-                            <td width="200" height = "30"  align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align: middle; background-color: #a0a0a0;">Имя селлера</td>
-                            <td width="100" height = "30"  align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align: middle; background-color: #a0a0a0;">ID селлера</td>
-                            <td width="100" height = "30" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #a0a0a0;">№ акта</td>
-                            <td width="200" height = "30" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #a0a0a0;">Дата</td>
-                            <td width="100" height = "30" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #a0a0a0;">Статус</td>
-                            <td width="120" height = "30" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #a0a0a0;">Акт</td>
-                            <td width="120" height = "30" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #a0a0a0;">Акт ЭДО</td>
-                            <td width="130" height = "30" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #a0a0a0;">Отгрузка МС</td>
-                        </tr>
-                        {{sellers}}
+<!--                    <form action = "{{url}}" method="POST">-->
+<!--                    <input type="hidden" name="login" value="{{login}}">-->
+<!--                    <input type="hidden" name="passw" value="{{passw}}">-->
+<!--                        <tr>-->
+<!--                            <td width="200" height = "30"  align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align: middle; background-color: #a0a0a0;">Имя селлера</td>-->
+<!--                            <td width="100" height = "30"  align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align: middle; background-color: #a0a0a0;">ID селлера</td>-->
+<!--                            <td width="100" height = "30" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #a0a0a0;">№ акта</td>-->
+<!--                            <td width="200" height = "30" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #a0a0a0;">Дата</td>-->
+<!--                            <td width="100" height = "30" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #a0a0a0;">Статус</td>-->
+<!--                            <td width="120" height = "30" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #a0a0a0;">Акт</td>-->
+<!--                            <td width="120" height = "30" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #a0a0a0;">Акт ЭДО</td>-->
+<!--                            <td width="130" height = "30" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #a0a0a0;">Отгрузка МС</td>-->
+<!--                        </tr>-->
+<!--                        {{sellers}}-->
 
-                </table>
-                    <br>
+<!--                </table>-->
+<!--                    <br>-->
 <!--
                     <table width = "950" style="border: 1px solid; border-color: #c4c4c4"  align="center">
                     <tr>
@@ -322,6 +326,7 @@ input[type=submit]:active {
                     </tr>
                     </table>
 -->
+
                 </form>
 
     </div>
