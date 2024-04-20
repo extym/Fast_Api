@@ -458,6 +458,7 @@ def get_product_list_v2(seller_id=None, shop_name=None, company_id=None):
     }
     last_id = ""
     requesting = True
+    count = 0
     while requesting:
         data = {
             "filter": {
@@ -480,12 +481,27 @@ def get_product_list_v2(seller_id=None, shop_name=None, company_id=None):
                     items.extend(proxy)
             else:
                 print('We are sleep and got {}'.format(answer.text))
-                time.sleep(1)
-                continue
+                try:
+                    data = json.loads(answer.text)
+                    if data.get('code') == 7 and data.get('message') == "Invalid Api-Key, please contact support":
+                        print('Error Api_Key for seller_id{}  shop {} get {}'
+                              .format(seller_id, shop_name, answer.text))
+                except Exception as err:
+                    print('Error get data for seller_id {}  shop {} get {}'
+                          .format(seller_id, shop_name, answer.text))
+                finally:
+                    count += 1
+                    time.sleep(1)
+                    if count >= 10:
+                        requesting = False
+                    continue
         except:
+            count += 1
             time.sleep(1)
+            if count >= 10:
+                requesting = False
             continue
-    print(7777777777, len(items))
+    print("We got from oson items", len(items))
     return items
 
 
@@ -514,18 +530,18 @@ def import_oson_data_prod(user_id=None, shop_name=None, company_id=None):
     # seller_id = db.session.execute(select(Marketplaces.seller_id)
     #                                .where(Marketplaces.shop_name == shop_name)).first()
     try:
-        seller_data = db.session.execute(select(Marketplaces.seller_id, Marketplaces.key_mp)
-                                         .where(Marketplaces.shop_name == shop_name)).first()
+        seller_data = db.session \
+            .execute(select(Marketplaces.seller_id, Marketplaces.key_mp)
+                     .where(Marketplaces.shop_name == shop_name)) \
+            .first()
 
         current_products = get_product_list_v2(seller_id=seller_data[0], company_id=company_id)
 
         time_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         uid_edit_user = user_id
-        count = 1
+        count = 0
         for prod in current_products:
             data = get_product_info(prod.get("product_id"), prod.get("offer_id"), seller_data)
-            # print(444444444444444444444, count)
-
             if data:
                 data_prod = data.get('result')
                 product = {
@@ -587,9 +603,9 @@ def import_oson_data_prod(user_id=None, shop_name=None, company_id=None):
                 continue
 
         print('Successfully import {} from {} store'.format(count, shop_name))
-        return {'success': count}
+        return 'success {}'.format(count)
     except Exception as error:
-        return {'errors': error}
+        return 'errors {}'.format(error)
 
 
 def make_import_ozon(donor=None, recipient=None, k=1):
@@ -639,7 +655,7 @@ def make_internal_import_oson(donor=None, recipient=None, k=1, sourse=None):
             }
 
             if sourse is None:
-                print('Client-Id {}'. format(header.get('Client-Id')))
+                print('Client-Id {}'.format(header.get('Client-Id')))
                 os.abort()
             else:
                 answer = requests.post(url=metod,
@@ -647,19 +663,19 @@ def make_internal_import_oson(donor=None, recipient=None, k=1, sourse=None):
                                        json=data)
                 if answer.ok:
                     data_json = answer.json()
-                # answer = True
-                # data_json = {"result": {
-                #     "task_id": 176594213,
-                #     "unmatched_sku_list": [1093855209,
-                #                            1006367092,
-                #                            1006367006,
-                #                            1006367113,
-                #                            1006367076,
-                #                            1006367113,
-                #                            1006354790]
-                #     }
-                # }
-                # if answer:
+                    # answer = True
+                    # data_json = {"result": {
+                    #     "task_id": 176594213,
+                    #     "unmatched_sku_list": [1093855209,
+                    #                            1006367092,
+                    #                            1006367006,
+                    #                            1006367113,
+                    #                            1006367076,
+                    #                            1006367113,
+                    #                            1006354790]
+                    #     }
+                    # }
+                    # if answer:
                     result = data_json.get('result')
                     if result:
                         sku_list = result.get('unmatched_sku_list')

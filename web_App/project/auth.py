@@ -19,6 +19,7 @@ from . import db, TEST_MODE
 from sqlalchemy.orm import Session, load_only
 
 from project.import_ozon import import_oson_data_prod
+from project.wb import import_product_from_wb
 # Pagination
 from flask_paginate import Pagination, get_page_parameter
 # # Redis
@@ -420,13 +421,21 @@ def import_settings_post():
     role = current_user.roles
     company_id = current_user.company_id
     data = request.form.to_dict()
-
+    print(111, data)
     if 'import_mp_name' in data:
+        mp = data.get('import_mp_name')
         shop_name = data.get('import_shop_names')
-        job = q.enqueue_call(import_oson_data_prod(user_id=uid,
+        if mp == 'ozon':
+            job = q.enqueue_call(import_oson_data_prod(user_id=uid,
                                                    shop_name=shop_name,
                                                    company_id=company_id))
-        print(777777777777, job.get_id)
+            print(777777777777, job.get_id)
+        elif mp == 'wb':
+            job = q.enqueue_call(import_product_from_wb(uid_edit_user=uid,
+                                                       shop_name=shop_name,
+                                                       company_id=company_id))
+            print(88888888888, job.get_id)
+
         return redirect('/import_settings')
 
     if 'internal_import_mp_1' in data:

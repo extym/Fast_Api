@@ -1,17 +1,19 @@
+import time
 from datetime import datetime, timedelta
 import random
 import string
 import asyncio
 
+import sqlalchemy
 from sqlalchemy import insert, create_engine, select, update, text
 from sqlalchemy.orm import Session
 
-from project.models import Marketplaces
-from read_json import read_json_wb, read_json_ids
+from project.models import Marketplaces, Product
+from psycopg2.extensions import register_adapter, AsIs
 import requests
 import json
 
-from conn import *
+from project.conn import *
 
 # data = read_json_wb()
 # https://suppliers-api.wildberries.ru/api/v3/stocks/{warehouse}
@@ -101,6 +103,16 @@ def send_stocks_wb():
         # print('send_stocks_wb', key, re_data, len(value['stocks']), value)
 
 
+def get_wh():
+    headers = {'Content-type': 'application/json',
+               'Authorization': wb_apikey}
+    link = 'https://suppliers-api.wildberries.ru/api/v2/warehouses'
+    answer = requests.get(link, headers=headers)
+    text = answer.text
+    # print(answer)
+    print('get_wh', text)
+
+
 # send_stocks_wb()
 
 
@@ -148,10 +160,10 @@ def get_orders_from_supply_wb(supply_id):
     return response, data
 
 
-
 def get_new_orders_wb(shop_name=None, company_id=None):
     stmt = select(Marketplaces.key_mp, Marketplaces.shop_id) \
-        .where(Marketplaces.shop_name == shop_name).where(Marketplaces.company_id == company_id)
+        .where(Marketplaces.shop_name == shop_name) \
+        .where(Marketplaces.company_id == company_id)
     with Session(engine) as session:
         wb_apikey = session.execute(stmt).first()
     headers = {'Content-type': 'application/json',
@@ -166,7 +178,8 @@ def get_new_orders_wb(shop_name=None, company_id=None):
         print('ALL_RIDE_get_new_orders_wb', response, len(data), data)
         return response.status_code, data
     else:
-        print('FUCK_UP_get_new_orders_wb ', response.status_code, 'response', response.text)
+        print('FUCK_UP_get_new_orders_wb {} response {}'
+              .format(response.status_code, response.text))
         return response.status_code, response.text
 
 
@@ -215,16 +228,152 @@ async def processing_orders_wb(shop_name=None, company_id=None):
         return "Error ger orders WB by {} to {}".format(data[0], data[1])
 
 
-
-asyncio.run(processing_orders_wb(shop_name='Полиция Вкуса', company_id='AdminTheRock'))
-
-def get_wh():
+def get_product_cards(shop_name=None, company_id=None):
+    metod = 'https://suppliers-api.wildberries.ru/content/v2/get/cards/list'
+    stmt = select(Marketplaces.key_mp, Marketplaces.shop_id) \
+        .where(Marketplaces.shop_name == shop_name) \
+        .where(Marketplaces.company_id == company_id)
+    with Session(engine) as session:
+        wb_apikey = session.execute(stmt).first()
     headers = {'Content-type': 'application/json',
-               'Authorization': wb_apikey}
-    link = 'https://suppliers-api.wildberries.ru/api/v2/warehouses'
-    answer = requests.get(link, headers=headers)
-    text = answer.text
-    # print(answer)
-    print('get_wh', text)
+               'Authorization': wb_apikey[0]}
+    limit = 1000
+    proxy, count, error_caunt, message = [], 0, 0, 'Error'
+    data = {
+        "settings": {
+            "cursor": {
+                "limit": limit
+            },
+            "filter": {
+                "withPhoto": -1
+            }
+        }
+    }
+    answer = requests.post(url=metod, headers=headers, json=data)
+    if answer.ok:
+        response = answer.json()
+        cards = response.get('cards')
+        cursor = response.get('cursor')
+        proxy.extend(cards)
+        message = 'Ok'
+        while len(cards) >= limit:
+            nm_id = cursor.get('nmID')
+            update_at = cursor.get('updatedAt')
+            data = {
+                "settings": {
+                    "cursor": {
+                        "updatedAt": update_at,
+                        "nmID": nm_id,
+                        "limit": limit
+                    },
+                    "filter": {
+                        "withPhoto": -1
+                    }
+                }
+            }
+            answer = requests.post(url=metod, headers=headers, json=data)
+            if answer.ok:
+                resp = answer.json()
+                cards = resp.get('cards')
+                cursor = resp.get('cursor')
+                proxy.extend(cards)
+                message = 'Ok'
+                # print(222, len(cards), nm_id, cursor)
+            else:
+                count += 1
+                print("We get some trouble from WB {}".format(answer.text))
+                if count >= 10:
+                    break
 
+        else:
+            proxy.extend(cards)
+
+    else:
+        error_caunt += 1
+        print("We get some trouble from WB {}".format(answer.text, error_caunt))
+
+    print('We get from WB {} cards'.format(len(proxy)))
+    return proxy, message
+
+
+def adapt_dict(dict_var):
+    return AsIs("'" + json.dumps(dict_var) + "'")
+
+
+def import_product_from_wb(shop_name=None, company_id=None, uid_edit_user=None):
+    register_adapter(dict, adapt_dict)
+    data = get_product_cards(shop_name=shop_name, company_id=company_id)[0]
+    query = select(Marketplaces.seller_id, Marketplaces.key_mp)\
+        .where(Marketplaces.shop_name == shop_name)
+    with Session(engine) as session:
+        session.begin()
+        seller_data = session.execute(query).first()
+    count = 0
+    time_now = datetime.datetime.now()
+    if data:
+        for data_prod in data:
+            product = {
+                'articul_product': str(data_prod.get("vendorCode")),
+                'shop_name': shop_name,
+                'store_id': seller_data[0],
+                'quantity': data_prod.get("stocks"),
+                'price_product_base': '0',
+                'discount': 0.0,
+                'description_product': data_prod.get("description"),
+                'photo': data_prod.get("photos"),
+                'id_1c': "",
+                'date_added': time_now,
+                'date_modifed': time_now,
+                'selected_mp': 'wb',
+                'name_product': data_prod.get("title"),
+                'status_mp': 'enabled',
+                'images_product': data_prod.get("images"),
+                'price_add_k': 0.0,
+                'discount_mp_product': 0.0,
+                'set_shop_name': data_prod.get("brand"),
+                'external_sku': data_prod.get("nmID"),
+                'alias_prod_name': data_prod.get("name"),
+                'status_in_shop': data_prod.get("status"),
+                'uid_edit_user': uid_edit_user,
+                'final_price': data_prod.get('price'),
+                'description_category_id': data_prod.get("subjectName"),
+                'volume_weight': data_prod.get("sizes")[0].get('chrtID'),
+                'type_id': data_prod.get("subjectID"),
+                'barcode': data_prod.get("sizes")[0].get('skus')
+            }
+
+            count_error = 0
+            with Session(engine) as session:
+                session.begin()
+                smth = insert(Product).values(product)
+                # print(77777, smth)
+                try:
+                    session.execute(smth)
+                    time.sleep(0.1)
+                    count += 1
+                    # print(555555555555)
+                except sqlalchemy.exc.IntegrityError as error:
+                    session.rollback()
+                    session.begin()
+                    update_prod = update(Product).where(Product.articul_product == product.get('articul_product')) \
+                        .where(Product.store_id == product.get('store_id')) \
+                        .values(product)
+                    session.execute(update_prod)
+                    count_error += 1
+                    # print(22222222222222, count_error)
+                finally:
+                    session.commit()
+
+            # os.abort()
+            count += 1
+
+        return 'Succes {}'.format(count)
+    else:
+
+        return 'Some trouble import {} {}'.format(shop_name, company_id)
+
+
+# get_product_cards(shop_name='Полиция Вкуса', company_id='AdminTheRock')
+# asyncio.run(processing_orders_wb(shop_name='Полиция Вкуса', company_id='AdminTheRock'))
+# import_product_from_wb(shop_name='Полиция Вкуса', company_id='AdminTheRock', uid_edit_user=3)
 # get_wh()
