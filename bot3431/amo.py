@@ -17,12 +17,12 @@ import re
 
 if LOCAL_MODE:
     UPLOAD_FOLDER = './'
-    PATH_DIR = './'
-    LOG_DIR = './'
+    PATH_DIR = os.getcwd()
+    LOG_DIR = 'logs/'
 else:
     UPLOAD_FOLDER = '/var/www/html/load/'
-    PATH_DIR = '/home/userbe/phone/'
-    LOG_DIR = 'home/userbe/phone/logs/'
+    PATH_DIR = '/home/userbe/bot3431'
+    LOG_DIR = '/home/userbe/bot3431/logs/'
 
 user_link = {
     # user_id: (link, name_tag, responsible_user_id, pipeline_id, field_url_id, field_promo_id amo_cred_id)
@@ -30,19 +30,19 @@ user_link = {
     353207078: ("https://amo3431ru.amocrm.ru", "3431 новые запчасти", 9983934, 7155526, 987785, 987783, '3431'),
     353821742: ("https://amo3431ru.amocrm.ru", "3431ru", 9983934, 7155526, 987785, 987783, '3431'),
     363810872: ("https://amo3431ru.amocrm.ru", "JP AKB", 9983934, 7155526, 987785, 987783, '3431'),
-    10138154: ("https://zakazjpexpressru.amocrm.ru", "JPexpress", 0, 5420530, 1335423, 1335421, 'JPexp'),
-    369221904: ('https://zakazjpexpressru.amocrm.ru', 'Быстрые шины', 0, 5420530, 1335423, 1335421, 'JPexp'),
-    369222251: ('https://zakazjpexpressru.amocrm.ru', 'Быстрый двигатель', 0, 5420530, 1335423, 1335421, 'JPexp'),
-    369220948: ('https://zakazjpexpressru.amocrm.ru', 'Классный салон', 0, 5420530, 1335423, 1335421, 'JPexp'),
-    369223108: ('https://zakazjpexpressru.amocrm.ru', 'Быстрая машина', 0, 5420530, 1335423, 1335421, 'JPexp'),
-    369222788: ('https://zakazjpexpressru.amocrm.ru', 'Быстрая коробка', 0, 5420530, 1335423, 1335421, 'JPexp'),
-    369721092: ('https://zakazjpexpressru.amocrm.ru', 'Быстрые мелочи', 0, 5420530, 1335423, 1335421, 'JPexp')
+    375810638: ("https://amo3431ru.amocrm.ru", "Запчасти за час", 9983934, 7155526, 987785, 987783, '3431'),
+    375811020: ("https://amo3431ru.amocrm.ru", "Новые Запчасти", 9983934, 7155526, 987785, 987783, '3431'),
+    375811448: ("https://amo3431ru.amocrm.ru", "Быстрые Запчасти", 9983934, 7155526, 987785, 987783, '3431'),
+    10138154: ("https://zakazjpexpressru.amocrm.ru", "JPexpress", 10131478, 5420530, 1335423, 1335421, 'JPexp'),
+    369221904: ('https://zakazjpexpressru.amocrm.ru', 'Быстрые шины', 10131478, 5420530, 1335423, 1335421, 'JPexp'),
+    369222251: ('https://zakazjpexpressru.amocrm.ru', 'Быстрый двигатель', 10131478, 5420530, 1335423, 1335421, 'JPexp'),
+    369220948: ('https://zakazjpexpressru.amocrm.ru', 'Классный салон', 10131478, 5420530, 1335423, 1335421, 'JPexp'),
+    369223108: ('https://zakazjpexpressru.amocrm.ru', 'Быстрая машина', 10131478, 5420530, 1335423, 1335421, 'JPexp'),
+    369222788: ('https://zakazjpexpressru.amocrm.ru', 'Быстрая коробка', 10131478, 5420530, 1335423, 1335421, 'JPexp'),
+    369721092: ('https://zakazjpexpressru.amocrm.ru', 'Быстрые мелочи', 10131478, 5420530, 1335423, 1335421, 'JPexp'),
+    369219038: ('https://zakazjpexpressru.amocrm.ru', 'Быстрый кузов', 10131478, 5420530, 1335423, 1335421, 'JPexp'),
+    'rota': ('https://otdelkadrovrota.amocrm.ru', 'OtdelKadrovRota', 0, 0, 0, 0, 'rota')
 }
-# 363810872: ("https://zakazjpexpressru.amocrm.ru", "JPexpress", 9983934, 7155526)
-# 357922774 = "3431 грузовые"
-# 353207078 = "3431 новые запчасти"
-# 353821742 = "3431ru"
-# 363810872 = "JP AKB"
 
 
 logging.basicConfig(filename=os.path.join(LOG_DIR + 'webhook.log'), level=logging.INFO,
@@ -98,28 +98,29 @@ channel_key = 'c77c73cb95dae182f221fc8786866875c968a2c2'
 
 
 def read_link(chat_id):
-    with open(PATH_DIR + 'links.json', 'r') as file:
+    with open(PATH_DIR + '/links.json', 'r') as file:
         links = json.load(file)
 
         return links.get(chat_id)
 
 
+
 async def read_link_v2(chat_id):
-    with open(PATH_DIR + 'links.json', 'r') as file:
+    with open(PATH_DIR + '/links.json', 'r') as file:
         links = json.load(file)
 
         return links.get(chat_id)
 
 
 def read_links_v2():
-    with open(PATH_DIR + 'links.json', 'r') as file:
+    with open(PATH_DIR + '/links.json', 'r') as file:
         links = json.load(file)
 
         return links
 
 
 async def read_links_v3():
-    with open(PATH_DIR + 'links.json', 'r') as file:
+    with open(PATH_DIR + '/links.json', 'r') as file:
         links = json.load(file)
 
         return links
@@ -127,7 +128,7 @@ async def read_links_v3():
 
 async def get_creds_v3(user_id):
     token_name = user_link[user_id][-1]
-    with open(PATH_DIR + f'cred_update_{token_name}.json', 'r') as file:
+    with open(PATH_DIR + f'/cred_update_{token_name}.json', 'r') as file:
         creds = json.load(file)
         # fresh = creds.get('refresh_token')
         # access = creds.get('access_token')
@@ -169,7 +170,7 @@ async def rewrite_contact(chat_id, user_id, phone_numbers):
         logging.info('TRY_write_contact_id {} {} {} {} {}'
                      .format(contact_id, user_id, chat_id, data, url))
         answer = requests.patch(url, json=data, headers=headers)
-        print(answer.text)
+
         if answer.ok:
             logging.info('ALL_RIDE_re_write_contact_id {}, answer- {} {} {} {} {}'.
                          format(contact_id, answer.status_code, user_id, chat_id, data, url))
@@ -199,8 +200,9 @@ async def rewrite_contact_v2(chat_id=0, contact_id=0, user_id=0, amo_name='', li
         link = user_link.get(user_id)[0]
     elif amo_name:
         access_token = get_creds(amo_name).get("access_token")
-
-    if contact_id and access_token:
+    logging.info("Check_status_make_bonus {}; {}; {}; {}; {}; {}".
+                 format(contact_id, chat_id, user_id, amo_name, link, data))
+    if contact_id:
         path = f'/api/v4/contacts/{contact_id}'
         url = link + path
         headers = {
@@ -210,22 +212,18 @@ async def rewrite_contact_v2(chat_id=0, contact_id=0, user_id=0, amo_name='', li
         if answer.ok:
             logging.info('ALL_RIDE_re_write_contact_v2_ {}, answer- {} {} {} {} {}'.
                          format(contact_id, answer.status_code, user_id, chat_id, data, url))
-            # print('ALL_RIDE_re_write_contact_v2_ {}, answer- {} {} {} {} {}'.
-            #              format(contact_id, answer.status_code, user_id, chat_id, data, url))
 
         else:
             logging.info('fuck_up_re_write_contact_v2_ {}, answer- {} {} {} {} {}'.
                          format(contact_id, answer.status_code, user_id, chat_id, data, url))
-            # print('fuck_up_re_write_contact_v2_ {}, answer- {} {} {} {} {}'.
-            #              format(contact_id, answer.status_code, user_id, chat_id, data, url))
     else:
-        logging.info('Contact is not found in Amo {} {} {}'
-                     .format(chat_id, user_id, data))
+        logging.info('Contact is not found in Amo {} {} {} {} '
+                     .format(chat_id, user_id, data, contact_id))
 
 
 async def re_write_link_v3(chat_id, leads_id, contact_id):
     links = await read_links_v3()
-    with open(PATH_DIR + f'links.json', 'w') as file:
+    with open(PATH_DIR + '/links.json', 'w') as file:
         proxy = links.get(chat_id)
         #############
         # {chat_id: (
@@ -259,7 +257,7 @@ async def re_write_link_v3(chat_id, leads_id, contact_id):
 
 
 def get_creds(amo_name):
-    with open(PATH_DIR + f'cred_update_{amo_name}.json', 'r') as file:
+    with open(PATH_DIR + f'/cred_update_{amo_name}.json', 'r') as file:
         creds = json.load(file)
         # fresh = creds.get('refresh_token')
         # access = creds.get('access_token')
@@ -267,9 +265,9 @@ def get_creds(amo_name):
     return creds
 
 
-def get_creds_v2(user_id: int):
+def get_creds_v2(user_id): # : int):
     token_name = user_link.get(user_id)[-1]
-    with open(PATH_DIR + f'cred_update_{token_name}.json', 'r') as file:
+    with open(PATH_DIR + f'/cred_update_{token_name}.json', 'r') as file:
         creds = json.load(file)
         # fresh = creds.get('refresh_token')
         # access = creds.get('access_token')
@@ -279,20 +277,21 @@ def get_creds_v2(user_id: int):
 
 def get_amo_akk(user_id):
     logging.info('GET_USER_AKK_AMO {}'.format(user_id))
-    with open(PATH_DIR + 'amo_akk.json', 'r') as file:
+    with open(PATH_DIR + '/amo_akk.json', 'r') as file:
         data = json.load(file)
         return data.get(user_link.get(user_id)[-1])
 
 
 def get_amo_akk_v2(amo_name):
     logging.info('GET_USER_AKK_AMO {}'.format(amo_name))
-    with open(PATH_DIR + 'amo_akk.json', 'r') as file:
+    with open(PATH_DIR + '/amo_akk.json', 'r') as file:
         data = json.load(file)
+        print(111, data.get(amo_name))
         return data.get(amo_name)
 
 
 async def get_amo_akk_v3(user_id):
-    with open(PATH_DIR + 'amo_akk.json', 'r') as file:
+    with open(PATH_DIR + '/amo_akk.json', 'r') as file:
         data = json.load(file)
         return data.get(user_link.get(user_id)[-1])
 
@@ -319,12 +318,12 @@ async def send_to_amo_message(message, path):
             logging.info('ALL_RIDE_SEND_TO_AMO {} {} {}'.format(answer.text, message, url))
         else:
             logging.error('ERROR_SEND_TO_AMO {} {} {}'.format(answer.text, message, url))
-        # print('SEND_TO_AMO', answer.text)
+
         result = True
 
     except:
         logging.info('SOMETHING_WRONG_WITH_SEND_TO_AMO ' + str(path))
-        print("SOMETHING_WRONG_WITH_SEND_TO_AMO", path)
+        # print("SOMETHING_WRONG_WITH_SEND_TO_AMO", path)
         result = False
 
     # return result
@@ -350,14 +349,15 @@ def send_to_amo_message_v2(message, path):
         answer = requests.post(url, headers=headers, data=data)
         if answer.ok:
             logging.info('ALL_RIDE_SEND_TO_AMO_2 {} {} {}'.format(answer.text, message, url))
+            print(88, answer.text)
         else:
             logging.error('ERROR_SEND_TO_AMO_2 {} {} {}'.format(answer.text, message, url))
-        # print('SEND_TO_AMO', answer.text)
+
         result = True
 
     except:
         logging.info('SOMETHING_WRONG_WITH_SEND_TO_AMO ' + str(path))
-        print("SOMETHING_WRONG_WITH_SEND_TO_AMO", path)
+
         result = False
 
     return result
@@ -389,13 +389,11 @@ async def make_message_for_amo(hook_data, chat_data, sender_id):
         avatar = chat_data.get("users")[0].get('public_user_profile').get("avatar").get("default")
     except:
         avatar = ''
-        print('trouble avatar', chat_data)
 
     try:
         re_avatar = chat_data.get("users")[1].get('public_user_profile').get("avatar").get("default")
     except:
         re_avatar = ''
-        print('trouble re_avatar', chat_data)
 
     try:
         name = chat_data.get("users")[0].get("name")
@@ -406,13 +404,11 @@ async def make_message_for_amo(hook_data, chat_data, sender_id):
         profile_link = chat_data.get("users")[0].get("public_user_profile").get("url")
     except:
         profile_link = ''
-        print('trouble_profile_link', chat_data)
 
     try:
         re_profile_link = chat_data.get("users")[1].get("public_user_profile").get("url")
     except:
         re_profile_link = ''
-        print('trouble_profile_link', chat_data)
 
     try:
         receiver = chat_data.get("users")[0].get('id')
@@ -420,7 +416,6 @@ async def make_message_for_amo(hook_data, chat_data, sender_id):
             receiver = chat_data.get("users")[1].get('id')
     except:
         receiver = ''
-        print('trouble avatar', chat_data)
 
     message_type = hook_data.get('payload').get("value").get('type')
 
@@ -505,12 +500,9 @@ async def make_message_for_amo(hook_data, chat_data, sender_id):
         user_id = hook_data.get('payload').get("value").get('user_id')
         scope_id = get_amo_akk(user_id).get('scope_id')
         await send_to_amo_message(message, f'/v2/origin/custom/{scope_id}')
-        logging.info('We_make_message_for_amo_1 {} {}'.format(user_id, send_message))
+        logging.info('We_make_message_for_amo_1 {} {}'.format(user_id, message))
     except:
         print('FUCKUP_make_message_for_amo_1')
-
-
-# print(2451341, get_amo_akk(369222788))
 
 
 async def make_message_for_amo_v2(hook_data, chat_data, sender_id, silent):
@@ -519,13 +511,11 @@ async def make_message_for_amo_v2(hook_data, chat_data, sender_id, silent):
         avatar = chat_data.get("users")[0].get('public_user_profile').get("avatar").get("default")
     except:
         avatar = ''
-        print('trouble avatar', chat_data)
 
     try:
         re_avatar = chat_data.get("users")[1].get('public_user_profile').get("avatar").get("default")
     except:
         re_avatar = ''
-        print('trouble re_avatar', chat_data)
 
     try:
         name = chat_data.get("users")[0].get("name")
@@ -536,13 +526,11 @@ async def make_message_for_amo_v2(hook_data, chat_data, sender_id, silent):
         profile_link = chat_data.get("users")[0].get("public_user_profile").get("url")
     except:
         profile_link = ''
-        print('trouble_profile_link', chat_data)
 
     try:
         re_profile_link = chat_data.get("users")[1].get("public_user_profile").get("url")
     except:
         re_profile_link = ''
-        print('trouble_profile_link', chat_data)
 
     try:
         receiver = chat_data.get("users")[0].get('id')
@@ -550,7 +538,6 @@ async def make_message_for_amo_v2(hook_data, chat_data, sender_id, silent):
             receiver = chat_data.get("users")[1].get('id')
     except:
         receiver = ''
-        print('trouble avatar', chat_data)
 
     message_type = hook_data.get('payload').get("value").get('type')
     if message_type == "text":
@@ -646,7 +633,7 @@ async def make_message_for_amo_v2(hook_data, chat_data, sender_id, silent):
         scope_data = await get_amo_akk_v3(user_id)
         scope_id = scope_data.get('scope_id')
         await send_to_amo_message(send_message, f'/v2/origin/custom/{scope_id}')
-        logging.info('We_make_message_for_amo_2 {} {}'.format(user_id, send_message))
+        # logging.info('We_make_message_for_amo_2 {}'.format(user_id))
     except:
         print('FUCKUP_make_message_for_amo_2')
 
@@ -660,10 +647,10 @@ async def make_message_for_amo_v2(hook_data, chat_data, sender_id, silent):
         await rewrite_contact(chat_id, user_id, is_phone)
 
 
-def get_amo_account_amojo_id():
-    name = 'JPexp'
-    access_token = get_creds(name).get("access_token")
-    link = 'https://zakazjpexpressru.amocrm.ru'
+def get_amo_account_amojo_id(amo_name):
+    # name = 'rota'
+    access_token = get_creds(amo_name).get("access_token")
+    link = get_amo_akk_v2(amo_name).get("link") # 'https://zakazjpexpressru.amocrm.ru'
     # link = 'https://amo3431ru.amocrm.ru/'
     path = '/api/v4/account?with=amojo_id'
     url = link + path
@@ -676,9 +663,9 @@ def get_amo_account_amojo_id():
     return answer.json().get('amojo_id')
 
 
-def get_amo_account_users():
-    access_token = get_creds(user_id).get("access_token")
-    # link = 'https://amo3431ru.amocrm.ru'
+def get_amo_account_users(user_id):
+    access_token = get_creds_v2(user_id).get("access_token")
+    link = user_link.get(user_id)[0]
     path = '/api/v4/users'
     url = link + path
     params = {
@@ -694,37 +681,37 @@ def get_amo_account_users():
 
 
 def refresh_access_main_amo_v3(amo_name):
-    url = 'https://amo3431ru.amocrm.ru/'
-    # url = 'https://zakazjpexpressru.amocrm.ru'
     creds = get_creds(amo_name)
     refresh = creds.get('refresh_token')
-    file = open(PATH_DIR + 'warning.txt', 'a')
+    file = open(PATH_DIR + '/warning.txt', 'a')
     file.write(str(datetime.datetime.now()))
     file.write('\n')
     file.write(f'refresh_{amo_name}=' + refresh)
     file.write('\n')
     file.close()
+    amo_cred = get_amo_akk_v2(amo_name)
+    print(22222, amo_cred)
+    # data = {
+    #     "client_id": amo_cred.get("client_id"),
+    #     "client_secret": amo_cred.get("client_secret"),
+    #     "grant_type": "refresh_token",
+    #     "refresh_token": refresh,
+    #     "redirect_uri": "https://phone-call.i-bots.ru/token-token"
+    # }
+    link = amo_cred.get("link")
     data = {
-        "client_id": client_id,
-        "client_secret": client_secret,
-        "grant_type": "refresh_token",
-        "refresh_token": refresh,
+        "client_id": amo_cred.get("client_id"),
+        "client_secret": amo_cred.get("client_secret"),
+        "grant_type": "authorization_code",
+        "code": 'def5020072d7f9b1c9ad8fb9ea984f9eb134cb1cb523f56c5c5aaa083e04ac1173cf156a5b3d0e386864d4e3e74d5cf6c18200aedcd33cd451752d229adfc4cb5df2fe5873c4fab5a8a5422c4a9523c057eaa66f571d65d6d645876b95cb8926965d834ca63f1245cb28c97f7e8451b24be8b02438656e30f20ebc9e6b83e525b0d86ed6c90c441b1656c872d51f99e1ada2255ec98e2c15db02096790a89270dd085bad8260dfbb39bb76645d30d4de79d54d90117c83e72dd8aa5aaab795d49869dfd522700e436a5a804ee5588cee8e8c92a9b70c4d97fa374b58bf085725036ba6e3d7efc5fc89b9cb1fee66b6d5c88648c6c35d0ac88979abf8675b19391af13876690b97f2c5ba232c95e5c4cac7518af5169a0d68e6e2a0b01f05f1c96d51e9062ce170245d1b1956a27c93394ce5f4823aca5ee7df69e2048b928deb267bd864d2eb1cd40a165cdf1c086c1501be29c1bf694260ad51ada47024868b7d1b56b0a1d5bec0e70f5244c397ed991a644b71f142676f86f512a6e24f7fa932e95422e524d9862032069460fce45bf6b47852414abb94f036643e172bcad449bff4eeca9e5ea8c38a33f88a9e3477b2d0edfa5c28b91129a1aad105357cb60eff910af86c868ec875930304ba05a1ba247b93036b367e95c4c77b2bd7a05be343ab6bd86a2609f35959feabd648c399964bd0fc2b452fcbf2',  # authorization_code,
         "redirect_uri": "https://phone-call.i-bots.ru/token-token"
     }
     headers = {'Content-Type': 'application/json'}
-    # data = {
-    #     "client_id": 'c172969a-1445-4443-90da-2842aede97b2',
-    #     "client_secret": 'KVuLImC2QsUmXkXOZjtuya55Wf5kHgDQ17nlRl1UpjOLxQG5fvbVwzzMWF665ySx',
-    #     "grant_type": "authorization_code",
-    #     "code": '', # authorization_code,
-    #     "redirect_uri": "https://phone-call.i-bots.ru/token-token"
-    # }
-
     metod = '/oauth2/access_token'
-    link = url + metod
-    answer = requests.post(link, headers=headers, json=data)
+    url = link + metod
+    answer = requests.post(url, headers=headers, json=data)
     print('refresh_access_main_amo', answer.text)
-    result = update_creds_main_amo(answer.text)
+    result = update_creds_main_amo_v2(answer.text, amo_name)
     if result:
         print('ALL_RIDE_refresh_access_main_amo')
 
@@ -737,14 +724,13 @@ def refresh_access_main_amo_v2(user_id):
     token_name = user_link.get(user_id)[-1]
     creds = get_creds_v2(user_id)
     refresh = creds.get('refresh_token')
-    file = open(PATH_DIR + 'warning.txt', 'a')
+    file = open(PATH_DIR + '/warning.txt', 'a')
     file.write(str(datetime.datetime.now()) + token_name)
     file.write('\n')
     file.write(f'refresh_{user_id}=' + refresh)
     file.write('\n')
     file.close()
     data_client = get_amo_akk(user_id)
-    print(data_client)
     data = {
         "client_id": data_client.get("client_id"),
         "client_secret": data_client.get("client_secret"),
@@ -765,8 +751,6 @@ def refresh_access_main_amo_v2(user_id):
     link = url + metod
     answer = requests.post(link, headers=headers, json=data)
     print('refresh_access_main_amo_v2 {} {}'.format(answer.status_code, user_id))
-    # result = update_creds_main_amo(answer.text)
-    print(data, data_client, link, token_name)
     result = update_creds_main_amo_v2(answer.text, token_name)
     if result:
         print('ALL_RIDE_refresh_access_main_amo_v2')
@@ -807,7 +791,7 @@ def get_amo_unsorted_list():
     else:
         data = answer.json()
         need_data = data.get('_embedded').get('unsorted')
-        print(333, need_data[0])
+        # print(333, need_data[0])
         return answer.status_code, need_data
 
 
@@ -824,7 +808,7 @@ def get_amo_current_leads(leads_id, amo_name):
         'limit': 250,  # but we can 250
     }
     answer = requests.get(url, headers=headers, params=params)
-    print('get_amo_unsorted_list ', answer.status_code)
+    print('get_amo_current_leads ', answer.status_code)
 
     if not answer.ok:
         print('EROOR_RESP_get_amo_current_leads', headers, params, answer.text)
@@ -874,15 +858,10 @@ def get_amo_unsorted_list_v2(user_id):
         return answer.status_code, need_data
 
 
-def make_pipeline(order_data):
-    order_id = order_data.get('clientId')
-    order = get_amo_list_leads('3431', order_id)
-
 
 
 async def get_amo_unsorted_list_v3(user_id):
     path = '/api/v4/leads/unsorted'
-    # access_token = get_creds_v2(user_id).get("access_token")
     creds = await get_creds_v3(user_id)
     access_token = creds.get('access_token')
     # link = 'https://amo3431ru.amocrm.ru/'
@@ -915,20 +894,29 @@ async def get_amo_unsorted_list_v3(user_id):
     else:
         data = answer.json()
         need_data = data.get('_embedded').get('unsorted')
-        print(answer.status_code, need_data)
+        # print(answer.status_code, need_data)
         return answer.status_code, need_data
 
 
-def get_amo_events(avito_id):
+def get_amo_events(avito_id=0, amo_name=None):
     path = '/api/v4/events'
-    access_token = get_creds_v2(avito_id).get("access_token")
-    link = user_link.get(avito_id)[0]
+    if avito_id:
+        access_token = get_creds_v2(avito_id).get("access_token")
+        link = user_link.get(avito_id)[0]
+    elif amo_name:
+        credos = get_amo_akk_v2(amo_name)
+        link = credos.get('link')
+        access_token = credos.get('longlife_token')
+    else:
+        access_token = ''
+        link = ''
+
     url = link + path
     headers = {
         'Authorization': 'Bearer ' + access_token
     }
     params = {
-        'page': 0,
+        'page': 2,
         'limit': 250,  # but we can 250
         'filter': {
             'category': [],
@@ -938,7 +926,7 @@ def get_amo_events(avito_id):
         }
     }
     answer = requests.get(url, headers=headers, params=params)
-    print('get_amo_unsorted_list ', answer.status_code)
+    print('get_amo_events ', answer.status_code)
     if answer.ok:
         data = answer.json()
         # need_data = data.get('_embedded').get('unsorted')
@@ -966,7 +954,7 @@ def get_contact_fields(avito_id):
     if answer.ok:
         data = answer.json()
         # need_data = data.get('_embedded').get('unsorted')
-        print(333, 'status', answer.text, data)
+        # print(333, 'status', answer.text, data)
     else:
         logging.error('fuck_up {} {} '.format(answer.status_code, answer.text))
 
@@ -1034,7 +1022,7 @@ async def rewrite_leads(chat_id):  # (leads_id, price, string):
         answer = requests.patch(url, json=data, headers=headers)
         logging.info('rewrite_leads {} {} {}'.format
                      (answer.status_code, data, chat_id))
-        print('rewrite_leads', answer.status_code)
+        # print('rewrite_leads', answer.status_code)
         if not answer.ok:
             print('ERROR rewrite_leads ', data, chat_id, leads_id)
             logging.info('fuck_up_rewrite_leads{} {} {} {}'.
@@ -1045,7 +1033,7 @@ async def rewrite_leads(chat_id):  # (leads_id, price, string):
 
 async def get_phone(string):
     extract_number = "\\+?[7-9][0-9]{9,11}"
-    result = re.findall(extract_number, string.replace(' ', ''))
+    result = re.findall(extract_number, string.replace(' ', '').replace(',', ''))
     if len(result) > 0 and len(result[0]) == 10:
         result[0] = '8' + result[0]
     return result
@@ -1090,7 +1078,7 @@ async def rewrite_leads_v2(chat_id, user_id):  # (leads_id, price, string):
         title = 'See in Avito'
     except Exception as error:
         title = ''
-        print("Some_fuck_up_title {}".format(error))
+        # print("Some_fuck_up_title {}".format(error))
     data = {
         'name': title,
         'price': price,
@@ -1132,15 +1120,15 @@ async def rewrite_leads_v2(chat_id, user_id):  # (leads_id, price, string):
     }
     if leads_id:
         answer = requests.patch(url, json=data, headers=headers)
-        logging.info('try_rewrite_lead_v2_ {} {} {} {} {} {}'.
-                     format(answer.status_code, user_id, chat_id, leads_id, data, url))
+        # logging.info('try_rewrite_lead_v2_{} {} {} {} {} {}'.
+        #              format(answer.status_code, user_id, chat_id, leads_id, data, url))
         if answer.ok:
             await re_write_link_v3(chat_id, leads_id, contact_id)
             logging.info('ALL_RIDE_rewrite_lead_v2 {} {} {} {} {} {} {}'.
                          format(answer.status_code, user_id, chat_id, leads_id, data, url, contact_id))
         else:
-            logging.info('fuck_up_rewrite_lead_v2 {} {} {} {} {} {}'.
-                         format(answer.status_code, user_id, chat_id, leads_id, data, url))
+            logging.info('Error_rewrite_lead_v2{} {} {} {} {} {} {}'.
+                         format(answer.status_code, answer.text, user_id, chat_id, leads_id, data, url))
     else:
         print('Leads is not found in Amo leads V2')
 
@@ -1154,11 +1142,11 @@ def connect_channel_with_account_amo(amo_name):
         "hook_api_version": "v2"
     }
     result = send_to_amo_message_v2(data, f'/v2/origin/custom/{channel_id}/connect')
-    print('connect_channel_with_account_amo', result)
+    # print('connect_channel_with_account_amo', result)
     return result
 
 
-async def make_bonus(subdomain, lead_id):
+async def make_bonus(subdomain, lead_id: int):
     amo_name = ''
     if subdomain == 'zakazjpexpressru':
         amo_name = 'JPexp'
@@ -1168,11 +1156,12 @@ async def make_bonus(subdomain, lead_id):
     links = await read_links_v3()
     bonuses, contact_id, price = 0, 0, 0
     for key, value in links.items():
-        # print(len(value), value)
         if len(value) == 9 and value[7] == lead_id:
             price = value[0].replace('\xa0', '').replace(' ₽', '')
             contact_id = value[8]
             bonuses = int(price) * 0.05
+            logging.info('BONUSES_price {}, contact_id {}, bonuses {}, lead_id {}'.
+                         format( price, contact_id, bonuses, lead_id))
             break
 
     if contact_id and bonuses:
@@ -1196,6 +1185,9 @@ async def make_bonus(subdomain, lead_id):
         answer_note = requests.post(url, headers=headers, json=data_note)
         logging.info('We are calculate_&_send_note {} user, {} bonuses, {} lead_id, and get answer - {}'
                      .format(contact_id, bonuses, lead_id, answer_note))
+        if LOCAL_MODE:
+            print('We are calculate_&_send_note {} user, {} bonuses, {} lead_id, and get answer - {}'
+                         .format(contact_id, bonuses, lead_id, answer_note))
 
         data_bonuses = {
             "custom_fields_values": [
@@ -1215,9 +1207,8 @@ async def make_bonus(subdomain, lead_id):
         await rewrite_contact_v2(data=data_bonuses, contact_id=contact_id, amo_name=amo_name, link=link)
 
     else:
-        logging.info("Not found a candidate for bonuses {} user, {} bonuses, {} lead_id, and get answer - {}"
+        logging.info("Not found a candidate for bonuses {} user, {} bonuses, {} lead_id, and price - {}"
                      .format(contact_id, bonuses, lead_id, price))
-
 
 
 def update_creds_main_amo(answer):
@@ -1225,7 +1216,7 @@ def update_creds_main_amo(answer):
     re_access = token_data.get('access_token')
     re_refresh = token_data.get('refresh_token')
     if re_refresh and re_access:
-        f = open(PATH_DIR + 'cred_update.json', 'w')
+        f = open(PATH_DIR + '/cred_update.json', 'w')
         cred = {
             "access_token": re_access,
             "refresh_token": re_refresh
@@ -1248,7 +1239,7 @@ def update_creds_main_amo_v2(answer, token_name):
     re_refresh = token_data.get('refresh_token')
     # token_name = user_link.get(user_id)[-1]
     if re_refresh and re_access:
-        f = open(PATH_DIR + f'cred_update_{token_name}.json', 'w')
+        f = open(PATH_DIR + f'/cred_update_{token_name}.json', 'w')
         cred = {
             "access_token": re_access,
             "refresh_token": re_refresh
@@ -1266,26 +1257,25 @@ def update_creds_main_amo_v2(answer, token_name):
 
 
 def refresh_access_main_amo():
-    # url = 'https://amo3431ru.amocrm.ru/'
-    # url = 'https://zakazjpexpressru.amocrm.ru'
-    # name = 'JPexp'  # "3431"  #
     name_link = [
         ('JPexp', 'https://zakazjpexpressru.amocrm.ru'),
-        ("3431", 'https://amo3431ru.amocrm.ru/')
+        ("3431", 'https://amo3431ru.amocrm.ru/'),
+        ("rota", 'https://otdelkadrovrota.amocrm.ru')
     ]
     for row in name_link:
         name, url = row[0], row[1]
         creds = get_creds(name)
         refresh = creds.get('refresh_token')
-        file = open(PATH_DIR + 'warning.txt', 'a')
+        file = open(PATH_DIR + '/warning.txt', 'a')
         file.write(str(datetime.datetime.now()))
         file.write('\n')
         file.write(f'refresh_{name}=' + refresh)
         file.write('\n')
         file.close()
+        other_data = get_amo_akk_v2(name)
         data = {
-            "client_id": client_id,
-            "client_secret": client_secret,
+            "client_id": other_data.get('client_id'),
+            "client_secret": other_data.get('client_secret'),
             "grant_type": "refresh_token",
             "refresh_token": refresh,
             "redirect_uri": "https://phone-call.i-bots.ru/token-token"
@@ -1313,12 +1303,14 @@ def refresh_access_main_amo():
                   format(name), answer.text)
 
 
+# get_amo_account_amojo_id('rota')
+# refresh_access_main_amo_v3('rota')
 # get_amo_unsorted_list()
-# connect_channel_with_account_amo()
+# connect_channel_with_account_amo('rota')
 # refresh_access_main_amo()
 # get_amo_unsorted_list()
 
-# get_amo_account_users()
+# get_amo_account_users(10138154)
 # print(asyncio.run(get_phone('Семь 9172213870')))
 # print(user_link.get(10138154)[0])
 # refresh_access_main_amo_v2(369222788)
@@ -1327,7 +1319,8 @@ def refresh_access_main_amo():
 # get_amo_events(369222788)
 # get_contact_fields(10138154)
 # get_contact_fields(353207078)
-# asyncio.run(make_bonus('zakazjpexpressru', 48993631))
+# asyncio.run(make_bonus('zakazjpexpressru', 49320771))
+# asyncio.run(make_bonus('zakazjpexpressru', 49320503))
 # asyncio.run(rewrite_contact_v2(chat_id='u2i-I9OIOGcbfkZKhO_uTUplCA', user_id=10138154,
 #                    data={"custom_fields_values":[
 #                        {"field_code":"PHONE","values":[
@@ -1335,3 +1328,7 @@ def refresh_access_main_amo():
 
 # asyncio.run(rewrite_contact('u2i-yMWc30AcgTbquI~Bi6Riig', 10138154, ["89211112357"]))
 # asyncio.run(rewrite_contact('u2i-U0FJJh6V1Trxk21sYY61qQ', 10138154, ['700948278543']))
+
+# refresh_access_main_amo_v3('rota')
+# get_amo_events(amo_name='JPexp')
+# print(get_amo_akk_v2('rota'))

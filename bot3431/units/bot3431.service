@@ -1,0 +1,14 @@
+[Unit]
+Description=uWSGI instance to serve profit
+After=network.target
+
+[Service]
+User=userbe
+Group=www-data
+WorkingDirectory=/home/userbe/bot3431
+Environment="PATH=/home/userbe/bot3431/botenv/bin"
+ExecStart=/home/userbe/bot3431/bin/uwsgi --ini profit.ini
+
+[Install]
+WantedBy=multi-user.target
+

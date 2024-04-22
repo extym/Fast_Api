@@ -20,7 +20,7 @@ def confirm_data_transfer(app_url, user):
                                        headers=headers,
                                        allow_redirects=False).text)
 
-    print(response)
+    print(2222, response)
     if response.get('general').get('response') == 10404:
         print('Данные для подтверждения отсутствуют')
         return False
@@ -42,11 +42,11 @@ def confirm_data_transfer(app_url, user):
         response = requests.get(get_location, auth=credentials, headers=headers, allow_redirects=False)
         status_code = json.loads(response.text).get('general').get('response')
         time.sleep(2)
-        print(status_code)
+        print(4444, status_code)
 
         if status_code != 10202:
             job_done = True
-    print(response.text)
+    print(4455, response.text)
     job_status_code = json.loads(response.text).get('general').get('response')
     if job_status_code != 10200:
         print(json.loads(response.text).get('general').get('message'))

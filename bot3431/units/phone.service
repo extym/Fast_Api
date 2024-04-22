@@ -1,0 +1,13 @@
+[Unit]
+Description=phone_server
+After=multi-user.target
+
+[Service]
+User=root
+Type=idle
+ExecStart=/usr/bin/python3 /home/userbe/phone/main.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+

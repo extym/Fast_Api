@@ -9,14 +9,14 @@ import requests
 import datetime
 from cred import *
 from amo import make_message_for_amo_v2, rewrite_leads_v2, user_link
-from worker import worker, async_worker
+# from worker import worker, async_worker
 import urllib.parse
 import hashlib
 from email import utils
 import hmac
 import logging
 import os
-
+from bot_tg import send_get
 
 # 357922774 = "3431 грузовые"
 # 353207078 = "3431 новые запчасти"
@@ -25,13 +25,15 @@ import os
 
 if LOCAL_MODE:
     UPLOAD_FOLDER = './'
-    PATH_DIR = './'
+    PATH_DIR = os.getcwd()
     LOG_DIR = './'
     CSV_PATH = './'
 else:
     UPLOAD_FOLDER = '/var/www/html/load/'
-    PATH_DIR = '/home/userbe/phone/'
-    LOG_DIR = 'home/userbe/phone/logs/'
+    PATH_DIR = os.getcwd()
+    PATH_DIR = '/home/userbe/bot3431'
+
+    LOG_DIR = './logs/'
     CSV_PATH = '/var/www/html/csv/'
 
 logging.basicConfig(filename=os.path.join(LOG_DIR + 'webhook.log'), level=logging.INFO,
@@ -49,7 +51,7 @@ sub_user_id = {}
 
 
 def read_links():
-    with open(PATH_DIR + 'links.json', 'r') as file:
+    with open(PATH_DIR + '/links.json', 'r') as file:
         links = json.load(file)
 
         return links
@@ -57,7 +59,7 @@ def read_links():
 
 async def re_write_link_v2(chat_id, msg_id):
     links = read_links()
-    with open(PATH_DIR + 'links.json', 'w') as file:
+    with open(PATH_DIR + '/links.json', 'w') as file:
         proxy = links.get(chat_id)
         #############{chat_id: (
         # price,
@@ -103,13 +105,12 @@ async def re_write_link_v2(chat_id, msg_id):
                     )
                 }
             )
-        # logging.info('LINKS {}'.format(proxy))
+
         json.dump(links, file)
 
 
-
 # def rewrite_links():
-#     with open(PATH_DIR + 'links.json', 'r') as file:
+#     with open(PATH_DIR + '/links.json', 'r') as file:
 #         links = json.load(file)
 #         data = {key: (value[0], value[1], value[2], 353207078) for key, value in links.items()}
 #         write_link(data)
@@ -117,24 +118,21 @@ async def re_write_link_v2(chat_id, msg_id):
 
 def write_link(data):
     links = read_links()
-    with open(PATH_DIR + f'links.json', 'w') as file:
+    with open(PATH_DIR + '/links.json', 'w') as file:
         links.update(data)
-        # print('links', links)
         json.dump(links, file)
 
 
 async def wrote_link_v2(data):
     links = read_links()
-    with open(PATH_DIR + f'links.json', 'w') as file:
+    with open(PATH_DIR + '/links.json', 'w') as file:
         links.update(data)
-        # print('links', links)
         json.dump(links, file)
-
 
 
 def re_write_link(chat_id, msg_id):
     links = read_links()
-    with open(PATH_DIR + 'links.json', 'w') as file:
+    with open(PATH_DIR + '/links.json', 'w') as file:
         proxy = links.get(chat_id)
         #############{chat_id: (price, target_link, msg_id, user_id, title, first_answer)}
         links.update(
@@ -149,45 +147,37 @@ def re_write_link(chat_id, msg_id):
                 )
             }
         )
-        # print('links', links)
+
         json.dump(links, file)
 
 
 def read_links_v2(chat_id):
-    with open(PATH_DIR + 'links.json', 'r') as file:
+    with open(PATH_DIR + '/links.json', 'r') as file:
         links = json.load(file)
 
         return links.get(chat_id)
 
 
 async def read_links_v4(chat_id):
-    with open(PATH_DIR + 'links.json', 'r') as file:
+    with open(PATH_DIR + '/links.json', 'r') as file:
         links = json.load(file)
-        print(links.get(chat_id))
+
         return links.get(chat_id)
 
-# asyncio.run(read_links_v4('u2i-oQfUJXqCG1jPGgXR8Kx6wQ'))
+
+# asyncio.run(read_links_v4('u2i-3jhIQx_QlTC_YIKFZY83Mg'))
 
 
 def read_links_v3(user_id, chat_id):
     name = user_link.get(user_id)[-1]
-    with open(PATH_DIR + f'links_{name}.json', 'r') as file:
+    with open(PATH_DIR + f'/links_{name}.json', 'r') as file:
         links = json.load(file)
 
         return links.get(chat_id)
 
 
-# def write_link_v(data, user_id):
-#     links = read_links()
-#     name = user_link.get(user_id)[-1]
-#     with open(PATH_DIR + f'links_{name}.json', 'w') as file:
-#         links.update(data)
-#         print('links', user_id, links)
-#         json.dump(links, file)
-
-
 def get_creds():
-    with open(PATH_DIR + 'cred_update.json', 'r') as file:
+    with open(PATH_DIR + '/cred_update.json', 'r') as file:
         creds = json.load(file)
     # fresh = creds.get('refresh_token')
     # access = creds.get('access_token')
@@ -196,7 +186,7 @@ def get_creds():
 
 
 def get_creds_avito(user_id):
-    with open(PATH_DIR + f'cred_update_avito_{user_id}.json', 'r') as file:
+    with open(PATH_DIR + f'/cred_update_avito_{user_id}.json', 'r') as file:
         creds = json.load(file)
         access = creds.get('access_token')
 
@@ -204,7 +194,7 @@ def get_creds_avito(user_id):
 
 
 async def get_creds_avito_v2(user_id):
-    with open(PATH_DIR + f'cred_update_avito_{user_id}.json', 'r') as file:
+    with open(PATH_DIR + f'/cred_update_avito_{user_id}.json', 'r') as file:
         creds = json.load(file)
         access = creds.get('access_token')
 
@@ -281,18 +271,6 @@ def test_compex_data(test_data):
     return data
 
 
-def test_lead_complex():  # (data):
-    access_token = creds.get('access_token')
-    data = test_compex_data(test)
-    headers = {
-        'Authorization': 'Bearer ' + access_token
-    }
-    metod = '/api/v4/leads/complex'
-    link = url + metod
-    answer = requests.post(link, headers=headers, json=data)
-
-    return answer.text
-
 # import re
 # validate_phone_number_pattern = "^\\+?[1-9][0-9]{7,14}$"
 # re.match(validate_phone_number_pattern, "+12223334444") # Returns Match object
@@ -323,7 +301,7 @@ def update_creds_avito(answer, user_id):
     token_data = json.loads(answer)
     re_access = token_data.get('access_token')
     if re_access:
-        f = open(PATH_DIR + f'cred_update_avito_{user_id}.json', 'w')
+        f = open(PATH_DIR + f'/cred_update_avito_{user_id}.json', 'w')
         cred = {
             "access_token": re_access
         }
@@ -343,7 +321,7 @@ async def update_creds_avito_v2(answer, user_id):
     token_data = json.loads(answer)
     re_access = token_data.get('access_token')
     if re_access:
-        f = open(PATH_DIR + f'cred_update_avito_{user_id}.json', 'w')
+        f = open(PATH_DIR + f'/cred_update_avito_{user_id}.json', 'w')
         cred = {
             "access_token": re_access
         }
@@ -360,24 +338,37 @@ async def update_creds_avito_v2(answer, user_id):
 
 
 def read_avito_akk(user_id):
-    with open(PATH_DIR + 'avito_akk.json', 'r') as file:
+    with open(PATH_DIR + '/avito_akk.json', 'r') as file:
         data = json.load(file)
 
         return data.get(str(user_id))
 
 
 async def read_avito_akk_v2(user_id):
-    with open(PATH_DIR + 'avito_akk.json', 'r') as file:
+    with open(PATH_DIR + '/avito_akk.json', 'r') as file:
         data = json.load(file)
 
         return data.get(str(user_id))
 
 
 def all_avito_akk():
-    with open(PATH_DIR + 'avito_akk.json', 'r') as file:
-
+    with open(PATH_DIR + '/avito_akk.json', 'r') as file:
         return json.load(file)
 
+
+def get_raw_avito_token(file):
+    url = 'https://api.avito.ru/token/'
+    headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+    with open(file, 'r') as f:
+        data = json.load(f)
+    data = {
+        "client_id": data.get('avito_key'),
+        "client_secret": data.get('avito_secret'),
+        "grant_type": "client_credentials"
+    }
+    answer = requests.post(url=url, headers=headers, data=data)
+    print(answer.text)
+    update_creds_avito(answer.text)
 
 
 def get_avito_token(user_id):
@@ -390,10 +381,8 @@ def get_avito_token(user_id):
         "grant_type": "client_credentials"
     }
     answer = requests.post(url=url, headers=headers, data=data)
-    print(answer.text)
+    # print(answer.text)
     update_creds_avito(answer.text, user_id)
-    # data = answer.json()
-    # print(data)
 
 
 def get_avito_token_v2():
@@ -408,10 +397,8 @@ def get_avito_token_v2():
             "grant_type": "client_credentials"
         }
         answer = requests.post(url=url, headers=headers, data=data)
-        print(answer.text)
+        # print(answer.text)
         update_creds_avito(answer.text, user_id)
-        # data = answer.json()
-        # print(data)
 
 
 async def get_avito_token_v3(user_id):
@@ -424,27 +411,19 @@ async def get_avito_token_v3(user_id):
         "grant_type": "client_credentials"
     }
     answer = requests.post(url=url, headers=headers, data=data)
-    # print('get_avito_token_v3', user_id, answer.text)
     await update_creds_avito(answer.text, user_id)
-    # data = answer.json()
-    # print(data)
 
 
 async def make_data_for_avito_v2(data):
     user_id = 0
-    logging.info('111444444111 {} '.format(data))
+    # logging.info('111444444111 {} '.format(data))
     try:
         chat_id = data.get('message').get('conversation').get('client_id')
     except:
         chat_id = None
-        print('FUCK_UP_with_get_chatId_for_avito', data)
-    # pre_user_id = read_links_v2(chat_id)
     pre_user_id = await read_links_v4(chat_id)
     if pre_user_id:
         user_id = pre_user_id[3]
-        # logging.info('2223333 {} {}'.format(chat_id, user_id))
-
-        # avito_token = get_creds_avito(user_id)
         avito_token = await get_creds_avito_v2(user_id)
         header_avito = {'Authorization': f'Bearer {avito_token}'}
         # user_id = 353207078
@@ -472,25 +451,31 @@ async def make_data_for_avito_v2(data):
             logging.info('ALL_RIDE_make_data_for_avito')
             return True
         else:
-            logging.error('FUCK_UP_with_get_answer_json_from_avito {} {}'
-                          .format(answer.text))
+            logging.error('FUCK_UP_with_get_answer_json_from_avito {} {} {}'
+                          .format(answer.text, user_id, chat_id))
             return False
 
     logging.info('FUCK_UP_with_chatId_from_amo_2 {} {}'.format(data, pre_user_id))
-
-# print(read_links_v2('u2i-kIW6LSkhsX~wAx6AKAQfeQ'))
 
 
 def make_first_answer_avito(chat_id, user_id):
     avito_token = get_creds_avito(user_id)
     header_avito = {'Authorization': f'Bearer {avito_token}'}
     url = f'https://api.avito.ru/messenger/v1/accounts/{user_id}/chats/{chat_id}/messages'
-    message = {
-        "message": {
-            "text": bot_answer
-        },
-        "type": "text"
-    }
+    if user_id == 'rota':
+        message = {
+            "message": {
+                "text": bot_rota_answer
+            },
+            "type": "text"
+        }
+    else:
+        message = {
+            "message": {
+                "text": bot_answer
+            },
+            "type": "text"
+        }
 
     if chat_id:
         # time.sleep(1.50)
@@ -501,15 +486,9 @@ def make_first_answer_avito(chat_id, user_id):
                          .format(chat_id, user_id, answer.text))
             return True
         else:
-            print('FUCK_UP_with_get_first_answer_json_from_avito {} {} {}'
-                  .format(chat_id, user_id, answer.text))
+            logging.info('FUCK_UP_with_get_first_answer_json_from_avito {} {} {}'
+                         .format(chat_id, user_id, answer.text))
             return False
-
-        # except:
-        #     print('FUCK_UP_with_get&send_chatId_from_amo', answer.text)
-        #     return False
-
-    # print('FUCK_UP_with_chatId_from_amo')
 
 
 async def make_first_answer_avito_v2(chat_id, user_id):
@@ -519,37 +498,33 @@ async def make_first_answer_avito_v2(chat_id, user_id):
 
     if chat_id:
         url = f'https://api.avito.ru/messenger/v1/accounts/{user_id}/chats/{chat_id}/messages'
-        message = {
-            "message": {
-                "text": bot_answer
-            },
-            "type": "text"
-        }
+        if user_id == 'rota':
+            message = {
+                "message": {
+                    "text": bot_rota_answer
+                },
+                "type": "text"
+            }
+        else:
+            message = {
+                "message": {
+                    "text": bot_answer
+                },
+                "type": "text"
+            }
         answer = requests.post(url, headers=header_avito, json=message)
         response = answer.json()
         try:
             if response['created']:
-                print('ALL_RIDE_send_data_for_avito')
+                logging.info('ALL_RIDE_send_data_for_avito')
                 return True
-            # elif answer.get('result').get('message') == 'access token expired':
-            #     get_avito_token(user_id)
-            #     avito_token = await get_creds_avito_v2(user_id)
-            #     header_avito = {'Authorization': f'Bearer {avito_token}'}
-            #     url = f'https://api.avito.ru/messenger/v1/accounts/{user_id}/chats/{chat_id}/messages'
-            #     answer = requests.post(url, headers=header_avito, json=message)
-            #     response = answer.json()
-            #     if response['created']:
-            #         print('ALL_RIDE_send_data_for_avito')
-            #         return True
         except Exception as e:
-            print('FUCK_UP_with_get_first_answer_json_from_avito_v2 {} {} {}'.
-                  format(answer.text, chat_id, user_id))
+            logging.info('FUCK_UP_with_get_first_answer_json_from_avito_v2 {} {} {}'.
+                         format(answer.text, chat_id, user_id))
             return False
 
     # proxy = {chat_id: (price, target_link, msg_id, user_id, title, first_answer)}
     # write_link(proxy)
-
-    # print('FUCK_UP_with_chatId_from_amo')
 
 
 def get_avito_chats_info(user_id):
@@ -584,8 +559,8 @@ async def get_avito_current_chat_v2(hook, check):
         ## try read current chat
         url = f'https://api.avito.ru/messenger/v2/accounts/{user_id}/chats/{chat_id}'
         answer = requests.get(url=url, headers=header_avito)
-        logging.info("GET_AVITO_CURRENT_CHAT_1 {} {} {}"
-                     .format(answer.status_code, chat_id, answer.text))
+        logging.info("GET_AVITO_CURRENT_CHAT_1 {} {}"
+                     .format(answer.status_code, chat_id))
         try:
             raw_data = answer.json()
         except Exception as error:
@@ -593,11 +568,9 @@ async def get_avito_current_chat_v2(hook, check):
             logging.error('Some_fuck_up_load_json_from avito_chat {} {} {}'
                           .format(answer.text, chat_id, user_id))
         author_id = hook.get('payload').get('value').get('author_id')
-        # await make_message_for_amo(hook, raw_data, author_id)
         await make_message_for_amo_v2(hook, raw_data, author_id, False)
         logging.info('SEND_DATA_FOR_MESSAGE_TO_AMO_2_ {} {}'
                      .format(chat_id, user_id))
-        # await make_first_answer_avito_v2(chat_id, user_id)
         resp = await make_first_answer_avito_v2(chat_id, user_id)
         logging.info('SEND_DATA_FOR__AMO_2_  {}'.format(resp))
         # # We await response, but this is so long and we get another hook
@@ -610,7 +583,6 @@ async def get_avito_current_chat_v2(hook, check):
             expired = 'not access token expired'
         if expired == 'access token expired':
             get_avito_token(user_id)
-            # avito_token = get_creds_avito(user_id)
             avito_token = await get_creds_avito_v2(user_id)
             header_avito = {'Authorization': f'Bearer {avito_token}'}
             url = f'https://api.avito.ru/messenger/v2/accounts/{user_id}/chats/{chat_id}'
@@ -620,7 +592,6 @@ async def get_avito_current_chat_v2(hook, check):
             raw_data = answer.json()
             logging.info("reTRY_GET_AVITO_CHAT"
                          .format(answer.status_code))
-            # resp = make_first_answer_avito(chat_id, user_id)
             resp = await make_first_answer_avito_v2(chat_id, user_id)
             if resp:
                 first_answer = True
@@ -632,23 +603,22 @@ async def get_avito_current_chat_v2(hook, check):
         except Exception as err:
             print("FUCK UP get_avito_price_string_chat {}".format(err))
 
-        proxy = {chat_id: 
-                     (price, 
+        proxy = {chat_id:
+                     (price,
                       target_link,
-                      msg_id, 
+                      msg_id,
                       user_id,
-                      title, 
-                      first_answer, 
+                      title,
+                      first_answer,
                       rewrite_lead,
                       leads_id,
-                      contact_id )
+                      contact_id)
                  }
         await wrote_link_v2(proxy)
-        # await rewrite_leads(chat_id)
         logging.info('WROTE_DATA_FOR___33 {}'.format(proxy))
         await rewrite_leads_v2(chat_id, user_id)
-        logging.info('TRY_REWRITE_DATA_TO_AMO_1 {} {} {} {} '.
-                     format(chat_id, user_id, title, target_link))
+        # logging.info('TRY_REWRITE_DATA_TO_AMO_1 {} {} {} {} '.
+        #              format(chat_id, user_id, title, target_link))
 
     ### Now in there no send
     elif not check[0]:  # if it's a message exist  or not
@@ -673,11 +643,10 @@ async def get_avito_current_chat_v2(hook, check):
             logging.info("reTRY_GET_AVITO_CURRENT_CHAT5 {} {}"
                          .format(answer.status_code, user_id))
 
-        # re_write_link(chat_id, msg_id)
         await re_write_link_v2(chat_id, msg_id)
 
         author_id = hook.get('payload').get('value').get('author_id')
-        await make_message_for_amo_v2(hook, raw_data, author_id, False) # True)
+        await make_message_for_amo_v2(hook, raw_data, author_id, False)  # True)
         logging.info('SEND_DATA_FOR_MESSAGE_TO_AMO_3_ {} {} {}'
                      .format(chat_id, user_id, check))
 
@@ -688,7 +657,7 @@ async def get_avito_current_chat_v2(hook, check):
                              format(chat_id, user_id, title, target_link))
             except:
                 logging.info('FuckUp_TRY_REWRITE_DATA_TO_AMO_ {} {} {} {} '.
-                         format(chat_id, user_id, title, target_link))
+                             format(chat_id, user_id, title, target_link))
 
     elif not check[2]:
         # try:
@@ -702,62 +671,6 @@ async def get_avito_current_chat_v2(hook, check):
     # return raw_data
 
 
-async def get_avito_current_chat(chat_id, hook):
-    user_id = hook.get('payload').get('value').get('user_id')  # 353207078
-    avito_token = get_creds_avito(user_id)
-    header_avito = {'Authorization': f'Bearer {avito_token}'}
-    msg_id = hook.get('payload').get('value').get('id')
-    author_id = hook.get('payload').get('value').get('author_id')
-    check = check_is_exist(msg_id, chat_id)
-    if not check:
-        url = f'https://api.avito.ru/messenger/v2/accounts/{user_id}/chats/{chat_id}'
-        answer = requests.get(url=url, headers=header_avito)
-        logging.info("GET_AVITO_CURRENT_CHAT_3 {} {}".format
-                     (answer.status_code, chat_id))
-        raw_data = answer.json()
-        print(1111111111, raw_data)
-        try:
-            expired = raw_data.get('result').get('message')
-        except:
-            expired = 'not access token expired'
-        if expired == 'access token expired':
-            get_avito_token(user_id)
-            url = f'https://api.avito.ru/messenger/v2/accounts/{user_id}/chats/{chat_id}'
-            answer = requests.get(url=url, headers=header_avito)
-            logging.info("reTRY_GET_AVITO_CURRENT_CHAT6 {} {}".format
-                         (answer.status_code, chat_id))
-            raw_data = answer.json()
-            print(1112222111, raw_data)
-            logging.info("reTRY_GET_AVITO_CURRENT_CHAT7 {} {}".format
-                         (answer.status_code, chat_id))
-        price, target_link, title = '', '', ''
-        try:
-            price = raw_data.get('context').get('value').get('price_string')
-            target_link = raw_data.get('context').get('value').get('url')
-            title = raw_data.get('context').get('value').get('title')
-        except Exception as err:
-            print("FUCK UP get_avito_price_string_chat {}".format(err))
-
-        proxy = {chat_id: (price, target_link, msg_id, user_id, title, False, 0, 0)}
-        write_link(proxy)
-
-        try:
-            sender_id = str(raw_data.get('last_message').get('author_id'))
-        except:
-            sender_id = ''
-            print('WE GET TROUBLE for get sender_id')
-        if author_id in sender_ids:  # and sender_id != '353207078':  #str(add_data.get('context').get('value').get('user_id'))
-            await rewrite_leads(chat_id)
-            logging.info('TRY_REWRITE_DATA_TO_AMO ' + str(chat_id))
-        elif raw_data and author_id not in sender_ids:
-            # await make_message_for_amo(hook, raw_data, sender_id)
-            logging.info('SEND_DATA_FOR_MESSAGE_TO_AMO_4_ ' + str(chat_id))
-    else:
-        print('WE ALREADY HAS it the MESSAGE', chat_id)
-
-        # return raw_data
-
-
 def enable_avito_webhook(user_id):
     avito_token = get_creds_avito(user_id)
     header_avito = {'Authorization': f'Bearer {avito_token}'}
@@ -769,7 +682,7 @@ def enable_avito_webhook(user_id):
     print('enable_avito_webhook', answer.text)
 
 
-def  disable_avito_webhook(user_id):
+def disable_avito_webhook(user_id):
     avito_token = get_creds_avito(user_id)
     header_avito = {'Authorization': f'Bearer {avito_token}'}
     data = {
@@ -788,43 +701,65 @@ def get_current_hook():
         header_avito = {'Authorization': f'Bearer {avito_token}'}
         answer = requests.post(url, headers=header_avito)
 
-        print(user_id, answer.text)
+        print(1212, user_id, answer.text)
+        logging.info('current_hook {} {}'.format(user_id, answer.text))
 
 
-heck = {'id': 'd8e51513-9229-4497-94c6-69dc65ffedab', 'version': 'v3.0.0', 
-        'timestamp': 1706865998, 
+def get_current_balance():
+    url = 'https://api.avito.ru/cpa/v2/balanceInfo'
+    for user_id in sender_ids:
+        time.sleep(1)
+        avito_token = get_creds_avito(user_id)
+        header_avito = {'Authorization': f'Bearer {avito_token}',
+                        'X-Source': 'i-bots'}
+        answer = requests.post(url, headers=header_avito, json={})
+
+        if answer.ok:
+            data = answer.json()
+            print(245254, data)
+            send_get('Avito report: \n Account: {},\n Balance {} ,\n Avito advance {}'
+                     .format(user_link.get(user_id)[1],
+                             data.get("result").get("balance") / 100,
+                             data.get("result").get("advance") / 100))
+        else:
+            print(2222, user_id, answer.text)
+            logging.error('balance {} {}'.
+                          format(user_id, answer.text))
+
+
+heck = {'id': 'd8e51513-9229-4497-94c6-69dc65ffedab', 'version': 'v3.0.0',
+        'timestamp': 1706865998,
         'payload': {
-            'type': 'message', 
+            'type': 'message',
             'value': {
-                'id': 'c1348bb968650a00e693d87e0e5e7e92', 
-                'chat_id': 'u2i-YvRiaEtf8Qn~N4sh3mMKkA', 
-                'user_id': 369223108, 'author_id': 459734245, 'created': 1706865998, 'type': 'text', 'chat_type': 'u2i', 'content': {'text': 'планируется поставка?'}, 'item_id': 4098549657}}}
+                'id': 'c1348bb968650a00e693d87e0e5e7e92',
+                'chat_id': 'u2i-YvRiaEtf8Qn~N4sh3mMKkA',
+                'user_id': 369223108, 'author_id': 459734245, 'created': 1706865998, 'type': 'text', 'chat_type': 'u2i',
+                'content': {'text': 'планируется поставка?'}, 'item_id': 4098549657}}}
 
 
-# import asyncio
-# asyncio.run(get_avito_current_chat('u2i-YvRiaEtf8Qn~N4sh3mMKkA', heck))
-#
-# #
-# get_avito_token(369221904)
 
-# get_avito_token(369222788)
-# get_avito_token(369721092)
-
-# get_avito_token(369721092)
-# get_avito_token(10138154)
+# get_avito_token(357717666)
 # # # get_vito_current_chat('u2i-plZ1VOkef3W2z8rMnrNHDg')
-# enable_avito_webhook(353207078)
-# enable_avito_webhook(369721092)
 # write_link({'u2i-sjJYEdKG89VKhGV6SDQIEw': ('5\xa0691 ₽', 'https://avito.ru/sankt-peterburg/zapchasti_i_aksessuary/standart_3396397474')})
 # hook = {'id': '97d14aac-97ac-40de-9220-4e6bdea78c5d', 'version': 'v3.0.0', 'timestamp': 1693842617, 'payload': {'type': 'message', 'value': {'id': '72ab5028eb846209e22f1c132e44a29e', 'chat_id': 'u2i-TOYzRVLyb9Hw_l7u2aBTVg', 'user_id': 353207078, 'author_id': 259749082, 'created': 1693842617, 'type': 'text', 'chat_type': 'u2i', 'content': {'text': 'Покупку произвести у вас непосредственно там, на месте можно при осмотре.'}, 'item_id': 3364311913}}}
 # result = hook.get('payload').get('value').get('chat_id')
 # rewrite_links()
 # print(read_avito_akk(357922774))
-# get_avito_token(369721092)
+# get_avito_token(363810872)
 
-
+# get_raw_avito_token('avito_akk-12.json')
+#
 # get_avito_token_v2()
+# get_current_balance()
+# enable_avito_webhook(363810872)
+# enable_avito_webhook(375811020)
 # get_current_hook()
 # disable_avito_webhook(10138154)
-
+# enable_avito_webhook('rota')
 # print(read_links())
+
+# get_avito_chats_info('rota')
+
+# hook = {'id': '93090b09-7774-4540-b875-8861356fbb6d', 'version': 'v3.0.0', 'timestamp': 1712220290, 'payload': {'type': 'message', 'value': {'id': '4e40017827104f1c5d42c5eb0a276585', 'chat_id': 'u2i-5u1BZROboeSAFX7u00euug', 'user_id': 375811020, 'author_id': 1000676, 'created': 1712220290, 'type': 'text', 'chat_type': 'u2i', 'content': {'text': 'есть в наличии?'}, 'item_id': 4073598608}}}
+# asyncio.run(get_avito_current_chat_v2(hook, (False, False, False)))
