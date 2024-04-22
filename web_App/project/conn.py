@@ -607,7 +607,8 @@ async def executemany_query_v2(query, data):
         print(f"The ERROR from execute_many_query '{err}' occured ")
 
 
-async def write_order(query1: object = None, data1: object = None, query2: object = None, data2: object = None) -> object:
+async def write_order(query1: str = None, data1: object = None,
+                      query2: str = None, data2: object = None) -> object:
     with create_connection() as connection:
         try:
             with connection.cursor() as cursor:

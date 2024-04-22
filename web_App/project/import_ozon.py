@@ -628,15 +628,14 @@ def make_internal_import_oson(donor=None, recipient=None, k=1, sourse=None):
                                                     Marketplaces.key_mp)
                                              .where(Marketplaces.shop_name == recipient)).first()
             product_data = session.query(Product).filter_by(shop_name=donor).all()
-            # product_data = session.execute(select(Product).where(Product.shop_name == donor)).all()
-            # product_data = session.execute(text(f"SELECT * FROM products WHERE products.shop_name ='{donor}' ")).all()
+            # product_data = session.execute(select(Product).where(Product.shop_name == donor)).fetchall()           # product_data = session.execute(text(f"SELECT * FROM products WHERE products.shop_name ='{donor}' ")).all()
             # print(33, recipient_data, product_data)
         if product_data:
             for row in product_data:
-                # print(22222, row.external_sku)
-                # os.abort()
-                price = int(row.price_product_base) * k
-                old_price = price * 4
+                # print(22222, row )
+                price = int(row.price) * (1 + k / 100)
+                price = str(price).split('.')[0][:-1] + "9"
+                old_price = str(int(price) * 4)
                 item = {
                     'name': row.name_product,
                     'articul_product': row.articul_product,
@@ -655,7 +654,7 @@ def make_internal_import_oson(donor=None, recipient=None, k=1, sourse=None):
             }
 
             if sourse is None:
-                print('Client-Id {}'.format(header.get('Client-Id')))
+                print('Client-Id {} from internal import oson'.format(header.get('Client-Id')))
                 os.abort()
             else:
                 answer = requests.post(url=metod,
@@ -663,24 +662,14 @@ def make_internal_import_oson(donor=None, recipient=None, k=1, sourse=None):
                                        json=data)
                 if answer.ok:
                     data_json = answer.json()
-                    # answer = True
-                    # data_json = {"result": {
-                    #     "task_id": 176594213,
-                    #     "unmatched_sku_list": [1093855209,
-                    #                            1006367092,
-                    #                            1006367006,
-                    #                            1006367113,
-                    #                            1006367076,
-                    #                            1006367113,
-                    #                            1006354790]
-                    #     }
-                    # }
-                    # if answer:
                     result = data_json.get('result')
                     if result:
                         sku_list = result.get('unmatched_sku_list')
                         count, count_error = 0, 0
                         for product in product_data:
+                            price = int(product.price_product_base) * (1 + k / 100)
+                            final_price = str(price).split('.')[0][:-1] + "9"
+                            old_price = str(int(price) * 4)
                             new_prod = {
                                 'articul_product': product.articul_product,
                                 'shop_name': recipient,
@@ -688,8 +677,8 @@ def make_internal_import_oson(donor=None, recipient=None, k=1, sourse=None):
                                 'quantity': product.quantity,
                                 'reserved': product.reserved,
                                 'price_product_base': product.price_product_base,
-                                'final_price': product.final_price,
-                                'old_price': product.old_price,
+                                'final_price': final_price,
+                                'old_price': old_price,
                                 'discount': product.discount,
                                 'description_product': product.description_product,
                                 'photo': product.photo,
@@ -718,7 +707,7 @@ def make_internal_import_oson(donor=None, recipient=None, k=1, sourse=None):
                             }
                             if int(product.external_sku) in sku_list:
 
-                                print(3333, product.shop_name, product.id, product.external_sku)
+                                # print(3333, product.shop_name, product.id, product.external_sku)
                                 # print(777777777, *product.as_dict(), sep=':,\n')
                                 with Session(engine) as session:
                                     session.begin()

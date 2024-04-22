@@ -16,7 +16,8 @@ from flask_login import current_user, login_required
 from werkzeug.utils import secure_filename
 
 from project.conn import *  # execute_query, executemany_query
-# from project.conn_maintenance import query_write_order, query_write_items, update_status_order_reverse_id
+# from project.conn_maintenance import query_write_order,
+# query_write_items, update_status_order_reverse_id
 from project import LOCAL_MODE
 from project.ozon import common_error
 
@@ -277,6 +278,38 @@ def reformat_data_items_v2(order, shop_name, mp):
     return result
 
 
+def product_info_price(id_mp, seller_id):
+    api_key = Marketplaces.query.filter_by(seller_id=seller_id).first().key_mp
+    headers = {
+        'Client-Id': seller_id,
+        'Api-Key': api_key,
+        'Content-Type': 'application/json'
+    }
+    url = 'https://api-seller.ozon.ru/v3/posting/fbs/get'
+    data = {
+        "posting_number": id_mp,
+        "with": {
+            "analytics_data": False,
+            "barcodes": False,
+            "financial_data": False,
+            "product_exemplars": False,
+            "translit": False}}
+    resp = requests.post(url=url, headers=headers, json=data)
+    # {'code': 5,
+    # 'message': 'Unknown posting number "55200317-0207-4"',
+    # 'details': []}
+    result = resp.json()
+    print('product_id_offer_id', result)
+    order = result.get("result")
+    if order:
+        return order
+    elif result.get('code') == 5:
+        # write_notice_order
+        return None
+    else:
+        return None
+
+
 @main.route('/')
 def index_main():
     return render_template('ui-login.html')  # 'start_page.html')
@@ -293,8 +326,8 @@ def profile():
 
 @main.route('/api/on', methods=['POST'])
 async def onon_push():
-    ip_addr = request.environ.get('X-REAL-IP')
-    print('X-REAL-IP', ip_addr)
+    ip_addr = request.environ.get('X-Real-IP')
+    print('X-Real-IP', ip_addr)
     addr = request.headers.get('X-Forwarded-For')
     print('X-Forwarded-For', addr)
     resp = request.get_json()
@@ -320,10 +353,11 @@ async def onon_push():
                 print('new_order_onon', order['posting_number'])
                 order['our_id'], order['id'], order['status'], order['our_status'] \
                     = our_id, id_mp, "NEW", "NEW"  # TODO change place id_mp & our_id
-                shop_name = Marketplaces.query.filter_by(seller_id=seller_id).first().shop_name
+                shop_name = Marketplaces.query.\
+                    filter_by(seller_id=seller_id).first().shop_name
                 ref_data = reformat_data_order(order, 'Ozon')
                 # list_items = reformat_data_items(order, 'Ozon')
-                list_items = reformat_data_items_v2(order, shop_name,  'Ozon')
+                list_items = reformat_data_items_v2(order, shop_name, 'Ozon')
                 await write_order(query1=query_write_order, data1=ref_data,
                                   query2=query_write_items_v2, data2=list_items)
                 # await execute_query(query_write_order, ref_data)
@@ -336,7 +370,10 @@ async def onon_push():
 
         elif resp.get("message_type") == "TYPE_POSTING_CANCELLED":
             order_id = resp["posting_number"]
-            data = ("canceled", "NEW", order_id, "Ozon")
+            order_status = resp.get('status')
+            print('INFO CANCELED ORDER - status {} from {}'
+                  .format(order_status, resp))
+            data = ("canceled", "canceled", order_id, "Ozon")
             # await execute_query(update_status_order_reverse_id, data)
             await execute_query_v3(query=update_status_order,
                                    query2=update_status_order_items,
@@ -398,45 +435,3 @@ def download():
 @main.route('/test', methods=['GET', 'POST'])
 def test():
     return 'OK'
-
-
-def product_info_price(id_mp, seller_id):  # product_id, offer_id
-    # url = 'https://api-seller.ozon.ru/v4/product/info/prices'
-    # data = {"filter": {
-    #             "offer_id": [offer_id],
-    #             "product_id": [str(product_id)],
-    #             "visibility": "ALL"
-    #         },
-    #         "last_id": "",
-    #         "limit": 100}
-    # api_key = db.session.execute(select(Marketplaces.key_mp)
-    #                                  .where(Marketplaces.seller_id == seller_id))
-    api_key = Marketplaces.query.filter_by(seller_id=seller_id).first().key_mp
-    headers = {
-        'Client-Id': seller_id,
-        'Api-Key': api_key,
-        'Content-Type': 'application/json'
-    }
-    url = 'https://api-seller.ozon.ru/v3/posting/fbs/get'
-    data = {
-        "posting_number": id_mp,
-        "with": {
-            "analytics_data": False,
-            "barcodes": False,
-            "financial_data": False,
-            "product_exemplars": False,
-            "translit": False}}
-    resp = requests.post(url=url, headers=headers, json=data)
-    # {'code': 5,
-    # 'message': 'Unknown posting number "55200317-0207-4"',
-    # 'details': []}
-    result = resp.json()
-    print('product_id_offer_id', result)
-    order = result.get("result")
-    if order:
-        return order
-    elif result.get('code') == 5:
-        # write_notice_order
-        return None
-    else:
-        return None

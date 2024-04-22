@@ -18,7 +18,7 @@ from .models import *
 from . import db, TEST_MODE
 from sqlalchemy.orm import Session, load_only
 
-from project.import_ozon import import_oson_data_prod
+from project.import_ozon import import_oson_data_prod, make_internal_import_oson
 from project.wb import import_product_from_wb
 # Pagination
 from flask_paginate import Pagination, get_page_parameter
@@ -421,8 +421,9 @@ def import_settings_post():
     role = current_user.roles
     company_id = current_user.company_id
     data = request.form.to_dict()
-    print(111, data)
-    if 'import_mp_name' in data:
+    make = data.get('make')
+    print(111, data, current_user.name)
+    if make == 'start_import':
         mp = data.get('import_mp_name')
         shop_name = data.get('import_shop_names')
         if mp == 'ozon':
@@ -438,7 +439,7 @@ def import_settings_post():
 
         return redirect('/import_settings')
 
-    if 'internal_import_mp_1' in data:
+    elif make == 'save_internal_import':
         internal_import_mp_1 = data.get('internal_import_mp_1')
         internal_import_store_1 = data.get('internal_import_store_1')
         internal_import_role_1 = data.get('internal_import_role_1')
@@ -464,9 +465,31 @@ def import_settings_post():
             flash("Настройки удачно сохранены", 'success')
         else:
             flash("Проверьте, пожалуйста, корректность вводимых данных", 'error')
+            return redirect('/import_settings')
 
-        print(data)
-        print(*data.items(), sep='\n')
+    elif make == 'start_internal_import':
+        internal_import_mp_1 = data.get('internal_import_mp_1')
+        internal_import_store_1 = data.get('internal_import_store_1')
+        internal_import_role_1 = data.get('internal_import_role_1')
+        internal_import_mp_2 = data.get('internal_import_mp_2')
+        internal_import_store_2 = data.get('internal_import_store_2')
+        internal_import_role_2 = data.get('internal_import_role_2')
+
+        if internal_import_role_1 != internal_import_role_2 and \
+            internal_import_store_1 != internal_import_store_2 and \
+            internal_import_mp_1 != 'Выбрать... ' and \
+            internal_import_mp_2 != 'Выбрать... ':
+            if internal_import_role_2 == 'donor' and internal_import_role_1 == 'recipient':
+                donor = data.get('internal_import_store_2')
+                recipient = data.get('internal_import_store_1')
+            else:
+                donor = data.get('internal_import_store_1')
+                recipient = data.get('internal_import_store_2')
+            job = q.enqueue_call(make_internal_import_oson(donor=donor,
+                                                           recipient=recipient,
+                                                           sourse='front'))
+            print(989898989, job.get_id)
+        # print(*data.items(), sep='\n')
 
     return redirect('/import_settings')
 
@@ -969,7 +992,8 @@ def assembly_sales(page=1):
                       SalesToday.shop_name,
                       SalesToday.article,
                       SalesToday.order_status) \
-            .where(SalesToday.date_added > example) \
+            .where(SalesToday.date_added > example)\
+            .where(SalesToday.shop_status == "NEW")\
             .order_by(SalesToday.article_mp) \
             .paginate(page=page, per_page=limit, error_out=False)
 
