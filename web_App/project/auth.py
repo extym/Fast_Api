@@ -7,15 +7,16 @@ from sqlalchemy.exc import IntegrityError
 from psycopg2.errors import UniqueViolation
 from flask import Blueprint, request, flash, render_template, redirect, url_for, session
 from flask_login import login_user, logout_user, login_required, current_user, UserMixin
-
+from werkzeug.utils import secure_filename
 from html import unescape
+import os
 
 from sqlalchemy import func, select, update, join, values, text
 from sqlalchemy.sql.functions import sum
 from .database import Data_base_connect as Db
 from werkzeug.security import generate_password_hash, check_password_hash
 from .models import *
-from . import db, TEST_MODE
+from . import db, TEST_MODE, PHOTO_UPLOAD_FOLDER
 from sqlalchemy.orm import Session, load_only
 
 from project.import_ozon import import_oson_data_prod, make_internal_import_oson
@@ -30,6 +31,13 @@ from rq.job import Job
 q = Queue(connection=conn)
 
 auth = Blueprint('auth', __name__)
+
+ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 @auth.route('/login-ui')
@@ -55,7 +63,7 @@ def login_post():
 
     login_user(user, remember=remember)
 
-    return redirect(url_for('main.profile'))
+    return redirect(url_for('main.come_in'))
 
 
 @auth.route('/form-consult', methods=['post'])
@@ -492,7 +500,7 @@ def import_settings_post():
 
             job = q.enqueue_call(make_internal_import_oson(donor=donor,
                                                            recipient=recipient,
-                                                           sourse='front',
+                                                           source='front',
                                                            donor_mp=donor_mp,
                                                            recipient_mp=recipient_mp))
             print(989898989, job.get_id)
@@ -1087,12 +1095,70 @@ def users_table(page=1):
                                         total_users=total_users))
 
 
-# @auth.route('/add-product')
-# @login_required
-# def add_product():
-#     pass
-#
-#     return unescape(render_template('eco-product-add.html'))
+@auth.route('/profile')
+@auth.route('/profile', methods=['POST'])
+@login_required
+def profile():
+    if not current_user.is_authenticated:
+        return redirect(url_for('main.index_main'))
+    else:
+        rows = {}
+        user_id = current_user.id
+        role = current_user.roles
+        company_id = current_user.company_id
+        user_data = db.session.execute(select(Users)
+                                       .where(Users.id == user_id)\
+                                       .where(Users.company_id == company_id))\
+            .first()
+        photo = user_data[0].photo
+        if not photo or photo is None:
+            photo = 'profile-music-2.jpg'
+        user_name = user_data[0].name
+        rows['photo'] = photo
+        # for row in need_data:
+        #     rows.extend(row)
+
+    if request.method == 'POST':
+        data = request.form.to_dict()
+        print(44444444444, data)
+        return redirect('/profile')
+
+    print(3333333, user_data, photo, user_name)
+    return render_template('hos-profile-edit.html',
+                           uid=user_id, role=role,
+                           rows=user_data[0], photo=photo,
+                           user_name=user_name)
+
+
+@auth.route('/upload_file', methods=['GET', 'POST'])
+def upload_file():
+    if request.method == 'POST':
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+        file = request.files['file']
+        # if user does not select file, browser also
+        # submit an empty part without filename
+        if file.filename == '':
+            flash('No selected file')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            # print(11111111111, os.getcwd())
+            file.save(os.path.join(PHOTO_UPLOAD_FOLDER, filename))
+
+            return redirect(url_for('auth.upload_file',
+                                    filename=filename))
+    return '''
+    <!doctype html>
+    <title>Upload new File</title>
+    <h1>Upload new File</h1>
+    <form method=post enctype=multipart/form-data>
+      <input type=file name=file>
+      <input type=submit value=Upload>
+    </form>
+    '''
 
 
 @auth.app_errorhandler(404)

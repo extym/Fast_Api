@@ -315,9 +315,9 @@ def index_main():
     return render_template('ui-login.html')  # 'start_page.html')
 
 
-@main.route('/profile')
+@main.route('/comein')
 @login_required
-def profile():
+def come_in():
     name = current_user.name
     uid = current_user.id
     role = current_user.roles

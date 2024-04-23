@@ -13,6 +13,7 @@ db = SQLAlchemy()
 
 TEST_MODE = 1
 LOCAL_MODE = 1
+PHOTO_UPLOAD_FOLDER = 'project/templates/static/data/profile/'
 
 def create_app():
     app = Flask(__name__,

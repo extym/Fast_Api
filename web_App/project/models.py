@@ -8,9 +8,11 @@ class Users(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(250), unique=True)
     password = db.Column(db.String(250))
+    login = db.Column(db.String(250))
     name = db.Column(db.String(250))
     company_id = db.Column(db.String(250))
     roles = db.Column(db.String(250))
+    photo = db.Column(db.String(250))
     date_added = db.Column(db.String(250))
     date_modifed = db.Column(db.String(250))
 

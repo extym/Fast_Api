@@ -608,17 +608,12 @@ def import_oson_data_prod(user_id=None, shop_name=None, company_id=None):
         return 'errors {}'.format(error)
 
 
-def make_import_ozon(donor=None, recipient=None, k=1):
-    if donor is not None and recipient is not None:
-        pass
-
-
 def check_import_limit(seller_id):
     pass
 
 
 def make_internal_import_oson(donor=None, recipient=None, k=1,
-                              sourse=None, donor_mp=None, recipient_mp=None):
+                              source=None, donor_mp=None, recipient_mp=None):
     # metod = 'https://api-seller.ozon.ru/v3/product/import'
     metod = 'https://api-seller.ozon.ru/v1/product/import-by-sku'
     if donor is not None and recipient is not None:
@@ -656,7 +651,7 @@ def make_internal_import_oson(donor=None, recipient=None, k=1,
                 'Content-Type': 'application/json'
             }
 
-            if sourse is None:
+            if source is None:
                 print('Client-Id {} from internal import oson'.format(header.get('Client-Id')))
                 os.abort()
 
