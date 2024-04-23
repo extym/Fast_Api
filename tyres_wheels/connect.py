@@ -1,19 +1,19 @@
 from __future__ import print_function
 
+from cred import DATA_PATH
 import csv
 import datetime
 # from pictures import write
 import json
 import mysql.connector
-from main import get_wheels
+from main import get_wheels, get_new_pages
 import requests
-from getcsv import get_tyres_csv
+from getcsv import standart_tyres_csv
 from categories import categories_summer, categories_wheels, categories_winter, categories_allseason
 
 
 def write(smth):
-    # with open('log.txt', 'a') as file:
-    with open('/usr/local/bin/fuck_debian/tyres_wheels/log.txt', 'a') as file:
+    with open(DATA_PATH + 'log.txt', 'a') as file:
         how_time = datetime.datetime.now()
         file.write(str(how_time) + '-' + smth + '\n')
 
@@ -111,7 +111,7 @@ def standart_product(dictionary, in_stock):
         default_picture = dictionary['picture']
         image_tuple = (0,)
         if default_picture[-2:] == '0.':
-            default_picture = 88888888
+            default_picture = '88888888'
         else:
             # default_picture = 88888888
             image_url = dictionary['picture']
@@ -209,7 +209,7 @@ def params_options_wheels(dictionary, product_id):
 
 def params_optwheels(dictionary, product_id):
     params = {'product_id': product_id}
-    url = 'http://super-puper.ml:5000/params/options/wheels'
+    url = 'http://194.87.248.20:5000/params/options/wheels'
     # url = 'http://localhost:7770/params/options/wheels'
     response = requests.post(url, params=params, json=dictionary)
     data = response.json()
@@ -265,10 +265,10 @@ def params_options(dictionary, product_id):
 def create_connection():
     connx = None
     try:
-        connx = mysql.connector.connect(user='root', database='db1000koles',
-                                      password='toor_Pass1!', host='localhost')  #password='12345678',
-        # connx = mysql.connector.connect(user='kolesru', database='kolesru',
-        #                                 password='9fUev3XGWb18glvs', host='localhost')
+        connx = mysql.connector.connect(user=local_user_db, database=local_name_db,
+                                        password=local_pass_db, host=local_host_db)  # password='12345678',
+        # connx = mysql.connector.connect(user=user_db, database=name_db,
+        #                                 password=pass_db, host=host_db)
     except ConnectionError as error:
         print(f'We have ERROR CREATE_CONN {error}')
 
@@ -351,14 +351,10 @@ def check_is_exist(product_code, categoryID):
     return result
 
 
-def get_magic_link():
-    link = 'http://super-puper.ml/data_product.json'
-    return link
-
-
 def data_products():
-    get_wheels()
-    get_tyres_csv()
+    # get_wheels()
+    get_new_pages()
+    standart_tyres_csv()
     # magic_link = get_magic_link()
     # data_resp = requests.get(magic_link)
     # data_product = data_resp.json()
@@ -498,7 +494,7 @@ def check_and_write():
     print('from_check_and_write errors', count)
 
 
-def check_write_json(data_from_json):
+def check_write_json_old(data_from_json):
     ij_data = []
     count = 0
     connection = create_connection()
@@ -554,7 +550,7 @@ def check_write_json(data_from_json):
                     proxy_data = [picture_id, product_id]
                     make_query(connection, add_product_picture,
                                proxy_data)  # cursor.execute(add_product_picture, proxy_data)
-                    print('ij_data-12-2', len(ij_data))
+                    print('ij_data-12-22', len(ij_data))
                     # write_pictures_data(ij_data)
                     # dict_options = params_data(data_product)
 
@@ -566,8 +562,8 @@ def check_write_json(data_from_json):
                     product_code = data_product[0][6]
                     price_for_site = data_product[0][3]
                     if quantity >= 4 and [is_exist[1], is_exist[2]] != [quantity, data_product[0][3]]:
-                        print(is_exist[1], is_exist[2], 'before_quantity22',
-                              category_id, product_code, ' -now', quantity, data_product[0][3])
+                        # print(is_exist[1], is_exist[2], 'before_quantity222',
+                        #       category_id, product_code, ' -now', quantity, data_product[0][3])
                         enabled = 1
                         new_data = [quantity, enabled, category_id, price_for_site, product_code]
                         make_query(connection, update, new_data)  # cursor.execute(update, new_data)
@@ -615,14 +611,16 @@ def check_write_json(data_from_json):
     # write('from_check_and_write errors ' +  str(count))
     print('from_check_and_write errors', count)
 
+
 def get_smth_please():
     # params = {'product_id': product_id}
-    url = 'http://super-puper.ml:5000/get/smth'
+    url = 'http://194.87.248.20:5000/get/smth'
     # url = 'http://localhost:7770/get/smth'
     response = requests.post(url)
     data = response.json()
 
     return data
+
 
 def check_for_json():
     ij_data = []
@@ -682,7 +680,7 @@ def check_for_json():
                     proxy_data = [picture_id, product_id]
                     make_query(connection, add_product_picture,
                                proxy_data)  # cursor.execute(add_product_picture, proxy_data)
-                    print('ij_data-12-2', len(ij_data))
+                    print('ij_data-12-21', len(ij_data))
                     # write_pictures_data(ij_data)
                     # dict_options = params_data(data_product)
 
@@ -694,7 +692,7 @@ def check_for_json():
                     product_code = data_product[0][6]
                     price_for_site = data_product[0][3]
                     if quantity >= 4 and [is_exist[1], is_exist[2]] != [quantity, data_product[0][3]]:
-                        print(is_exist[1], is_exist[2], 'before_quantity22',
+                        print(is_exist[1], is_exist[2], 'before_quantity1122',
                               category_id, product_code, ' -now', quantity, data_product[0][3])
                         enabled = 1
                         new_data = [quantity, enabled, category_id, price_for_site, product_code]

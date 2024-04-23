@@ -35,7 +35,8 @@ def test():
 
 string_add_product_picture = ("UPDATE avl_products SET default_picture = %s  WHERE productID = %s")
 
-string_update = ("UPDATE avl_products SET Price = %s, in_stock = %s, enabled = %s, date_modified = NOW()  WHERE categoryID = %s AND product_code = %s")
+string_update = ("UPDATE avl_products SET Price = %s, in_stock = %s, enabled = %s, date_modified = NOW()  "
+                 "WHERE categoryID = %s AND product_code = %s")
 
 string_add_options = ("INSERT INTO avl_product_options_values (optionID, productID, option_value) VALUES (%s, %s, %s)")
 
@@ -56,7 +57,7 @@ def random_choice():
 @app.route('/params/options/wheels', methods=['POST'])
 def params_optinels():
     product_id = request.args.get('product_id')
-    print('product_id', product_id)
+    # print('product_id', product_id)
     dictionary = request.get_json()
     # print('dictionary', dictionary)
     data_options = []
