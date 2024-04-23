@@ -185,6 +185,87 @@ def get_orders_v2(delta, headers=OZON_HEADERS, schema='fbs'):
     return res
 
 
+def get_orders_v3(delta, headers=OZON_HEADERS, schema='fbs'):
+    url = f"https://api-seller.ozon.ru/v3/posting/{schema}/list"
+    offset = 0
+    per_request = 100
+    res = []
+    dt = datetime.datetime.now() - datetime.timedelta(hours=delta)
+    date_since = dt.strftime(DATE_FORMAT)
+    date_to = datetime.datetime.now().strftime(DATE_FORMAT)
+    headers = {'Client-Id': str(headers['Client-Id']), 'Api-Key': headers['Api-Key'], 'Content-Type': headers['Content-Type'], 'Accept' : headers['Accept']}
+    while True:
+        data = {
+            "limit": per_request,
+            "offset": offset,
+            "filter": {
+                "since": date_since,
+                "to": date_to,
+                "status": "awaiting_packaging"
+            },
+            "with": {
+                "analytics_data": True,
+                "financial_data": True
+            }
+        }
+        resp = requests.post(url, headers=headers, json=data)
+        # print(resp.text)
+        try:
+            res_list = json.loads(resp.text)["result"]["postings"]
+        except:
+            break
+        if not res_list:
+            break
+
+        res.extend(res_list)
+        offset += per_request
+    return res
+
+
+def divide_orders_v4(data, header, schema='fbs'):
+    url = "https://api-seller.ozon.ru/v4/posting/fbs/ship"
+    res, result = [], False
+    # headers = {'Client-Id': str(header['Client-Id']), 'Api-Key': header['Api-Key'], 'Content-Type': headers['Content-Type'], 'Accept' : headers['Accept']}
+    resp = requests.post(url, headers=header, json=data)
+    print('divide_orders_v4', resp.text, 'send_data', data, header)
+    res_list = resp.json()
+    try:
+        # res_list = json.loads(resp.text)["result"]["postings"]
+        # res_list = [resp.json()]
+        res = res_list.get('additional_data')
+        if res:
+            # res.extend(res_list)
+            result = True
+    except Exception as er:
+        # break
+        code = res_list.get('code')
+        if code == 3:
+            result = False
+        logging.error('API error {}'.format(er))
+    if not res_list:
+        # break
+        logging.info('res_list from divide_orders_v4 is empty')
+
+    return result, res
+
+
+def send_discount(data, header):  ##TODO
+    url = "https://api-seller.ozon.ru/v1/product/update/discount"
+    resp = requests.post(url, headers=header, json=data)
+    print('OSON_send_discount', resp.text)
+    re_data = resp.json()
+    result = False
+    try:
+        res = re_data.get("result")
+        if res:
+            result = True
+    except Exception as error:
+        logging.info('ERROR_send_discount {}'.format(error))
+        print('ERROR_send_discount', header.get("client_id"), data, resp.text)
+
+    return result
+
+
 def get_transactions_moments(delta_days=5):
     """
     Dict {order_number: transaction_date}
@@ -477,22 +558,25 @@ def order_status_ship_v2(posting_number: str, package_products: List, headers=OZ
     """
     Собрать заказ 'status': 'awaiting_packaging'
     """
-    url = f"https://api-seller.ozon.ru/v3/posting/fbs/ship"
+    url = "https://api-seller.ozon.ru/v4/posting/fbs/ship"
     data = {
         "packages": [{
-            "items": package_products
+            "products": package_products
         }],
-        "posting_number": posting_number
+        "posting_number": posting_number,
+        "with": {
+            "additional_data": True
+        }
     }
     # print(data)
     headers = {'Client-Id': str(headers['Client-Id']), 'Api-Key': headers['Api-Key'], 'Content-Type': headers['Content-Type'], 'Accept' : headers['Accept']}
     resp = requests.post(url, headers=headers, json=data)
-    # print(resp.text)
+    print(44444, resp.text)
     return resp.ok
 
 
 def order_label(posting_number: str, file_path: str, headers=OZON_HEADERS) -> bool:
-    print(file_path)
+    # print('file_path', file_path)
     url = f"https://api-seller.ozon.ru/v2/posting/fbs/package-label"
     data = {
         "posting_number": [
@@ -509,7 +593,7 @@ def order_label(posting_number: str, file_path: str, headers=OZON_HEADERS) -> bo
         with open(file_path, "wb") as outfile:
             outfile.write(res_content)
     else:
-        print(resp.text)
+        print('order_label', resp.text, posting_number)
     return resp.ok
     
 
@@ -611,6 +695,26 @@ def get_fbs_order_v3(posting_number, headers=OZON_HEADERS):
     except:
         return {}
 
+
+def get_fbs_order_v4(posting_number, header):
+    url = "https://api-seller.ozon.ru/v3/posting/fbs/get"
+    data = {
+        "posting_number": posting_number,
+        "with": {
+            "financial_data": True,
+            "translit": True
+        }
+    }
+    headers = {'Client-Id': str(header['Client-Id']), 'Api-Key': header['Api-Key'], 'Content-Type': header['Content-Type'], 'Accept' : header['Accept']}
+    resp = requests.post(url, headers=headers, json=data)
+    #headers = {'Client-Id': str(headers['Client-Id']), 'Api-Key': headers['Api-Key'], 'Content-Type': headers['Content-Type'], 'Accept' : headers['Accept']}
+    if not resp.ok:
+        return {}
+    try:
+        res_dict = json.loads(resp.text)
+        return res_dict.get("result")
+    except:
+        return {}
 
 def get_fbs_order_barcode(posting_number, headers=OZON_HEADERS):
     url = "https://api-seller.ozon.ru/v3/posting/fbs/get"

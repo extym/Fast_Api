@@ -66,14 +66,14 @@ body {
 
 .container {
   margin: 20px auto;
-  width: 1100;
+  width: 1240px;
 }
 
 .login {
   position: relative;
   margin: 100px auto 0 auto;
   padding: 20px 20px 20px;
-  width: 960px;
+  width: 1120px;  //TODO
   background: white;
   border-radius: 3px;
   -webkit-box-shadow: 0 0 200px rgba(255, 255, 255, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3);
@@ -252,24 +252,25 @@ input[type=submit]:active {
                 <input type="hidden" name="passw" value="{{passw}}">
                     <input type="hidden" name="seller_id" value="{{seller_id}}">
 
-                <table width = "970" style="border: 1px solid; border-color: #c4c4c4"  align="center">
+                <table  style="border: 1px solid; border-color: #c4c4c4"  align="center">
                     <tr>
-                        <td colspan="3" align="center" valign="middle" height="30" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align: middle"><a href="{{edit_seller_url}}?seller_id={{seller_id}}&login={{login}}&passw={{passw}}">Назад к настройкам селлера</a></td>
+                        <td colspan="45" align="center" valign="middle" height="30" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align: middle"><a href="{{edit_seller_url}}?seller_id={{seller_id}}&login={{login}}&passw={{passw}}">Назад к настройкам селлера</a></td>
                     </tr>
                     <tr>
-                        <td width = "450" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #a0a0a0;">Товар OZON</td>
+                        <td width = "550" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #a0a0a0;">Товар OZON</td>
                         <td width = "450" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #a0a0a0;">Товар МС</td>
                         <td width = "70" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #a0a0a0;">Доставка</td>
+                        <td width = "70" height = "40" align="center" placeholder="%" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #a0a0a0;">Скидка</td>
                     </tr>
                     {{rows}}
                     <tr>
-                        <td colspan="3" align="center" valign="middle" height="30" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align: middle"><input type="submit" value="Сохранить" name="save_products" class="my"></td>
+                        <td colspan="5" align="center" valign="middle" height="30" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align: middle"><input type="submit" value="Сохранить" name="save_products" class="my"></td>
                     </tr>
                     <tr>
-                        <td colspan="3" align="center" valign="middle" height="30" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align: middle"><a href="{{edit_seller_url}}?seller_id={{seller_id}}&login={{login}}&passw={{passw}}">Назад к настройкам селлера</a></td>
+                        <td colspan="5" align="center" valign="middle" height="30" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align: middle"><a href="{{edit_seller_url}}?seller_id={{seller_id}}&login={{login}}&passw={{passw}}">Назад к настройкам селлера</a></td>
                     </tr>
                     <tr>
-                        <td colspan="3" align="center" valign="middle" height="30" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align: middle"><a href="{{index_url}}?login={{login}}&passw={{passw}}">Назад к списку селлеров</a></td>
+                        <td colspan="5" align="center" valign="middle" height="30" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align: middle"><a href="{{index_url}}?login={{login}}&passw={{passw}}">Назад к списку селлеров</a></td>
                     </tr>
 
                 </table>

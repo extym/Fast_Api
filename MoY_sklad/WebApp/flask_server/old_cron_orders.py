@@ -21,7 +21,7 @@ from settings import MYSQL_HOST, MYSQL_USER, MYSQL_PASW, MYSQL_DATABASE, DB_DICT
 
 def check_divide_orders(list_postings, stores, divide_count): #check seller ordderress list
     print('#' * 49)
-    print('11111_list_postings', len(list_postings), stores, divide_count)
+    print('11111', type(list_postings), len(list_postings))
     count_quan = []
     result = False
     # position_count = len(posting['products'])
@@ -29,25 +29,20 @@ def check_divide_orders(list_postings, stores, divide_count): #check seller ordd
     for posting in list_postings:   #posting is dict
         count = 0
         if posting.get('status') != 'awaiting_packaging':
-            # print(55555, posting.get('status'), posting)
             continue
         else:
             store = posting.get('delivery_method')['warehouse_id']
+            # print("STORE_FROM_POSTING", store, type(store))
             type_store = stores.get(str(store))
-            print("STORE_FROM_POSTING", store, type_store)
             if type_store != 'fbs':
                 continue
             else:
                 index = (0,)
                 for prods in posting['products']:
-                    quantity = prods['quantity']
-                    if quantity == divide_count: ##check need divide
-                        continue
-                    else:
-                        count += quantity       #count quantity all positions
+                    count += prods['quantity']        #count quantity all positions
 
-                if count > divide_count:
-                    print('!' * 30)
+                if count > divide_count:  # and type_store == 'fbs':
+                    print('!' * 100)
                     print('1_check_divide_orders', datetime.datetime.now(), 'products', len(posting['products']), 'quantity',
                           posting['products'][0]['quantity'], posting['products'], posting.get('posting_number'))
                     # posting_number = posting['posting_number']
@@ -55,9 +50,8 @@ def check_divide_orders(list_postings, stores, divide_count): #check seller ordd
                     count_quan.append(index)
                     result = True
 
-                print('CHEcked_position_index_&_count', index, count_quan)
-
-    return result, count_quan
+                print('CHEcked_position_index_&_count', index)
+    return result, count_quan,
 
 
 def divide_order(posting_enum, header, divide_slice, total_count):
@@ -392,11 +386,11 @@ def start_orders():
 
         # continue
         #
-        ##################CUSTOM DIVIDE###############
+        ##################CUBSTOM DIVIDE###############
         o_stores = seller[13]
 
         if divide == 1:
-            print('divide', seller_stores)
+            # print('divide', seller_stores)
             check = check_divide_orders(orders, seller_stores, divide_count)
             if check[0]:
                 # raw_divide_orders = []
@@ -420,8 +414,6 @@ def start_orders():
                 orders.extend(divide_posting_number)
                 # orders.append(divided_post)
                 print('LEN_ORDERS_&_DIVIDE_ORDERS', len(orders), len(divide_posting_number))
-            else:
-                continue
 
         ##################CUSTOM DIVIDE###############
 
@@ -577,15 +569,12 @@ def start_orders():
             res_products = []
             products = []
             delive = 0
-            setted_discount = 0
 
             for product in order['products']:
                 elem_dict = {}
                 elem_dict['offer_id'] = product['offer_id']
-                print("product['offer_id']", product['offer_id'])
-                # raw_tmp = db.get_product_href_delive(seller_id, elem_dict['offer_id'])
-                raw_tmp = db.get_product_href_delive_v2(seller_id, elem_dict['offer_id'])
-                print('get_product_href_delive_v2', raw_tmp)
+
+                raw_tmp = db.get_product_href_delive(seller_id, elem_dict['offer_id'])
                 try:
                     elem_dict['href'] = raw_tmp[0][0]
                 except:
@@ -599,12 +588,6 @@ def start_orders():
                     elem_dict['delive'] = 0
                 if elem_dict['delive'] > delive:
                     delive = elem_dict['delive']
-
-                try:
-                    elem_dict['set_discount'] = int(raw_tmp[0][2])
-                except:
-                    elem_dict['set_discount'] = 0
-                    # continue
 
                 elem_dict['sku'] = product['sku']
                 elem_dict['name'] = product['name']
@@ -621,7 +604,7 @@ def start_orders():
                 logging.info(f"Products 0, Continue")
                 continue
 
-            print('proxy-1', delive)
+            # print(1, delive)
             if usluga_price_ms:
                 delive = ms.get_usluga_price(usluga)
 
@@ -629,12 +612,11 @@ def start_orders():
             # continue
 
             # res_products.append({'quantity': 1, 'price': elem_dict['delive'], 'href': usluga})
-            products_meta = ms.make_products_meta_v2(res_products, reserve=True)
-            # products_meta = ms.make_products_meta(res_products, reserve=True)
+            products_meta = ms.make_products_meta(res_products, reserve=True)
             if usluga and usluga != '0': #FIXME del and delive
                 usluga_meta = ms.make_service_meta({'quantity': 1, 'price': delive, 'href': usluga, 'vat': 0})
                 products_meta.append(usluga_meta)
-            print('products_meta', products_meta)
+            # print(products_meta)
 
             # order_name = f"{name}_{str(posting_number)}"
             if moment_date:
@@ -733,19 +715,18 @@ def start_orders():
                 #         logging.warning(f"KO changing status to awaiting_deliver in order {posting_number} in MS")
                 if order['status'] in ('awaiting_approve', 'awaiting_packaging'):
                     package_products = ozon.prepare_products_for_ship(products)
-                    # if ozon.order_status_ship(posting_number, package_products, header):
-                    if ozon.order_status_ship_v2(posting_number, package_products, header):
-                        logging.info(f"OKi changing status to awaiting_deliver in order {posting_number} in MS")
+                    if ozon.order_status_ship(posting_number, package_products, header):
+                        logging.info(f"OK changing status to awaiting_deliver in order {posting_number} in MS")
                         order['status'] = 'awaiting_deliver'
                         time.sleep(SLEEP_TIME)
                     else:
-                        logging.warning(f"KiO changing status to awaiting_deliver in order {posting_number} in MS")
+                        logging.warning(f"KO changing status to awaiting_deliver in order {posting_number} in MS")
                 if order['status'] == 'awaiting_deliver':
                     if ozon.order_status_delivery(posting_number, header):
-                        logging.info(f"OKi changing status to delivering in order {posting_number} in MS")
+                        logging.info(f"OK changing status to delivering in order {posting_number} in MS")
                         order['status'] = 'delivering'
                     else:
-                        logging.warning(f"KiO changing status to delivering in order {posting_number} in MS")
+                        logging.warning(f"KO changing status to delivering in order {posting_number} in MS")
 
             else:
                 ################### FBS ######################
@@ -766,8 +747,7 @@ def start_orders():
                 if order['status'] in ('awaiting_approve', 'awaiting_packaging'):
                     # print('fbs')
                     package_products = ozon.prepare_products_for_ship(products)
-                    # if ozon.order_status_ship(posting_number, package_products, header):
-                    if ozon.order_status_ship_v2(posting_number, package_products, header):
+                    if ozon.order_status_ship(posting_number, package_products, header):
                         logging.info(f"OK changing status to awaiting_deliver in order {posting_number} in MS")
                         order['status'] = 'awaiting_deliver'
                         time.sleep(SLEEP_TIME)
@@ -789,7 +769,7 @@ def start_orders():
                 customer_comment = ''
             ########## Обновление БД #########
             for product in products:
-                print('product_from_xs_before_insert', product)
+                print('product_from_xs', product)
                 result = db.insert_update_oder(seller_id, order_id, order, product, comment, order_href, label, fbs)
                 if result:
                     logging.info(f"Order {order_id} / {posting_number} insert/update in BD")
@@ -800,7 +780,7 @@ def start_orders():
 
     db.close()
     # sys.exit(0)
-    print(datetime.datetime.now(), 'ONE_CIRCLE_MADE')
+    print(datetime.datetime.now(), 'ONE_FUCK_CIRCLE_MADE')
 
 
 start_orders()

@@ -14,15 +14,24 @@ from settings import TRY, MS_HEADERS, SLEEP_TIME, MS_LAST_DOCUMENTS, LOCAL_MODE
 
 
 def requests_get(url, headers=MS_HEADERS):
+    proxy_sleep_time = SLEEP_TIME
     i = 0
     resp = None
     while i < TRY:
         try:
             resp = requests.get(url, headers=headers)
-        except:
-            logging.warning('Error making GET request to MS, try again')
-            time.sleep(SLEEP_TIME)
-            i += 1
+            if resp.status_code == 429:
+                proxy_sleep_time += 30
+                logging.warning("TOO MANY REQUESTS TO MS")
+            if resp.status_code == 200:
+                i += 5
+
+        except Exception as error:
+            logging.error(f'Error making GET request to MS, try again. {error}'.format())
+            logging.error(f'Error making GET request to MS' + str(url) + str(headers))
+            time.sleep(proxy_sleep_time)
+            i += 2
+            proxy_sleep_time += 2
         else:
             break
     return resp
@@ -346,6 +355,50 @@ def make_products_meta(products: List[Dict], reserve: bool = False):
     return products
 
 
+def make_products_meta_v2(products: List[Dict], reserve: bool = False):
+    """
+    products = {price, quantity, discount, href}
+    "positions": [{
+                "quantity": 10,
+                "price": 100,
+                "discount": 0,
+                "vat": 0,
+                "assortment": {
+                  "meta": {
+                    "href": "https://online.moysklad.ru/api/remap/1.2/entity/product/8b382799-f7d2-11e5-8a84-bae5000003a5",
+                    "type": "product",
+                    "mediaType": "application/json"
+                  }
+                },
+                "reserve": 10
+              }]
+    """
+    for i in range(len(products)):
+        mshref = "https://online.moysklad.ru/api/remap/1.2/entity/product/" + products[i]['href']
+        price = products[i]['price'] * 100
+        quantity = products[i]['quantity']
+        discount = products[i]['set_discount']
+        if reserve:
+            reserve_num = quantity
+        else:
+            reserve_num = 0
+        products[i] = {
+                "quantity": quantity,
+                "price": price,
+                "discount": discount,
+                "vat": 0,
+                "assortment": {
+                  "meta": {
+                    "href": mshref,
+                    "type": "product",
+                    "mediaType": "application/json"
+                  }
+                },
+                "reserve": reserve_num
+        }
+    return products
+
+
 def make_service_meta(service: Dict):
     mshref = "https://online.moysklad.ru/api/remap/1.2/entity/service/" + service['href']
     price = service['price'] * 100
@@ -437,19 +490,21 @@ def post_order(contragent, products_meta, organization, comment, posting_number,
           "value": moment
         })
 
-    # print(data) #FIXME
+    #print('MSMSMS', data) #FIXME
     # return
-
+    res_dict = {}
     resp = requests.post(url, headers=MS_HEADERS, json=data)
-    print(resp.text)
-    # res_dict = json.loads(resp.text)
-    res_dict = resp.json()
+    print('RESULT_post_order', resp.text)
+    try:
+        res_dict = json.loads(resp.text)
+    except Exception as err:
+        print('ERROR from ms_post_order {}'.format(err))
     if resp.ok:
-        logging.info(f"MS ok add lead {res_dict['name']}") #FIXME
+        logging.info(f"MS ok add lead {res_dict.get('name')}") #FIXME
         return res_dict['name'], res_dict['id']
-    # print(resp.text)
-    logging.warning(res_dict)
-    logging.warning(data['moment'])
+    logging.info('RESULT_post_order ' + resp.text)
+    logging.warning('CHECK ' + res_dict)
+    logging.warning(data.get('moment'))
     return None, None
 
 
@@ -676,7 +731,7 @@ def post_demand(demand_dict: Dict) -> bool:
     method = '/demand'
     url = link + method
     resp = requests.post(url, headers=MS_HEADERS, json=demand_dict)
-    print(resp.text)
+    print('demand', resp.text)
     return resp.ok
 
 

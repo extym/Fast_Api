@@ -7,11 +7,18 @@ import logging
 import json
 from typing import Any, Dict, List
 
+# import mysql
 import mysql.connector
 # pip install mysql-connector-python
+import os
+from settings import OZON_ORDERS_OLD_DAYS, PUBLIC_DIR, ORDERS_LOG_FILE
 
-from settings import OZON_ORDERS_OLD_DAYS
-
+########################################
+logging.basicConfig(filename=os.path.join(PUBLIC_DIR, ORDERS_LOG_FILE),
+                    format='[%(asctime)s] [%(levelname)s] => %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S', level=logging.INFO)
+logging.info('=' * 50)
+logging.info('DATABASE_LOG Started')
 
 class MsDatabase:
     def __init__(self, host=None, user=None, passwd=None, database=None):
@@ -53,9 +60,11 @@ class MsDatabase:
         return True
 
     def update_seller(self, seller: Dict):
+        # print('seller++++++++++', seller)
         try:
-            self.cur.execute("UPDATE `sellers` SET `name`=%s, `token`=%s, date_ozon_field=%s, `status`=%s, `contragent`=%s, `comment`=%s, `active`=%s, `fb`=%s, `sklad`=%s, `organization`=%s, `ozon_store`=%s, `usluga`=%s, `usluga_price_ms`=%s, `status_realfbs`=%s, `contragent_realfbs`=%s, `comment_realfbs`=%s, `usluga_realfbs`=%s, `usluga_price_ms_realfbs`=%s, `price`=%s, `cancell_status`=%s WHERE `client_id`=%s",
-                             (seller['name'], seller['token'], seller['date_ozon_field'], seller['status'], seller['contragent'], seller['comment'], seller['active'], '', seller['sklad'], seller['organization'], seller['ozon_store'], seller['usluga'], seller['usluga_price_ms'], seller['status_realfbs'], seller['contragent_realfbs'], seller['comment_realfbs'], seller['usluga_realfbs'], seller['usluga_price_ms_realfbs'], seller['price'], seller['cancell_status'], seller['client_id']))
+            self.cur.execute("UPDATE `sellers` SET `name`=%s, `token`=%s, date_ozon_field=%s, `status`=%s, `contragent`=%s, `comment`=%s, `active`=%s, `fb`=%s, `sklad`=%s, `organization`=%s, `ozon_store`=%s, `usluga`=%s, `usluga_price_ms`=%s, `status_realfbs`=%s, `contragent_realfbs`=%s, `comment_realfbs`=%s, `usluga_realfbs`=%s, `usluga_price_ms_realfbs`=%s, `price`=%s, `cancell_status`=%s, `divide`=%s, `divide_count`=%s"
+                             " WHERE `client_id`=%s",
+                             (seller['name'], seller['token'], seller['date_ozon_field'], seller['status'], seller['contragent'], seller['comment'], seller['active'], '', seller['sklad'], seller['organization'], seller['ozon_store'], seller['usluga'], seller['usluga_price_ms'], seller['status_realfbs'], seller['contragent_realfbs'], seller['comment_realfbs'], seller['usluga_realfbs'], seller['usluga_price_ms_realfbs'], seller['price'], seller['cancell_status'], seller['divide'], seller['divide_count'], seller['client_id']))
             self.conn.commit()
         except Exception as ex:
             print(f"MySQL update seller {seller['name']} error {ex}")
@@ -98,6 +107,11 @@ class MsDatabase:
     def get_seller(self, client_id):
         self.cur.execute(f"SELECT * FROM `sellers` WHERE `client_id`=%s", (client_id,))
         raw_list = self.cur.fetchall()
+        return raw_list
+
+    def get_seller_v2(self, client_id):
+        self.cur.execute(f"SELECT `token` FROM `sellers` WHERE `client_id`=%s", (client_id,))
+        raw_list = self.cur.fetchone()
         return raw_list
 
     def get_dict(self, table='organizations'):
@@ -172,6 +186,20 @@ class MsDatabase:
             return False
         return True
 
+
+    def update_ozon_discount(self, client_id: str, product_id: int, discount: int):
+        try:
+            self.cur.execute(
+                f"UPDATE `ozon_products` SET `discount` = %s WHERE `client_id` = %s AND `product_id` = %s",
+                (discount, client_id, product_id))
+            self.conn.commit()
+        except Exception as e:
+            logging.warning('MySQL update dict table ozon_products discount error {}'.format(e))
+            print('update_ozon_discount', e)
+            return False
+        return True
+
+
     def insert_update_ms_product(self, product: List):
         # product[4] = json.dumps(product[4])
         # self.cur.execute(
@@ -208,7 +236,7 @@ class MsDatabase:
                  order['status'], order['shipment_date'], ms_order_id, ms_order_href, label, fbs, delivery_date_end))
             self.conn.commit()
         except Exception as e:
-            logging.warning(f'MySQL insert/update order error')
+            print('MySQL insert_update_oder ERROR {}'.format(e))
             logging.error('insert/update order error {}'.format(e))
             return False
         return True
@@ -216,6 +244,15 @@ class MsDatabase:
     def get_products(self, client_id):
         try:
             self.cur.execute("SELECT `product_id`, `offer_id`, `name`, `barcode`, `ms_id`, `delive` FROM `ozon_products` WHERE `client_id` = %s ORDER BY `name`", (client_id, ))
+            raw_list = self.cur.fetchall()
+        except:
+            return []
+        return raw_list
+
+
+    def get_products_v2(self, client_id):
+        try:
+            self.cur.execute("SELECT `product_id`, `offer_id`, `name`, `barcode`, `ms_id`, delive, `base_count`, `discount` FROM `ozon_products` WHERE `client_id` = %s ORDER BY `name`", (client_id, ))
             raw_list = self.cur.fetchall()
         except:
             return []
@@ -236,6 +273,16 @@ class MsDatabase:
         except:
             return []
         return raw_list
+
+
+    def get_product_href_delive_v2(self, client_id, offer_id):
+        try:
+            self.cur.execute("SELECT `ms_id`, `delive`, `discount` FROM `ozon_products` WHERE `client_id` = %s AND `offer_id` = %s", (client_id, offer_id))
+            raw_list = self.cur.fetchall()
+        except:
+            return []
+        return raw_list
+
 
     def get_ms_products(self):
         try:

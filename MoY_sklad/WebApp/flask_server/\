@@ -1,0 +1,9 @@
+*.pdf
+*.txt
+*.sql
+*.xml
+*.iml
+*.out
+*gitignore
+*htaccess
+

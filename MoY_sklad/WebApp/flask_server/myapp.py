@@ -19,6 +19,19 @@ import ozon
 import ms
 
 
+async def send_discount_now(header, product):
+    data = {
+        "discount": product[-1],
+        "product_id": product[0]
+        }
+    result = ozon.send_discount(data, header)
+    print(result, data)
+    if result:
+        print("All ride to send", product[0])
+    else:
+        print("ERRoorr ", product[0], product[5])
+
+
 app = Flask(__name__,
             static_folder='templates/static')
 app.debug = True
@@ -197,7 +210,7 @@ def sellers_today():
 
     #################################################################################
     for act in list_act_id:
-        print(type(act), act)
+        # print('act', type(act), act)
         seller_id = act[1]
         sell_tok = sell_dict.get(seller_id)[1]
         header = ozon.get_header(sell_tok, seller_id)
@@ -218,7 +231,7 @@ def sellers_today():
             demand = 'Архив'
         elif act[6] == 2:
             orders = ozon.get_act_orders(act_id, header)
-            print(act_id, '-',  header, '-',  orders)
+            # print('act_id', act_id, '-',  header, '-',  orders)
             i = 0
             j = 0
             for order in orders:
@@ -277,7 +290,6 @@ def sellers_today():
         act_id = int(result['create_demand'])
         for row in list_act_id:
             if row[0] == act_id:
-                print(type(row[0]))
                 seller_id = row[1]
         sell_tok = sell_dict.get(seller_id)[1]
         header = ozon.get_header(sell_tok, seller_id)
@@ -449,6 +461,12 @@ def edit_seller():
                 res['active'] = 1
             else:
                 res['active'] = 0
+            if result.get('divide'):
+                res['divide'] = 1
+                res['divide_count'] = int(result.get('divide_count', 2))
+            else:
+                res['divide'] = 0
+                res['divide_count'] = 0
             if result.get('usluga_price_ms'):
                 res['usluga_price_ms'] = 1
             else:
@@ -529,7 +547,7 @@ def edit_seller():
     else:
         try:
             (id, date, name, seller_id, api_token, date_field, state, contragent_id, comment, active, fb, store, organization_id, ozon_store_json, usluga,
-             usluga_price_ms, state_realfbs, contragent_realfbs, comment_realfbs, usluga_realfbs, usluga_price_ms_realfbs, price, cancell_state) = db.get_seller(seller_id)[0]
+             usluga_price_ms, state_realfbs, contragent_realfbs, comment_realfbs, usluga_realfbs, usluga_price_ms_realfbs, price, cancell_state, divide, divide_count) = db.get_seller(seller_id)[0]
         except:
             return f'Не найден селлер в базе<br><a href="{index_url}?login={login}&passw={passw}">Назад</a>'
 
@@ -537,6 +555,12 @@ def edit_seller():
             active = 'checked'
         else:
             active = ''
+        if divide == 1:
+            divide = 'checked'
+            # divide_cnt = divide_count
+        else:
+            divide = ''
+            divide_count = ''
         if not price:
             price = MS_DEFAULT_PRICE
 
@@ -670,11 +694,12 @@ def edit_seller():
                                     ozon_stores=ozon_stores, login=LOGIN, passw=PASSW, seller_id=seller_id, status_text=status_text,
                                     uslugi=uslugi, usluga_price_ms_active=usluga_price_ms_active, contragents_realfbs=contragents_realfbs,
                                     states_realfbs=states_realfbs, comment_realfbs=comment_realfbs, uslugi_realfbs=uslugi_realfbs,
-                                    usluga_price_ms_active_realfbs=usluga_price_ms_active_realfbs, prices=prices, cancell_states=cancell_states))
+                                    usluga_price_ms_active_realfbs=usluga_price_ms_active_realfbs, prices=prices, cancell_states=cancell_states,
+                                    divide=divide, divide_count=divide_count))
 
 
 @app.route("/edit_seller_products", methods=['GET', 'POST'])
-def edit_seller_products():
+async def edit_seller_products():
     if LOGGING:
         logging.basicConfig(filename=os.path.join(PUBLIC_DIR, LOG_FILE),
                             format='[%(asctime)s] [%(levelname)s] => %(message)s',
@@ -703,13 +728,21 @@ def edit_seller_products():
         errors = 0
         jobs = 0
         if result.get('save_products'):
-            ozon_products = db.get_products(seller_id)
+            # ozon_products = db.get_products(seller_id)
+            token = db.get_seller_v2(seller_id)[0]
+            ozon_products = db.get_products_v2(seller_id)
             for product in ozon_products:
                 product_id = product[0]
                 # print(product_id)
                 ms_id = str(product[4])
                 delive = product[5]
                 new_ms_id = result.get(str(product_id))
+                discount = product[7]
+                try:
+                    new_discount = int(result.get(str(product_id) + '_discount'))
+                    # print('discount_pr', discount, new_discount)
+                except:
+                    new_discount = 0
                 try:
                     new_delive = float(result.get(str(product_id) + '_price'))
                 except:
@@ -730,6 +763,16 @@ def edit_seller_products():
                     except:
                         pass
                     # print(seller_id, product_id, new_ms_id)
+                if new_discount and new_discount != discount:
+                    try:
+                        if not db.update_ozon_discount(seller_id, product_id, new_discount):
+                            errors += 1
+                        jobs += 1
+                    except:
+                        pass
+                    header = ozon.get_header(token, seller_id)
+                    await send_discount_now(header, product)
+                    print('discount try send successfully')
         if errors:
             status_text = f"При обновлении связей товаров возникло {errors} ошибок"
         elif jobs:
@@ -749,7 +792,8 @@ def edit_seller_products():
         pass
 
     rows = ''
-    ozon_products = db.get_products(seller_id)
+    # ozon_products = db.get_products(seller_id)
+    ozon_products = db.get_products_v2(seller_id)
     ms_products = db.get_ms_products()
     for product in ozon_products:
         try:
@@ -759,6 +803,14 @@ def edit_seller_products():
             barcode = product[3]
             ms_id = product[4]
             delive = product[5]
+            if product[6]:
+                count_base = product[6]
+            else:
+                count_base = '0'
+            if product[7]:
+                discount = product[7]
+            else:
+                discount = '0'
     
             ms_products_text = ''
             for elem in ms_products:
@@ -775,8 +827,9 @@ def edit_seller_products():
         
         rows += f'<tr><td width = "450" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle">{name} / id: {product_id} / offer_id: {offer_id}</td>' \
                 f'<td width = "450" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle"><select name={product_id}  style="max-width:450;">{ms_products_text}</select></td>' \
-                f'<td width = "70" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle"><input type="text" name="{product_id}_price" value="{delive}" style="width: 60px;" required="required"></td></tr>'
-
+                f'<td width = "70" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle"><input type="text" name="{product_id}_price" value="{delive}" style="width: 60px;" required="required"></td>' \
+                f'<td width = "70" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle"><input type="text" name="{product_id}_discount" value="{discount}" style="width: 60px;" required="required"></td></tr>'
+                    #f'<td width = "70" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; background-color: #f3f3f3; vertical-align:middle"><input type="text" name="count_base" value="{count_base}" style="width: 60px;" required="required"></td>' \
     db.close()
     print('Закрыли БД')
     
@@ -911,7 +964,7 @@ def seller_acts():
         if 'create_act' in result:
             # print(ozon.get_delivery_methods(header))
             sklads_dict = json.loads(seller[13])
-            print('sklads_dict', sklads_dict)
+            # print('sklads_dict', sklads_dict)
             status_text = ''
             for sklad_id in sklads_dict:
                 act_id = ozon.get_act(int(sklad_id), header)

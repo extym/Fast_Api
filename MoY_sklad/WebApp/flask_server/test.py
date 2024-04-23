@@ -40,3 +40,41 @@ import random
 import string
 
 gen = random.choice(string.ascii_letters)
+
+total_proxy = []
+
+for position in shipments:
+    # print('positon', positon)
+    count_prod = position['quantity']
+    product_id = position['product_id']  # positon['financial_data']['products'][0]['product_id']
+    # we can get:
+    # count products in position <= total count
+    #### count products in position < divide_slice
+    #### current coun products in position < divide_slice
+    #### count products in position % divide_slice != 0
+    while count_prod > divide_slice and total_count > divide_slice:
+        # for _ in range(count_prod):
+        proxy_pac = {
+            'products': [
+                {
+                    "product_id": product_id,
+                    "quantity": divide_slice
+                }
+            ]
+        }
+        total_proxy.append(proxy_pac)
+        count_prod -= divide_slice
+        total_count -= divide_slice
+        print('count_prod', count_prod, 'total_count', total_count)
+        # if count_prod % divide_slice != 0:
+
+    else:
+        proxy_pac = {
+            'products': [
+                {
+                    "product_id": product_id,
+                    "quantity": 1
+                }
+            ]
+        }
+        total_proxy.append(proxy_pac)
