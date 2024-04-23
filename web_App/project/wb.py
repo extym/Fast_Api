@@ -296,6 +296,17 @@ def get_product_cards(shop_name=None, company_id=None):
     return proxy, message
 
 
+def make_cart_id(shop_name=None, data=None):
+    metod = 'https://suppliers-api.wildberries.ru/content/v2/cards/upload'
+    query = select(Marketplaces.seller_id, Marketplaces.key_mp)\
+        .where(Marketplaces.shop_name == shop_name)
+    with Session(engine) as session:
+        session.begin()
+        seller_data = session.execute(query).first()
+
+
+
+
 def adapt_dict(dict_var):
     return AsIs("'" + json.dumps(dict_var) + "'")
 
@@ -327,7 +338,7 @@ def import_product_from_wb(shop_name=None, company_id=None, uid_edit_user=None):
                 'selected_mp': 'wb',
                 'name_product': data_prod.get("title"),
                 'status_mp': 'enabled',
-                'images_product': data_prod.get("images"),
+                'images_product': data_prod.get("photos")[0].get('square'),
                 'price_add_k': 0.0,
                 'discount_mp_product': 0.0,
                 'set_shop_name': data_prod.get("brand"),
@@ -339,7 +350,10 @@ def import_product_from_wb(shop_name=None, company_id=None, uid_edit_user=None):
                 'description_category_id': data_prod.get("subjectName"),
                 'volume_weight': data_prod.get("sizes")[0].get('chrtID'),
                 'type_id': data_prod.get("subjectID"),
-                'barcode': data_prod.get("sizes")[0].get('skus')
+                'barcode': data_prod.get("sizes")[0].get('skus'),
+                'cart_id': data_prod.get("imtID"),
+                'brand': data_prod.get("brand"),
+                'brand_id': ""
             }
 
             count_error = 0

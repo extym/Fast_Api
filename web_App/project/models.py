@@ -67,6 +67,9 @@ class Product(db.Model):
     type_id = db.Column(db.Integer())
     volume_weight = db.Column(db.Double())
     barcode = db.Column(db.String(50))
+    cart_id = db.Column(db.String(250))
+    brand = db.Column(db.String(250))
+    brand_id = db.Column(db.String(250))
 
     # attributes_product = db.Column(db.Integer())   #'attributes_product.id')
 

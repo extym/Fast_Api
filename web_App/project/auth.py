@@ -428,13 +428,13 @@ def import_settings_post():
         shop_name = data.get('import_shop_names')
         if mp == 'ozon':
             job = q.enqueue_call(import_oson_data_prod(user_id=uid,
-                                                   shop_name=shop_name,
-                                                   company_id=company_id))
+                                                       shop_name=shop_name,
+                                                       company_id=company_id))
             print(777777777777, job.get_id)
         elif mp == 'wb':
             job = q.enqueue_call(import_product_from_wb(uid_edit_user=uid,
-                                                       shop_name=shop_name,
-                                                       company_id=company_id))
+                                                        shop_name=shop_name,
+                                                        company_id=company_id))
             print(88888888888, job.get_id)
 
         return redirect('/import_settings')
@@ -476,18 +476,25 @@ def import_settings_post():
         internal_import_role_2 = data.get('internal_import_role_2')
 
         if internal_import_role_1 != internal_import_role_2 and \
-            internal_import_store_1 != internal_import_store_2 and \
-            internal_import_mp_1 != 'Выбрать... ' and \
-            internal_import_mp_2 != 'Выбрать... ':
+                internal_import_store_1 != internal_import_store_2 and \
+                internal_import_mp_1 != 'Выбрать... ' and \
+                internal_import_mp_2 != 'Выбрать... ':
             if internal_import_role_2 == 'donor' and internal_import_role_1 == 'recipient':
                 donor = data.get('internal_import_store_2')
                 recipient = data.get('internal_import_store_1')
+                donor_mp = data.get('internal_import_mp_2')
+                recipient_mp = data.get('internal_import_mp_1')
             else:
                 donor = data.get('internal_import_store_1')
                 recipient = data.get('internal_import_store_2')
+                donor_mp = data.get('internal_import_mp_1')
+                recipient_mp = data.get('internal_import_mp_2')
+
             job = q.enqueue_call(make_internal_import_oson(donor=donor,
                                                            recipient=recipient,
-                                                           sourse='front'))
+                                                           sourse='front',
+                                                           donor_mp=donor_mp,
+                                                           recipient_mp=recipient_mp))
             print(989898989, job.get_id)
         # print(*data.items(), sep='\n')
 
@@ -551,20 +558,20 @@ def user_settings_post():
         company_id = current_user.company_id  # request.form.get('cabinetID')
         user = Users.query.filter_by(name=exist_user_name).first()
         if user_role != '' and user.roles != user_role:
-            smth = update(Users).where(Users.name == exist_user_name)\
-                .where(Users.company_id == company_id)\
+            smth = update(Users).where(Users.name == exist_user_name) \
+                .where(Users.company_id == company_id) \
                 .values({'roles': user_role, 'date_modifed': now_date})
             db.session.execute(smth)
             flash("Роль пользователя успешно изменена")
         if user_email != '':
-            smth = update(Users).where(Users.name == exist_user_name)\
-                .where(Users.company_id == company_id)\
+            smth = update(Users).where(Users.name == exist_user_name) \
+                .where(Users.company_id == company_id) \
                 .values({'email': user_email, 'date_modifed': now_date})
             db.session.execute(smth)
             flash("Емайл пользователя успешно изменена")
         if user_password != '':
-            smth = update(Users).where(Users.name == exist_user_name)\
-                .where(Users.company_id == company_id)\
+            smth = update(Users).where(Users.name == exist_user_name) \
+                .where(Users.company_id == company_id) \
                 .values({'password': generate_password_hash(user_password, method='scrypt'),
                          'date_modifed': now_date})
             db.session.execute(smth)
@@ -992,8 +999,8 @@ def assembly_sales(page=1):
                       SalesToday.shop_name,
                       SalesToday.article,
                       SalesToday.order_status) \
-            .where(SalesToday.date_added > example)\
-            .where(SalesToday.shop_status == "NEW")\
+            .where(SalesToday.date_added > example) \
+            .where(SalesToday.shop_status == "NEW") \
             .order_by(SalesToday.article_mp) \
             .paginate(page=page, per_page=limit, error_out=False)
 

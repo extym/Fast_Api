@@ -617,7 +617,8 @@ def check_import_limit(seller_id):
     pass
 
 
-def make_internal_import_oson(donor=None, recipient=None, k=1, sourse=None):
+def make_internal_import_oson(donor=None, recipient=None, k=1,
+                              sourse=None, donor_mp=None, recipient_mp=None):
     # metod = 'https://api-seller.ozon.ru/v3/product/import'
     metod = 'https://api-seller.ozon.ru/v1/product/import-by-sku'
     if donor is not None and recipient is not None:
@@ -628,14 +629,16 @@ def make_internal_import_oson(donor=None, recipient=None, k=1, sourse=None):
                                                     Marketplaces.key_mp)
                                              .where(Marketplaces.shop_name == recipient)).first()
             product_data = session.query(Product).filter_by(shop_name=donor).all()
-            # product_data = session.execute(select(Product).where(Product.shop_name == donor)).fetchall()           # product_data = session.execute(text(f"SELECT * FROM products WHERE products.shop_name ='{donor}' ")).all()
-            # print(33, recipient_data, product_data)
+
         if product_data:
             for row in product_data:
                 # print(22222, row )
+                #############################3
+                # Make price ended for '9'
                 price = int(row.price) * (1 + k / 100)
                 price = str(price).split('.')[0][:-1] + "9"
                 old_price = str(int(price) * 4)
+                ##############################3
                 item = {
                     'name': row.name_product,
                     'articul_product': row.articul_product,
@@ -656,7 +659,8 @@ def make_internal_import_oson(donor=None, recipient=None, k=1, sourse=None):
             if sourse is None:
                 print('Client-Id {} from internal import oson'.format(header.get('Client-Id')))
                 os.abort()
-            else:
+
+            elif donor_mp == 'ozon' and recipient_mp == 'ozon':
                 answer = requests.post(url=metod,
                                        headers=header,
                                        json=data)
@@ -740,7 +744,14 @@ def make_internal_import_oson(donor=None, recipient=None, k=1, sourse=None):
                 else:
                     return "Что-то пошло не так", \
                         answer.status_code, \
-                        answer.text
+                        answer.text, \
+                        recipient_mp
+
+            elif donor_mp == 'ozon' and recipient_mp == 'wb':
+                pass
+
+            else:
+                return 'Check you data', donor, donor_mp, recipient_mp
 
 
 # print(make_internal_import_oson(donor='ImportGoods', recipient='Ф-фторник'))
