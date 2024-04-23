@@ -1,4 +1,5 @@
 from gevent import monkey
+
 monkey.patch_all()
 
 import json
@@ -10,12 +11,13 @@ from flask import Flask, request
 from gevent.pywsgi import WSGIServer
 import pytz
 from datetime import datetime, timedelta
-from read_json import processing_json,  read_order_json, read_json_on
-from cred import token_market_dbs, token_market_fbs
+from read_json import processing_json, read_order_json, read_json_on
+from cred import token_market_dbs, token_market_fbs, url_address, headers
 from ozon import product_info_order
-#from proxy import proxy_onon
+# from proxy import proxy_onon
 
 import urllib3
+
 urllib3.disable_warnings()
 
 
@@ -26,7 +28,6 @@ def write_json(smth_json):
     except:
         with open('test_json.json', 'w') as file:
             json.dump(smth_json, file)
-
 
 
 def write_smth_date():
@@ -52,7 +53,9 @@ def write_smth(smth):
         f.write(str(time) + str(smth) + '\n')
         f.close()
 
+
 write_smth(' start ')
+
 
 def write_fake(smth):
     time = datetime.now(pytz.timezone("Africa/Nairobi")).isoformat()
@@ -84,7 +87,7 @@ def write_order(order, created_id):
     data = read_order_json()
     order_id = order.get("id")
     order['created_id'] = created_id
-    if order_id not in data.keys():  #check order is exist
+    if order_id not in data.keys():  # check order is exist
         data[order_id] = order
         try:
             with open("/var/www/html/artol/orders.json", 'w') as file:
@@ -93,21 +96,23 @@ def write_order(order, created_id):
             with open("orders.json", 'w') as file:
                 json.dump(data, file)
 
+
 # def token_generator(size=10, chars = string.ascii_uppercase + string.digits):
 #     return ''.join(random.choice(chars) for _ in range(size))
 
 
-def token_generator(size=10, chars = string.digits): #string.ascii_lowercase + string.digits):
+def token_generator(size=10, chars=string.digits):  # string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
+
 
 ## check the order number for the one date and shop
 def check_order_number(order_id, shipment_date, shop):
     is_day_in_orders = False
     order_num = order_id
-    data  = read_order_json()
+    data = read_order_json()
     for value in data.values():
         try:
-            if  value['delivery']['shipments'][0]['shipmentDate'] == shipment_date and shop == "Yandex":
+            if value['delivery']['shipments'][0]['shipmentDate'] == shipment_date and shop == "Yandex":
                 order_num = value['created_id']
                 is_day_in_orders = True
                 break
@@ -161,9 +166,9 @@ def create_data_for_1c(order, status, shop):
             items_pr.append(proxy)
         data_re = {
             "order": {
-                "shop": shop,  #"Yandex",
+                "shop": shop,  # "Yandex",
                 "businessId": order['businessId'],
-                #"id": response_id,
+                # "id": response_id,
                 "id": order_number[1],
                 "paymentType": order['paymentType'],
                 "delivery": order['delivery']['type'],
@@ -174,8 +179,8 @@ def create_data_for_1c(order, status, shop):
         }
 
     elif shop == "Ozon":
-        #shipment_date = order['in_process_at'].split('T')[0]
-        shipment_date = proxy_time_1()  #?????????
+        # shipment_date = order['in_process_at'].split('T')[0]
+        shipment_date = proxy_time_1()  # ?????????
         response_id = order['our_id']
         order_number = check_order_number(response_id, shipment_date, shop)
         list_items = order['products']
@@ -195,21 +200,20 @@ def create_data_for_1c(order, status, shop):
                 "paymentType": 'PREPAID',
                 "delivery": order['delivery_method']['id'],
                 "status": status,
-                "date": shipment_date,  #order_number[2],
+                "date": shipment_date,  # order_number[2],
                 "items": items_pr
             }
         }
-        #print('data_re', data_re)
+        # print('data_re', data_re)
 
     return data_re
 
 
-
 def make_cancel(order_id):
-    data  = read_order_json()
+    data = read_order_json()
     if str(order_id) in data.keys():
         our_order = data[str(order_id)]
-        #created_id = our_order.get("created_id")
+        # created_id = our_order.get("created_id")
         print(our_order)
 
         return our_order
@@ -222,24 +226,23 @@ def check_stocks(skus, warehouse_id):
     for sku in skus:
         if sku in data_stocks:
             count = data_stocks[sku].get('stock', "0")
-            if count ==  None:
+            if count == None:
                 count = "0"
             data = {
                 "sku": sku,
                 "warehouseId": warehouse_id,
                 "items":
-                [
-                    {
-                        "type": "FIT",
-                        "count": str(count),
-                        "updatedAt": str(time)
-                    }
-                ]
+                    [
+                        {
+                            "type": "FIT",
+                            "count": str(count),
+                            "updatedAt": str(time)
+                        }
+                    ]
             }
             proxy_list.append(data)
-    
-    return {"skus": proxy_list}  #, proxy_list
 
+    return {"skus": proxy_list}  # , proxy_list
 
 
 def rewrite_order_status(order):
@@ -262,9 +265,8 @@ def rewrite_order_status(order):
         print('WRONG ORDER', order_id)
 
     with open("/var/www/html/artol/orders.json", 'w') as file:
-    # with open("orders.json", 'w') as file:
+        # with open("orders.json", 'w') as file:
         json.dump(data, file)
-
 
 
 def data_summary():
@@ -284,12 +286,12 @@ def check_is_accept_ym(list_items):
             item_data = data.get(shop_sku)
             count = item_data['stock']
             if count >= item['count']:
-                #result = True
+                # result = True
                 cnt += 1
             # else:
             #     result = False
             item['id_1c'] = item_data.get('id_1c')
-            #item['result'] = result
+            # item['result'] = result
 
     if cnt == len(list_items):
         result_global = True
@@ -362,51 +364,48 @@ def create_re_cart(items):
         proxy_list.append(proxy_item)
 
     data = {
-       "cart":
-       {
-        "deliveryOptions":
-        [
+        "cart":
             {
-            "id": delivery_id,
-            "serviceName": service_name,
-            "type": "DELIVERY",
-            "dates":
-               {
-              "fromDate": proxy_time(),
-               }
+                "deliveryOptions":
+                    [
+                        {
+                            "id": delivery_id,
+                            "serviceName": service_name,
+                            "type": "DELIVERY",
+                            "dates":
+                                {
+                                    "fromDate": proxy_time(),
+                                }
+                        }
+                    ],
+                "items": proxy_list,
+                "paymentMethods":
+                    [
+                        "YANDEX",
+                        "CARD_ON_DELIVERY",
+                        "CASH_ON_DELIVERY",
+                        "TINKOFF_CREDIT",
+                        "TINKOFF_INSTALLMENTS",
+                        "SBP"
+                    ]
             }
-        ],
-        "items": proxy_list,
-        "paymentMethods":
-        [
-               "YANDEX",
-               "CARD_ON_DELIVERY",
-               "CASH_ON_DELIVERY",
-               "TINKOFF_CREDIT",
-               "TINKOFF_INSTALLMENTS",
-               "SBP"
-           ]
-        }
     }
 
     return data
 
 
 async def send_post(data):
-    url_address = 'https://92.39.143.137:14723/Trade/hs/post/order/post'
-    headers = {'Content-type': 'application/json',
-               'Authorization': 'Basic 0JzQsNGA0LrQtdGC0L/Qu9C10LnRgdGLOjExMQ==',
-               'Content-Encoding': 'utf-8'}
     answer = requests.post(url_address, data=json.dumps(data), headers=headers, verify=False)
     write_smth(answer)
     write_smth(data)
-    #result = answer.text
+    # result = answer.text
     time = datetime.now(pytz.timezone("Africa/Nairobi")).isoformat()
     print('answer1', str(time), answer, data)
-    #return result
+    # return result
 
 
 app = Flask(__name__)
+
 
 @app.route('/', methods=['GET', 'POST'])
 def bay_bay():
@@ -418,13 +417,13 @@ def bay_bay():
 
 common_comfirm_response = {"result": True}
 common_error = {'error': {
-      "code": "ERROR_UNKNOWN",
-      "message": "Неизвестный метод",
-      "details": None }}
+    "code": "ERROR_UNKNOWN",
+    "message": "Неизвестный метод",
+    "details": None}}
 common_product_error = {'error': {
-      "code": "ERROR_UNKNOWN",
-      "message": "Product not found",
-      "details": None }}
+    "code": "ERROR_UNKNOWN",
+    "message": "Product not found",
+    "details": None}}
 
 
 @app.route('/api/on', methods=['GET', 'POST'])
@@ -434,9 +433,9 @@ async def onon_push():
     if resp.get('message_type') == 'TYPE_PING':
         time = resp["time"]
         response = app.response_class(
-            json.dumps({ "version": "v.1",
-                   "name": "brain-trust.bot",
-                   "time": time }),
+            json.dumps({"version": "v.1",
+                        "name": "brain-trust.bot",
+                        "time": time}),
             status=200
         )
 
@@ -444,11 +443,11 @@ async def onon_push():
         id_mp = resp["posting_number"]
         our_id = id_mp.replace('-', '')[:10]
         order = product_info_order(id_mp)
-        #order = proxy_onon["result"]   #FOR TEST ONLY
+        # order = proxy_onon["result"]   #FOR TEST ONLY
         stock = check_is_accept_onon(order['products'])
         print('stock', stock[0], order['products'])
         if stock[0]:
-            order['our_id'], order['id'],  order['status'], order['our_status'], order['shop'] \
+            order['our_id'], order['id'], order['status'], order['our_status'], order['shop'] \
                 = our_id, id_mp, "NEW", "NEW", "Ozon"
             order['products'] = stock[1]
             send_data = create_data_for_1c(order, "accept", "Ozon")
@@ -473,7 +472,7 @@ async def onon_push():
         our_order = make_cancel(order_id)
         if our_order is not None:
             created_id = our_order.get("created_id")
-            data = create_data_for_1c(our_order, "canceled",  "Ozon")
+            data = create_data_for_1c(our_order, "canceled", "Ozon")
             print('send_cancel_data', data, created_id, our_order)
             await send_post(data)
             response = app.response_class(
@@ -512,7 +511,7 @@ def json_example():
         write_json(request_data)
         write_smth_date()
 
-        #print(request_data)
+        # print(request_data)
         response = app.response_class(
             status=200
         )
@@ -543,15 +542,18 @@ async def order_accept():
         stock = check_is_accept_ym(proxy)  # проверяем наличие for order
 
         data = order_resp_ym(None, False)
-        response = app.response_class(json.dumps(data[0]), status=200, content_type='application/json')
+        response = app.response_class(
+            json.dumps(data[0]),
+            status=200,
+            content_type='application/json')
 
         if stock[0]:
-            current_order['items'], current_order['shop'] = stock[1],  "Yandex"
+            current_order['items'], current_order['shop'] = stock[1], "Yandex"
             data = order_resp_ym(current_order, stock[0])
             current_order['our_id'] = data[1]
             send_data = create_data_for_1c(current_order, "accept", "Yandex")
             print('send_data', send_data)
-            if confirm_data is not True: ## if order not test
+            if confirm_data is not True:  ## if order not test
                 se_id = str(send_data['order']['id'])
                 write_smth(' order_id_accept ' + se_id)
                 await send_post(send_data)
@@ -565,10 +567,10 @@ async def order_accept():
             else:
                 write_fake(data_req)
                 response = app.response_class(
-                json.dumps(data[0]),
-                status=200,
-                content_type='application/json'
-            )
+                    json.dumps(data[0]),
+                    status=200,
+                    content_type='application/json'
+                )
 
     else:
         response = app.response_class(
@@ -590,7 +592,7 @@ async def status():
         if status == "CANCELLED":
             our_order = make_cancel(id)
             if our_order is not None:
-                created_id  = our_order.get("created_id")
+                created_id = our_order.get("created_id")
                 data = create_data_for_1c(our_order, created_id, "canceled")
                 await send_post(data)
             # else:
@@ -627,7 +629,7 @@ def cart():
         request_data = request.get_json()
         cart = request_data.get('cart')
         businessId = cart.get('businessId')
-        #delivery = cart.get('delivery')
+        # delivery = cart.get('delivery')
         items = cart.get('items')
         check = check_cart(items, businessId)
         data = create_re_cart(check[0])
@@ -710,12 +712,10 @@ def order_cancell():
 
     return response
 
+
 @app.route('/test', methods=['GET'])
 def test():
     return "OK"
-
-
-
 
 
 # Press the green button in the gutter to run the script.
@@ -726,7 +726,6 @@ if __name__ == '__main__':
     # Production
     http_server = WSGIServer(('', 5000), app)
     http_server.serve_forever()
-
 
 # @app.route('/form', methods=['GET', 'POST'])
 # def form():
@@ -751,4 +750,4 @@ if __name__ == '__main__':
 #         </select>
 #         <input type="submit" value="CANCEL"></div>
 
-        # '''
+# '''

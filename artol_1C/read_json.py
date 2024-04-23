@@ -2,6 +2,7 @@ import json
 #from prepare_data import read_price
 import requests
 from proxy import proxy_dicty
+from cred import link
 
 
 # r = requests.get('http://super-good.ml/test_json.json')
@@ -9,8 +10,9 @@ from proxy import proxy_dicty
 
 
 #dict: key = sku, value = min_quantity
+
 # link = 'http://artol-json.i-bots.ru/test_json.json'
-link = 'http://super-puper.ml/test_json.json'
+# link = 'http://super-puper.ml/test_json.json'
 #processing data from json (proxy file) for price & etc.
 def processing_json():
     r = requests.get(link)
@@ -31,7 +33,7 @@ def processing_json():
         result_dict[sku] = {'id_1c': id_1c, 'vendor_code': vendor_code, 'price_ym': price,
                             'stock': quantity, 'min_quantity': min_quantity}
     #print(sku, result_dict[sku])
-    print('result_dict_from_procces_json ', len(result_dict))   #, result_dict)
+    print('result_dict_artol_procces_json ', len(result_dict))   #, result_dict)
     return result_dict
 
 

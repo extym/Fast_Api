@@ -6,13 +6,13 @@ from time import sleep
 import pytz
 import requests
 
-from cred import api_key_ozon_admin, client_id_onon
+from cred import api_key_ozon_admin, client_id_onon, REMOTE_DIR
 
 
 def write_smth(smth):
     time = datetime.now(pytz.timezone("Africa/Nairobi")).isoformat()
     try:
-        f = open('/home/userbe/artol/no_test.txt', 'a')
+        f = open(REMOTE_DIR + '/no_test.txt', 'a')
         f.write(str(time) + str(smth) + '\n')
         f.close()
     except:
