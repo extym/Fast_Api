@@ -1,16 +1,17 @@
 import psycopg2
 from psycopg2 import OperationalError
 from conn_maintenance import *
+from cred import database, user, password, host
 
 
 def create_connection():
     connection = None
     try:
         connection = psycopg2.connect(
-            database='stm_app',
-            user='user_name',
-            password='user_pass',
-            host='localhost',
+            database=database,
+            user=user,
+            password=password,
+            host=host,
             port=5432
         )
         print("Connection to DB successfully")
@@ -73,6 +74,7 @@ def check_order(query, data):
     cursor = connection.cursor()
     re_data = None
     try:
+        print('check_order', query, data)
         cursor.execute(query, data)
         re_data = cursor.fetchall()
         print("Query from check_order executed successfully")
@@ -85,14 +87,14 @@ def check_order(query, data):
     return re_data
 
 
-def check_is_exist(query, data):
+def check_is_exist_in_db(query, data):
     connection = create_connection()
     cursor = connection.cursor()
     result = False
     try:
         cursor.execute(query, data)
         redata = cursor.fetchone()
-        print(f"Query from check_is_exist '{data[0]}' executed successfully")
+        print(f"Query from check_is_exist_in_db '{data[0]}' executed successfully")
         if redata is not None:
             result = True
     except OperationalError as err:

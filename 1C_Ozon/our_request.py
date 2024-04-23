@@ -67,6 +67,27 @@ data_pshh = {
     }
 }
 
+
+
+data_pshh_2 = {
+    "order": {
+        "shop": "Ozon",
+        "businessId": "3675591",
+        "id": "127712771",
+        "paymentType": "PREPAREID",
+        "delivery": True,
+        "status": "accept",
+        "date": "21-02-2023",
+        "items": [
+            {
+                "shopSku": "26fb989e-fdbe-11ec-a655-00155d58510a",
+                "count": -2,
+                "price": 999999001336
+            }
+        ]
+    }
+}
+
 # url_address = 'https://92.39.143.137:14723/Trade/hs/post/order/post'   #'http://super-good.ml:8800/json'  #   'http://iiko.ml:8800/json'   ##  # #'https://iiko.biz:9900/api/0/orders/add?'  # 'https://httpbin.org/post'#'https://f73fc613-638a-487f-8a19-e528b998c4b6.mock.pstmn.io'
 # headers = {'Content-type': 'application/json',  # Определение типа данных
 #            'Authorization': 'Basic 0JzQsNGA0LrQtdGC0L/Qu9C10LnRgdGLOjExMQ==',

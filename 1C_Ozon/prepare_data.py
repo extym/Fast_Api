@@ -188,6 +188,23 @@ from datetime import date, timedelta
 #     #print('datta',dat,  dtt)
 #     return dtt
 
+
+def convert_sales():
+    leroy = {}
+    with open('actions.csv', 'r') as file:
+        data = csv.reader(file, delimiter=';')
+        for row in data:
+            leroy[str(row[0])] = int(row[2])
+
+
+        f = open('sales.py', 'w')
+        f.write(f'leroy = {leroy}')
+        f.close()
+        print('Wrote',  len(leroy), 'products')
+
+
+# convert_sales()
+
 # day_for_stm("2023-03-30")
 # from datetime import datetime
 # dt = datetime.now().date() + timedelta(days=1)

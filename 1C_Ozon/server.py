@@ -5,16 +5,18 @@ from conn import *
 import random
 import string
 import json
-from flask import Flask, request
+from flask import Flask, request, flash, redirect, render_template
+from werkzeug.utils import secure_filename
 from gevent.pywsgi import WSGIServer
 import pytz
 from datetime import datetime, timedelta
-from read_json import process_json_dict,  read_order_json, read_json_sper, read_json_ids
-from our_request import data_psh, data_pshh
-from cred import token_market_dbs, tokens_market, token_market_fbs_exp, token_sper
+from read_json import process_json_dict,  read_order_json, process_json_dict_v2, read_json_ids
+import pandas as pd
+from cred import tokens_market, token_sper, LOCAL_MODE, import_key
 from ozon import read_skus, product_info_price
 from sper import post_smth_sb, check_is_accept_sb
 from time import sleep
+import os
 #from cred import token_market_dbs, token_market_fbs
 import urllib3
 urllib3.disable_warnings()
@@ -30,21 +32,21 @@ another_id_reverse = {'а0026033': 'OWLT190101', 'а0027568': 'OWLM200300','а00
 
 def write_json(smth_json):
     try:
-        with open('/var/www/html/stm/test_json.json', 'w') as file:
+        with open('/var/www/html/stm/data_json.json', 'w') as file:
             json.dump(smth_json, file)
     except Exception:
-        with open('test_json.json', 'w') as file:
+        with open('data_json.json', 'w') as file:
             json.dump(smth_json, file)
 
 
 def write_smth_date():
     try:
-        f = open('/var/www/html/stm/test_txt.txt', 'w')
+        f = open('/var/www/html/stm/data_txt.txt', 'w')
         time = datetime.now(pytz.timezone("Africa/Nairobi")).isoformat()
         f.write(str(time) + '\n')
         f.close()
     except:
-        f = open('test_txt.txt', 'w')
+        f = open('data_txt.txt', 'w')
         time = datetime.now(pytz.timezone("Africa/Nairobi")).isoformat()
         f.write(str(time) + '\n')
         f.close()
@@ -69,8 +71,9 @@ def write_smth(smth):
 def write_fake(smth):
     time = datetime.now(pytz.timezone("Africa/Nairobi")).isoformat()
     try:
-        f = open('/var/www/html/stm/fake_json.txt', 'a')
-        f.write(str(time) + str(smth) + '\n')
+        f = open(f'/var/www/html/stm/proxy_json.txt', 'a')
+        f.write(str(time) + '\n')
+        f.write(str(smth) + '\n')
         f.close()
     except:
         f = open('fake_json.txt', 'a')
@@ -85,7 +88,31 @@ def check_cart(items):
     id_1c = ''
     for item in items:
         offer_id = item['offerId']
+        if offer_id in another_id_reverse.keys():
+            offer_id = another_id_reverse[offer_id]
         need = item['count']
+        if offer_id in data_stocks.keys():
+            exist = data_stocks[offer_id][2]
+            id_1c = data_stocks[offer_id][0]
+            if int(exist) < need:
+                #item['count'] = int(exist)
+                item['count'] = 0
+        else:
+            item['count'] = 0
+
+    return items, id_1c
+
+
+def check_cart_v2(items):
+    # data_stocks = process_json_dict()
+    id_1c = ''
+    for item in items:
+        offer_id = item['offerId']
+        if offer_id in another_id_reverse.keys():
+            offer_id = another_id_reverse[offer_id]
+        need = item['count']
+        outlet = warehouses.get(item.get('warehouseId'))
+        data_stocks = process_json_dict_v2(outlet)
         if offer_id in data_stocks.keys():
             exist = data_stocks[offer_id][2]
             id_1c = data_stocks[offer_id][0]
@@ -102,8 +129,31 @@ def token_generator(size=10, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
 
-# def token_generator(size=10, chars = string.ascii_lowercase + string.digits):
-#     return ''.join(random.choice(chars) for _ in range(size))
+def read_xls(files):
+    file = pd.read_excel(files)
+    df = pd.DataFrame(file).values
+    proxy = {}
+    for row in df:
+        proxy[row[0]] = int(row[2])
+    print(type(proxy))
+
+    return proxy  #dict
+
+
+ALLOWED = {'csv', 'xls', 'xlsx'}
+if LOCAL_MODE:
+    UPLOAD_FOLDER = './'
+    PATH = './'
+else:
+    UPLOAD_FOLDER = '/var/www/html/load/'
+    PATH = '/home/userbe/stm/'
+
+
+def check_allowed_filename(filename):
+    result = '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED
+    curr_name = filename.rsplit('.', 1)[1]
+    # print(result)
+    return result, curr_name
 
 
 def create_data_for_1c(data):
@@ -138,11 +188,16 @@ def create_data_for_1c(data):
     return data_re
 
 
-
+warehouses = {
+    50639: u'YM.СТМ',
+    479988: u'YM.НашадостСклОкт',
+    432708: u'YM.СклЭкспресс'
+}
 
 def check_stocks(skus, warehouse_id):
     time = datetime.now(pytz.timezone("Africa/Nairobi")).replace(microsecond=0).isoformat()
-    data_stocks = process_json_dict()
+    # data_stocks = process_json_dict()
+    data_stocks = process_json_dict_v2(warehouses.get(warehouse_id))
     proxy_list = []
     for sku in skus:
         if sku in another_id_reverse:
@@ -150,11 +205,29 @@ def check_stocks(skus, warehouse_id):
             print('SKU ', sku)
         if sku in data_stocks:
             count = data_stocks[sku][2]  #.get('stock')
-            if count is None:
+            if not count:
                 count = 0
             if sku in another_id:
                 sku = another_id[sku]
                 print('another', sku)
+            data = {
+                "sku": sku,
+                "warehouseId": warehouse_id,
+                "items":
+                [
+                    {
+                        "type": "FIT",
+                        "count": count,
+                        "updatedAt": str(time)
+                    }
+                ]
+            }
+            proxy_list.append(data)
+        else:
+            count = 0
+            if sku in another_id:
+                sku = another_id[sku]
+                # print('another', sku)
             data = {
                 "sku": sku,
                 "warehouseId": warehouse_id,
@@ -188,7 +261,7 @@ def check_stocks(skus, warehouse_id):
 
 
 async def rewrite_status_order_db(order_id, status, shop):
-    data = check_is_exist(query_read_order, (order_id, shop))
+    data = check_is_exist_in_db(query_read_order, (order_id, shop))
     if data:
         await execute_query(update_status_order,
                             (status, "NEW", order_id, shop))
@@ -243,7 +316,6 @@ def check_is_accept_ym(list_items):
     data = process_json_dict()
     result_global = False
     cnt = 0
-    #printt('check_is_accept_ym', list_items)
     for item in list_items:
         shop_sku = item['offerId']   #item['shopSku']
         if shop_sku in data.keys():
@@ -259,7 +331,32 @@ def check_is_accept_ym(list_items):
 
     if cnt == len(list_items):
         result_global = True
-    #printt('check_is_accept_ym_222222222', count, len(list_items))
+
+    return result_global, list_items
+
+
+def check_is_accept_ym_v2(list_items):
+    # data = process_json_dict()
+    result_global = False
+    cnt = 0
+    for item in list_items:
+        shop_sku = item['offerId']   #item['shopSku']
+        outlet = item.get('warehouseId')
+        data = process_json_dict_v2(outlet)
+        if shop_sku in data.keys():
+            item_data = data.get(shop_sku)
+            count = item_data[2]
+            if count >= item['count']:
+                result = True
+                cnt += 1
+            else:
+                result = False
+            item['id_1c'] = item_data[0]
+            item['result'] = result
+
+    if cnt == len(list_items):
+        result_global = True
+
     return result_global, list_items
 
 
@@ -565,18 +662,21 @@ def confirm_data_sb(order): #TODO
     result = {
         'data': {
             'token': token_sper,
-            'shipments': [{
-                'shipmentId': order["shipments"][0]["shipmentId"],
-                'orderCode': order['our_id'],
-                'items': proxy,
-            }]
+            'shipments': [
+                {
+                    'shipmentId': order["shipments"][0]["shipmentId"],
+                    'orderCode': order['our_id'],
+                    'items': proxy,
+                }
+            ]
         }
     }
 
     return result
 
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='template/')
+app.secret_key = import_key
 #for develop ONLY!
 #app.debug = True
 
@@ -589,19 +689,49 @@ def bay_bay():
     return response
 
 
-@app.route('/json', methods=['GET', 'POST'])
+@app.route('/data', methods=['GET', 'POST'])
 def get_json():
     ip_addr = request.environ.get('REMOTE_ADDR')  ## return ::ffff:46.21.252.7
     #'X-Forwarded-For': '46.21.252.7'
     addr = request.headers.get('X-Forwarded-For')
+    print(ip_addr, addr)
     if ip_addr == '::ffff:46.21.252.7' or ip_addr == '46.21.252.7'\
             or ip_addr == '62.76.102.53':
         request_data = request.get_json()
+        # alter_data = request.data
+        # print('alter_data', alter_data)
         write_json(request_data)
         write_smth_date()
 
         response = app.response_class(
             status=200
+        )
+
+    else:
+
+        response = app.response_class(
+            status=403
+        )
+
+    return response
+
+
+@app.route('/json', methods=['GET', 'POST'])
+def fail_json():
+    ip_addr = request.environ.get('REMOTE_ADDR')  ## return ::ffff:46.21.252.7
+    #'X-Forwarded-For': '46.21.252.7'
+    addr = request.headers.get('X-Forwarded-For')
+    print(ip_addr, addr)
+    if ip_addr == '::ffff:46.21.252.7' or ip_addr == '46.21.252.7'\
+            or ip_addr == '62.76.102.53':
+        request_data = request.get_json()
+        # alter_data = request.data
+        # print('alter_data', alter_data)
+        # write_json(request_data)
+        # write_smth_date()
+
+        response = app.response_class(
+            status=403
         )
 
     else:
@@ -627,7 +757,8 @@ async def order_accept_ym():
         proxy = order['items']
         our_id = token_generator()
         stock = check_is_accept_ym(proxy)  # проверяем наличие for order
-        print('fak', stock[1])
+        # stock = check_is_accept_ym_v2(proxy)
+
         if stock[0]:
             data = order_resp_ym(our_id, stock[0])
             response = app.response_class(
@@ -635,11 +766,11 @@ async def order_accept_ym():
             status=200,
             content_type='application/json'
             )
-            if confirm_data is not True: ## if order not test
+            if not confirm_data: ## if order not test
                 order['our_id'], order['status'], order['our_status']\
                     = our_id, "ACCEPTED", "NEW"
                 ref_data = reformat_data_order(order, 'Yandex')
-                check_is = check_is_exist(query_read_order, (str(order['id']), 'Yandex'))
+                check_is = check_is_exist_in_db(query_read_order, (str(order['id']), 'Yandex'))
                 if check_is:
                     response = app.response_class(
                         json.dumps(data),
@@ -759,6 +890,8 @@ def stocks_ym():
         warehouseId = req.get('warehouseId')
         skus = req.get('skus')
         result = check_stocks(skus, warehouseId)
+        write_fake(result)
+        print(7878787, len(result.get('skus', [])))
         response = app.response_class(
             json.dumps(result),
             status=200,
@@ -795,10 +928,10 @@ def order_cancell_ym():
 @app.route('/order/new', methods=['POST'])
 async def new_order_sb():
     token = request.headers.get('Basic auth')
-    print('from_order_new_token', token)
+    # print('from_order_new_token', token)
     if token == None or token != None:
-        data_req = request.get_json()
-        print('data_from_order_new', data_req)
+        data_req = request.json
+        # print('data_from_order_new', data_req)
         order = data_req["data"]
         pre_proxy = order["shipments"][0]["items"]
         proxy = counter_items(pre_proxy)
@@ -867,11 +1000,60 @@ async def order_cancel():
 
 
 @app.route('/check/orders', methods=['GET', 'POST'])
-async def check_orders():
+async def fail_check():
     ip_addr = request.environ.get('REMOTE_ADDR')  ## return ::ffff:46.21.252.7
     addr = request.headers.get('X-Forwarded-For')  # 'X-Forwarded-For': '46.21.252.7'
-    #printt(ip_addr, addr)
-    if ip_addr == '::ffff:46.21.252.7' or ip_addr == '46.21.252.7':  # or ip_addr == '54.86.50.139':  #POSTMAN
+    print(ip_addr, addr)
+    if ip_addr == '::ffff:46.21.252.7' or ip_addr == '46.21.252.7' or ip_addr == '62.76.102.53':  # or ip_addr == '54.86.50.139':  #POSTMAN
+        # data = get_one_order()  #query_read_order(get_new_order))
+        # if data[0] is not None:
+        #     re_data = create_data_for_1c(data)
+        #     print("SEND order", re_data)
+        #     response = json.dumps(re_data)
+        #     await execute_query(rebase_order,
+        #                     ("SEND", data[0][0], data[0][1]))
+        #     write_smth(" SEND " + re_data["order"]["shop"]
+        #                     + " " + re_data["order"]["id"])
+        # else:
+        #     empty_data = {
+        #         "order": {
+        #             "status": "stop"
+        #         }
+        #     }
+        #     response = json.dumps(empty_data)
+        #     write_smth(" empty_data")
+        response = app.response_class(
+            status=200
+        )
+
+    elif addr == '62.76.102.53' or ip_addr == '62.76.102.53' or ip_addr == '::1':
+        data = get_one_order()  #query_read_order(get_new_order))
+        if data[0] is not None:
+            re_data = create_data_for_1c(data)
+            response = json.dumps(re_data)
+            write_smth(" test " + re_data["order"]["id"])
+        else:
+            empty_data = {
+                "order": {
+                    "status": "stop"
+                }
+            }
+            response = json.dumps(empty_data)
+
+    else:
+        response = app.response_class(
+            status=402
+        )
+
+    return response
+
+
+@app.route('/check/order', methods=['GET', 'POST'])
+async def check_order():
+    ip_addr = request.environ.get('REMOTE_ADDR')  ## return ::ffff:46.21.252.7
+    addr = request.headers.get('X-Forwarded-For')  # 'X-Forwarded-For': '46.21.252.7'
+    print(1111, ip_addr, addr)
+    if ip_addr == '::ffff:46.21.252.7' or ip_addr == '46.21.252.7' or ip_addr == '62.76.102.53':  # or ip_addr == '54.86.50.139':  #POSTMAN
         data = get_one_order()  #query_read_order(get_new_order))
         if data[0] is not None:
             re_data = create_data_for_1c(data)
@@ -903,6 +1085,29 @@ async def check_orders():
                 }
             }
             response = json.dumps(empty_data)
+
+    elif ip_addr == '212.12.15.45':   #левый олень какой то бомбит
+        data_pshh_2 = {
+            "order": {
+                "shop": "Yandex",
+                "businessId": "3675591",
+                "id": token_generator(),
+                "paymentType": "PREPAREID",
+                "delivery": True,
+                "status": "accept",
+                "date": "21-12-2024",
+                "items": [
+                    {
+                        "shopSku": "26fb989e-fdbe-11ec-a655-00155d58510a",
+                        "count": -1,
+                        "price": 999999001336
+                    }
+                ]
+            }
+        }
+        response = app.response_class(
+            json.dumps(data_pshh_2),
+            status=403)
 
     else:
         response = app.response_class(
@@ -980,15 +1185,38 @@ async def onon_push():
     print('api_on_response', response)
     return response
 
+
+@app.route('/file', methods=['get', 'post'])
+def download():
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            flash('Невозможно прочитать файл')
+            return redirect(request.url)
+        file = request.files['file']
+
+        if file.filename == '':
+            flash('Файл не выбран')
+            return redirect(request.url)
+
+        check = check_allowed_filename(file.filename)
+        if file and check[0]:
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(UPLOAD_FOLDER, filename))
+
+        if check[1] == 'xlsx':
+            data = read_xls(file)
+            with open(UPLOAD_FOLDER + 'sales.json', 'w') as ff:
+                json.dump(data, ff)
+
+                flash('Файл excel загружен')
+                return redirect(request.url)
+
+    return render_template('index.html')
+
+
 @app.route('/test', methods=['GET', 'POST'])
 def test():
-    response = 'OK'
-    # response = app.response_class(
-    #     json.dumps('OK'),
-    #     status=200,
-    #     content_type='application/json'
-    # )
-    return response
+    return 'OK'
 
 
 # allow both GET and POST requests

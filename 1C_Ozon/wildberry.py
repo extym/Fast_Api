@@ -5,7 +5,7 @@ import asyncio
 from read_json import read_json_wb, read_json_ids
 import requests
 import json
-from cred import wb_apikey
+from cred import wb_apikey, wh
 from conn import *
 from proxy import proxy_wb_orders
 #data = read_json_wb()
@@ -62,8 +62,7 @@ compare_id = {'Артикул поставщика': 'Штрихкод това�
               "OWLC19-006": "6973720575780", "OWLC19-010": "6973720585239", "OWLC19-013": "6973772599925",
               "OWLC19-015": "6973772600973"}  # ,'OW06.06.00': '4610093021033', 'OWLT190305': '6973720575438'}
 
-wh = [{"name":"Обычный склад СТМ","id":664706, "name_1C": "WB.НашсклСТМ"}, {"name":"Сверхгабаритный товар","id":730558, "name_1C": "WB.СверхГБсклNEW"}]  #,
-      #{"name_1C": "WB.СверхГБсклСТМ", "name":"Сверхгабаритный СТМ склад","id":664704}]
+      #{"name_1C": "WB.СверхГБсклСТМ", "name":"Сверхгабаритный СТМ склад","id":664704}] # {"name":"Сверхгабаритный товар","id":730558, "name_1C": "WB.СверхГБсклNEW"}
 
 
 def token_generator(size=12, chars=string.ascii_uppercase + string.digits):
@@ -96,14 +95,15 @@ def day_for_stm(string):
 
 def make_send_data():
     data = read_json_wb()
-    print('make_send_data_wb', len(data))
+    print('make_send_data_wb', len(data), data )
     warehouse = {}
     for string in wh:
         stocks = []
         w_house = string['id']
         warehouse[w_house] = {'stocks': stocks}
         for row in data:
-            sku = compare_id.get(row[1]) #barcode WB
+            barcode = row[2]
+            sku = compare_id.get(row[1], barcode) #barcode WB
             if sku is not None and string['name_1C'] in row[4].keys():
                 proxy = {
                     'sku': sku,
@@ -115,12 +115,12 @@ def make_send_data():
 
         warehouse[w_house] = {'stocks': stocks}
 
-    # print('(warehouse[730558]', len(warehouse[730558]['stocks' ]),warehouse[730558])
-    # print('(warehouse[664706]', len(warehouse[664706]['stocks']), warehouse[664706])
+    print('warehouse[730558]', len(warehouse[730558]['stocks']))  #,warehouse[730558])
+    print('warehouse[664706]', len(warehouse[664706]['stocks']))   #, warehouse[664706])
     # print(warehouse.keys())
     return warehouse
 
-make_send_data()
+# make_send_data()
 
 def send_stocks_wb():
     data = make_send_data()
@@ -133,7 +133,7 @@ def send_stocks_wb():
         answer = requests.put(target, data=json.dumps(value), headers=headers)
         re_data = answer.text
 
-        print('send_stocks_wb', key, answer, re_data, len(value['stocks']))
+        # print('send_stocks_wb', key, re_data, len(value['stocks']), value)
 
 # send_stocks_wb()
 
@@ -191,9 +191,12 @@ def get_new_orders_wb():
     metod = '/api/v3/orders/new'
     url = link + metod
     response = requests.get(url, headers=headers)
-    data = response.json()
-
-    print('get_new_orders_wb', response, len(data), data)
+    data = {}
+    try:
+        data = response.json()
+        print('ALL_RIDE_get_new_orders_wb', response, len(data), data, 'response', response.text)
+    except:
+        print('FUCK_UP_get_new_orders_wb ', response.status_code, 'response', response.text)
     return data
 
 async def get_id_1c(vendor_code):
@@ -201,12 +204,12 @@ async def get_id_1c(vendor_code):
     if vendor_code in data.keys():
         id_1c = data[vendor_code][0]
 
-    return id_1c
+        return id_1c
 
 async def processing_orders_wb():
     # orders = proxy_wb_orders["orders"]    # FOR TEST ONLY TODO
     orders = get_new_orders_wb().get("orders")
-    if len(orders) > 0:
+    if orders and len(orders) > 0:
         for order in orders:
             id_mp = str(order["id"])
             our_id = token_generator()
@@ -234,7 +237,7 @@ async def processing_orders_wb():
                 await executemany_query(query_write_items, [items_data])
         print(f"Write {len(orders)} orders WB")
 
-    print("Recieved orders WB", len(orders))
+    print("fuckup orders WB")
 
 # asyncio.run(processing_orders_wb())
 

@@ -7,29 +7,26 @@ from read_json import read_json_on
 from time import sleep
 
 common_error = {
-   "error": {
-      "code": "ERROR_UNKNOWN",
-      "message": "ошибка",
-      "details": None
-   }
+    "error": {
+        "code": "ERROR_UNKNOWN",
+        "message": "ошибка",
+        "details": None
+    }
 }
 
 host = 'https://api-seller.ozon.ru'
 client_id = '90963'
 
-
 last_id = 'WzQ2MzcyNzEyNyw0NjM3MjcxMjdd'
 
 headers = {
-        'Client-Id': client_id,
-        'Api-Key': api_key_ozon_admin,
-        'Content-Type': 'application/json'
-    }
-
+    'Client-Id': client_id,
+    'Api-Key': api_key_ozon_admin,
+    'Content-Type': 'application/json'
+}
 
 metod_get_list_products = '/v2/product/list'
 metod_get_new_orders = ''
-
 
 
 def write_json_skus(smth_json):
@@ -39,6 +36,7 @@ def write_json_skus(smth_json):
     except Exception:
         with open('onon_skus.json', 'w') as file:
             json.dump(smth_json, file)
+
 
 def get_smth(metod):
     params = {
@@ -51,18 +49,20 @@ def get_smth(metod):
     print('get_smth_on', metod, response, response.json())
     return response
 
+
 def post_get_smth(metod):
     link = host + metod
     response = requests.post(link, headers=headers)
     data = response.json()
-    #print('post_get_smth',len(data['result']['items']), type(data['result']['items']))
+    # print('post_get_smth',len(data['result']['items']), type(data['result']['items']))
     result = data['result']['items']
     total = data['result']['total']
     last_id = data['result']['last_id']
     print('post_get_smth_onon', result[0])
     return result, total, last_id
 
-#post_get_smth(metod_get_list_products)
+
+# post_get_smth(metod_get_list_products)
 
 
 # wh = ['OZ.RFBSнашсклДЛ', 'OZ.RFBSНашсклСДЭК', 'OZ.НашадостМиМО',
@@ -73,10 +73,10 @@ def get_product_info(product_id, offer_id):
     metod = '/v2/product/info'
     link = host + metod
     data = {
-            "offer_id": offer_id,
-            "product_id": int(product_id),
-            "sku": 0
-        }
+        "offer_id": offer_id,
+        "product_id": int(product_id),
+        "sku": 0
+    }
     response = requests.post(link, headers=headers, json=data)
     answer = response.json()
     result = answer['result']["fbs_sku"]
@@ -84,11 +84,12 @@ def get_product_info(product_id, offer_id):
     # print('get_product_info_onon', len(result)) #{'product_id': 38010832, 'offer_id': 'OWLT190601', 'is_fbo_visible': True, 'is_fbs_visible': True, 'archived': False, 'is_discounted': False}
     return result
 
+
 def create_data_stocks():
     data_read = read_json_on()
     result = []
     stocks = []
-    # proxy_skus = {}
+    proxy_errors = []
     current_assortment = post_get_smth(metod_get_list_products)[0]
     for product in current_assortment:
         proxy = {}
@@ -98,25 +99,34 @@ def create_data_stocks():
             proxy['stock'] = data_read[product['offer_id']][2]
             outlets = data_read[product['offer_id']][3]
             for wh in outlets:
-                if wh != 23012928587000:   # TODO for TEST only
-                    proxy['warehouse_id'] = wh
-                    pr = proxy.copy()
-                    stocks.append(pr)
+                # if wh != 23012928587000:  # TODO for TEST only
+                proxy['warehouse_id'] = wh
+                pr = proxy.copy()
+                stocks.append(pr)
+        else:
+            proxy_errors.append(product)
+
+    print(2345677, len(proxy_errors), proxy_errors)
+        #
+        # if product['product_id'] == 1016996546:
+        #     print(product)
+
 
                 # if wh == 23012928587000:  # TODO for TEST only
                 #     print('stocks', stocks)
     while len(stocks) >= 100:
         result.append(stocks[:100])
         del stocks[:100]
-        #print('stocks', stocks)
+        print('stocks', stocks)
     else:
         result.append(stocks)
 
-    print('create_data_stocks_onon_x100', len(result))  #, result)
+    print('create_data_stocks_onon_x100', len(result))
     return result
 
+
 # asyncio.run(create_data_stocks())
-# create_data_stocks()
+create_data_stocks()
 
 def read_skus():
     try:
@@ -128,6 +138,8 @@ def read_skus():
 
     print('items_skus', len(items_skus), type(items_skus))
     return items_skus
+
+
 #
 # read_skus()
 
@@ -137,26 +149,30 @@ def send_stocks_on():
     link = host + metod
     proxy = []
     for row in pre_data:
-        data = {'stocks': row }
+        data = {'stocks': row}
         # print('SEND_DATA', data)
-        response = requests.post(link,  headers=headers, data=json.dumps(data))
+        dt = json.dumps(data)
+        # print(len(data['stocks']), dt)
+        response = requests.post(link, headers=headers, json=data)
         answer = response.json()
-        #ans = response.text
-        # print(ans)
-        result = answer["result"]
-        for row in result:
-            if len(row["errors"]) > 0:  #and row['warehouse_id'] != 23012928587000: #TODO temporary 'warehouse_id': 23012928587000
-                print('ERROR from send_stocks_on', row)
-            elif row['updated'] == False:
-                print('ERROR update from send_stocks_on', row)
-            # elif row['updated'] == True:  # and row['warehouse_id'] != 23012928587000:
-            #     print('SUCCES update from send_stocks_on', row)
-        proxy.append(answer)
-        sleep(0.4)
+        ans = response.text
+        print('answer send_stocks_on', ans)
+        result = answer.get("result")
+        if result:
+            for row in result:
+                if len(row["errors"]) > 0:  # and row['warehouse_id'] != 23012928587000: #TODO temporary 'warehouse_id': 23012928587000
+                    print('ERROR from send_stocks_ozon', row)
+                elif row['updated'] == False:
+                    print('ERROR update from send_stocks_ozon', row)
+                elif row['updated'] == True:  # and row['warehouse_id'] != 23012928587000:
+                    print('SUCCES update from send_stocks_on', row)
+            proxy.append(answer)
+        sleep(1)
+
 
 # send_stocks_on()
 
-def product_info_price(id_mp):  #product_id, offer_id
+def product_info_price(id_mp):  # product_id, offer_id
     # url = 'https://api-seller.ozon.ru/v4/product/info/prices'
     # data = {"filter": {
     #             "offer_id": [offer_id],
@@ -167,26 +183,24 @@ def product_info_price(id_mp):  #product_id, offer_id
     #         "limit": 100}
     url = 'https://api-seller.ozon.ru/v3/posting/fbs/get'
     data = {
-      "posting_number": id_mp,
-      "with": {
-        "analytics_data": False,
-        "barcodes": False,
-        "financial_data": False,
-        "product_exemplars": False,
-        "translit": False }}
+        "posting_number": id_mp,
+        "with": {
+            "analytics_data": False,
+            "barcodes": False,
+            "financial_data": False,
+            "product_exemplars": False,
+            "translit": False}}
     resp = requests.post(url=url, headers=headers, json=data)
     result = resp.json()
     print('product_id_offer_id', result)
-    #price = result.get("result")["items"][0]["price"]["marketing_price"][:-2]
+    # price = result.get("result")["items"][0]["price"]["marketing_price"][:-2]
     order = result.get("result")
     return order
 
-
-
-#get_product_info(38010832, "OWLT190601")
+# get_product_info(38010832, "OWLT190601")
 # product_info_price("463727127", "OWLC19-014")
 # send_stocks_on()
-#asyncio.run(post_send_stocks())
+# asyncio.run(post_send_stocks())
 # create_data_stocks()
 
 # def convert(string):
@@ -195,5 +209,3 @@ def product_info_price(id_mp):  #product_id, offer_id
 # # pr = [{'id': 'MP1703473-001', 'pickup': {'deliveryServiceId': 123600, 'deliveryServiceName': 'Леруа Мерлен сервис доставки', 'warehouseId': '1200', 'timeInterval': 'Invalid Interval', 'pickupDate': '2022-12-14'}, 'products': [{'lmId': '90115665', 'vendorCode': 'BT2834B', 'price': 5860, 'qty': 3, 'comissionRate': 0}, {'lmId': '90121362', 'vendorCode': 'HPUV65ELC', 'price': 5860, 'qty': 3, 'comissionRate': 0}], 'deliveryCost': 0, 'parcelPrice': 5860, 'creationDate': '2022-12-14', 'promisedDeliveryDate': '2022-12-22', 'calculatedWeight': 4.8, 'calculatedLength': 707, 'calculatedHeight': 156, 'calculatedWidth': 686}, {'id': 'MP1703472-001', 'pickup': {'deliveryServiceId': 123600, 'deliveryServiceName': 'Леруа Мерлен сервис доставки', 'warehouseId': '1200', 'timeInterval': 'Invalid Interval', 'pickupDate': '2022-12-14'}, 'products': [{'lmId': '90115665', 'vendorCode': 'BT2834B', 'price': 5860, 'qty': 3, 'comissionRate': 0}, {'lmId': '90121362', 'vendorCode': 'HPUV65ELC', 'price': 5860, 'qty': 3, 'comissionRate': 0}], 'deliveryCost': 0, 'parcelPrice': 5860, 'creationDate': '2022-12-14', 'promisedDeliveryDate': '2022-12-22', 'calculatedWeight': 4.8, 'calculatedLength': 707, 'calculatedHeight': 156, 'calculatedWidth': 686}, {'id': 'MP1703471-001', 'pickup': {'deliveryServiceId': 123600, 'deliveryServiceName': 'Леруа Мерлен сервис доставки', 'warehouseId': '1200', 'timeInterval': 'Invalid Interval', 'pickupDate': '2022-12-14'}, 'products': [{'lmId': '90115665', 'vendorCode': 'BT2834B', 'price': 5860, 'qty': 3, 'comissionRate': 0}, {'lmId': '90121362', 'vendorCode': 'HPUV65ELC', 'price': 5860, 'qty': 3, 'comissionRate': 0}], 'deliveryCost': 0, 'parcelPrice': 5860, 'creationDate': '2022-12-14', 'promisedDeliveryDate': '2022-12-22', 'calculatedWeight': 4.8, 'calculatedLength': 707, 'calculatedHeight': 156, 'calculatedWidth': 686}]
 # pr = {'message_type': 'TYPE_NEW_POSTING', 'seller_id': 90963, 'warehouse_id': 1020000075732000, 'posting_number': '13223249-0059-1', 'in_process_at': '2023-03-18T03:56:36Z', 'products': [{'sku': 789880982, 'quantity': 1}]}
 # convert(pr)
-
-
