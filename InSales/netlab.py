@@ -564,6 +564,6 @@ def get_goods_images(product_id):
 # # create_csv_file_from_netlab_v2()
 # # create_csv_file_from_netlab('Прайс-лист', [1974806])  #127955)
 # # create_csv_for_category_from_netlab_v3()
-create_csv_for_category_from_netlab_v4()
+# create_csv_for_category_from_netlab_v4()
 # asyncio.run(save_categories_vendors())
 # 11008078

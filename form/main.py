@@ -8,7 +8,7 @@ import pdfkit
 import templates
 import uuid
 import json
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect, url_for, send_file
 # from cred import user_id, user_secret
 # from trap import access_token
 import requests
@@ -56,6 +56,26 @@ def get_list():
 def get_blanks():
     date = datetime.date
     return render_template('blanks.html', date=date)
+
+
+@app.route('/blanks/raspiska', methods=['GET'])
+def get_raspiska():
+    return send_file('./templates/c_files/pdf/raspiska.pdf')
+
+
+@app.route('/blanks/manychilds', methods=['GET', 'POST'])
+def get_blank_manychilds():
+    return send_file('./templates/c_files/pdf/manychilds.pdf')
+
+
+@app.route('/blanks/workbook', methods=['GET', 'POST'])
+def get_workbook():
+    return send_file('./templates/c_files/pdf/workbook.pdf')
+
+
+@app.route('/blanks/agreement', methods=['GET'])
+def get_agreement():
+    return send_file('./templates/c_files/pdf/agreement.pdf')
 
 
 @app.route('/phones', methods=['GET', 'POST'])
