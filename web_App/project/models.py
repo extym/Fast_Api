@@ -5,6 +5,9 @@ from sqlalchemy import ForeignKey
 
 
 class Users(db.Model, UserMixin):
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(250), unique=True)
     password = db.Column(db.String(250))

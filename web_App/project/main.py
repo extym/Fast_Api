@@ -10,7 +10,7 @@ from project import db
 import pandas as pd
 # pip install openpyxl
 from project.models import *
-from flask import Blueprint, render_template, app, redirect, make_response, Response
+from flask import Blueprint, render_template, app, redirect, make_response, Response, url_for
 from flask import request, flash
 from flask_login import current_user, login_required
 from werkzeug.utils import secure_filename
@@ -315,13 +315,24 @@ def index_main():
     return render_template('ui-login.html')  # 'start_page.html')
 
 
-@main.route('/comein')
+@main.route('/come-in')
 @login_required
 def come_in():
-    name = current_user.name
-    uid = current_user.id
-    role = current_user.roles
-    return render_template('hospital.html', name=name, uid=uid, role=role)  # index.html
+    if not current_user.is_authenticated:
+        return redirect(url_for('main.index_main'))
+    else:
+        name = current_user.name
+        uid = current_user.id
+        role = current_user.roles
+        user_login = current_user.login
+        photo = current_user.photo
+        if not photo or photo is None:
+            photo = 'profile-music-2.jpg'
+        return render_template('hospital.html',
+                               user_name=name,
+                               uid=uid, role=role,
+                               user_login=user_login,
+                               photo=photo)
 
 
 @main.route('/api/on', methods=['POST'])

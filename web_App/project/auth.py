@@ -100,11 +100,13 @@ def signup():
 def signup_post():
     # ('cabinetID', '1'), ('login', '1'), ('email', '1'), ('password', '1234'), ('remember', 'forever'), ('wp-submit', 'Зарегистрироваться')
     email = request.form.get('email')
-    name = request.form.get('login')
+    user_login = request.form.get('login')
     password = request.form.get('password')
+    photo = ''
     user = Users.query.filter_by(
         email=email).first()  # if this returns a user, then the email already exists in database
     now_date = datetime.datetime.strftime(datetime.datetime.now(), '%H:%M %d/%m/%Y')
+    name = request.form.get('name', f'{user_login}_{now_date}')
     company_id = request.form.get('cabinetID')
 
     if user:
@@ -113,10 +115,12 @@ def signup_post():
 
     new_user = Users(email=email,
                      name=name,
+                     login=user_login,
                      company_id=company_id,
                      roles='owner',
                      date_added=now_date,
                      date_modifed=now_date,
+                     photo=photo,
                      password=generate_password_hash(password, method='scrypt'))
 
     db.session.add(new_user)
@@ -136,16 +140,21 @@ def logout():
 @auth.route('/dashboard')
 @login_required
 def dashboard():
-    # make smth
-    pass
-    return unescape(render_template('index.html'))
+    if not current_user.is_authenticated:
+        return redirect(url_for('main.index_main'))
+    else:
+        pass
+        return unescape(render_template('index.html'))
 
 
 @auth.route('/main-page')
 @login_required
 def main_page():
-    pass
-    return render_template('base-layout.html')
+    if not current_user.is_authenticated:
+        return redirect(url_for('main.index_main'))
+    else:
+        pass
+        return render_template('base-layout.html')
 
 
 def check_api(key_mp, shop_id):
@@ -162,13 +171,20 @@ def add_mp():
         uid = current_user.id
         role = current_user.roles
         need_id = current_user.company_id
+        user_name = current_user.name
+        photo = current_user.photo
+        if not photo or photo is None:
+            photo = 'prof-music-2.jpg'
         need_data = db.session.execute(select(Marketplaces.shop_name)
                                        .where(Marketplaces.company_id == need_id))
         rows = []
         for row in need_data:
             rows.extend(row)
         # print(3333333, row, rows)
-        return render_template('mp_settings.html', uid=uid, role=role, rows=rows)
+        return render_template('mp_settings.html', uid=uid,
+                               role=role, rows=rows,
+                               photo=photo,
+                               user_name=user_name)
 
 
 @auth.route('/add_mp', methods=['POST'])  # /<int:uid>')
@@ -409,6 +425,10 @@ def import_settings():
         uid = current_user.id
         role = current_user.roles
         need_id = current_user.company_id
+        user_name = current_user.name
+        photo = current_user.photo
+        if not photo or photo is None:
+            photo = 'prof-music-2.jpg'
         need_data = db.session.execute(select(Marketplaces.shop_name,
                                               Marketplaces.name_mp)
                                        .where(Marketplaces.company_id == need_id))
@@ -418,7 +438,10 @@ def import_settings():
             rows_mp.append(row[1])
 
         return render_template('/import_settings.html',
-                               uid=uid, role=role, rows=rows, rows_mp=set(rows_mp))
+                               uid=uid, role=role,
+                               rows=rows, rows_mp=set(rows_mp),
+                               photo=photo,
+                               user_name=user_name)
 
 
 @auth.route('/import_settings', methods=['POST'])
@@ -517,10 +540,17 @@ def user_settings():
     else:
         uid = current_user.id
         role = current_user.roles
+        user_name = current_user.name
+        photo = current_user.photo
+        if not photo or photo is None:
+            photo = 'prof-music-2.jpg'
         users = Users.query.filter_by(company_id=current_user.company_id).all()
         rows = [row.name for row in users if row.name not in ('admin100500', 'Admin100500')]
         # print(rows)
-        return render_template('user-settings.html', uid=uid, role=role, rows=rows)
+        return render_template('user-settings.html', uid=uid,
+                               role=role, rows=rows,
+                               photo=photo,
+                               user_name=user_name)
 
 
 @auth.route('/user-settings', methods=['POST'])
@@ -531,23 +561,29 @@ def user_settings_post():
     if 'add_user_role' in data:
         user_role = data.get('add_user_role')
         user_name = data.get('user_name')
+        user_login = data.get('user_login')
         user_email = data.get('user_email')
         user_password = data.get('Password')
+        photo = data.get('photo')
         now_date = datetime.datetime.strftime(datetime.datetime.now(), '%H:%M %d/%m/%Y')
         company_id = current_user.company_id  # request.form.get('cabinetID')
         user = Users.query.filter_by(email=user_email).first()
 
         if user:
             flash('Адрес почты уже существует')
-            return render_template('mp_settings.html', uid=uid)
+            return render_template('mp_settings.html', uid=uid,
+                                   photo=photo,
+                                   user_name=user_name)
         elif not user and user_email != '' and user_name != '':
 
             new_user = Users(email=user_email,
                              name=user_name,
+                             login=user_login,
                              company_id=company_id,
                              roles=user_role,
                              date_added=now_date,
                              date_modifed=now_date,
+                             photo=photo,
                              password=generate_password_hash(user_password, method='scrypt')
                              )
             db.session.add(new_user)
@@ -562,6 +598,7 @@ def user_settings_post():
         exist_user_name = data.get('edit_user_exist')
         user_email = data.get('user_email')
         user_password = data.get('Password')
+        user_login = data.get('user_login')
         now_date = datetime.datetime.strftime(datetime.datetime.now(), '%H:%M %d/%m/%Y')
         company_id = current_user.company_id  # request.form.get('cabinetID')
         user = Users.query.filter_by(name=exist_user_name).first()
@@ -584,6 +621,12 @@ def user_settings_post():
                          'date_modifed': now_date})
             db.session.execute(smth)
             flash("Пароль пользователя успешно изменен")
+        if user_login != '':
+            smth = update(Users).where(Users.name == exist_user_name) \
+                .where(Users.company_id == company_id) \
+                .values({'login': user_login, 'date_modifed': now_date})
+            db.session.execute(smth)
+            flash("Логин пользователя успешно изменен")
 
         db.session.commit()
         db.session.close()
@@ -623,6 +666,10 @@ def edit_product(product=None):
         # print(rows_shops, type(rows_shops))
         rows = [row[0] for row in rows_shops]
         role = current_user.roles
+        user_name = current_user.name
+        photo = current_user.photo
+        if not photo or photo is None:
+            photo = 'prof-music-2.jpg'
         if product is None:
             product = {
                 'selected_mp': '',
@@ -651,7 +698,9 @@ def edit_product(product=None):
                                role=role,
                                product=product,
                                price_product_base=product.get('price_product_base'),
-                               rows=rows)
+                               rows=rows,
+                               photo=photo,
+                               user_name=user_name)
 
         # selected_mp=selected_mp,
         # articul_product=articul_product,
@@ -749,8 +798,6 @@ def edit_product_post():
         finally:
             db.session.close()
 
-        # print(123, session)
-        # return render_template('product-edit.html', role=role)
     return redirect('/edit_product')
 
 
@@ -762,8 +809,14 @@ def add_product():
     else:
         uid = current_user.id
         role = current_user.roles
-        # return render_template('form-product.html', uid=uid, role=role)
-        return render_template('product-add.html', uid=uid, role=role)
+        user_name = current_user.name
+        photo = current_user.photo
+        if not photo or photo is None:
+            photo = 'prof-music-2.jpg'
+
+        return render_template('product-add.html', uid=uid, role=role,
+                               photo=photo,
+                               user_name=user_name)
 
 
 @auth.route('/add_product', methods=['POST'])  # /<int:uid>')
@@ -772,8 +825,12 @@ def add_product_post():
     data = request.form.to_dict()
     uid = current_user.id
     role = current_user.roles
-    print('/add_product', *data, sep='\n')
-    print('/add_product', *data, sep=', \n')
+    user_name = current_user.name
+    photo = current_user.photo
+    if not photo or photo is None:
+        photo = 'prof-music-2.jpg'
+    # print('/add_product', *data, sep='\n')
+    # print('/add_product', *data, sep=', \n')
     shop_k_product = data.get('shop_k_product', 1)
     shop_name = data.get('set_shop_name', '0')
     price_product_base = int(data.get('price_product_base', '0')) * 100
@@ -803,11 +860,15 @@ def add_product_post():
 
     if shop_name is None:
         flash('Укажите, пожалуйста, название магазина, желательно как на маркетплейсе', 'error')
-        return render_template('form-validation.html')
+        return render_template('form-validation.html',
+                               photo=photo,
+                               user_name=user_name)
 
     if price_product_base is None:
         flash('Укажите, пожалуйста, базовую цену товара на маркетплейсе', 'error')
-        return render_template('product-add.html')
+        return render_template('product-add.html',
+                               photo=photo,
+                               user_name=user_name)
 
     try:
         db.session.add(prod_set)
@@ -835,6 +896,10 @@ def products_page(page=1):
     else:
         uid = current_user.id
         role = current_user.roles
+        user_name = current_user.name
+        photo = current_user.photo
+        if not photo or photo is None:
+            photo = 'prof-music-2.jpg'
         rows = ''
         limit = 30
         my_query = db.func.count(Product.id)
@@ -859,7 +924,9 @@ def products_page(page=1):
         return unescape(render_template('tables-products.html',
                                         rows=rows, role=role,
                                         raw_list_products=raw_list_products,
-                                        max_page=max_page))
+                                        max_page=max_page,
+                                        photo=photo,
+                                        user_name=user_name))
 
 
 @auth.route('/shops')
@@ -870,6 +937,10 @@ def shops():
     else:
         uid = current_user.id
         role = current_user.roles
+        user_name = current_user.name
+        photo = current_user.photo
+        if not photo or photo is None:
+            photo = 'prof-music-2.jpg'
         rows = ''
         # d_b = Db()
         # raw_list_orders = d_b.select_orders()  # TODO make select orders to user id
@@ -893,7 +964,10 @@ def shops():
         #             f'<td width = "80" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #f3f3f3;">{row[12]}</td>' \
         #             f'</tr>'
 
-        return unescape(render_template('tables-shops.html', rows=rows, role=role))
+        return unescape(render_template('tables-shops.html',
+                                        rows=rows, role=role,
+                                        photo=photo,
+                                        user_name=user_name))
 
 
 @auth.route('/sales', methods=['GET', 'POST'])
@@ -906,6 +980,10 @@ def sales_page(page=1):
     else:
         uid = current_user.id
         role = current_user.roles
+        user_name = current_user.name
+        photo = current_user.photo
+        if not photo or photo is None:
+            photo = 'prof-music-2.jpg'
         rows = ''
         limit = 30
         sales = db.session.query(Sales) \
@@ -928,9 +1006,13 @@ def sales_page(page=1):
                     f'<td >{row.category}</td>' \
                     f'</tr>'
 
-        return unescape(render_template('table-paginate.html', rows=rows, role=role,
-                                        max_page=max_page, total_sales=total_sales,
-                                        sales=sales))
+        return unescape(render_template('table-paginate.html',
+                                        rows=rows, role=role,
+                                        max_page=max_page,
+                                        total_sales=total_sales,
+                                        sales=sales,
+                                        photo=photo,
+                                        user_name=user_name))
 
 
 @auth.route('/sales_today', methods=['GET', 'POST'])
@@ -943,6 +1025,10 @@ def sales_today(page=1):
     else:
         uid = current_user.id
         role = current_user.roles
+        user_name = current_user.name
+        photo = current_user.photo
+        if not photo or photo is None:
+            photo = 'prof-music-2.jpg'
         rows = ''
         limit = 30
         # sales_today = db.session.query(SalesToday) \
@@ -971,7 +1057,9 @@ def sales_today(page=1):
                                         rows=rows, role=role,
                                         max_page=max_page,
                                         total_sales_today=total_sales_today,
-                                        sales_today=sales_today))
+                                        sales_today=sales_today,
+                                        photo=photo,
+                                        user_name=user_name))
 
 
 @auth.route('/assembly_sales', methods=['GET', 'POST'])
@@ -984,10 +1072,15 @@ def assembly_sales(page=1):
     else:
         uid = current_user.id
         role = current_user.roles
+        user_name = current_user.name
+        user_photo = current_user.photo
+        if not user_photo or user_photo is None:
+            user_photo = 'prof-music-2.jpg'
         rows = ''
         limit = 30
         HOUR = '09:00:00'
-        example = (datetime.datetime.today() - datetime.timedelta(days=1)).strftime(f"%Y-%m-%d {HOUR}")
+        example = (datetime.datetime.today() - datetime.timedelta(days=1)) \
+            .strftime(f"%Y-%m-%d {HOUR}")
         # print(333333333333, example, type(example))
         my_query = db.func.count(SalesToday.id)
         total_assembly_sales = db.session.execute(my_query).scalar()
@@ -997,18 +1090,18 @@ def assembly_sales(page=1):
         #     .where(SalesToday.date_added > example) \
         #     .order_by(SalesToday.article_mp) \
         #     .paginate(page=page, per_page=limit, error_out=False)
-
+        # TODO
         assembly_orders = db.session.query(SalesToday.article_mp,
                                            SalesToday.shop_name,
                                            SalesToday.article,
                                            SalesToday.order_status,
-                                           func.sum(SalesToday.quantity).label('total_sales')) \
+                                           func.sum(SalesToday.quantity)
+                                           .label('total_sales')) \
             .group_by(SalesToday.article_mp,
                       SalesToday.shop_name,
                       SalesToday.article,
                       SalesToday.order_status) \
             .where(SalesToday.date_added > example) \
-            .where(SalesToday.shop_status == "NEW") \
             .order_by(SalesToday.article_mp) \
             .paginate(page=page, per_page=limit, error_out=False)
 
@@ -1055,7 +1148,9 @@ def assembly_sales(page=1):
                                         rows=rows, role=role,
                                         max_page=max_page,
                                         total_assembly_sales=total_assembly_sales,
-                                        assembly_sales=assembly_orders))
+                                        assembly_sales=assembly_orders,
+                                        photo=user_photo,
+                                        user_name=user_name))
 
 
 @auth.route('/users-table')
@@ -1068,6 +1163,10 @@ def users_table(page=1):
     else:
         company_id = current_user.company_id
         role = current_user.roles
+        user_name = current_user.name
+        photo = current_user.photo
+        if not photo or photo is None:
+            photo = 'prof-music-2.jpg'
         data = []
         rows = ''
         limit = 10
@@ -1092,7 +1191,9 @@ def users_table(page=1):
         return unescape(render_template('users-table.html',
                                         rows=rows, role=role,
                                         max_page=max_page,
-                                        total_users=total_users))
+                                        total_users=total_users,
+                                        photo=photo,
+                                        user_name=user_name))
 
 
 @auth.route('/profile')
@@ -1102,31 +1203,56 @@ def profile():
     if not current_user.is_authenticated:
         return redirect(url_for('main.index_main'))
     else:
-        rows = {}
         user_id = current_user.id
         role = current_user.roles
         company_id = current_user.company_id
         user_data = db.session.execute(select(Users)
-                                       .where(Users.id == user_id)\
-                                       .where(Users.company_id == company_id))\
+                                       .where(Users.id == user_id) \
+                                       .where(Users.company_id == company_id)) \
             .first()
         photo = user_data[0].photo
         if not photo or photo is None:
-            photo = 'profile-music-2.jpg'
+            photo = 'prof-music-2.jpg'
         user_name = user_data[0].name
-        rows['photo'] = photo
-        # for row in need_data:
-        #     rows.extend(row)
 
     if request.method == 'POST':
+        proxy = dict()
+        file = request.files['file']
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            # print(11111111111, os.getcwd())
+            file.save(os.path.join(PHOTO_UPLOAD_FOLDER, filename))
+            proxy['photo'] = filename
+
         data = request.form.to_dict()
-        print(44444444444, data)
+        now_date = datetime.datetime.strftime(datetime.datetime.now(), '%H:%M %d/%m/%Y')
+        proxy['date_modifed'] = now_date
+        if data.get('current_user_name') != current_user.name:
+            proxy_name = data.get('current_user_name')
+            proxy['name'] = proxy_name
+
+        if data.get('change_user_password') != data.get('check_user_password') \
+                and data.get('check_user_password') != '':
+            flash('Введенные пароли не совпадают', 'error')
+
+        elif data.get('change_user_password') == data.get('check_user_password') \
+                and data.get('check_user_password') != '':
+
+            proxy['password'] = generate_password_hash \
+                (data.get('change_user_password'), method='scrypt')
+
+        smth = update(Users) \
+            .where(Users.id == current_user.id) \
+            .values(proxy)
+
+        db.session.execute(smth)
+        db.session.commit()
+
         return redirect('/profile')
 
-    print(3333333, user_data, photo, user_name)
     return render_template('hos-profile-edit.html',
-                           uid=user_id, role=role,
-                           rows=user_data[0], photo=photo,
+                           uid=user_id, user_role=role,
+                           photo=photo,
                            user_name=user_name)
 
 
@@ -1166,8 +1292,13 @@ def page_not_found(error):
     if not current_user.is_authenticated:
         return redirect(url_for('main.index_main'))
     else:
-        # role = current_user.roles
-        return render_template("blank-2.html", title='404'), 404
+        photo = current_user.photo
+        if not photo or photo is None:
+            photo = 'prof-music-2.jpg'
+        user_name = current_user.name
+        return render_template("blank-2.html", title='404',
+                               user_name=user_name,
+                               photo=photo), 404
 
 
 @auth.app_errorhandler(500)
