@@ -160,7 +160,7 @@ class SalesToday(db.Model):
     quantity = db.Column(db.Integer())
     price = db.Column(db.String(250))
     add_price = db.Column(db.String(250))
-    # discount = db.Column(db.Double())
+    our_status = db.Column(db.String(250))
     photo = db.Column(db.String(250))
     category = db.Column(db.String(250))
     shipment_date = db.Column(db.String(250))

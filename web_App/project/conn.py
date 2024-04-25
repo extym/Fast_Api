@@ -494,7 +494,8 @@ update_send_data_order = (
     " WHERE id_MP = %s and shop_name = %s ")
 
 update_status_order = (" UPDATE fresh_orders "
-                       "SET status = %s, our_status = %s "
+                       "SET status = %s, our_status = %s, "
+                       " date_modifed = NOW() "
                        "WHERE id_MP = %s and shop_name = %s ")
 
 update_status_order_items = (" UPDATE order_items "

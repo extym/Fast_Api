@@ -144,7 +144,8 @@ def reformat_data_order(order, shop):
 
 def try_get_id_1c(offer_id):
     # items_skus = read_skus()
-    # items_ids = read_json_ids()  # we wait dict[vendor_code] = (id_1c, price, quantity)
+    # we wait dict[vendor_code] = (id_1c, price, quantity)
+    # items_ids = read_json_ids()
     # id_1c = items_ids[vendor_code][0]  # 1c
     pass
     return None
@@ -359,13 +360,14 @@ async def onon_push():
             id_mp = resp["posting_number"]
             seller_id = str(resp.get('seller_id'))
             sleep(1.5)
+            shop_name = Marketplaces.query. \
+                filter_by(seller_id=seller_id).first().shop_name
             order = product_info_price(id_mp, seller_id)
+
             if order:
                 print('new_order_onon', order['posting_number'])
                 order['our_id'], order['id'], order['status'], order['our_status'] \
                     = our_id, id_mp, "NEW", "NEW"  # TODO change place id_mp & our_id
-                shop_name = Marketplaces.query.\
-                    filter_by(seller_id=seller_id).first().shop_name
                 ref_data = reformat_data_order(order, 'Ozon')
                 # list_items = reformat_data_items(order, 'Ozon')
                 list_items = reformat_data_items_v2(order, shop_name, 'Ozon')
@@ -381,10 +383,13 @@ async def onon_push():
 
         elif resp.get("message_type") == "TYPE_POSTING_CANCELLED":
             order_id = resp["posting_number"]
-            order_status = resp.get('status')
+            order_status = resp.get('seller_id')
+            seller_id = resp.get('seller_id')
             print('INFO CANCELED ORDER - status {} from {}'
                   .format(order_status, resp))
-            data = ("canceled", "canceled", order_id, "Ozon")
+            shop_name = Marketplaces.query. \
+                filter_by(seller_id=seller_id).first().shop_name
+            data = (order_status, "canceled", order_id, shop_name)
             # await execute_query(update_status_order_reverse_id, data)
             await execute_query_v3(query=update_status_order,
                                    query2=update_status_order_items,

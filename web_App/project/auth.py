@@ -996,17 +996,15 @@ def sales_page(page=1):
             rows += '<tr>' \
                     f'<td>{row.shop_order_id}</td>' \
                     f'<td >{row.article}</td>' \
-                    f'<td >{row.article_mp}</td>' \
                     f'<td >{row.quantity}</td>' \
                     f'<td >{row.price}</td>' \
                     f'<td >{row.shop_name}</td>' \
-                    f'<td >{row.date_added}</td>' \
+                    f'<td >{str(row.date_added).rsplit(":")[0]}</td>' \
+                    f'<td >{row.shop_status}</td>' \
                     f'<td >{row.shipment_date}</td>' \
-                    f'<td >{row.order_status}</td>' \
-                    f'<td >{row.category}</td>' \
                     f'</tr>'
 
-        return unescape(render_template('table-paginate.html',
+        return unescape(render_template('table-sales-page.html',
                                         rows=rows, role=role,
                                         max_page=max_page,
                                         total_sales=total_sales,
@@ -1102,6 +1100,7 @@ def assembly_sales(page=1):
                       SalesToday.article,
                       SalesToday.order_status) \
             .where(SalesToday.date_added > example) \
+            .where(SalesToday.our_status == "NEW")\
             .order_by(SalesToday.article_mp) \
             .paginate(page=page, per_page=limit, error_out=False)
 
@@ -1251,7 +1250,7 @@ def profile():
         return redirect('/profile')
 
     return render_template('hos-profile-edit.html',
-                           uid=user_id, user_role=role,
+                           uid=user_id, role=role,
                            photo=photo,
                            user_name=user_name)
 
