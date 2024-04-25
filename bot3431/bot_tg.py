@@ -16,5 +16,5 @@ def send_get(text):
 
 # send_get(TEXT)
 
-# answer = requests.get(url='https://api.telegram.org/bot6727922879:AAFpcrRrVnA7q3RB37FPUtv5bytdlsViMJU/getUpdates')
+
 # print(answer)
