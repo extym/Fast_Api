@@ -1,0 +1,13 @@
+[Unit]
+Description=Schedule_server
+After=multi-user.target
+
+[Service]
+User=root
+Type=idle
+ExecStart=/usr/bin/python3 /var/www/html/2c/schedul.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+

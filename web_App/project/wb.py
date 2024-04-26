@@ -13,6 +13,7 @@ from psycopg2.extensions import register_adapter, AsIs
 import requests
 import json
 
+from project.bot_tg import send_get
 from project.conn import *
 
 # data = read_json_wb()
@@ -177,9 +178,20 @@ def get_new_orders_wb(shop_name=None, company_id=None):
         data = response.json()
         print('ALL_RIDE_get_new_orders_wb', response, len(data), data)
         return response.status_code, data
-    else:
-        print('FUCK_UP_get_new_orders_wb {} response {}'
+
+    elif response.status_code == 403:
+        print('ERROR_get_new_orders_wb {} response {}'
               .format(response.status_code, response.text))
+        send_get('Ошибка получения заказов с WB {} response {}.'
+                 'Проверьте корректность сохраненного ключа API.'
+                 .format(response.status_code, response.text))
+        return response.status_code, response.text
+
+    else:
+        print('ERROR_get_new_orders_wb {} response {}'
+              .format(response.status_code, response.text))
+        send_get('Ошибка получения заказов с WB {} response {}.'
+                 .format(response.status_code, response.text))
         return response.status_code, response.text
 
 
@@ -226,6 +238,25 @@ async def processing_orders_wb(shop_name=None, company_id=None):
     else:
         print("Error ger orders WB by {} to {}".format(data[0], data[1]))
         return "Error ger orders WB by {} to {}".format(data[0], data[1])
+
+
+def run_processing_orders_wb():
+    default_company_id = "AdminTheRock"  # TODO FIX magic name company
+    with Session(engine) as session:
+        session.begin()
+        default_shop_name = session \
+            .execute(select(Marketplaces.shop_name)
+                     .where(Marketplaces.company_id == default_company_id)
+                     .where(Marketplaces.name_mp == 'wb')
+                     ).first()
+        # TODO check is possible made TWO & more stores in WB
+    if default_shop_name is not None:
+        print(444444, default_shop_name, default_company_id)
+        asyncio.run(processing_orders_wb(shop_name=default_shop_name[0],
+                                         company_id=default_company_id))
+    else:
+        print("Some trouble get shop_name for WB {} {}"
+              .format(default_company_id, default_shop_name))
 
 
 def get_product_cards(shop_name=None, company_id=None):
@@ -298,13 +329,11 @@ def get_product_cards(shop_name=None, company_id=None):
 
 def make_cart_id(shop_name=None, data=None):
     metod = 'https://suppliers-api.wildberries.ru/content/v2/cards/upload'
-    query = select(Marketplaces.seller_id, Marketplaces.key_mp)\
+    query = select(Marketplaces.seller_id, Marketplaces.key_mp) \
         .where(Marketplaces.shop_name == shop_name)
     with Session(engine) as session:
         session.begin()
         seller_data = session.execute(query).first()
-
-
 
 
 def adapt_dict(dict_var):
@@ -314,7 +343,7 @@ def adapt_dict(dict_var):
 def import_product_from_wb(shop_name=None, company_id=None, uid_edit_user=None):
     register_adapter(dict, adapt_dict)
     data = get_product_cards(shop_name=shop_name, company_id=company_id)[0]
-    query = select(Marketplaces.seller_id, Marketplaces.key_mp)\
+    query = select(Marketplaces.seller_id, Marketplaces.key_mp) \
         .where(Marketplaces.shop_name == shop_name)
     with Session(engine) as session:
         session.begin()
@@ -369,7 +398,8 @@ def import_product_from_wb(shop_name=None, company_id=None, uid_edit_user=None):
                 except sqlalchemy.exc.IntegrityError as error:
                     session.rollback()
                     session.begin()
-                    update_prod = update(Product).where(Product.articul_product == product.get('articul_product')) \
+                    update_prod = update(Product) \
+                        .where(Product.articul_product == product.get('articul_product')) \
                         .where(Product.store_id == product.get('store_id')) \
                         .values(product)
                     session.execute(update_prod)
@@ -391,3 +421,5 @@ def import_product_from_wb(shop_name=None, company_id=None, uid_edit_user=None):
 # asyncio.run(processing_orders_wb(shop_name='Полиция Вкуса', company_id='AdminTheRock'))
 # import_product_from_wb(shop_name='Полиция Вкуса', company_id='AdminTheRock', uid_edit_user=3)
 # get_wh()
+
+# run_processing_orders_wb()

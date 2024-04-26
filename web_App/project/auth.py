@@ -1079,33 +1079,60 @@ def assembly_sales(page=1):
         HOUR = '09:00:00'
         example = (datetime.datetime.today() - datetime.timedelta(days=1)) \
             .strftime(f"%Y-%m-%d {HOUR}")
-        # print(333333333333, example, type(example))
-        my_query = db.func.count(SalesToday.id)
-        total_assembly_sales = db.session.execute(my_query).scalar()
-        max_page = total_assembly_sales // limit
+        pre_rows_shops = db.session.query(Marketplaces.shop_name)\
+            .where(Marketplaces.company_id == current_user.company_id).all()
+        rows_shops = [i[0] for i in pre_rows_shops]
 
-        # assembly_orders = db.session.query(SalesToday) \
-        #     .where(SalesToday.date_added > example) \
-        #     .order_by(SalesToday.article_mp) \
-        #     .paginate(page=page, per_page=limit, error_out=False)
-        # TODO
-        assembly_orders = db.session.query(SalesToday.article_mp,
-                                           SalesToday.shop_name,
-                                           SalesToday.article,
-                                           SalesToday.order_status,
-                                           func.sum(SalesToday.quantity)
-                                           .label('total_sales')) \
-            .group_by(SalesToday.article_mp,
-                      SalesToday.shop_name,
-                      SalesToday.article,
-                      SalesToday.order_status) \
-            .where(SalesToday.date_added > example) \
-            .where(SalesToday.our_status == "NEW")\
-            .order_by(SalesToday.article_mp) \
-            .paginate(page=page, per_page=limit, error_out=False)
+        shop = request.args.get('select_shop_name')
+        print(11111, shop)
+        if shop is None or shop == 'Все Магазины':
+            my_query = db.func.count(SalesToday.id)
+            total_assembly_sales = db.session.execute(my_query).scalar()
+            max_page = total_assembly_sales // limit
 
-        # print(333333, assembly)
-        # print(assembly)
+            # TODO
+            assembly_orders = db.session.query(SalesToday.article_mp,
+                                               SalesToday.shop_name,
+                                               SalesToday.article,
+                                               SalesToday.order_status,
+                                               func.sum(SalesToday.quantity)
+                                               .label('total_sales')) \
+                .group_by(SalesToday.article_mp,
+                          SalesToday.shop_name,
+                          SalesToday.article,
+                          SalesToday.order_status) \
+                .where(SalesToday.date_added > example) \
+                .where(SalesToday.our_status == "NEW")\
+                .order_by(SalesToday.article_mp) \
+                .paginate(page=page, per_page=limit, error_out=False)
+
+            # print(333333, assembly)
+            # print(assembly)
+            print(222222, shop)
+        else:
+            my_query = db.func.count(SalesToday.id)
+            total_assembly_sales = db.session.execute(my_query).scalar()
+            max_page = total_assembly_sales // limit
+            print(33333, shop)
+            # TODO
+            assembly_orders = db.session.query(SalesToday.article_mp,
+                                               SalesToday.shop_name,
+                                               SalesToday.article,
+                                               SalesToday.order_status,
+                                               func.sum(SalesToday.quantity)
+                                               .label('total_sales')) \
+                .group_by(SalesToday.article_mp,
+                          SalesToday.shop_name,
+                          SalesToday.article,
+                          SalesToday.order_status) \
+                .where(SalesToday.date_added > example) \
+                .where(SalesToday.our_status == "NEW") \
+                .filter(SalesToday.shop_name == shop)\
+                .order_by(SalesToday.article_mp) \
+                .paginate(page=page, per_page=limit, error_out=False)
+
+            # print(333333, assembly)
+            # print(assembly)
 
         for row in assembly_orders.items:
             # print(11111111111, row)
@@ -1118,22 +1145,6 @@ def assembly_sales(page=1):
             # print(111, photo)
             if photo is None:
                 photo = ('нет фото',)
-
-            # if row.shipment_date is not None:
-            #     shipment_date = str(row.shipment_date).split(" ")
-            # else:
-            #     shipment_date = row.shipment_date
-            #
-            # rows += '<tr>' \
-            #         f'<td ><img class="img-fluid" src="{photo[0]}" alt="" style="max-width:50px;"></td>' \
-            #         f'<td>{row.shop_order_id}</td>' \
-            #         f'<td >{row.article}</td>' \
-            #         f'<td >{row.shop_name}</td>' \
-            #         f'<td >{row.quantity}</td>' \
-            #         f'<td >{str(row.date_added).rsplit(".")[0]}</td>' \
-            #         f'<td >{shipment_date}</td>' \
-            #         f'<td >{row.order_status}</td>' \
-            #         f'</tr>'
 
             rows += '<tr>' \
                     f'<td ><img class="img-fluid" src="{photo[0]}" alt="" style="max-width:50px;"></td>' \
@@ -1149,7 +1160,8 @@ def assembly_sales(page=1):
                                         total_assembly_sales=total_assembly_sales,
                                         assembly_sales=assembly_orders,
                                         photo=user_photo,
-                                        user_name=user_name))
+                                        user_name=user_name,
+                                        shops=rows_shops))
 
 
 @auth.route('/users-table')

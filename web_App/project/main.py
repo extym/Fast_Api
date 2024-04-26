@@ -338,10 +338,8 @@ def come_in():
 
 @main.route('/api/on', methods=['POST'])
 async def onon_push():
-    ip_addr = request.environ.get('X-Real-IP')
-    print('X-Real-IP', ip_addr)
     addr = request.headers.get('X-Forwarded-For')
-    print('X-Forwarded-For', addr)
+    # print('X-Forwarded-For', addr)
     resp = request.get_json()
     # head = dict(request.headers)
     # print('resp_header', head)
@@ -383,8 +381,8 @@ async def onon_push():
 
         elif resp.get("message_type") == "TYPE_POSTING_CANCELLED":
             order_id = resp["posting_number"]
-            order_status = resp.get('seller_id')
-            seller_id = resp.get('seller_id')
+            order_status = resp.get('new_state')
+            seller_id = str(resp.get('seller_id'))
             print('INFO CANCELED ORDER - status {} from {}'
                   .format(order_status, resp))
             shop_name = Marketplaces.query. \

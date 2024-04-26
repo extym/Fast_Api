@@ -11,6 +11,7 @@ import requests
 import sqlalchemy
 from sqlalchemy.orm import Session
 
+from project.bot_tg import send_get
 from project.models import *
 from project.creds import *
 from project.database import Data_base_connect as Db
@@ -486,8 +487,12 @@ def get_product_list_v2(seller_id=None, shop_name=None, company_id=None):
                     if data.get('code') == 7 and data.get('message') == "Invalid Api-Key, please contact support":
                         print('Error Api_Key for seller_id{}  shop {} get {}'
                               .format(seller_id, shop_name, answer.text))
+                        send_get('Error Api_Key for seller_id{}  shop {} get {}'
+                              .format(seller_id, shop_name, answer.text))
                 except Exception as err:
                     print('Error get data for seller_id {}  shop {} get {}'
+                          .format(seller_id, shop_name, answer.text))
+                    send_get('Error get data for seller_id {}  shop {} get {}'
                           .format(seller_id, shop_name, answer.text))
                 finally:
                     count += 1
@@ -521,7 +526,10 @@ def get_product_info(product_id=None, offer_id=None, seller_data=None):
     if answer.ok:
         result = answer.json()
     else:
-        print('Some_Error_from_get_product_info {} '.format(answer.text))
+        print('Some_Error_from_get_product_info {}, product_id {}, offer_id {} '
+              .format(answer.text, product_id, offer_id))
+        send_get('Some_Error_from_get_product_info {}, product_id {}, offer_id {} '
+              .format(answer.text, product_id, offer_id))
 
     return result
 
@@ -605,6 +613,7 @@ def import_oson_data_prod(user_id=None, shop_name=None, company_id=None):
         print('Successfully import {} from {} store'.format(count, shop_name))
         return 'success {}'.format(count)
     except Exception as error:
+        send_get('Error import {} from {} store'.format(count, shop_name))
         return 'errors {}'.format(error)
 
 

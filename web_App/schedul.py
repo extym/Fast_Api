@@ -1,12 +1,18 @@
+import asyncio
+import os
+
 import schedule
 import time
 from project.conn import rewrite_orders_v3
+from project.wb import run_processing_orders_wb
 
+
+# def job():
+#     asyncio.run(processing_orders_wb)
 
 schedule.every().day.at("09:01").do(rewrite_orders_v3)
+schedule.every(60).minutes.do(run_processing_orders_wb)
 
-def job():
-    print("I'm working...")
 
 # # Run job every 3 second/minute/hour/day/week,
 # # Starting 3 second/minute/hour/day/week from now
