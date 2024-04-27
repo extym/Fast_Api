@@ -27,7 +27,7 @@ def read_xlsx(file):
         maxy.append(int(row[0]))
         shipment_date = row[13][:-5]
     # print(proxy, sep='\n')
-    print(maxy)
+    # print(1111111111, maxy)
     return sorted(maxy), shipment_date
 
 

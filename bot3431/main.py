@@ -551,7 +551,8 @@ async def download():
                     flash("Выберите маркетплейс для загружаемого файла")
                     return redirect(request.url)
                 data = read_xlsx(file)
-                # await make_data_for_request_v2(data, market)
+                # print(2222222222222, data)
+                await make_data_for_request_v2(data, market)
                 if data:
                     flash("File upload successfully")
                     return redirect(request.url)

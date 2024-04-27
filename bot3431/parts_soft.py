@@ -1,3 +1,6 @@
+import logging
+import os
+
 from requests.auth import HTTPBasicAuth
 
 import bot_tg
@@ -47,35 +50,45 @@ async def change_status(ids: str):
 
 def get_orders_v2(customer_id, marketplace_id):
     result, result_list = '', []
-    page = 0
+    page, error = 0, 0
     while marketplace_id != result:
         params = {
             'search[customer_id_eq]': customer_id,
-            # 'search[marketplace_id_eq]': marketplace_id,
+            'search[marketplace_id_eq]': marketplace_id,
             'per_page': 20,
             'page': page
         }
         url = ps_link + "/orders.json"
         token_ps = HTTPBasicAuth(admin_ps_login, admin_ps_pass)
         answer = requests.get(url, auth=token_ps, params=params)
-        data = answer.json()
-        result_list = [i for i in data.get('orders')
-                       if i.get('marketplace_id') == marketplace_id]
-        if result_list:
-            result = marketplace_id
-        else:
-            page += 1
-            print('page ', page)
-        if page >= 5:
-            bot_tg.send_get('So many pages {} for {} in {}'.format(page, marketplace_id, customer_id))
-            break
+        if answer.ok:
+            data = answer.json()
+            result_list = [i for i in data.get('orders')
+                           if i.get('marketplace_id') == marketplace_id]
 
-    print(7777, result_list)
+            if result_list:
+                result = marketplace_id
+            else:
+                page += 1
+                print('page ', page)
+            if page >= 5:
+                bot_tg.send_get('So many pages {} for {} in {}'.format(page, marketplace_id, customer_id))
+                break
+        else:
+            error += 1
+            logging.info('Some trouble with access parts-soft - status {} text {}'
+                         .format(answer.status_code, answer.text))
+            bot_tg.send_get('Some trouble with access parts-soft - status {} text {}'
+                            .format(answer.status_code, answer.text))
+            if page >= 5:
+                break
+
+    # print(7777, result_list)
     try:
         datas = ' '.join([str(i.get('id')) for i in result_list[0].get('order_items')])
     except:
         datas = ''
-    print('datas', datas)
+    # print('datas', datas)
     return datas
 
 
@@ -84,11 +97,12 @@ async def make_data_for_request_v2(data_file, market):
     count = 0
     proxy = ''
     shipment_date = data_file[1]
+    # print(33333333, data_file)
     for number in data_file[0]:
         item_ids = get_orders_v2(market, marketplace_id=str(number))
-        # result = await change_status(item_ids.strip())
         proxy += item_ids.strip() + ' '
         count += 1
+
 
     result = await change_status(proxy.strip())
     if result:
