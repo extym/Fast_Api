@@ -898,27 +898,39 @@ def products_page(page=1):
         role = current_user.roles
         user_name = current_user.name
         photo = current_user.photo
+        shop = request.args.get('select_shop_name')
+        # print(11111, shop)
         if not photo or photo is None:
             photo = 'prof-music-2.jpg'
         rows = ''
         limit = 30
-        my_query = db.func.count(Product.id)
-        all_product = db.session.execute(my_query).scalar()
-        max_page = all_product // limit
-        raw_list_products = db.session.query(Product) \
-            .paginate(page=page, per_page=30, error_out=False)
+        pre_rows_shops = db.session.query(Marketplaces.shop_name)\
+            .where(Marketplaces.company_id == current_user.company_id).all()
+        rows_shops = [i[0] for i in pre_rows_shops]
+        if shop is None or shop == 'Все Магазины':
+            my_query = db.func.count(Product.id)
+            all_product = db.session.execute(my_query).scalar()
+            max_page = all_product // limit
+            raw_list_products = db.session.query(Product) \
+                .paginate(page=page, per_page=30, error_out=False)
+
+        else:
+            my_query = db.func.count(Product.id)
+            all_product = db.session.execute(my_query).scalar()
+            max_page = all_product // limit
+            raw_list_products = db.session.query(Product).filter_by(shop_name=shop) \
+                .paginate(page=page, per_page=30, error_out=False)
+
+
         for row in raw_list_products.items:
             rows += '<tr>' \
                     f'<td>{row.name_product}</td>' \
                     f'<td >{row.articul_product}</td>' \
-                    f'<td >{row.external_sku}</td>' \
+                    f'<td >{row.shop_name}</td>' \
                     f'<td >{row.quantity}</td>' \
-                    f'<td >{row.discount}</td>' \
                     f'<td >{row.final_price}</td>' \
-                    f'<td >{row.date_added}</td>' \
-                    f'<td >{row.date_modifed}</td>' \
-                    f'<td >{row.discount_shop_product}</td>' \
                     f'<td >{row.status_in_shop}</td>' \
+                    f'<td >{row.date_modifed}</td>' \
                     f'</tr>'
 
         return unescape(render_template('tables-products.html',
@@ -926,7 +938,8 @@ def products_page(page=1):
                                         raw_list_products=raw_list_products,
                                         max_page=max_page,
                                         photo=photo,
-                                        user_name=user_name))
+                                        user_name=user_name,
+                                        shops=rows_shops))
 
 
 @auth.route('/shops')
@@ -1084,7 +1097,7 @@ def assembly_sales(page=1):
         rows_shops = [i[0] for i in pre_rows_shops]
 
         shop = request.args.get('select_shop_name')
-        print(11111, shop)
+        # print(11111, shop)
         if shop is None or shop == 'Все Магазины':
             my_query = db.func.count(SalesToday.id)
             total_assembly_sales = db.session.execute(my_query).scalar()
@@ -1113,7 +1126,6 @@ def assembly_sales(page=1):
             my_query = db.func.count(SalesToday.id)
             total_assembly_sales = db.session.execute(my_query).scalar()
             max_page = total_assembly_sales // limit
-            print(33333, shop)
             # TODO
             assembly_orders = db.session.query(SalesToday.article_mp,
                                                SalesToday.shop_name,
@@ -1262,7 +1274,7 @@ def profile():
         return redirect('/profile')
 
     return render_template('hos-profile-edit.html',
-                           uid=user_id, role=role,
+                           uid=user_id, user_role=role,
                            photo=photo,
                            user_name=user_name)
 
