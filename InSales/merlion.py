@@ -142,6 +142,7 @@ def create_csv_for_category_from_merlion():
     base_fields = ['category_id', 'Name', 'item_id', 'quantity', 'Brand', 
                    'Vendor_part', 'price', 'published', 'image', 'currency']
     date = get_shipment_dates()  # 2023-11-19
+    allpro = []
     for key in category_groups.keys():
         result_list = []
         rewrite_properties = {}
@@ -210,6 +211,14 @@ def create_csv_for_category_from_merlion():
         #     print(*result_list, sep='\n')
 
         # break
+
+        allpro.extend(result_list.copy())
+
+    with open(CSV_PATH + f'merlion-all.csv', 'w') as file:
+        writer = csv.DictWriter(file, dialect='excel', restval='', delimiter=';',
+                                extrasaction='ignore', fieldnames=base_fields)
+        writer.writeheader()
+        writer.writerows(allpro)
 
 
 # get_catalog_merlion(url_test_re)

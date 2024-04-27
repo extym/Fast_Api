@@ -121,6 +121,7 @@ def create_csv_for_category_from_treolan():
     base_fields = ['category_id', 'Name', 'target_price', 'quantity', 'Brand', 'Vendor_part',
                    'published', 'full_price', 'currency', 'images']
     # date = get_shipment_dates()  # 2023-11-19
+    allpro = []
     for key in category_groups.keys():
         result_list = []
         rewrite_properties = {}
@@ -176,6 +177,14 @@ def create_csv_for_category_from_treolan():
             writer.writerows(result_list)
 
         # break
+
+        allpro.extend(result_list.copy())
+
+    with open(CSV_PATH + f'treolan-all.csv', 'w') as file:
+        writer = csv.DictWriter(file, dialect='excel', restval='', delimiter=';',
+                                extrasaction='ignore', fieldnames=base_fields)
+        writer.writeheader()
+        writer.writerows(allpro)
 
 # get_categories_treolan()
 # get_cats_treolan()

@@ -299,7 +299,9 @@ def create_csv_for_category_from_ocs_v3():  ##for import goods only (maybe)
     # print(11, category_ids)
     # print(22, category_groups)
     site_category_path = {key: value[2] for key, value in category_ids.items()}
-    base_fields = ['category_id', 'brand', 'id', 'name', 'quantity', 'price', 'published', 'description']
+    base_fields = ['category_id', 'brand', 'id', 'name',
+                   'quantity', 'price', 'published', 'description']
+    allpro = []
     for key in category_groups.keys():
         result_list, maxy = [], []
         rewrite_properties = {}
@@ -370,6 +372,14 @@ def create_csv_for_category_from_ocs_v3():  ##for import goods only (maybe)
             writer.writerows(result_list)
 
         # break
+
+        allpro.extend(result_list.copy())
+
+    with open(CSV_PATH + f'ocs-all.csv', 'w') as file:
+        writer = csv.DictWriter(file, dialect='excel', restval='', delimiter=';',
+                                extrasaction='ignore', fieldnames=base_fields)
+        writer.writeheader()
+        writer.writerows(allpro)
 
 
 def check_len_keys(cats):

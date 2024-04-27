@@ -313,7 +313,7 @@ def create_csv_for_category_from_netlab_v4():  ##for import goods only (maybe)
         'mini D-Sub',
         'HDMI'
     ]
-    all = []
+    allpro = []
     fields = base_fields.copy()
     for key in category_groups.keys():
         # if key == 1:
@@ -370,13 +370,13 @@ def create_csv_for_category_from_netlab_v4():  ##for import goods only (maybe)
             writer.writeheader()
             writer.writerows(result_list)
 
-        all.extend(result_list.copy())
+        allpro.extend(result_list.copy())
 
     with open(CSV_PATH + f'netlab-all.csv', 'w') as file:
         writer = csv.DictWriter(file, dialect='excel', restval='', delimiter=';',
                                 extrasaction='ignore', fieldnames=fields)
         writer.writeheader()
-        writer.writerows(all)
+        writer.writerows(allpro)
 
 
 

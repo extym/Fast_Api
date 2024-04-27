@@ -123,6 +123,7 @@ def create_csv_for_category_from_marvel_v2():
         category_groups[cats[4]] = category_groups.get(cats[4], []) + cats[0].split(', ')
     base_fields = ['category_id', 'brand', 'id', 'quantity', 'price', 'published',
                    'name', 'currency', 'photos']
+    allpro = []
     for key in category_groups.keys():
         result_list = []
         rewrite_properties = {}
@@ -178,6 +179,14 @@ def create_csv_for_category_from_marvel_v2():
             writer.writerows(pro_result_list)
 
         # break
+
+        allpro.extend(result_list.copy())
+
+    with open(CSV_PATH + f'marvel-all.csv', 'w') as file:
+        writer = csv.DictWriter(file, dialect='excel', restval='', delimiter=';',
+                                extrasaction='ignore', fieldnames=base_fields)
+        writer.writeheader()
+        writer.writerows(allpro)
 
 def make_data_cats():
     try:

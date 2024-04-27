@@ -141,10 +141,11 @@ def create_csv_for_category_from_logic():  ##for import goods only (maybe)
     site_category_path = {key: value[2] for key, value in category_ids.items()}
     base_fields = ['category_id', 'brand', 'full_name', 'quantity', 'price', 'published',
                    'image_short', 'image_additional', 'image_main', 'id', 'stock']
+    allpro = []
     for key in category_groups.keys():
         count = 0
         result_list, ids = [], []
-        rewrite_properties = {}
+        rewrite_properties, prod = {}, {}
         for category_id in category_groups.get(key):
             site_category_name = category_ids[category_id][1]
             try:
@@ -228,6 +229,14 @@ def create_csv_for_category_from_logic():  ##for import goods only (maybe)
         print(count, '_all_prod_logic', key)
 
         # break
+
+        allpro.extend(result_list.copy())
+
+    with open(CSV_PATH + f'logic-all.csv', 'w') as file:
+        writer = csv.DictWriter(file, dialect='excel', restval='', delimiter=';',
+                                extrasaction='ignore', fieldnames=base_fields)
+        writer.writeheader()
+        writer.writerows(allpro)
 
 
 # dss = ['Операционная система:  Andoid 12, MIUI Pad 13', 'Тип дисплея:  IPS', 'Диагональ дисплея, дюйм:  10.61', 'Разрешение дисплея:  2000x1200', 'Яркость, кд/м2:  400', 'Процессор:  MediaTek Helio G99', 'Видеокарта:  ARM Mali-G57 MC2', 'Оперативная память, ГБ:  4', 'Хранение данных, ГБ:  128', 'Беспроводное подключение:  ', '   WiFi:  WLAN 802.11a/b/g/n/ac', '   Bluetooth:  5.3', 'Проводное подключение:  ', '   USB Type-C:  1', 'Слоты:  ', '   Слот для карт памяти:  1 x microSD (до 1ТБ)', 'Тыловая камера, Мп:  8', 'Фронтальная камера, Мп:  8', 'Микрофон:  Да', 'Динамики:  4 динамика с поддержкой Dolby Atmos', 'Датчики, сенсоры:  датчик света, акселерометр, компас, гироскоп, сканер отпечатков пальцев, распознавание лица', 'Основной цвет:  Серый', 'Материал:  Металл', 'Питание:  Аккумулятор: емкость - 8000 мАч', 'Габариты:  ', '   Высота, мм:  254.7', '   Ширина, мм:  166.3', '   Толщина, мм:  6.9', 'Вес нетто, грамм:  511', 'Особенности:  Поддержка быстрой зарядки до 18W', 'Ссылка на описание:  https://ru-mi.com/product/42837/', 'Комплект поставки:  Планшет, документация, зарядное устройство, кабель USB-C, скрепка']
