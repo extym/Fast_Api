@@ -2,6 +2,7 @@
 from flask_login import LoginManager
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+
 # # Redis
 # from rq import Worker, Queue, Connection
 # from project.worker import conn
@@ -13,7 +14,25 @@ db = SQLAlchemy()
 
 TEST_MODE = 1
 LOCAL_MODE = 1
+if LOCAL_MODE:
+    interval = 6
+else:
+    interval = 120
 PHOTO_UPLOAD_FOLDER = 'project/templates/static/data/profile/'
+
+
+def sensor():
+    """ Function for test purposes. """
+    print("Scheduler is alive!")
+
+
+# add scheduler
+from apscheduler.schedulers.gevent import GeventScheduler
+
+sched = GeventScheduler(daemon=True)
+sched.add_job(sensor, 'interval', minutes=interval)
+sched.start()
+
 
 def create_app():
     app = Flask(__name__,
@@ -43,7 +62,6 @@ def create_app():
     app.register_blueprint(main_blueprint)
 
     return app
-
 
 # from celery import Celery
 #

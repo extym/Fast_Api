@@ -11,7 +11,7 @@ from project.wb import run_processing_orders_wb
 #     asyncio.run(processing_orders_wb)
 
 schedule.every().day.at("09:01").do(rewrite_orders_v3)
-schedule.every(60).minutes.do(run_processing_orders_wb)
+# schedule.every(60).minutes.do(run_processing_orders_wb)
 
 
 # # Run job every 3 second/minute/hour/day/week,

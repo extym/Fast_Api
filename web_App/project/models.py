@@ -188,6 +188,9 @@ class Marketplaces(db.Model):
     mp_markup = db.Column(db.Double())
     store_discount = db.Column(db.Double())
     store_markup = db.Column(db.Double())
+    check_send_null = db.Column(db.Boolean())
+    check_send_stocks = db.Column(db.Boolean())
+    check_enable_submit = db.Column(db.Boolean())
     date_added = db.Column(db.String(50))
     date_modifed = db.Column(db.String(50))
 

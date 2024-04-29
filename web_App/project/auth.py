@@ -13,6 +13,8 @@ import os
 
 from sqlalchemy import func, select, update, join, values, text
 from sqlalchemy.sql.functions import sum
+
+from project import sched
 from .database import Data_base_connect as Db
 from werkzeug.security import generate_password_hash, check_password_hash
 from .models import *
@@ -20,7 +22,8 @@ from . import db, TEST_MODE, PHOTO_UPLOAD_FOLDER
 from sqlalchemy.orm import Session, load_only
 
 from project.import_ozon import import_oson_data_prod, make_internal_import_oson
-from project.wb import import_product_from_wb
+# from project.wb import import_product_from_wb
+import project.wb as wb
 # Pagination
 from flask_paginate import Pagination, get_page_parameter
 # # Redis
@@ -463,9 +466,9 @@ def import_settings_post():
                                                        company_id=company_id))
             print(777777777777, job.get_id)
         elif mp == 'wb':
-            job = q.enqueue_call(import_product_from_wb(uid_edit_user=uid,
-                                                        shop_name=shop_name,
-                                                        company_id=company_id))
+            job = q.enqueue_call(wb.import_product_from_wb(uid_edit_user=uid,
+                                                           shop_name=shop_name,
+                                                           company_id=company_id))
             print(88888888888, job.get_id)
 
         return redirect('/import_settings')
@@ -904,7 +907,7 @@ def products_page(page=1):
             photo = 'prof-music-2.jpg'
         rows = ''
         limit = 30
-        pre_rows_shops = db.session.query(Marketplaces.shop_name)\
+        pre_rows_shops = db.session.query(Marketplaces.shop_name) \
             .where(Marketplaces.company_id == current_user.company_id).all()
         rows_shops = [i[0] for i in pre_rows_shops]
         if shop is None or shop == 'Все Магазины':
@@ -920,7 +923,6 @@ def products_page(page=1):
             max_page = all_product // limit
             raw_list_products = db.session.query(Product).filter_by(shop_name=shop) \
                 .paginate(page=page, per_page=30, error_out=False)
-
 
         for row in raw_list_products.items:
             rows += '<tr>' \
@@ -948,6 +950,16 @@ def shops():
     if not current_user.is_authenticated:
         return redirect(url_for('main.index_main'))
     else:
+        # if request.args.get('smth'):
+        #     sched.add_job(wb.run_processing_orders_wb, 'interval', minutes=10)
+        data = request.args.to_dict()
+        if len(data.keys()) > 0:
+            for key, value in data.items():
+                need_job = key.rsplit('_')[0]
+                seller_id_job = key.rsplit('_')[1]
+
+
+        print(22222, request.args.to_dict())
         uid = current_user.id
         role = current_user.roles
         user_name = current_user.name
@@ -955,27 +967,51 @@ def shops():
         if not photo or photo is None:
             photo = 'prof-music-2.jpg'
         rows = ''
-        # d_b = Db()
-        # raw_list_orders = d_b.select_orders()  # TODO make select orders to user id
-        # raw_list_products = db.session.query(Product).all()
+
+        raw_list_shops = db.session.query(Marketplaces).filter_by(company_id=current_user.company_id).all()
         # raw_list_products = db.session.query(Product).paginate(page=30, per_page=30, error_out=False).items
-        # for row in raw_list_products:
-        #     print(8888888, len(raw_list_products), row)
-        #     order_id = row[1]
-        #     price = ''
-        #
-        #     rows += '<tr>' \
-        #             f'<td width = "130" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #f3f3f3;">{order_id}</td>' \
-        #             f'<td width = "140" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #f3f3f3;">{row[2]}</td>' \
-        #             f'<td width = "140" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #f3f3f3;">{row[7]}</td>' \
-        #             f'<td width = "140" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #f3f3f3;">{row[2]}</td>' \
-        #             f'<td width = "120" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #f3f3f3;">{row[8]}</td>' \
-        #             f'<td width = "100" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #f3f3f3;">{price}</td>' \
-        #             f'<td width = "60" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #f3f3f3;">{row[9]}</td>' \
-        #             f'<td width = "60" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #f3f3f3;">{row[10]}</td>' \
-        #             f'<td width = "140" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #f3f3f3;">{row[11]}</td>' \
-        #             f'<td width = "80" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #f3f3f3;">{row[12]}</td>' \
-        #             f'</tr>'
+        for row in raw_list_shops:
+            seller_id = row.seller_id
+            if row.mp_markup:
+                mp_markup = row.mp_markup
+            else:
+                mp_markup = "0"
+
+            if row.store_markup:
+                store_markup = row.store_markup
+            else:
+                store_markup = "0"
+
+            if row.date_modifed:
+                date_modifed = row.date_modifed
+            else:
+                date_modifed = "Нет"
+            if row.check_send_null:
+                check_send_null = "checked"
+            else:
+                check_send_null = "unchecked"
+            if row.check_send_stocks:
+                check_send_stocks = "checked"
+            else:
+                check_send_stocks = "unchecked"
+            if row.check_enable_submit:
+                check_enable_submit = "checked"
+            else:
+                check_enable_submit = "unchecked"
+            rows += '<tr>' \
+                    f'<td >{row.shop_name} </td>' \
+                    f'<td >{row.name_mp}</td>' \
+                    f'<td >{row.seller_id}</td>' \
+                    f'<td >{mp_markup}</td>' \
+                    f'<td >{store_markup}</td>' \
+                    f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="enable_submit_stocks_{seller_id}' \
+                    f'" {check_send_stocks} class="iswitch iswitch iswitch-purple"></div></td>' \
+                    f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="enable_submit_null_{seller_id}' \
+                    f'" {check_send_null} class="iswitch iswitch iswitch-warning"></div></td>' \
+                    f'<td >{str(date_modifed).rsplit(":")[0]}</td>' \
+                    f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="enable_submit_{seller_id}' \
+                    f'" {check_enable_submit} class="iswitch iswitch iswitch-purple"></div></td>' \
+                    f'</tr>'
 
         return unescape(render_template('tables-shops.html',
                                         rows=rows, role=role,
@@ -1092,7 +1128,7 @@ def assembly_sales(page=1):
         HOUR = '09:00:00'
         example = (datetime.datetime.today() - datetime.timedelta(days=1)) \
             .strftime(f"%Y-%m-%d {HOUR}")
-        pre_rows_shops = db.session.query(Marketplaces.shop_name)\
+        pre_rows_shops = db.session.query(Marketplaces.shop_name) \
             .where(Marketplaces.company_id == current_user.company_id).all()
         rows_shops = [i[0] for i in pre_rows_shops]
 
@@ -1115,7 +1151,7 @@ def assembly_sales(page=1):
                           SalesToday.article,
                           SalesToday.order_status) \
                 .where(SalesToday.date_added > example) \
-                .where(SalesToday.our_status == "NEW")\
+                .where(SalesToday.our_status == "NEW") \
                 .order_by(SalesToday.article_mp) \
                 .paginate(page=page, per_page=limit, error_out=False)
 
@@ -1139,7 +1175,7 @@ def assembly_sales(page=1):
                           SalesToday.order_status) \
                 .where(SalesToday.date_added > example) \
                 .where(SalesToday.our_status == "NEW") \
-                .filter(SalesToday.shop_name == shop)\
+                .filter(SalesToday.shop_name == shop) \
                 .order_by(SalesToday.article_mp) \
                 .paginate(page=page, per_page=limit, error_out=False)
 
