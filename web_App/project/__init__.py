@@ -21,19 +21,6 @@ else:
 PHOTO_UPLOAD_FOLDER = 'project/templates/static/data/profile/'
 
 
-def sensor():
-    """ Function for test purposes. """
-    print("Scheduler is alive!")
-
-
-# add scheduler
-from apscheduler.schedulers.gevent import GeventScheduler
-
-sched = GeventScheduler(daemon=True)
-sched.add_job(sensor, 'interval', minutes=interval)
-sched.start()
-
-
 def create_app():
     app = Flask(__name__,
                 static_folder='templates/static')

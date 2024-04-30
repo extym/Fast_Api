@@ -3,6 +3,19 @@ from project import create_app
 # from project import app
 
 
+# def sensor():
+#     """ Function for test purposes. """
+#     print("Scheduler is alive!")
+#
+#
+# # add scheduler
+# from apscheduler.schedulers.gevent import GeventScheduler
+#
+# sched = GeventScheduler(daemon=True)
+# sched.add_job(sensor, 'interval', minutes=60)
+# sched.start()
+
+
 
 
 # if __name__ == "__main__":

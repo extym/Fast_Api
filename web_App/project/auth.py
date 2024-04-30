@@ -1,35 +1,32 @@
 import datetime
 import logging
-import time
-
-import flask_login
-from sqlalchemy.exc import IntegrityError
-from psycopg2.errors import UniqueViolation
-from flask import Blueprint, request, flash, render_template, redirect, url_for, session
-from flask_login import login_user, logout_user, login_required, current_user, UserMixin
-from werkzeug.utils import secure_filename
-from html import unescape
 import os
+import time
+from html import unescape
 
-from sqlalchemy import func, select, update, join, values, text
-from sqlalchemy.sql.functions import sum
-
-from project import sched
-from .database import Data_base_connect as Db
+from flask import Blueprint, request, flash, render_template, redirect, url_for
+from flask_login import login_user, logout_user, login_required, current_user
+from psycopg2.errors import UniqueViolation
+# Pagination
+# # Redis
+from rq import Queue
+from rq.job import Job
+from sqlalchemy import func, select, update
+from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash, check_password_hash
-from .models import *
-from . import db, TEST_MODE, PHOTO_UPLOAD_FOLDER
-from sqlalchemy.orm import Session, load_only
+from werkzeug.utils import secure_filename
 
-from project.import_ozon import import_oson_data_prod, make_internal_import_oson
 # from project.wb import import_product_from_wb
 import project.wb as wb
-# Pagination
-from flask_paginate import Pagination, get_page_parameter
-# # Redis
-from rq import Worker, Queue, Connection
+from project.import_ozon import import_oson_data_prod, make_internal_import_oson
 from project.worker import conn
-from rq.job import Job
+from . import db, TEST_MODE, PHOTO_UPLOAD_FOLDER
+from .database import Data_base_connect as Db
+from .models import *
+
+from apscheduler.schedulers.background import BackgroundScheduler
+
+scheduler = BackgroundScheduler()
 
 q = Queue(connection=conn)
 
@@ -944,79 +941,104 @@ def products_page(page=1):
                                         shops=rows_shops))
 
 
-@auth.route('/shops')
+@auth.route('/shops', methods=['GET', 'POST'])
 @login_required
 def shops():
     if not current_user.is_authenticated:
         return redirect(url_for('main.index_main'))
     else:
-        # if request.args.get('smth'):
-        #     sched.add_job(wb.run_processing_orders_wb, 'interval', minutes=10)
-        data = request.args.to_dict()
-        if len(data.keys()) > 0:
-            for key, value in data.items():
-                need_job = key.rsplit('_')[0]
-                seller_id_job = key.rsplit('_')[1]
+        if request.method == "POST":
+            data = request.form.to_dict()
+            if len(data.keys()) > 0:
+                proxy = {}
+                for key, value in data.items():
+                    need_job = key.rsplit('_', maxsplit=1)[0]
+                    proxy[value] = proxy.get(value, []) + [need_job]
+            else:
+                proxy = {}
+
+            markets = Marketplaces.query.filter_by(company_id=current_user.company_id).all()
+            for row in markets:
+                current_work = {'check_send_null': False,
+                                'check_send_stocks': False,
+                                'check_enable_submit': False}
+                if row.shop_name in proxy.keys():
+                    current = {i: True for i in proxy[row.shop_name]}
+                    current_work.update(current)
+                    db.session.execute(update(Marketplaces)
+                                       .where(Marketplaces.seller_id==row.seller_id)
+                                       .values(current_work))
+                else:
+                    db.session.execute(update(Marketplaces)
+                                       .where(Marketplaces.seller_id == row.seller_id)
+                                       .values(current_work))
+                db.session.commit()
 
 
-        print(22222, request.args.to_dict())
-        uid = current_user.id
-        role = current_user.roles
-        user_name = current_user.name
-        photo = current_user.photo
-        if not photo or photo is None:
-            photo = 'prof-music-2.jpg'
-        rows = ''
 
-        raw_list_shops = db.session.query(Marketplaces).filter_by(company_id=current_user.company_id).all()
-        # raw_list_products = db.session.query(Product).paginate(page=30, per_page=30, error_out=False).items
-        for row in raw_list_shops:
-            seller_id = row.seller_id
-            if row.mp_markup:
-                mp_markup = row.mp_markup
-            else:
-                mp_markup = "0"
+            return redirect(url_for('auth.shops'))
 
-            if row.store_markup:
-                store_markup = row.store_markup
-            else:
-                store_markup = "0"
+        else:
+            # print(22222, request.args.to_dict())
+            uid = current_user.id
+            role = current_user.roles
+            user_name = current_user.name
+            photo = current_user.photo
+            if not photo or photo is None:
+                photo = 'prof-music-2.jpg'
+            rows = ''
 
-            if row.date_modifed:
-                date_modifed = row.date_modifed
-            else:
-                date_modifed = "Нет"
-            if row.check_send_null:
-                check_send_null = "checked"
-            else:
-                check_send_null = "unchecked"
-            if row.check_send_stocks:
-                check_send_stocks = "checked"
-            else:
-                check_send_stocks = "unchecked"
-            if row.check_enable_submit:
-                check_enable_submit = "checked"
-            else:
-                check_enable_submit = "unchecked"
-            rows += '<tr>' \
-                    f'<td >{row.shop_name} </td>' \
-                    f'<td >{row.name_mp}</td>' \
-                    f'<td >{row.seller_id}</td>' \
-                    f'<td >{mp_markup}</td>' \
-                    f'<td >{store_markup}</td>' \
-                    f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="enable_submit_stocks_{seller_id}' \
-                    f'" {check_send_stocks} class="iswitch iswitch iswitch-purple"></div></td>' \
-                    f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="enable_submit_null_{seller_id}' \
-                    f'" {check_send_null} class="iswitch iswitch iswitch-warning"></div></td>' \
-                    f'<td >{str(date_modifed).rsplit(":")[0]}</td>' \
-                    f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="enable_submit_{seller_id}' \
-                    f'" {check_enable_submit} class="iswitch iswitch iswitch-purple"></div></td>' \
-                    f'</tr>'
+            raw_list_shops = db.session.query(Marketplaces)\
+                .filter_by(company_id=current_user.company_id).order_by(Marketplaces.seller_id.asc()).all()
+            # raw_list_products = db.session.query(Product)
+            # .paginate(page=30, per_page=30, error_out=False).items
+            for row in raw_list_shops:
+                seller_id = row.seller_id
+                if row.mp_markup:
+                    mp_markup = row.mp_markup
+                else:
+                    mp_markup = "0"
 
-        return unescape(render_template('tables-shops.html',
-                                        rows=rows, role=role,
-                                        photo=photo,
-                                        user_name=user_name))
+                if row.store_markup:
+                    store_markup = row.store_markup
+                else:
+                    store_markup = "0"
+
+                if row.date_modifed:
+                    date_modifed = row.date_modifed
+                else:
+                    date_modifed = "Нет"
+                if row.check_send_null:
+                    check_send_null = "checked"
+                else:
+                    check_send_null = "unchecked"
+                if row.check_send_stocks:
+                    check_send_stocks = "checked"
+                else:
+                    check_send_stocks = "unchecked"
+                if row.check_enable_submit:
+                    check_enable_submit = "checked"
+                else:
+                    check_enable_submit = "unchecked"
+                rows += '<tr>' \
+                        f'<td >{row.shop_name} </td>' \
+                        f'<td >{row.name_mp}</td>' \
+                        f'<td >{row.seller_id}</td>' \
+                        f'<td >{mp_markup}</td>' \
+                        f'<td >{store_markup}</td>' \
+                        f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="check_send_stocks_{seller_id}' \
+                        f'" {check_send_stocks} class="iswitch iswitch iswitch-purple"></div></td>' \
+                        f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="check_send_null_{seller_id}' \
+                        f'" {check_send_null} class="iswitch iswitch iswitch-warning"></div></td>' \
+                        f'<td >{str(date_modifed).rsplit(":")[0]}</td>' \
+                        f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="check_enable_submit_{seller_id}' \
+                        f'" {check_enable_submit} class="iswitch iswitch iswitch-purple"></div></td>' \
+                        f'</tr>'
+
+            return unescape(render_template('tables-shops.html',
+                                            rows=rows, role=role,
+                                            photo=photo,
+                                            user_name=user_name))
 
 
 @auth.route('/sales', methods=['GET', 'POST'])
