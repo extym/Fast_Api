@@ -101,7 +101,7 @@ def get_product_info(product_id, offer_id):
         "product_id": int(product_id),
         "sku": 0
     }
-    response = requests.post(link, headers=headers, json=data)
+    response = requests.post(link, headers=header, json=data)
     answer = response.json()
     result = answer['result']["fbs_sku"]
     sleep(0.4)
