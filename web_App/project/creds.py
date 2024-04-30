@@ -11,3 +11,9 @@ client_id_onon_stm = '90963'
 
 token_bot = '6992933795:AAHcK2YW8zC2gni0AJfPwQdF67_Y0ny9DQg'
 chat_id = '-4034247798'
+
+
+db_user = 'user_name'
+db_pass = 'user_pass'
+db_host = 'localhost'
+db_name = 'stm_app'

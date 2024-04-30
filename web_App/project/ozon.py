@@ -1,11 +1,12 @@
 import asyncio
 import json
+import os
 
 import requests
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from project.models import *
-
+from project import engine
 from project.creds import *
 # from read_json import read_json_on
 from time import sleep
@@ -19,18 +20,12 @@ common_error = {
     }
 }
 
-# host = 'https://api-seller.ozon.ru'
-# client_id = '90963'
+host = 'https://api-seller.ozon.ru'
 
 last_id = 'WzQ2MzcyNzEyNyw0NjM3MjcxMjdd'
 
-headers = {
-    'Client-Id': client_id_oson_artol,
-    'Api-Key': api_key_oson_admin_artol,
-    'Content-Type': 'application/json'
-}
-
 metod_get_list_products = '/v2/product/list'
+get_wh_list = '/v1/warehouse/list'
 metod_get_new_orders = ''
 
 
@@ -50,9 +45,29 @@ def get_smth(metod):
     #     'Content-Type': 'application/json'
     # }
     link = host + metod
-    response = requests.get(link, headers=headers)
+    response = requests.get(link)
     print('get_smth_on', metod, response, response.json())
     return response
+
+
+def post_smth_v2(metod, seller_id=None, key=None):
+    headers = {
+        'Client-Id': seller_id,
+        'Api-Key': key,
+        'Content-Type': 'application/json'
+    }
+    link = host + metod
+    response = requests.post(link, headers=headers)
+    if response.ok:
+        data = response.json()
+        result = data['result']['items']
+        total = data['result']['total']
+        last_id = data['result']['last_id']
+        print('post_get_smth_onon', result[0])
+        return result, total, last_id
+    else:
+        print(response.text)
+        return [], [], 0
 
 
 def post_get_smth(metod):
@@ -60,7 +75,7 @@ def post_get_smth(metod):
     response = requests.post(link, headers=headers)
     if response.ok:
         data = response.json()
-        print('post_get_smth',data)  #(data['result']['items']), type(data['result']['items']))
+        print('post_get_smth', data)  # (data['result']['items']), type(data['result']['items']))
         result = data['result']['items']
         total = data['result']['total']
         last_id = data['result']['last_id']
@@ -126,8 +141,35 @@ def create_data_stocks():
     return result
 
 
+def create_data_stocks_from_db(seller_id=None, key=None):
+    with Session(engine) as session:
+        data = session.query(Product) \
+            .where(Product.quantity > 0) \
+            .where(Product.store_id == seller_id) \
+            .all()
+        key = session.execute(select(Marketplaces.key_mp).where(Marketplaces.seller_id == seller_id)).first()
+        print(len(key[0]), type(key[0]))
+    print(len(data), data[:50])
+    # os.abort()
+    outlets_data = post_smth_v2(get_wh_list, seller_id=seller_id)
+    result = []
+    stocks = []
+    for product in data:
+        proxy = {}
+        proxy['offer_id'] = product['offer_id']
+        proxy['product_id'] = product['product_id']
+        proxy['stock'] = product['offer_id']
+
+        # for wh in outlets:
+        #     # if wh != 23012928587000:  # TODO for TEST only
+        #     proxy['warehouse_id'] = wh
+        #     pr = proxy.copy()
+        #     stocks.append(pr)
+
+
 # asyncio.run(create_data_stocks())
-# create_data_stocks()
+create_data_stocks_from_db(seller_id="1278621")
+
 
 def read_skus():
     try:
@@ -152,6 +194,36 @@ def send_stocks_on():
     for row in pre_data:
         data = {'stocks': row}
         # print('SEND_DATA', data)
+        response = requests.post(link, headers=headers, json=data)
+        answer = response.json()
+        ans = response.text
+        print('answer send_stocks_on', ans)
+        result = answer.get("result")
+        if result:
+            for row in result:
+                if len(row[
+                           "errors"]) > 0:  # and row['warehouse_id'] != 23012928587000: #TODO temporary 'warehouse_id': 23012928587000
+                    print('ERROR from send_stocks_ozon', row)
+                elif row['updated'] == False:
+                    print('ERROR update from send_stocks_ozon', row)
+                elif row['updated'] == True:  # and row['warehouse_id'] != 23012928587000:
+                    print('SUCCES update from send_stocks_on', row)
+            proxy.append(answer)
+        sleep(1)
+
+
+def send_stocks_oson_v2(key=None, seller_id=None):
+    pre_data = create_data_stocks()
+    headers = {
+        'Client-Id': seller_id,
+        'Api-Key': key,
+        'Content-Type': 'application/json'
+    }
+    metod = '/v2/products/stocks'
+    link = host + metod
+    proxy = []
+    for row in pre_data:
+        data = {'stocks': row}
         dt = json.dumps(data)
         # print(len(data['stocks']), dt)
         response = requests.post(link, headers=headers, json=data)
@@ -161,7 +233,8 @@ def send_stocks_on():
         result = answer.get("result")
         if result:
             for row in result:
-                if len(row["errors"]) > 0:  # and row['warehouse_id'] != 23012928587000: #TODO temporary 'warehouse_id': 23012928587000
+                if len(row[
+                           "errors"]) > 0:  # and row['warehouse_id'] != 23012928587000: #TODO temporary 'warehouse_id': 23012928587000
                     print('ERROR from send_stocks_ozon', row)
                 elif row['updated'] == False:
                     print('ERROR update from send_stocks_ozon', row)
@@ -183,7 +256,7 @@ def product_info_price(id_mp, seller_id):  # product_id, offer_id
     #         "last_id": "",
     #         "limit": 100}
     api_key = db.session.execute(select(Marketplaces.key_mp)
-                                     .where(Marketplaces.seller_id == seller_id))
+                                 .where(Marketplaces.seller_id == seller_id))
     print(api_key, type(api_key))
     headers = {
         'Client-Id': seller_id,
@@ -207,7 +280,8 @@ def product_info_price(id_mp, seller_id):  # product_id, offer_id
     # return order
 
 # get_product_info(38010832, "OWLT190601")
-# product_info_price("463727127", "OWLC19-014")
+# with app.app_context():
+#     product_info_price("463727127", "OWLC19-014")
 # send_stocks_on()
 # asyncio.run(post_send_stocks())
 # create_data_stocks()
@@ -218,5 +292,3 @@ def product_info_price(id_mp, seller_id):  # product_id, offer_id
 # # pr = [{'id': 'MP1703473-001', 'pickup': {'deliveryServiceId': 123600, 'deliveryServiceName': 'Леруа Мерлен сервис доставки', 'warehouseId': '1200', 'timeInterval': 'Invalid Interval', 'pickupDate': '2022-12-14'}, 'products': [{'lmId': '90115665', 'vendorCode': 'BT2834B', 'price': 5860, 'qty': 3, 'comissionRate': 0}, {'lmId': '90121362', 'vendorCode': 'HPUV65ELC', 'price': 5860, 'qty': 3, 'comissionRate': 0}], 'deliveryCost': 0, 'parcelPrice': 5860, 'creationDate': '2022-12-14', 'promisedDeliveryDate': '2022-12-22', 'calculatedWeight': 4.8, 'calculatedLength': 707, 'calculatedHeight': 156, 'calculatedWidth': 686}, {'id': 'MP1703472-001', 'pickup': {'deliveryServiceId': 123600, 'deliveryServiceName': 'Леруа Мерлен сервис доставки', 'warehouseId': '1200', 'timeInterval': 'Invalid Interval', 'pickupDate': '2022-12-14'}, 'products': [{'lmId': '90115665', 'vendorCode': 'BT2834B', 'price': 5860, 'qty': 3, 'comissionRate': 0}, {'lmId': '90121362', 'vendorCode': 'HPUV65ELC', 'price': 5860, 'qty': 3, 'comissionRate': 0}], 'deliveryCost': 0, 'parcelPrice': 5860, 'creationDate': '2022-12-14', 'promisedDeliveryDate': '2022-12-22', 'calculatedWeight': 4.8, 'calculatedLength': 707, 'calculatedHeight': 156, 'calculatedWidth': 686}, {'id': 'MP1703471-001', 'pickup': {'deliveryServiceId': 123600, 'deliveryServiceName': 'Леруа Мерлен сервис доставки', 'warehouseId': '1200', 'timeInterval': 'Invalid Interval', 'pickupDate': '2022-12-14'}, 'products': [{'lmId': '90115665', 'vendorCode': 'BT2834B', 'price': 5860, 'qty': 3, 'comissionRate': 0}, {'lmId': '90121362', 'vendorCode': 'HPUV65ELC', 'price': 5860, 'qty': 3, 'comissionRate': 0}], 'deliveryCost': 0, 'parcelPrice': 5860, 'creationDate': '2022-12-14', 'promisedDeliveryDate': '2022-12-22', 'calculatedWeight': 4.8, 'calculatedLength': 707, 'calculatedHeight': 156, 'calculatedWidth': 686}]
 # pr = {'message_type': 'TYPE_NEW_POSTING', 'seller_id': 90963, 'warehouse_id': 1020000075732000, 'posting_number': '13223249-0059-1', 'in_process_at': '2023-03-18T03:56:36Z', 'products': [{'sku': 789880982, 'quantity': 1}]}
 # convert(pr)
-
-

@@ -16,13 +16,14 @@ from project.models import *
 from project.creds import *
 from project.database import Data_base_connect as Db
 from sqlalchemy import insert, create_engine, select, update, text
+from project import engine
 import traceback  # Used for printing the full traceback | Better for debug.
 from psycopg2 import errors
 from psycopg2._psycopg import IntegrityError
 
 UniqueViolation = errors.lookup('23505')
 
-engine = create_engine("postgresql+psycopg2://user_name:user_pass@localhost/stm_app")
+# engine = create_engine(f"postgresql+psycopg2://{db_user}:{db_pass}@{db_host}/{db_name}")
 
 
 def write_smth(smth):

@@ -11,7 +11,7 @@ from psycopg2.errors import UniqueViolation
 # # Redis
 from rq import Queue
 from rq.job import Job
-from sqlalchemy import func, select, update
+from sqlalchemy import func, select, update, or_
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
@@ -33,6 +33,21 @@ q = Queue(connection=conn)
 auth = Blueprint('auth', __name__)
 
 ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+
+
+def back_shops_tasks():
+    markets = db.session.query(Marketplaces) \
+        .filter(or_(Marketplaces.check_send_null == True,
+                    Marketplaces.check_send_stocks == True,
+                    Marketplaces.check_enable_submit == True)) \
+        .all()
+    for row in markets:
+        if row.check_send_stocks and row.check_send_null:
+            if row.name_mp == 'oson':
+                pass
+
+
+    print(777, markets)
 
 
 def allowed_file(filename):
@@ -956,6 +971,12 @@ def shops():
                     proxy[value] = proxy.get(value, []) + [need_job]
             else:
                 proxy = {}
+            # kets = db.session.query(Marketplaces) \
+            #     .filter(or_(Marketplaces.check_send_null == True,
+            #                 Marketplaces.check_send_stocks == True,
+            #                 Marketplaces.check_enable_submit == True)) \
+            #     .all()
+            # print(777, kets)
 
             markets = Marketplaces.query.filter_by(company_id=current_user.company_id).all()
             for row in markets:
@@ -966,15 +987,13 @@ def shops():
                     current = {i: True for i in proxy[row.shop_name]}
                     current_work.update(current)
                     db.session.execute(update(Marketplaces)
-                                       .where(Marketplaces.seller_id==row.seller_id)
+                                       .where(Marketplaces.seller_id == row.seller_id)
                                        .values(current_work))
                 else:
                     db.session.execute(update(Marketplaces)
                                        .where(Marketplaces.seller_id == row.seller_id)
                                        .values(current_work))
                 db.session.commit()
-
-
 
             return redirect(url_for('auth.shops'))
 
@@ -988,7 +1007,7 @@ def shops():
                 photo = 'prof-music-2.jpg'
             rows = ''
 
-            raw_list_shops = db.session.query(Marketplaces)\
+            raw_list_shops = db.session.query(Marketplaces) \
                 .filter_by(company_id=current_user.company_id).order_by(Marketplaces.seller_id.asc()).all()
             # raw_list_products = db.session.query(Product)
             # .paginate(page=30, per_page=30, error_out=False).items
