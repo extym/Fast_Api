@@ -465,6 +465,11 @@ query_write_order = ("INSERT INTO fresh_orders "
                      "shipment_Date, status, our_status, payment_Type, delivery)"
                      "VALUES (%s, %s, NOW(), NOW(), %s, %s, %s, %s, %s, %s)")
 
+query_write_order_2 = ("INSERT INTO fresh_orders "
+                     "(id_mp, our_id, date_Added, date_Modifed, shop_Name, mp, "
+                     "shipment_Date, status, our_status, payment_Type, delivery)"
+                     "VALUES (%s, %s, NOW(), NOW(), %s, %s, %s, %s, %s, %s, %s)")
+
 query_write_items = ("INSERT INTO order_items "
                      "(id_mp, shop_order_id, shop_Name, "
                      "our_status, vendor_code, id_1c, quantity, price, "
@@ -584,6 +589,17 @@ async def execute_query_v2(query, data):
         print(f"The ERROR from execute_query '{err}' occured ")
 
 
+def execute_query_v3(query, data):
+    try:
+        with create_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(query, data)
+                print("Query from execute_query executed successfully")
+
+    except (OperationalError, psycopg2.DatabaseError) as err:
+        print(f"The ERROR from execute_query '{err}' occured ")
+
+
 
 async def executemany_query(query, data):
     connection = create_connection()
@@ -609,6 +625,18 @@ async def executemany_query_v2(query, data):
 
     except (OperationalError, psycopg2.DatabaseError) as err:
         print(f"The ERROR from execute_many_query '{err}' occured ")
+
+
+def executemany_query_v3(query, data):
+    try:
+        with create_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.executemany(query, data)
+                print("Query from execute_many_query executed successfully")
+
+    except (OperationalError, psycopg2.DatabaseError) as err:
+        print(f"The ERROR from execute_many_query '{err}' occured ")
+
 
 
 async def write_order(query1: str = None, data1: object = None,

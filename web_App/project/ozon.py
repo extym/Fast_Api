@@ -22,7 +22,7 @@ common_error = {
 
 host = 'https://api-seller.ozon.ru'
 
-last_id = 'WzQ2MzcyNzEyNyw0NjM3MjcxMjdd'
+last_id = 'custom_last_id'
 
 metod_get_list_products = '/v2/product/list'
 get_wh_list = '/v1/warehouse/list'
@@ -60,14 +60,11 @@ def post_smth_v2(metod, seller_id=None, key=None):
     response = requests.post(link, headers=headers)
     if response.ok:
         data = response.json()
-        result = data['result']['items']
-        total = data['result']['total']
-        last_id = data['result']['last_id']
-        print('post_get_smth_onon', result[0])
-        return result, total, last_id
+        print('post_get_smth_onon_v2', data.keys())
+        return response.status_code, data
     else:
         print(response.text)
-        return [], [], 0
+        return response.status_code, response.text
 
 
 def post_get_smth(metod):
@@ -113,7 +110,6 @@ def create_data_stocks():
     data_read = read_json_on()
     result = []
     stocks = []
-    # proxy_skus = {}
     current_assortment = post_get_smth(metod_get_list_products)[0]
     for product in current_assortment:
         proxy = {}
@@ -141,46 +137,78 @@ def create_data_stocks():
     return result
 
 
-def create_data_stocks_from_db(seller_id=None, key=None):
-    with Session(engine) as session:
-        data = session.query(Product) \
-            .where(Product.quantity > 0) \
-            .where(Product.store_id == seller_id) \
-            .all()
-        key = session.execute(select(Marketplaces.key_mp).where(Marketplaces.seller_id == seller_id)).first()
-        print(len(key[0]), type(key[0]))
-    print(len(data), data[:50])
-    # os.abort()
-    outlets_data = post_smth_v2(get_wh_list, seller_id=seller_id)
+def create_data_stocks_from_db(seller_id=None, is_stocks_null=False):
     result = []
     stocks = []
-    for product in data:
-        proxy = {}
-        proxy['offer_id'] = product['offer_id']
-        proxy['product_id'] = product['product_id']
-        proxy['stock'] = product['offer_id']
+    if not is_stocks_null:
+        with Session(engine) as session:
+            data = session.query(Product) \
+                .where(Product.quantity > 0) \
+                .where(Product.store_id == seller_id) \
+                .all()
+            key = session.execute(select(Marketplaces.key_mp)
+                                  .where(Marketplaces.seller_id == seller_id))\
+                .first()
+            outlets_data = post_smth_v2(get_wh_list, seller_id=seller_id, key=key[0])
+            outlets = [i['warehouse_id'] for i in outlets_data[1].get('result') if outlets_data[0] == 200]
+            for product in data:
+                proxy = {
+                    'offer_id': product.articul_product,
+                    'product_id': product.external_sku,
+                    'stock': product.quantity
+                }
+                for wh in outlets:
+                    proxy['warehouse_id'] = wh
+                    pr = proxy.copy()
+                    stocks.append(pr)
+    else:
+        with Session(engine) as session:
+            key = session.execute(select(Marketplaces.key_mp)
+                                  .where(Marketplaces.seller_id == seller_id))\
+                .first()
+        outlets_data = post_smth_v2(get_wh_list, seller_id=seller_id, key=key[0])
+        outlets = [i['warehouse_id'] for i in outlets_data[1].get('result') if outlets_data[0] == 200]
+        data = post_smth_v2(metod_get_list_products, seller_id=seller_id, key=key[0])
+        # print(77777, data[1].get('result'), data)
+        if data[0] == 200:
+            for product in data[1].get('result'):
+                proxy = {
+                    'offer_id': product['offer_id'],
+                    'product_id': product['product_id'],
+                    'stock': 0
+                }
+                for wh in outlets:
+                    proxy['warehouse_id'] = wh
+                    pr = proxy.copy()
+                    stocks.append(pr)
 
-        # for wh in outlets:
-        #     # if wh != 23012928587000:  # TODO for TEST only
-        #     proxy['warehouse_id'] = wh
-        #     pr = proxy.copy()
-        #     stocks.append(pr)
+    while len(stocks) >= 100:
+        result.append(stocks[:100])
+        del stocks[:100]
+    else:
+        result.append(stocks)
+
+    print('create_data_stocks_onon_x100', len(result))
+    return result
+
+
+
 
 
 # asyncio.run(create_data_stocks())
-create_data_stocks_from_db(seller_id="1278621")
+# create_data_stocks_from_db(seller_id="1278621", is_stocks_null=True)
 
 
-def read_skus():
-    try:
-        with open('/var/www/html/stm/onon_skus.json', 'r') as file:
-            items_skus = json.load(file)
-    except:
-        with open('onon_skus.json', 'r') as file:
-            items_skus = json.load(file)
-
-    print('items_skus', len(items_skus), type(items_skus))
-    return items_skus
+# def read_skus():
+#     try:
+#         with open('/var/www/html/stm/onon_skus.json', 'r') as file:
+#             items_skus = json.load(file)
+#     except:
+#         with open('onon_skus.json', 'r') as file:
+#             items_skus = json.load(file)
+#
+#     print('items_skus', len(items_skus), type(items_skus))
+#     return items_skus
 
 
 #
@@ -212,8 +240,9 @@ def send_stocks_on():
         sleep(1)
 
 
-def send_stocks_oson_v2(key=None, seller_id=None):
-    pre_data = create_data_stocks()
+def send_stocks_oson_v2(key=None, seller_id=None, is_stocks_null=False):
+    pre_data = create_data_stocks_from_db(seller_id=seller_id,
+                                          is_stocks_null=is_stocks_null)
     headers = {
         'Client-Id': seller_id,
         'Api-Key': key,
@@ -224,24 +253,24 @@ def send_stocks_oson_v2(key=None, seller_id=None):
     proxy = []
     for row in pre_data:
         data = {'stocks': row}
-        dt = json.dumps(data)
-        # print(len(data['stocks']), dt)
         response = requests.post(link, headers=headers, json=data)
-        answer = response.json()
-        ans = response.text
-        print('answer send_stocks_on', ans)
-        result = answer.get("result")
-        if result:
-            for row in result:
-                if len(row[
-                           "errors"]) > 0:  # and row['warehouse_id'] != 23012928587000: #TODO temporary 'warehouse_id': 23012928587000
-                    print('ERROR from send_stocks_ozon', row)
-                elif row['updated'] == False:
-                    print('ERROR update from send_stocks_ozon', row)
-                elif row['updated'] == True:  # and row['warehouse_id'] != 23012928587000:
-                    print('SUCCES update from send_stocks_on', row)
-            proxy.append(answer)
-        sleep(1)
+        if answer.ok:
+            answer = response.json()
+            result = answer.get("result")
+            if result:
+                for row in result:
+                    if len(row[
+                               "errors"]) > 0:  # and row['warehouse_id'] != 23012928587000: #TODO temporary 'warehouse_id': 23012928587000
+                        print('ERROR from send_stocks_ozon', row)
+                    elif row['updated'] == False:
+                        print('ERROR update from send_stocks_ozon', row)
+                    elif row['updated'] == True:  # and row['warehouse_id'] != 23012928587000:
+                        print('SUCCES update from send_stocks_on', row)
+                proxy.append(answer)
+            sleep(1)
+        else:
+            ans = response.text
+            print('answer send_stocks_on', ans)
 
 
 # send_stocks_on()

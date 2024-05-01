@@ -13,6 +13,7 @@ from rq import Queue
 from rq.job import Job
 from sqlalchemy import func, select, update, or_
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
@@ -20,11 +21,18 @@ from werkzeug.utils import secure_filename
 import project.wb as wb
 from project.import_ozon import import_oson_data_prod, make_internal_import_oson
 from project.worker import conn
-from . import db, TEST_MODE, PHOTO_UPLOAD_FOLDER
+from project import db, TEST_MODE, PHOTO_UPLOAD_FOLDER, engine
 from .database import Data_base_connect as Db
 from .models import *
 
 from apscheduler.schedulers.background import BackgroundScheduler
+
+from .ozon import send_stocks_oson_v2
+
+import logging
+
+logging.basicConfig()
+logging.getLogger('apscheduler').setLevel(logging.DEBUG)
 
 scheduler = BackgroundScheduler()
 
@@ -36,16 +44,41 @@ ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
 
 def back_shops_tasks():
-    markets = db.session.query(Marketplaces) \
-        .filter(or_(Marketplaces.check_send_null == True,
-                    Marketplaces.check_send_stocks == True,
-                    Marketplaces.check_enable_submit == True)) \
-        .all()
+    with Session(engine) as session:
+        markets = session.query(Marketplaces) \
+            .filter(or_(Marketplaces.check_send_null == True,
+                        Marketplaces.check_send_stocks == True,
+                        Marketplaces.check_enable_submit == True)) \
+            .all()
     for row in markets:
         if row.check_send_stocks and row.check_send_null:
             if row.name_mp == 'oson':
-                pass
+                send_stocks_oson_v2(key=row.key_mp,
+                                    seller_id=row.seller_id,
+                                    is_stocks_null=True)
+            if row.name_mp == 'wb':
+                wb.send_stocks_wb_v2(api_key=row.key_mp,
+                                     seller_id=row.seller_id,
+                                     is_stocks_null=True)
+        elif row.check_send_stocks and not row.check_send_null:
+            if row.name_mp == 'oson':
+                send_stocks_oson_v2(key=row.key_mp,
+                                    seller_id=row.seller_id,
+                                    is_stocks_null=False)
+            if row.name_mp == 'wb':
+                wb.send_stocks_wb_v2(api_key=row.key_mp,
+                                     seller_id=row.seller_id,
+                                     is_stocks_null=False)
 
+        if row.check_enable_submit:
+            if row.name_mp == 'oson':
+                # get_stocks_oson_v2(key=row.key_mp,
+                #                     seller_id=row.seller_id,
+                #                     is_stocks_null=False)
+                pass
+            if row.name_mp == 'wb':
+                wb.processing_orders_wb_v2(key=row.key_mp,
+                                           shop_name=row.shop_name)
 
     print(777, markets)
 
@@ -964,27 +997,20 @@ def shops():
     else:
         if request.method == "POST":
             data = request.form.to_dict()
+            proxy_settings = {}
             if len(data.keys()) > 0:
-                proxy = {}
                 for key, value in data.items():
                     need_job = key.rsplit('_', maxsplit=1)[0]
-                    proxy[value] = proxy.get(value, []) + [need_job]
-            else:
-                proxy = {}
-            # kets = db.session.query(Marketplaces) \
-            #     .filter(or_(Marketplaces.check_send_null == True,
-            #                 Marketplaces.check_send_stocks == True,
-            #                 Marketplaces.check_enable_submit == True)) \
-            #     .all()
-            # print(777, kets)
+                    proxy_settings[value] = proxy_settings.get(value, []) + [need_job]
 
-            markets = Marketplaces.query.filter_by(company_id=current_user.company_id).all()
+            markets = Marketplaces.query\
+                .filter_by(company_id=current_user.company_id).all()
             for row in markets:
                 current_work = {'check_send_null': False,
                                 'check_send_stocks': False,
                                 'check_enable_submit': False}
-                if row.shop_name in proxy.keys():
-                    current = {i: True for i in proxy[row.shop_name]}
+                if row.shop_name in proxy_settings.keys():
+                    current = {i: True for i in proxy_settings[row.shop_name]}
                     current_work.update(current)
                     db.session.execute(update(Marketplaces)
                                        .where(Marketplaces.seller_id == row.seller_id)
@@ -994,6 +1020,20 @@ def shops():
                                        .where(Marketplaces.seller_id == row.seller_id)
                                        .values(current_work))
                 db.session.commit()
+
+
+            if len(data.keys()) > 0:
+                current_job = scheduler.add_job(back_shops_tasks, id='shops_back',
+                                                trigger='interval', minutes=5)
+                scheduler.start()
+                print(100000000, current_job)
+                print(111000, len(data.keys()))
+            else:
+                try:
+                    scheduler.remove_job('shops_back')
+                except:
+                    print('Job_remove_error')
+
 
             return redirect(url_for('auth.shops'))
 
