@@ -3,7 +3,7 @@ from flask_login import LoginManager
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import insert, create_engine, select, update, text
-from creds import *
+from .creds import *
 
 # # Redis
 # from rq import Worker, Queue, Connection

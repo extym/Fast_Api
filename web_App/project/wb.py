@@ -8,11 +8,11 @@ import sqlalchemy
 from sqlalchemy import insert, create_engine, select, update, text
 from sqlalchemy.orm import Session
 
-from project.models import Marketplaces, Product
+from project.models import Marketplaces, Product, Sales, SalesToday
 from psycopg2.extensions import register_adapter, AsIs
 import requests
 import json
-
+from project import engine
 from project.bot_tg import send_get
 from project.conn import *
 
@@ -21,10 +21,10 @@ from project.conn import *
 link = 'https://suppliers-api.wildberries.ru'
 l = 'https://suppliers-api.wildberries.ru/api/v3/supplies'
 
-engine = create_engine("postgresql+psycopg2://user_name:user_pass@localhost/stm_app")
 
-wh = [{"name": "Обычный склад СТМ", "id": 664706, "name_1C": "WB.НашсклСТМ"},
-      {"name": "Сверхгабаритный товар", "id": 730558, "name_1C": "WB.СверхГБсклNEW"}]  # ,
+
+# wh = [{"name": "Обычный склад СТМ", "id": 664706, "name_1C": "WB.НашсклСТМ"},
+#       {"name": "Сверхгабаритный товар", "id": 730558, "name_1C": "WB.СверхГБсклNEW"}]  # ,
 
 
 # {"name_1C": "WB.СверхГБсклСТМ", "name":"Сверхгабаритный СТМ склад","id":664704}] # {"name":"Сверхгабаритный товар","id":730558, "name_1C": "WB.СверхГБсклNEW"}
@@ -60,6 +60,32 @@ def day_for_stm(string):
     return dtt
 
 
+def get_wh(key=None):
+    headers = {'Content-type': 'application/json',
+               'Authorization': key}
+    link = 'https://suppliers-api.wildberries.ru/api/v2/warehouses'
+    answer = requests.get(link, headers=headers)
+    if answer.ok:
+        print('get_wh', answer.json())
+        return answer.status_code, answer.json()
+    else:
+        print('errot_get_wh', answer.text)
+        return answer.status_code, answer.text
+
+
+def get_curent_stocks(key=None, warehouse_id=None):
+    headers = {'Content-type': 'application/json',
+               'Authorization': key}
+    link = f'https://suppliers-api.wildberries.ru/api/v3/stocks/{warehouse_id}'
+    answer = requests.get(link, headers=headers)
+    if answer.ok:
+        print('get_wh', answer.json())
+        return answer.status_code, answer.json()
+    else:
+        print('errot_get_wh', answer.text)
+        return answer.status_code, answer.text
+
+
 def make_send_data():
     data = read_json_wb()
     print('make_send_data_wb', len(data), data)
@@ -88,7 +114,47 @@ def make_send_data():
     return warehouse
 
 
-# make_send_data()
+def make_send_data_v2(key=None, seller_id=None, is_stocks_null=False):
+    warehouse = {}
+    outlets_data = get_wh(key=key)
+    outlets = [i['id'] for i in outlets_data[1] if outlets_data[0] == 200]
+    if not is_stocks_null:
+        with Session(engine) as session:
+            data = session.query(Product) \
+                .where(Product.quantity > 0) \
+                .where(Product.store_id == seller_id) \
+                .all()
+            # TODO fix it - products maybe in to different warehouses
+            # все товары на все склады
+            for w_house in outlets:
+                stocks = []
+                for row in data:
+                    proxy = {
+                        'sku': row.external_sku,
+                        'amount': row.quantity
+                    }
+                    stocks.append(proxy)
+
+            warehouse[w_house] = {'stocks': stocks}
+    else:
+        for w_house in outlets:
+            stocks = []
+            data = get_curent_stocks(key=key, warehouse_id=w_house)
+            if data[0] == 200:
+                for row in data[1].get('stocks'):
+                    proxy = {
+                        'sku': row.get('sku'),
+                        'amount': 0
+                    }
+                    stocks.append(proxy)
+
+            warehouse[w_house] = {'stocks': stocks}
+
+            print('warehouse-', w_house, len(warehouse[w_house]['stocks']))
+
+    print(warehouse.keys())
+    return warehouse
+
 
 def send_stocks_wb():
     data = make_send_data()
@@ -104,28 +170,46 @@ def send_stocks_wb():
         # print('send_stocks_wb', key, re_data, len(value['stocks']), value)
 
 
-def get_wh():
-    headers = {'Content-type': 'application/json',
-               'Authorization': wb_apikey}
-    link = 'https://suppliers-api.wildberries.ru/api/v2/warehouses'
-    answer = requests.get(link, headers=headers)
-    text = answer.text
-    # print(answer)
-    print('get_wh', text)
+def send_stocks_wb_v2(api_key=None, seller_id=None, is_stocks_null=None):
+    data = make_send_data_v2(key=api_key, seller_id=seller_id,
+                             is_stocks_null=is_stocks_null)
+    for wh_id, value in data.items():
+        metod = f'https://suppliers-api.wildberries.ru/api/v3/stocks/{wh_id}'
+        headers = {'Content-type': 'application/json',
+                   'Authorization': api_key}
+        print('SEND_WB', wh_id, len(value['stocks']))
+        answer = requests.put(metod, data=json.dumps(value), headers=headers)
+        if answer.ok:
+            print('All_ride_send to WB - wh {} stocks {}'
+                  .format(wh_id, len(wh_id)))
+        else:
+            print('All_ride_send to WB - wh {} stocks {} - result {}'
+                  .format(wh_id, len(wh_id), answer.text))
 
 
-# send_stocks_wb()
+def check_is_exist(id_mp, shop):
+    data = check_order(query_read_order, (id_mp, shop))
+    print(data, id_mp, shop)
+    if len(data) > 0:
+        result = True
+    else:
+        result = False
+
+    return result
 
 
-# def check_is_exist(id_mp, shop):
-#     data = check_order(query_read_order, (id_mp, shop))
-#     print(data, id_mp, shop)
-#     if len(data) > 0:
-#         result = True
-#     else:
-#         result = False
-#
-#     return result
+def check_is_exist_v2(id_mp, shop):
+    result = False
+    with Session(engine) as session:
+        session.begin()
+        data = session.execute(select(SalesToday.id)
+                               .where(SalesToday.mp_order_id == id_mp)
+                               .where(SalesToday.shop_name == shop)
+                               ).first()
+    if len(data) > 0:
+        result = True
+
+    return result
 
 
 def get_new_supply_wb(next):
@@ -142,10 +226,6 @@ def get_new_supply_wb(next):
     next_page = data['next']  # 32899717
     print('get_new_supply_wb', response, data)
     return response, data, next_page
-
-
-# get_new_supply_wb()
-# https://suppliers-api.wildberries.ru/api/v3/supplies/{supply}/orders
 
 
 def get_orders_from_supply_wb(supply_id):
@@ -195,12 +275,56 @@ def get_new_orders_wb(shop_name=None, company_id=None):
         return response.status_code, response.text
 
 
+def get_new_orders_wb_v2(key=None):
+    headers = {'Content-type': 'application/json',
+               'Authorization': key}
+
+    metod = '/api/v3/orders/new'
+    url = link + metod
+    response = requests.get(url, headers=headers)
+    data = {}
+    if response.ok:
+        data = response.json()
+        print('ALL_RIDE_get_new_orders_wb', response, len(data), data)
+        return response.status_code, data
+
+    elif response.status_code == 403:
+        print('ERROR_get_new_orders_wb {} response {}'
+              .format(response.status_code, response.text))
+        send_get('Ошибка получения заказов с WB {} response {}.'
+                 'Проверьте корректность сохраненного ключа API.'
+                 .format(response.status_code, response.text))
+        return response.status_code, response.text
+
+    else:
+        print('ERROR_get_new_orders_wb {} response {}'
+              .format(response.status_code, response.text))
+        send_get('Ошибка получения заказов с WB {} response {}.'
+                 .format(response.status_code, response.text))
+        return response.status_code, response.text
+
+
 async def get_id_1c(vendor_code):
     data = read_json_ids()
     if vendor_code in data.keys():
         id_1c = data[vendor_code][0]
 
         return id_1c
+
+
+def get_id_1c_v2(vendor_code, shop_name):
+    id_1c = None
+    with Session(engine) as session:
+        Session.begin()
+        data = session.execute(select(Product.id_1c)
+                               .where(Product.articul_product == vendor_code)
+                               .where(Product.shop_name == shop_name)
+                               ).first()
+
+    if len(data) > 0:
+        id_1c = data[0]
+
+    return id_1c
 
 
 async def processing_orders_wb(shop_name=None, company_id=None):
@@ -232,6 +356,45 @@ async def processing_orders_wb(shop_name=None, company_id=None):
                               id_1c, quantity, summ_order)
                 print('items_data_WB', items_data)
                 await executemany_query(query_write_items, [items_data])
+        print(f"Write {len(orders)} orders WB")
+        return "Write {} orders WB".format(len(orders))
+
+    else:
+        print("Error ger orders WB by {} to {}".format(data[0], data[1]))
+        return "Error ger orders WB by {} to {}".format(data[0], data[1])
+
+
+def processing_orders_wb_v2(shop_name=None, key=None):
+    # orders = proxy_wb_orders["orders"]    # FOR TEST ONLY TODO
+    data = get_new_orders_wb_v2(key=key)
+    if data[0] == 200:
+        orders = data[1].get("orders")
+        for order in orders:
+            id_mp = str(order["id"])
+            our_id = token_generator()
+            check = check_is_exist(id_mp, shop_name)
+            if check:
+                continue
+            else:
+                shipment_Date = proxy_time_1()  # order["createdAt"] #TODO plus 1 day?
+                status = "CREATED"
+                our_status = "NEW"
+                payment_Type = "PREPAID"
+                delivery = order.get("deliveryType", 'Not_Know')
+                # list_items = order["skus"]
+                summ_order = order["price"] / 100
+                vendor_code = order["article"]
+                quantity = order.get("quantity", 1)
+                id_1c = get_id_1c_v2(vendor_code)
+                article = order["article"]
+                article_mp = order["skus"][0]
+                result = (id_mp, our_id, shop_name, "wb", shipment_Date,
+                          status, our_status, payment_Type, delivery)
+                execute_query_v3(query_write_order, result)
+                items_data = (id_mp, our_id, "wb", shop_name, "NEW", vendor_code,
+                              id_1c, quantity, summ_order,  article, article_mp)
+                print('items_data_WB', items_data)
+                executemany_query_v3(query_write_items_v2, [items_data])
         print(f"Write {len(orders)} orders WB")
         return "Write {} orders WB".format(len(orders))
 
