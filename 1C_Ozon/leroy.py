@@ -494,7 +494,16 @@ def tt():
     print('111--', time)
 
 
-# confirm_orders([{'id': 'MP3865511-001', 'pickup': {'deliveryServiceId': 123640, 'deliveryServiceName': 'Самопривоз', 'warehouseId': '7866', 'timeInterval': '07:00:00.000Z/11:00:00.000Z', 'pickupDate': '2023-08-22'}, 'products': [{'lmId': '91114119', 'vendorCode': 'OWLM200801', 'price': 8742, 'qty': 1, 'comissionRate': 0}], 'deliveryCost': 0, 'parcelPrice': 8742, 'creationDate': '2023-08-20', 'promisedDeliveryDate': '2023-08-23', 'calculatedWeight': 7.3, 'calculatedLength': 1112, 'calculatedHeight': 52, 'calculatedWidth': 800}, {'id': 'MP3864774-001', 'pickup': {'deliveryServiceId': 123640, 'deliveryServiceName': 'Самопривоз', 'warehouseId': '7866', 'timeInterval': '07:00:00.000Z/11:00:00.000Z', 'pickupDate': '2023-08-22'}, 'products': [{'lmId': '91105230', 'vendorCode': 'OWLIB191102', 'price': 34084.5, 'qty': 1, 'comissionRate': 0}], 'deliveryCost': 0, 'parcelPrice': 34084.5, 'creationDate': '2023-08-20', 'promisedDeliveryDate': '2023-08-24', 'calculatedWeight': 120, 'calculatedLength': 1924, 'calculatedHeight': 624, 'calculatedWidth': 832}])
+# confirm_orders([{'id': 'MP3865511-001', 'pickup': {'deliveryServiceId': 123640, 'deliveryServiceName':
+# 'Самопривоз', 'warehouseId': '7866', 'timeInterval': '07:00:00.000Z/11:00:00.000Z', 'pickupDate': '2023-08-22'},
+# 'products': [{'lmId': '91114119', 'vendorCode': 'OWLM200801', 'price': 8742, 'qty': 1, 'comissionRate': 0}],
+# 'deliveryCost': 0, 'parcelPrice': 8742, 'creationDate': '2023-08-20', 'promisedDeliveryDate': '2023-08-23',
+# 'calculatedWeight': 7.3, 'calculatedLength': 1112, 'calculatedHeight': 52, 'calculatedWidth': 800},
+# {'id': 'MP3864774-001', 'pickup': {'deliveryServiceId': 123640, 'deliveryServiceName': 'Самопривоз', 'warehouseId':
+# '7866', 'timeInterval': '07:00:00.000Z/11:00:00.000Z', 'pickupDate': '2023-08-22'}, 'products': [{'lmId':
+# '91105230', 'vendorCode': 'OWLIB191102', 'price': 34084.5, 'qty': 1, 'comissionRate': 0}], 'deliveryCost': 0,
+# 'parcelPrice': 34084.5, 'creationDate': '2023-08-20', 'promisedDeliveryDate': '2023-08-24', 'calculatedWeight':
+# 120, 'calculatedLength': 1924, 'calculatedHeight': 624, 'calculatedWidth': 832}])
 
 
 def make_log():

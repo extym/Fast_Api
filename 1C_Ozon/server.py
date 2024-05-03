@@ -497,19 +497,6 @@ def counter_items(items_list):
     #printt('counter_items',lst)
     return lst
 
-#
-# async def send_post(data):
-#     url_address = ''
-#     headers = {'Content-type': 'application/json',
-#                'Authorization': 'Basic 0JzQsNGA0LrQtdGC0L/Qu9C10LnRgdGLOjExMQ=11=',
-#                'Content-Encoding': 'utf-8'}
-#     answer = requests.post(url_address, data=json.dumps(data), headers=headers, verify=False)
-#     write_smth(answer)
-#     result = answer.status_code
-#     time = datetime.now(pytz.timezone("Africa/Nairobi")).isoformat()
-#     print('answer1', str(time), answer)
-#     #return result
-
 
 def reverse_time(time):
     t = time.split('-')
@@ -518,7 +505,6 @@ def reverse_time(time):
 
     return result
 
-#"Yandex", "Ozon", "Sber", "Leroy", "WB"
 
 def reformat_data_order(order, shop):
     result = None
@@ -610,14 +596,12 @@ def reformat_data_items(order, shop):
     elif shop == 'Ozon':
         result = []
         list_items = order['products']
-        # read_skus() -> {sku<str>: (product_id<int>, vendor_code<str>}
-        #items_skus = read_skus()
         items_ids = read_json_ids() #ids 1C
         for item in list_items:
             sku = str(item["sku"])
-            #vendor_code = items_skus[sku][1]
             vendor_code = item["offer_id"]
-            print('product_info_price', sku[0], vendor_code)
+            id_1c = items_ids[vendor_code][0]
+            # print('product_info_price', sku[0], vendor_code)
             #price = product_info_price(items_skus[sku][0], vendor_code)
             proxy = (
                 order["id"],
@@ -625,7 +609,7 @@ def reformat_data_items(order, shop):
                 shop,
                 order["our_status"],
                 vendor_code,
-                items_ids[vendor_code][0], #1c
+                id_1c, #1c
                 item["quantity"],
                 item["price"][:-2]  #price
             )
@@ -725,9 +709,7 @@ def fail_json():
     if ip_addr == '::ffff:46.21.252.7' or ip_addr == '46.21.252.7'\
             or ip_addr == '62.76.102.53':
         request_data = request.get_json()
-        # alter_data = request.data
-        # print('alter_data', alter_data)
-        # write_json(request_data)
+        write_json(request_data)
         # write_smth_date()
 
         response = app.response_class(

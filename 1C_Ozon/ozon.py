@@ -126,7 +126,7 @@ def create_data_stocks():
 
 
 # asyncio.run(create_data_stocks())
-create_data_stocks()
+# create_data_stocks()
 
 def read_skus():
     try:
@@ -156,7 +156,7 @@ def send_stocks_on():
         response = requests.post(link, headers=headers, json=data)
         answer = response.json()
         ans = response.text
-        print('answer send_stocks_on', ans)
+        print('answer send_stocks_on', response.status_code)
         result = answer.get("result")
         if result:
             for row in result:

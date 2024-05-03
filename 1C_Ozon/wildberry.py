@@ -74,7 +74,7 @@ def proxy_time_1():
     d = str(dt).split('-')
     d.reverse()
     pt = '-'.join(d)
-    print(pt)
+    # print(pt)
     return pt
 
 def day_for_stm(string):
@@ -93,9 +93,10 @@ def day_for_stm(string):
     #print('datta',dat,  dtt)
     return dtt
 
+
 def make_send_data():
     data = read_json_wb()
-    print('make_send_data_wb', len(data), data )
+    # print('make_send_data_wb', len(data))
     warehouse = {}
     for string in wh:
         stocks = []
@@ -192,10 +193,10 @@ def get_new_orders_wb():
     url = link + metod
     response = requests.get(url, headers=headers)
     data = {}
-    try:
+    if response.ok:
         data = response.json()
         print('ALL_RIDE_get_new_orders_wb', response, len(data), data, 'response', response.text)
-    except:
+    else:
         print('FUCK_UP_get_new_orders_wb ', response.status_code, 'response', response.text)
     return data
 
@@ -239,7 +240,7 @@ async def processing_orders_wb():
 
     print("fuckup orders WB")
 
-# asyncio.run(processing_orders_wb())
+asyncio.run(processing_orders_wb())
 
 def get_wh():
     headers = {'Content-type': 'application/json',
