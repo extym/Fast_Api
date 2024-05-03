@@ -22,8 +22,12 @@ print(url, url2)
 #     result = wget.download(url, out='/usr/local/bin/fuck_debian/tyres_wheels/proxy_wheels.csv')
 #     result2 = wget.download(url2, out='/usr/local/bin/fuck_debian/tyres_wheels/proxy_tyres.csv')
 # except:
-result = wget.download(url, out=DATA_PATH + '/proxy_wheels.csv')
-result2 = wget.download(url2, out=DATA_PATH + '/proxy_tyres.csv')
+try:
+    result = wget.download(url, out=DATA_PATH + '/proxy_wheels.csv')
+    result2 = wget.download(url2, out=DATA_PATH + '/proxy_tyres.csv')
+except:
+    pass
+
 
 name = ['sku', 'title', 'brand_sku', 'gtin', 'season', 'brand', 'model', 'diameter', 'width', 'profile', 'load_index',
         'speed_index', 'pins', 'runflat', 'homologation', 'production_year', 'sale', 'price', 'price_retail',

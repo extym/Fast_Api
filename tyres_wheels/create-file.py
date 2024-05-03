@@ -151,7 +151,10 @@ def create_offer(name, vendor, product_code, category_id, description, url, coun
 
 
 def create_need_data():
-    csv_data = standart_wheels_csv()
+    try:
+        csv_data = standart_wheels_csv()
+    except:
+        pass
     json_data = standart_wheels_from_json()
     data = check_and_write_v3()
     pre_csv_data = {key: value for key, value in csv_data.items() if int(value[0][4]) >= 4}
@@ -164,21 +167,21 @@ def create_need_data():
             del pre_json_data[ke]
         else:
             count_json = 0
-        if pre_csv_data.get(ke):
-            pre_count_csv = pre_csv_data.get(ke)
-            count_csv = int(pre_count_csv[0][4])
-            del pre_csv_data[ke]
-        else:
-            count_csv = 0
+        # if pre_csv_data.get(ke):
+        #     pre_count_csv = pre_csv_data.get(ke)
+        #     count_csv = int(pre_count_csv[0][4])
+        #     del pre_csv_data[ke]
+        # else:
+        #     count_csv = 0
 
-        in_stok = int(val[0][4]) + count_json + count_csv
+        in_stok = int(val[0][4]) + count_json #+ count_csv
         new_data = val[0].copy()
         del new_data[4]
         new_data.insert(4, in_stok)
 
         need_data.update({ke: (new_data, val[1], val[2], val[3])})
 
-    need_data.update(pre_csv_data)
+    # need_data.update(pre_csv_data)
     need_data.update(pre_json_data)
     print('ALL_RIDE create_need_data ', len(need_data))
 
