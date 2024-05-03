@@ -17,3 +17,6 @@ db_user = 'user_name'
 db_pass = 'user_pass'
 db_host = 'localhost'
 db_name = 'stm_app'
+
+
+link = 'http://stm-data.i-bots.ru/data_json.json'

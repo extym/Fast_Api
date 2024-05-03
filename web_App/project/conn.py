@@ -31,7 +31,7 @@ UNIQUE (id_mp)
 )
 """
 
-create_market_cred = """
+create_marketplaces = """
 CREATE TABLE IF NOT EXISTS marketplaces (
 id SERIAL PRIMARY KEY,
 user_id varchar NOT NULL,
@@ -448,7 +448,7 @@ CREATE TABLE IF NOT EXISTS  attributes_product (
 """
 
 # custom_create_all = [create_fresh_orders_table,
-#                      create_market_cred,
+#                      create_marketplaces,
 #                      create_order_items,
 #                      create_users,
 #                      create_products,
@@ -466,9 +466,9 @@ query_write_order = ("INSERT INTO fresh_orders "
                      "VALUES (%s, %s, NOW(), NOW(), %s, %s, %s, %s, %s, %s)")
 
 query_write_order_2 = ("INSERT INTO fresh_orders "
-                     "(id_mp, our_id, date_Added, date_Modifed, shop_Name, mp, "
-                     "shipment_Date, status, our_status, payment_Type, delivery)"
-                     "VALUES (%s, %s, NOW(), NOW(), %s, %s, %s, %s, %s, %s, %s)")
+                       "(id_mp, our_id, date_Added, date_Modifed, shop_Name, mp, "
+                       "shipment_Date, status, our_status, payment_Type, delivery)"
+                       "VALUES (%s, %s, NOW(), NOW(), %s, %s, %s, %s, %s, %s, %s)")
 
 query_write_items = ("INSERT INTO order_items "
                      "(id_mp, shop_order_id, shop_Name, "
@@ -504,9 +504,9 @@ update_status_order = (" UPDATE fresh_orders "
                        "WHERE id_MP = %s and shop_name = %s ")
 
 update_status_order_items = (" UPDATE order_items "
-                       "SET order_status = %s, our_status = %s,"
+                             "SET order_status = %s, our_status = %s,"
                              " date_modifed = NOW() "
-                       "WHERE mp_order_id = %s and shop_name = %s ")
+                             "WHERE mp_order_id = %s and shop_name = %s ")
 
 update_status_order_reverse_id = (" UPDATE fresh_orders "
                                   "SET status = %s, our_status = %s "
@@ -515,8 +515,6 @@ update_status_order_reverse_id = (" UPDATE fresh_orders "
 rewrite_status_order = (" UPDATE fresh_orders "
                         "SET status = %s "
                         "WHERE id_MP = %s and shop_name = %s ")
-
-
 
 rebase_order = (" UPDATE fresh_orders "
                 "SET our_status = %s "
@@ -560,7 +558,7 @@ async def execute_query(query, data):
     connection.close()
 
 
-async def execute_query_v3(query=None, query2=None, data=None):
+async def execute_query_v4(query=None, query2=None, data=None):
     connection = create_connection()
     connection.autocommit = True
     cursor = connection.cursor()
@@ -600,7 +598,6 @@ def execute_query_v3(query, data):
         print(f"The ERROR from execute_query '{err}' occured ")
 
 
-
 async def executemany_query(query, data):
     connection = create_connection()
     connection.autocommit = True
@@ -636,7 +633,6 @@ def executemany_query_v3(query, data):
 
     except (OperationalError, psycopg2.DatabaseError) as err:
         print(f"The ERROR from execute_many_query '{err}' occured ")
-
 
 
 async def write_order(query1: str = None, data1: object = None,
@@ -766,7 +762,6 @@ query_insert = "insert  INTO sales ( mp_order_id, shop_order_id, date_added, sho
                "VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, now(), now() )"
 
 
-
 def rewrite_orders(query1, query2):
     try:
         connection = create_connection()
@@ -858,9 +853,8 @@ def rewrite_orders_v3():
         return False
 
 
-
 custom_create_all = [create_fresh_orders_table,
-                     create_market_cred,
+                     create_marketplaces,
                      create_order_items_v2,
                      create_users,
                      create_products,
@@ -869,9 +863,17 @@ custom_create_all = [create_fresh_orders_table,
                      create_internal_import
                      ]
 
+upgrade_db = [create_marketplaces,
+              create_users,
+              create_products,
+              create_attributes_product,
+              create_sales,
+              create_internal_import
+              ]
+
 update_db = [
-    "alter table public.products alter column price_product_base type int using price_product_base::int",
-    "alter table public.marketplaces alter column key_mp type varchar(1000) using key_mp::varchar(1000)",
+    # "alter table public.products alter column price_product_base type int using price_product_base::int",
+    # "alter table public.marketplaces alter column key_mp type varchar(1000) using key_mp::varchar(1000)",
     # "alter table order_items rename column our_order_id to shop_order_id",
     "alter table order_items rename column id_mp to mp_order_id",
     "alter table order_items add column article varchar",
@@ -906,7 +908,7 @@ update_db = [
 # maintenans_query(create_fresh_orders_table)
 # maintenans_query(create_order_items)
 # maintenans_query(create_users)
-# maintenans_query(create_market_cred)
+# maintenans_query(create_marketplaces)
 # maintenans_query(create_users)
 # maintenans_query(create_consult_users)
 

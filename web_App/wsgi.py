@@ -11,7 +11,7 @@ from project import create_app
 # # add scheduler
 # from apscheduler.schedulers.gevent import GeventScheduler
 #
-# sched = GeventScheduler(daemon=True)
+# scheduler = GeventScheduler(daemon=True)
 # sched.add_job(sensor, 'interval', minutes=60)
 # sched.start()
 

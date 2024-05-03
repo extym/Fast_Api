@@ -191,6 +191,7 @@ class Marketplaces(db.Model):
     check_send_null = db.Column(db.Boolean())
     check_send_stocks = db.Column(db.Boolean())
     check_enable_submit = db.Column(db.Boolean())
+    is_1c = db.Column(db.Boolean())
     date_added = db.Column(db.String(50))
     date_modifed = db.Column(db.String(50))
 

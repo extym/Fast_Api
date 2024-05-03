@@ -1024,7 +1024,7 @@ def shops():
 
             if len(data.keys()) > 0:
                 current_job = scheduler.add_job(back_shops_tasks, id='shops_back',
-                                                trigger='interval', minutes=5)
+                                                trigger='interval', minutes=15)
                 scheduler.start()
                 print(100000000, current_job)
                 print(111000, len(data.keys()))
@@ -1202,19 +1202,20 @@ def assembly_sales(page=1):
         role = current_user.roles
         user_name = current_user.name
         user_photo = current_user.photo
+        shop = request.args.get('select_shop_name')
         if not user_photo or user_photo is None:
             user_photo = 'prof-music-2.jpg'
         rows = ''
         limit = 30
         HOUR = '09:00:00'
-        example = (datetime.datetime.today() - datetime.timedelta(days=1)) \
+        yesterday = (datetime.datetime.today() - datetime.timedelta(days=1)) \
             .strftime(f"%Y-%m-%d {HOUR}")
         pre_rows_shops = db.session.query(Marketplaces.shop_name) \
             .where(Marketplaces.company_id == current_user.company_id).all()
         rows_shops = [i[0] for i in pre_rows_shops]
+        # rows_shops.insert(0, 'Все Магазины')
 
         shop = request.args.get('select_shop_name')
-        # print(11111, shop)
         if shop is None or shop == 'Все Магазины':
             my_query = db.func.count(SalesToday.id)
             total_assembly_sales = db.session.execute(my_query).scalar()
@@ -1231,7 +1232,7 @@ def assembly_sales(page=1):
                           SalesToday.shop_name,
                           SalesToday.article,
                           SalesToday.order_status) \
-                .where(SalesToday.date_added > example) \
+                .where(SalesToday.date_added > yesterday) \
                 .where(SalesToday.our_status == "NEW") \
                 .order_by(SalesToday.article_mp) \
                 .paginate(page=page, per_page=limit, error_out=False)
@@ -1254,24 +1255,18 @@ def assembly_sales(page=1):
                           SalesToday.shop_name,
                           SalesToday.article,
                           SalesToday.order_status) \
-                .where(SalesToday.date_added > example) \
+                .where(SalesToday.date_added > yesterday) \
                 .where(SalesToday.our_status == "NEW") \
                 .filter(SalesToday.shop_name == shop) \
                 .order_by(SalesToday.article_mp) \
                 .paginate(page=page, per_page=limit, error_out=False)
 
-            # print(333333, assembly)
-            # print(assembly)
-
         for row in assembly_orders.items:
-            # print(11111111111, row)
-
             s_today = (select(Product.photo)
                        .where(Product.articul_product == row.article)
                        .where(Product.shop_name == row.shop_name))
 
             photo = db.session.execute(s_today).first()
-            # print(111, photo)
             if photo is None:
                 photo = ('нет фото',)
 
@@ -1290,7 +1285,8 @@ def assembly_sales(page=1):
                                         assembly_sales=assembly_orders,
                                         photo=user_photo,
                                         user_name=user_name,
-                                        shops=rows_shops))
+                                        shops=rows_shops,
+                                        select_shop_name=shop))
 
 
 @auth.route('/users-table')
@@ -1446,109 +1442,3 @@ def page_server_error(error):
     role = current_user.roles
     return render_template("blank-500.html", title='500', role=role, error=error), 500
 
-# @auth.route('/main_table')
-# @auth.route('/main_table/<int:page>', methods=['GET', 'POST'])
-# def main_table():
-#     uid = current_user.id
-#     role = current_user.roles
-#     rows = ''
-#
-#     if current_user.roles in ['admin', 'owner']:
-#         content = {}
-#         company_id = current_user.company_id
-#         # открываем соединение с БД
-#         db = Db().conn
-#         # определяем текущую страницу пагинации
-#         page = request.args.get(get_page_parameter(), type=int, default=1)
-#         limit = 3
-#         # определяем `offset` записей для основного запроса
-#         offset = 0 if page == 1 else (page - 1) * limit
-#         # with closing(db.cursor()) as cursor:
-#         cursor = db.cursor()
-#         cursor.execute("SELECT id FROM sales WHERE company_id=%s", (company_id,))
-#         total = cursor.rowcount
-#         print(222222222222, total, company_id)
-#
-#         pagination = Pagination(page=page, total=total, search=True,
-#                                 per_page=limit, css_framework='bootstrap3')  # bs_version=4)
-#         # `page` это номер текущей страницы, параметр URL (по умолчанию page') из которого
-#         #  он будет извлекаться. Его можно настроить, например Pagination(page_parameter='p', ...)
-#         # или установить `PAGE_PARAMETER` в файле конфигурации.
-#         # Также можно настроить параметр URL, который будет передавать количество выводимых
-#         # записей на одной странице, например Pagination(per_page_parameter='pp') или установить
-#         # параметр `PER_PAGE` в файле конфигурации
-#
-#         if total:
-#
-#             with closing(db.cursor()) as cursor:
-#                 # try:
-#                 cursor.execute("SELECT * FROM sales "
-#                                "WHERE company_id = %s LIMIT %s OFFSET %s ",
-#                                (current_user.company_id, limit, offset))
-#                 # except Exception as e:
-#                 #     print(f'{e.args} ==> {e.args}')
-#                 #     # abort(404)
-#                 dsata = cursor.fetchall()
-#                 for row in dsata:
-#                     print(row)
-#                     rows += '<tr>' \
-#                             f'<td>{row[1]}</td>' \
-#                             f'<td >{row[3]}</td>' \
-#                             f'<td >{row[2]}</td>' \
-#                             f'<td >{row[4]}</td>' \
-#                             f'<td >{row[6]}</td>' \
-#                             f'<td >{row[7]}</td>' \
-#                             f'<td >{row[8]}</td>' \
-#                             f'<td >{row[9]}</td>' \
-#                             f'<td >{row[21]}</td>' \
-#                             f'<td >{row[20]}</td>' \
-#                             f'</tr>'
-#         else:
-#             # abort(404)
-#             print(1111, 'fuckup')
-#
-#         if db:
-#             # закрываем соединение с БД
-#             db.close()
-#
-#         return unescape(render_template('tables-responsive.html',
-#                                         rows=rows, role=role, pagination=pagination))
-#
-#     # raw_list_orders = d_b.select_orders()  #db.select_orders()  TODO make select orders to user id
-#     # raw_list_orders = db.session.query(Sales).all()
-#     # raw_list_orders = db.session.query(Sales).paginate(page=page, per_page=30, error_out=False).items
-#
-#     # for row in raw_list_orders:
-#     #     print(7777888, row.mp_order_id)
-#     #     order_id = row.shop_order_id
-#     #     price = 1200
-#     #
-#     #     rows += '<tr>' \
-#     #             f'<td>{order_id}</td>' \
-#     #             f'<td >{row.article}</td>' \
-#     #             f'<td >{row.shop_order_id}</td>' \
-#     #             f'<td >{row.quantity}</td>' \
-#     #             f'<td >{row.price}</td>' \
-#     #             f'<td >{row.shop_name}</td>' \
-#     #             f'<td >{row.date_added}</td>' \
-#     #             f'<td >{row.shipment_date}</td>' \
-#     #             f'<td >{row.order_status}</td>' \
-#     #             f'<td >{row.category}</td>' \
-#     #             f'</tr>'
-#
-#     # rows += '<tr>' \
-#     #         f'<td width = "130" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #f3f3f3;">{order_id}</td>' \
-#     #         f'<td width = "140" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #f3f3f3;">{row[2]}</td>' \
-#     #         f'<td width = "140" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #f3f3f3;">{row[7]}</td>' \
-#     #         f'<td width = "140" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #f3f3f3;">{row[2]}</td>' \
-#     #         f'<td width = "120" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #f3f3f3;">{row[8]}</td>' \
-#     #         f'<td width = "100" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #f3f3f3;">{price}</td>' \
-#     #         f'<td width = "60" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #f3f3f3;">{row[9]}</td>' \
-#     #         f'<td width = "60" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #f3f3f3;">{row[10]}</td>' \
-#     #         f'<td width = "140" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #f3f3f3;">{row[11]}</td>' \
-#     #         f'<td width = "80" height = "40" align="center" style="border: 1px solid; border-color: #c4c4c4; vertical-align:middle; background-color: #f3f3f3;">{row[12]}</td>' \
-#     #         f'</tr>'
-#
-#     ################################################
-#
-#     return unescape(render_template('tables-responsive.html', rows=rows, role=role))

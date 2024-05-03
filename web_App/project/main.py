@@ -2,6 +2,7 @@ import json
 import os
 import random
 import string
+from datetime import timedelta
 from time import sleep
 
 import requests
@@ -14,7 +15,7 @@ from flask import Blueprint, render_template, app, redirect, make_response, Resp
 from flask import request, flash
 from flask_login import current_user, login_required
 from werkzeug.utils import secure_filename
-
+from project.read_json import process_json_dict,  read_order_json, process_json_dict_v2, read_json_ids
 from project.conn import *  # execute_query, executemany_query
 # from project.conn_maintenance import query_write_order,
 # query_write_items, update_status_order_reverse_id
@@ -71,24 +72,40 @@ def check_allowed_filename(filename):
     return result, curr_name
 
 
+def day_for_stm(string):
+    datta = datetime.strptime(string, '%Y-%m-%d')
+    dat = datta.weekday()
+    dtt = datta.strftime('%d-%m-%Y')
+    if 1 <= dat <= 4:
+        dtt = (datta - timedelta(1)).strftime('%d-%m-%Y')
+    elif dat == 5:
+        proxy = datta + timedelta(2)
+        dtt = proxy.strftime('%d-%m-%Y')
+    elif dat == 6:
+        proxy = datta + timedelta(1)
+        dtt = proxy.strftime('%d-%m-%Y')
+
+    #print('datta',dat,  dtt)
+    return dtt
+
+
 def reformat_data_order(order, shop):
     result = None
     if shop == 'Yandex':
-        pass
-        # try:
-        #     day = reverse_time(order["delivery"]["shipments"][0]["shipmentDate"])
-        # except:
-        #     day = reverse_time(order['delivery']['dates']['fromDate'])
-        # result = (
-        #     order["id"],
-        #     order["our_id"],
-        #     shop,   #order["shop"],
-        #     day_for_stm(day),
-        #     order["status"],
-        #     order["our_status"],
-        #     order["paymentType"],
-        #     order["delivery"]["type"]
-        # )
+        try:
+            day = reverse_time(order["delivery"]["shipments"][0]["shipmentDate"])
+        except:
+            day = reverse_time(order['delivery']['dates']['fromDate'])
+        result = (
+            order["id"],
+            order["our_id"],
+            shop,   #order["shop"],
+            day_for_stm(day),
+            order["status"],
+            order["our_status"],
+            order["paymentType"],
+            order["delivery"]["type"]
+        )
 
     elif shop == 'Ozon':
         time = order["shipment_date"].split('T')[0]
@@ -116,28 +133,6 @@ def reformat_data_order(order, shop):
             "PREPAID",  # order['data'].get("paymentType"),
             order["shipments"][0]['fulfillmentMethod']
         )
-
-    # elif shop == 'Leroy':
-    #     result = (
-    #         order['order']["id"],
-    #         order['order']["our_id"],
-    #         order['order']["shop"],
-    #         order['order']["date"],
-    #         order['order']["status"],
-    #         order['order']["paymentType"],
-    #         order['order']["delivery"]
-    #     )
-    #
-    # elif shop == 'WB':
-    #     result = (
-    #         order['order']["businessId"],
-    #         order['order']["id"],
-    #         order['order']["shop"],
-    #         order['order']["date"],
-    #         order['order']["status"],
-    #         order['order']["paymentType"],
-    #         order['order']["delivery"]
-    #     )
 
     return result
 
@@ -171,18 +166,15 @@ def reformat_data_items(order, shop):
     elif shop == 'Ozon':
         result = []
         list_items = order['products']
-        # read_skus() -> {sku<str>: (product_id<int>, vendor_code<str>}
-        # items_skus = read_skus()
         # items_ids = read_json_ids()  # we wait dict[vendor_code] = (id_1c, price, quantity)
         # id_1c = items_ids[vendor_code][0]  # 1c
 
         for item in list_items:
             sku = str(item["sku"])
-            # vendor_code = items_skus[sku][1]
             vendor_code = item["offer_id"]
-            # print('product_info_price', sku[0], vendor_code)
-            # price = product_info_price(items_skus[sku][0], vendor_code)
-            id_1c = try_get_id_1c(item["offer_id"])
+            items_ids = read_json_ids()
+            id_1c = items_ids[vendor_code][0]
+            # id_1c = try_get_id_1c(item["offer_id"])
             proxy = (
                 order["posting_number"],
                 order["our_id"],
@@ -300,7 +292,7 @@ def product_info_price(id_mp, seller_id):
     # 'message': 'Unknown posting number "55200317-0207-4"',
     # 'details': []}
     result = resp.json()
-    print('product_id_offer_id', result)
+    print('product_id_offer_id', result['result']['posting_number'])
     order = result.get("result")
     if order:
         return order
@@ -389,7 +381,7 @@ async def onon_push():
                 filter_by(seller_id=seller_id).first().shop_name
             data = (order_status, "canceled", order_id, shop_name)
             # await execute_query(update_status_order_reverse_id, data)
-            await execute_query_v3(query=update_status_order,
+            await execute_query_v4(query=update_status_order,
                                    query2=update_status_order_items,
                                    data=data)
             print('cencelled_order_onon', order_id)
