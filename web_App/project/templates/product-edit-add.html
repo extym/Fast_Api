@@ -16,6 +16,7 @@
 
 
                 <div class="col-lg-6 col-md-6 col-6">
+                    <form action="/edit_product" method="post" >
 <!--                <div class="col-xl-6">-->
                     <div class="form-group">
 
@@ -29,11 +30,11 @@
                             </select>
                         </div>
                     </div>
-                </div>
+<!--                </div>-->
 
-                <div class="col-xl-6">
+<!--                <div class="col-xl-6">-->
 
-                    <form action="/edit_product" method="post" >
+<!--                    <form action="/edit_product" method="post" >-->
                     <div class="input-group primary">
 
                         <span class="input-group-addon">
@@ -243,7 +244,7 @@
                                             </div>
                                             <select class="custom-select" id="input_shop_name" name="set_shop_name">
     {#                                          <option selected>Выбрать </option>#}
-                                                <option value="{{ current_shop}}" ></option>
+                                                <option value="{{ product.get('shop_name', '') }}" >{{ product.get('shop_name', '') }}</option>
 
                                             </select>
                                             </div>
@@ -253,7 +254,7 @@
                                             <label class="form-label" for="formfield5">SKU Товара на МП</label>
 <!--                                            <span class="desc">e.g. "3423"</span>-->
                                             <div class="controls">
-                                                <input type="text" class="form-control" id="formfield5" name="external_sku" >
+                                                <input type="text" value="{{ product.get('external_sku', '') }}"  class="form-control" id="formfield5" name="external_sku" >
                                             </div>
                                         </div>
 
@@ -261,7 +262,7 @@
                                             <label class="form-label" for="formfield6">Алиас назавния на МП</label>
 <!--                                            <span class="desc">e.g. "minimum 3 characters"</span>-->
                                             <div class="controls">
-                                                <input type="text" class="form-control" id="formfield6" name="alias_prod_name" >
+                                                <input type="text" value="{{ product.get('alias_prod_name', '') }}"  class="form-control" id="formfield6" name="alias_prod_name" >
                                             </div>
                                         </div>
 
@@ -270,9 +271,13 @@
                                                 <label class="form-label" for="field-5">Статус в магазине</label>
                                                 <span class="desc"></span>
                                                 <select class="form-control" name="status_in_shop">
+                                                    {% if product.get('status_in_shop') %}
+                                                    <option value="{{product.get('status_in_shop')}}" selected='selected'>{{ product.get('status_in_shop') }}</option>
+                                                    {% else %}
                                                     <option></option>
                                                     <option value="insale" selected='selected'>В продаже</option>
                                                     <option value="outsale">Снят с продажи</option>
+                                                    {% endif %}
                                                 </select>
                                             </div>
 
@@ -294,28 +299,41 @@
 <!--                                        </div>-->
 
                                         <div class="form-group">
-                                            <label class="form-label" for="formfield11">Коэффициент магазина</label>
-                                            <span class="desc">Плюс 50% это будет коэффициент 1.5</span>
+                                            <label class="form-label" for="formfield11">Коэффициент магазина  в %</label>
+                                            <span class="desc">50 это будет коэффициент 1.5</span>
                                             <div class="controls">
-                                                <input type="text" value="{{product.get('shop_k_product','1.0')}}" class="form-control" id="formfield11" name="shop_k_product" >
+                                                {% if product.get('shop_k_product') is not none %}
+                                                <input type="text" value="{{product.get('shop_k_product')}}" class="form-control" name="shop_k_product" >
+                                                {% else %}
+                                                <input type="text" value="0" class="form-control" id="formfield11" name="shop_k_product" >
+                                                 {% endif %}
                                             </div>
                                         </div>
 
 
                                         <div class="form-group">
-                                                <label class="form-label" for="field-56">Наценка магазина %</label>
+                                                <label class="form-label" for="field-56">Наценка магазина в %</label>
                                                 <span class="desc"></span>
                                                 <div class="controls">
-                                                    <input type="text" value="10.00" class="form-control" id="field-56" name="price_add_k">
+                                                    {% if product.get('price_add_k') is not none %}
+                                                    <input type="text" value="{{ product.get('price_add_k') }}" class="form-control" name="price_add_k">
+                                                    {% else %}
+                                                    <input type="text" value="0" class="form-control" id="field-56" name="price_add_k">
+                                                    {% endif %}
                                                 </div>
                                             </div>
 
 
                                         <div class="form-group">
-                                                <label class="form-label" for="field-17">Скидка для магазина</label>
+                                                <label class="form-label" for="field-17">Скидка для магазина  в %</label>
                                                 <span class="desc"></span>
                                                 <div class="controls">
-                                                    <input type="text" value="10" class="form-control" id="field-17" name="discount_shop_product">
+                                                    {% if product.get('discount_shop_product') is not none %}
+                                                    <input type="text" value="{{ product.get('discount_shop_product') }}" class="form-control" name="discount_shop_product">
+                                                    {% else %}
+                                                    <input type="text" value="0" class="form-control" id="field-17" name="discount_shop_product">
+                                                    {% endif %}
+
                                                 </div>
                                             </div>
 
@@ -324,8 +342,11 @@
                                                    <label class="form-label" for="field-18">Количество для этого магазина</label>
                                              <span class="desc"></span>
                                                 <div class="controls">
-
-                                                    <input type="text" value="{{product.get('quantity_for_shop','0')}}" class="form-control" id="field-18" name="quantity_for_shop">
+                                                    {% if product.get('quantity_for_shop') is not none %}
+                                                    <input type="text" value="{{product.get('quantity_for_shop')}}" class="form-control" id="field-18" name="quantity_for_shop">
+                                                    {% else %}
+                                                    <input type="text" value="{{product.get('quantity')}}" class="form-control"  name="quantity_for_shop">
+                                                    {% endif %}
                                                 </div>
                                             </div>
 
@@ -334,7 +355,7 @@
                                                 <label class="form-label" for="field-18">Описание</label>
                                                 <span class="desc">Введите описание товара здесь</span>
                                                 <div class="controls">
-                                                    <textarea class="form-control autogrow" cols="5" id="field-19" name="description_product_add">A multi colored sleeve for your laptop. It is available in 3 colors</textarea>
+                                                    <textarea data-value="{{product.get('description_product_add','')}}" class="form-control autogrow" cols="5" id="field-19" name="description_product_add"></textarea>
                                                 </div >
                                             </div>
 

@@ -274,8 +274,9 @@ prod_wb_photo = {'nmID': 225634469,
 
 # datas = json.dumps(data)
 # print(datas)
-def ping(link):
-    data = {"message_type": "TYPE_NEW_POSTING", "seller_id": 172781,
+def ping_oson(link):
+    data = {"message_type": "TYPE_NEW_POSTING",
+            "seller_id": 172781,
             "warehouse_id": 1020001060644000,
             "posting_number": "46231993-0568-11",
             "in_process_at": "2024-04-09T05:08:35Z",
@@ -292,3 +293,42 @@ def ping(link):
 
 # ping('https://samoesladkoe.i-bots.ru/api/on')
 # ping('http://localhost:3000/api/on')
+
+
+('id', 4779)
+('old_price', None)
+('name_product', 'Набор из 4 банок напитков газированных Aziano по 350 мл (мохито, киви, апельсин, личи)')
+('status_in_shop', 'Продается')
+('type_id', 96778)
+('shop_name', 'ImportGoods')
+('discount', 0.0)
+('status_mp', 'enabled')
+('volume_weight', 2.0)
+('barcode', 'OZN1006343576')
+('store_id', '1179095')
+('description_product', None)
+('images_product', '{https://cdn1.ozone.ru/s3/multimedia-z/6644681639.jpg,https://cdn1.ozone.ru/s3/multimedia-y/6644681638.jpg,https://cdn1.ozone.ru/s3/multimedia-0/6644681640.jpg,https://cdn1.ozone.ru/s3/multimedia-v/6646032139.jpg,https://cdn1.ozone.ru/s3/multimedia-m/6646032130.jpg}')
+('shop_k_product', None)
+('cart_id', None)
+('quantity', 895)
+('photo', 'https://cdn1.ozone.ru/s3/multimedia-l/6646032129.jpg')
+('price_add_k', 0.0)
+('discount_shop_product', None)
+('brand', None)
+('reserved', None)
+('id_1c', '')
+('discount_mp_product', 0.0)
+('quantity_for_shop', None)
+('brand_id', None)
+('price_product_base', 0)
+('date_added', '2024-04-13 09:05:06')
+('set_shop_name', 'Набор из 4 банок напитков газированных Aziano по 350 мл (мохито, киви, апельсин, личи)')
+('description_product_add', None)
+('final_price', 721.0)
+('date_modifed', '2024-04-13 09:05:06')
+('external_sku', '1006343577')
+('uid_edit_user', 3)
+('articul_product', 'ССНаб4БанНапГазирAziano350млМохКивАпелЛич/205')
+('selected_mp', 'oson')
+('alias_prod_name', 'Набор из 4 банок напитков газированных Aziano по 350 мл (мохито, киви, апельсин, личи)')
+('description_category_id', '17028764')

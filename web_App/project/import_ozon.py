@@ -770,10 +770,10 @@ def make_send_price_data(data, seller_id=None, headers=None):
         proxy = {
             # "auto_action_enabled": "UNKNOWN",
             "currency_code": "RUB",
-            # "min_price": "800",
+            "min_price": price,
             "offer_id": row.get("offer_id"),
             "old_price": "0",
-            "price": "1448",
+            "price": price,
             "price_strategy_enabled": "UNKNOWN",
             "product_id": 1386
         }

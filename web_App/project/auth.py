@@ -709,8 +709,10 @@ def edit_product(product=None):
     if not current_user.is_authenticated:
         return redirect(url_for('main.index_main'))
     else:
-        rows_shops = db.session.execute(select(Marketplaces.shop_name)
-                                        .where(Marketplaces.company_id == current_user.company_id)).all()
+        rows_shops = db.session \
+            .execute(select(Marketplaces.shop_name) \
+                     .where(Marketplaces.company_id == current_user.company_id)) \
+            .all()
         # print(rows_shops, type(rows_shops))
         rows = [row[0] for row in rows_shops]
         role = current_user.roles
@@ -750,53 +752,43 @@ def edit_product(product=None):
                                photo=photo,
                                user_name=user_name)
 
-        # selected_mp=selected_mp,
-        # articul_product=articul_product,
-        # name_product=name_product,
-        # status_mp=status_mp,
-        # images_product=image_product,
-        # price_product_base=price_product_base,
-        # price_add_k=price_add_k,
-        # discount_mp_product=discount_mp_product,
-        # quantity=quantity,
-        # description_product=description_product,
-        # set_shop_name=set_shop_name,
-        # external_sku=external_sku,
-        # alias_prod_name=alias_prod_name,
-        # status_in_shop=alias_prod_name,
-        # shop_k_product=shop_k_product,
-        # discount_shop_product=discount_shop_product,
-        # quantity_for_shop=quantity_for_shop,
-        # description_product_add=description_product_add
-        # )
-
 
 @auth.route('/edit_product', methods=['POST'])
 @login_required
 def edit_product_post():
     data = request.form.to_dict()
     role = current_user.roles
+    photo = current_user.photo
+    if not photo or photo is None:
+        photo = 'prof-music-2.jpg'
     # print('/edit_product', *data, sep='\n')
     # print('/edit_product', *data, sep=', \n')
     if 'search_product' in data:
         articul = data.get('search_product')
-        shop_name = data.get('shop_name')
+        shop_name = data.get('import_shop_names')
         if articul and articul != '':
-            try:
-                product = db.session.query(Product).filter_by(articul_product=articul, shop_name=shop_name) \
-                    .first().as_dict()
-            except:
+            prod = db.session \
+                .execute(select(Product)
+                         .filter_by(shop_name=shop_name) \
+                         .where(Product.articul_product == articul)) \
+                .first()
+            if not prod:
                 flash('Артикул не найден')
                 product = {}
+            else:
+                product = dict(prod[0].__dict__)
+                # print(111111111, *product.items(), sep='\n')
             rows_shops = db.session.execute(select(Marketplaces.shop_name)
-                                            .where(Marketplaces.company_id == current_user.company_id)).all()
+                                            .where(Marketplaces.company_id == current_user.company_id)) \
+                .all()
             # print(rows_shops, type(rows_shops))
             rows = [row[0] for row in rows_shops]
             # prod = Product.query.filter_by(articul_product="12345").first().__dict__
             # print(22222, *product.items(), sep='\n')  # ' sep=' = prod.get(""),\n')
             # print(33333, product)
 
-            return render_template('/product-edit-add.html', product=product, rows=rows)
+            return render_template('/product-edit-add.html', product=product,
+                                   rows=rows, photo=photo, role=role)
 
     else:
         prod_set = Product(
@@ -1003,7 +995,7 @@ def shops():
                     need_job = key.rsplit('_', maxsplit=1)[0]
                     proxy_settings[value] = proxy_settings.get(value, []) + [need_job]
 
-            markets = Marketplaces.query\
+            markets = Marketplaces.query \
                 .filter_by(company_id=current_user.company_id).all()
             for row in markets:
                 current_work = {'check_send_null': False,
@@ -1021,7 +1013,6 @@ def shops():
                                        .values(current_work))
                 db.session.commit()
 
-
             if len(data.keys()) > 0:
                 current_job = scheduler.add_job(back_shops_tasks, id='shops_back',
                                                 trigger='interval', minutes=15)
@@ -1033,7 +1024,6 @@ def shops():
                     scheduler.remove_job('shops_back')
                 except:
                     print('Job_remove_error')
-
 
             return redirect(url_for('auth.shops'))
 
@@ -1441,4 +1431,3 @@ def page_not_found(error):
 def page_server_error(error):
     role = current_user.roles
     return render_template("blank-500.html", title='500', role=role, error=error), 500
-
