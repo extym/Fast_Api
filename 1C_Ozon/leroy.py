@@ -16,9 +16,11 @@ import asyncio
 test_url = 'http://localhost:5500/response'
 remote_test_url = 'https://api-test.leroymerlin.ru/marketplace/merchants/v1'
 url_orders = 'https://api.leroymerlin.ru/marketplace/merchants/v1'
+print(11111111111111111111111111111111111111111111111111111111111111111, os.getcwd())
+
 if LOCAL_MODE:
     UPLOAD_FOLDER = './'
-    PATH = './'
+    PATH = os.getcwd()
 else:
     UPLOAD_FOLDER = '/var/www/html/load/'
     PATH = '/home/userbe/stm/'
@@ -160,7 +162,7 @@ def send_stocks_lm():
     data = check_stocks()
     answer = requests.post(url_address, data=json.dumps(data), headers=headers)
 
-    print('send_stocks_leroy', len(data["data"]["products"]), answer.text, data)
+    print('send_stocks_leroy', len(data["data"]["products"]), answer.text)
 
 
 # send_stocks_lm()
@@ -281,11 +283,6 @@ def send_get_orders_lm():
     print('send_get_orders_lm', len(data), data)
     return data
 
-
-# send_stocks_lm()
-# send_get_new_orders()
-
-# send_get_orders_lm()
 
 def get_smth(metod):
     # url = 'https://api.leroymerlin.ru/marketplace/api/v1/'

@@ -1,3 +1,5 @@
+import logging
+
 from gevent import monkey
 monkey.patch_all()
 
@@ -12,7 +14,7 @@ import pytz
 from datetime import datetime, timedelta
 from read_json import process_json_dict,  read_order_json, process_json_dict_v2, read_json_ids
 import pandas as pd
-from cred import tokens_market, token_sper, LOCAL_MODE, import_key
+from cred import *
 from ozon import read_skus, product_info_price
 from sper import post_smth_sb, check_is_accept_sb
 from time import sleep
@@ -20,6 +22,12 @@ import os
 #from cred import token_market_dbs, token_market_fbs
 import urllib3
 urllib3.disable_warnings()
+
+LOG_DIR = os.getcwd() + "/logs"
+print(LOG_DIR)
+
+logging.basicConfig(filename=os.path.join(LOG_DIR + '/stm_app.log'), level=logging.INFO,
+                    format="%(asctime)s %(levelname)s %(message)s")
 
 
 #time = datetime.now(pytz.timezone("Africa/Nairobi")).replace(microsecond=0).isoformat()
@@ -1034,12 +1042,12 @@ async def fail_check():
 async def check_order():
     ip_addr = request.environ.get('REMOTE_ADDR')  ## return ::ffff:46.21.252.7
     addr = request.headers.get('X-Forwarded-For')  # 'X-Forwarded-For': '46.21.252.7'
-    print(1111, ip_addr, addr)
-    if ip_addr == '::ffff:46.21.252.7' or ip_addr == '46.21.252.7' or ip_addr == '62.76.102.53':  # or ip_addr == '54.86.50.139':  #POSTMAN
+    logging.info("WE get request from {} {}".format(ip_addr, addr))
+    if ip_addr == '::ffff:46.21.252.7' or ip_addr == '46.21.252.7':  # or ip_addr == '54.86.50.139':  #POSTMAN
         data = get_one_order()  #query_read_order(get_new_order))
         if data[0] is not None:
             re_data = create_data_for_1c(data)
-            print("SEND order", re_data)
+            logging.info("SEND order {}".format(re_data))
             response = json.dumps(re_data)
             await execute_query(rebase_order,
                             ("SEND", data[0][0], data[0][1]))
