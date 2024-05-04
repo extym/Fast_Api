@@ -58,7 +58,7 @@
                                         <div class="input-group-prepend">
                                             <label class="input-group-text" for="input_name_mp">Маркетплейс</label>
                                         </div>
-                                        <select class="custom-select" id="input_name_mp" name="select_mp">
+                                        <select class="custom-select" id="input_name_mp" name="insert_new_shop">
                                                 <option selected>Выбрать...</option>
                                                 <option value="yandex">ЯндексМаркет</option>
                                                 <option value="sber">СберМегаМаркет</option>
@@ -200,10 +200,10 @@
 
                                         <div class="input-group mb-3">
                                         <div class="input-group-prepend">
-                                            <label class="input-group-text" for="select_name_mp">Маркетплейс</label>
+                                            <label class="input-group-text" for="settings_store">Маркетплейс</label>
                                         </div>
-                                        <select class="custom-select" id="select_name_mp" name="select_name_mp">
-                                                <option selected>Выбрать...</option>
+                                        <select class="custom-select" id="settings_store" name="settings_store">
+                                                <option selected></option>
                                                 <option value="yandex">ЯндексМаркет</option>
                                                 <option value="sber">СберМегаМаркет</option>
                                                 <option value="ozon">Озон</option>
@@ -216,7 +216,7 @@
                                             <label class="form-label" for="formfield1">Общая наценка на маркетплейс</label>
                                             <span class="desc">% например "16"</span>
                                             <div class="controls">
-                                                <input type="text" class="form-control" id="formfield1" name="formfield1" >
+                                                <input type="text" class="form-control" id="formfield1" name="common_markup_mp" >
                                             </div>
                                         </div>
 
@@ -260,7 +260,7 @@
                                         <div class="input-group-prepend">
                                             <label class="input-group-text" for="input_shop_name">Магазин</label>
                                         </div>
-                                        <select class="custom-select" id="input_shop_name" name="set_shop_settings">
+                                        <select class="custom-select" id="input_shop_name" name="shop_name">
                                         <option selected>Выбрать </option>
                                             {% for row in rows %}
                                             <option value="{{ row }}" >{{ row }}</option>
@@ -273,7 +273,7 @@
                                             <label class="form-label" for="formfield5">Дополнительная наценка на магазин</label>
                                             <span class="desc">% например "33"</span>
                                             <div class="controls">
-                                                <input type="text" class="form-control" id="formfield5" name="extra_markup_shop " >
+                                                <input type="text" class="form-control" id="formfield5" name="store_markup" >
                                             </div>
                                         </div>
 
@@ -281,7 +281,7 @@
                                             <label class="form-label" for="formfield6">Дополнительная скидка на магазин</label>
                                             <span class="desc">% например "23"</span>
                                             <div class="controls">
-                                                <input type="text" class="form-control" id="formfield6" name="formfield6" >
+                                                <input type="text" class="form-control" id="formfield6" name="store_discount" >
                                             </div>
                                         </div>
 

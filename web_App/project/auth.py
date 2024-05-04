@@ -21,10 +21,10 @@ from werkzeug.utils import secure_filename
 import project.wb as wb
 from project.import_ozon import import_oson_data_prod, make_internal_import_oson
 from project.worker import conn
-from project import db, TEST_MODE, PHOTO_UPLOAD_FOLDER, engine
+from project import  TEST_MODE, PHOTO_UPLOAD_FOLDER, engine
 from .database import Data_base_connect as Db
 from .models import *
-
+from . import db
 from apscheduler.schedulers.background import BackgroundScheduler
 
 from .ozon import send_stocks_oson_v2
@@ -206,8 +206,8 @@ def main_page():
 
 
 def check_api(key_mp, shop_id):
-    pass
 
+    return True
 
 @auth.route('/add_mp')  # /<int:uid>')
 @login_required
@@ -242,9 +242,10 @@ def add_mp_post():
     uid = current_user.id
     role = current_user.roles
     company_id = current_user.company_id
-    print(11111111111, data)
-    if 'select_mp' in data:
-        mp = data.get('select_mp')
+    date_add = datetime.datetime.now()
+    print(113333333111, data)
+    if 'insert_new_shop' in data:
+        mp = data.get('insert_new_shop')
         shop_name = data.get('name')
         shop_id = data.get('id_mp')
         key_mp = data.get('key')
@@ -266,13 +267,26 @@ def add_mp_post():
                 result = True
             else:
                 result = check_api(key_mp, shop_id)
-            # print('result', result)
+            print('result', result)
             if result:
-                d_b = Db()
-                d_b.insert_new_mp(uid, shop_id, shop_name, mp, key_mp, company_id)
+                # d_b = Db()
+                # d_b.insert_new_mp(uid, shop_id, shop_name, mp, key_mp, company_id)
                 # mp_sett = (uid, shop_id, shop_name, mp, key_mp)
                 # db.session.add(mp_sett)
                 # db.session.commit()
+                # d_b = Db()
+                # d_b.insert_new_mp(uid, shop_id, shop_name, mp, key_mp, company_id)
+                mp_sett = Marketplaces(
+                    user_id=uid,
+                    seller_id=shop_id,
+                    shop_name=shop_name,
+                    name_mp=mp,
+                    key_mp=key_mp,
+                    company_id=company_id,
+                    date_added=date_add)
+                db.session.add(mp_sett)
+                print(2222222222222222222222222222222222222222222222)
+                db.session.commit()
                 flash('Настройки удачно сохранены', 'success')
             else:
                 flash('Проверьте, пожалуйста, данные', 'error')
@@ -349,7 +363,7 @@ def edit_mp_post():
             return redirect('/add_mp')
 
         if shop_name != 'Выбрать' and mp != 'Выбрать...' and key_mp:
-            print(1111, mp, shop_name, key_mp)
+            # print(1111, mp, shop_name, key_mp)
             mp = data.get('edit_shop')
             shop_name = data.get('edit_shop_name')
             shop_id = data.get('id_mp')
@@ -371,95 +385,23 @@ def edit_store_post():
     role = current_user.roles
     company_id = current_user.company_id
     print(*data.items(), sep='\n')
-    # {'select_name_mp': 'Выбрать...',
-    # 'extract_articul_shop': '',
-    # 'mp_discount': '',
-    # 'price_before': '',
-    # 'add_articul_mp': '',
-    # 'extract_articul_mp': '',
-    # 'set_shop_settings': 'Выбрать',
-    # 'extra_markup_shop': '',
-    # 'formfield6': '',
-    # 'shop_add_price_before': '',
-    # 'formfield7': '',
-    # 'formfield11': ''}
-    if 'select_mp' in data:
-        mp = data.get('select_mp')
-        shop_name = data.get('name')
-        shop_id = data.get('id_mp')
-        key_mp = data.get('key')
 
-        if mp == 'Выбрать...':
-            flash('Укажите, пожалуйста, маркетплейс', 'error')
-            return render_template('mp_settings.html')
+    if 'settings_store' in data:
+        settings = dict()
+        if data['shop_name'] != 'Выбрать':
+            for key, value in data.items():
+                if value != '':
+                    settings.update({key: value})
 
-        if shop_name is None:
-            flash('Укажите, пожалуйста, название магазина, желательно как на маркетплейсе', 'error')
-            return render_template('mp_settings.html')
-
-        if shop_name is None:
-            flash('Укажите, пожалуйста, API ключ магазина на маркетплейсе', 'error')
-            return render_template('mp_settings.html')
-
-        if mp == 'ozon' and key_mp != None and shop_id != None:
-            if TEST_MODE:
-                result = True
-            else:
-                result = check_api(key_mp, shop_id)
-            # print('result', result)
-            if result:
-                d_b = Db()
-                d_b.insert_new_mp(uid, shop_id, shop_name, mp, key_mp, company_id)
-                # mp_sett = (uid, shop_id, shop_name, mp, key_mp)
-                # db.session.add(mp_sett)
-                # db.session.commit()
-                flash('Настройки удачно сохранены', 'success')
-            else:
-                flash('Проверьте, пожалуйста, данные', 'error')
-                return render_template('mp_settings.html')
-
-        if mp == 'yandex' and key_mp != None and shop_id != None:
-            d_b = Db()
-            d_b.insert_new_mp(uid, shop_id, shop_name, mp, key_mp, company_id)
-            # mp_sett = Marketplaces(uid, shop_id, shop_name, mp, key_mp)
-            # db.session.add(mp_sett)
-            # db.session.commit()
+            # shop_name = settings['shop_name']
+            market = Marketplaces.query\
+                .filter_by(shop_name=settings['shop_name']) \
+                .update(settings)
+            db.session.commit()
             flash('Настройки удачно сохранены', 'success')
 
-        if mp == 'wb' and key_mp != None and shop_id != None:
-            d_b = Db()
-            d_b.insert_new_mp(uid, shop_id, shop_name, mp, key_mp, company_id)
-            flash('Настройки удачно сохранены', 'success')
-
-        if mp == 'leroy' and key_mp != None and shop_id != None:
-            d_b = Db()
-            d_b.insert_new_mp(uid, shop_id, shop_name, mp, key_mp, company_id)
-            flash('Настройки удачно сохранены', 'success')
-
-        if mp == 'sber' and key_mp and shop_id:
-            d_b = Db()
-            d_b.insert_new_mp(uid, shop_id, shop_name, mp, key_mp, company_id)
-            # mp_sett = Marketplaces(uid, shop_id, shop_name, mp, key_mp)
-            # db.session.add(mp_sett)
-            # db.session.commit()
-            flash('Настройки удачно сохранены', 'success')
-
-    if 'import_from' in data:
-        pass
-        # job = q.enqueue_call(test_time)
-        # print(job.get_id)
-    if 'edit_shop' in data:
-        print(33333333333333333333333, data)
-        if 'edit_shop' == 'Выбрать...' and 'edit_shop_settings' == 'Выбрать':
-            flash('Не выбран магазин')
-        if 'edit_shop_settings' != 'Выбрать' and 'key':
-            mp = data.get('edit_shop')
-            shop_name = data.get('edit_shop_name')
-            shop_id = data.get('id_mp')
-            key_mp = data.get('key')
-            d_b = Db()
-            d_b.update_mp(shop_name, mp, key_mp)
-        print(*data.keys(), sep='\n')
+        else:
+            flash('Выберите редактируемый магазин')
 
     return redirect('/add_mp')
 
@@ -759,6 +701,7 @@ def edit_product_post():
     data = request.form.to_dict()
     role = current_user.roles
     photo = current_user.photo
+    user_name = current_user.name
     if not photo or photo is None:
         photo = 'prof-music-2.jpg'
     # print('/edit_product', *data, sep='\n')
@@ -778,8 +721,9 @@ def edit_product_post():
             else:
                 product = dict(prod[0].__dict__)
                 # print(111111111, *product.items(), sep='\n')
-            rows_shops = db.session.execute(select(Marketplaces.shop_name)
-                                            .where(Marketplaces.company_id == current_user.company_id)) \
+            rows_shops = db.session\
+                .execute(select(Marketplaces.shop_name)
+                                .where(Marketplaces.company_id == current_user.company_id)) \
                 .all()
             # print(rows_shops, type(rows_shops))
             rows = [row[0] for row in rows_shops]
@@ -788,12 +732,13 @@ def edit_product_post():
             # print(33333, product)
 
             return render_template('/product-edit-add.html', product=product,
-                                   rows=rows, photo=photo, role=role)
+                                   rows=rows, photo=photo, role=role,
+                                   user_name=user_name)
 
     else:
         prod_set = Product(
             uid_edit_user=current_user.id,
-            selected_mp=data.get('select_mp', '0'),
+            selected_mp=data.get('insert_new_shop', '0'),
             shop_name=data.get('set_shop_name', '0'),
             articul_product=data.get('articul_product', '0'),
             name_product=data.get('name_product', '0'),
@@ -1205,7 +1150,6 @@ def assembly_sales(page=1):
         rows_shops = [i[0] for i in pre_rows_shops]
         # rows_shops.insert(0, 'Все Магазины')
 
-        shop = request.args.get('select_shop_name')
         if shop is None or shop == 'Все Магазины':
             my_query = db.func.count(SalesToday.id)
             total_assembly_sales = db.session.execute(my_query).scalar()
@@ -1346,7 +1290,6 @@ def profile():
         file = request.files['file']
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            # print(11111111111, os.getcwd())
             file.save(os.path.join(PHOTO_UPLOAD_FOLDER, filename))
             proxy['photo'] = filename
 
@@ -1397,7 +1340,6 @@ def upload_file():
             return redirect(request.url)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            # print(11111111111, os.getcwd())
             file.save(os.path.join(PHOTO_UPLOAD_FOLDER, filename))
 
             return redirect(url_for('auth.upload_file',
@@ -1422,12 +1364,22 @@ def page_not_found(error):
         if not photo or photo is None:
             photo = 'prof-music-2.jpg'
         user_name = current_user.name
+        role = current_user.roles
         return render_template("blank-2.html", title='404',
+                               role=role,
                                user_name=user_name,
                                photo=photo), 404
 
 
 @auth.app_errorhandler(500)
 def page_server_error(error):
+    photo = current_user.photo
+    if not photo or photo is None:
+        photo = 'prof-music-2.jpg'
+    user_name = current_user.name
     role = current_user.roles
-    return render_template("blank-500.html", title='500', role=role, error=error), 500
+    return render_template("blank-500.html", title='500',
+                           role=role,
+                           photo=photo,
+                           user_name=user_name,
+                           error=error), 500

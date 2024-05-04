@@ -192,9 +192,6 @@ def create_data_stocks_from_db(seller_id=None, is_stocks_null=False):
     return result
 
 
-
-
-
 # asyncio.run(create_data_stocks())
 # create_data_stocks_from_db(seller_id="1278621", is_stocks_null=True)
 
