@@ -503,7 +503,8 @@ def adapt_dict(dict_var):
     return AsIs("'" + json.dumps(dict_var) + "'")
 
 
-def import_product_from_wb(shop_name=None, company_id=None, uid_edit_user=None):
+def import_product_from_wb(shop_name=None, company_id=None,
+                           uid_edit_user=None, change_base_price=False):
     register_adapter(dict, adapt_dict)
     data = get_product_cards(shop_name=shop_name, company_id=company_id)[0]
     query = select(Marketplaces.seller_id, Marketplaces.key_mp) \
@@ -513,7 +514,69 @@ def import_product_from_wb(shop_name=None, company_id=None, uid_edit_user=None):
         seller_data = session.execute(query).first()
     count = 0
     time_now = datetime.datetime.now()
-    if data:
+    if data and not change_base_price:
+        for data_prod in data:
+            product = {
+                'articul_product': str(data_prod.get("vendorCode")),
+                'shop_name': shop_name,
+                'store_id': seller_data[0],
+                'quantity': data_prod.get("stocks"),
+                'discount': 0.0,
+                'description_product': data_prod.get("description"),
+                'photo': data_prod.get("photos"),
+                'id_1c': "",
+                'date_added': time_now,
+                'date_modifed': time_now,
+                'selected_mp': 'wb',
+                'name_product': data_prod.get("title"),
+                'status_mp': 'enabled',
+                'images_product': data_prod.get("photos")[0].get('square'),
+                'price_add_k': 0.0,
+                'discount_mp_product': 0.0,
+                'set_shop_name': data_prod.get("brand"),
+                'external_sku': data_prod.get("nmID"),
+                'alias_prod_name': data_prod.get("name"),
+                'status_in_shop': data_prod.get("status"),
+                'uid_edit_user': uid_edit_user,
+                'final_price': data_prod.get('price'),
+                'description_category_id': data_prod.get("subjectName"),
+                'volume_weight': data_prod.get("sizes")[0].get('chrtID'),
+                'type_id': data_prod.get("subjectID"),
+                'barcode': data_prod.get("sizes")[0].get('skus'),
+                'cart_id': data_prod.get("imtID"),
+                'brand': data_prod.get("brand"),
+                'brand_id': ""
+            }
+
+            count_error = 0
+            with Session(engine) as session:
+                session.begin()
+                smth = insert(Product).values(product)
+                # print(77777, smth)
+                try:
+                    session.execute(smth)
+                    time.sleep(0.1)
+                    count += 1
+                    # print(555555555555)
+                except sqlalchemy.exc.IntegrityError as error:
+                    session.rollback()
+                    session.begin()
+                    update_prod = update(Product) \
+                        .where(Product.articul_product == product.get('articul_product')) \
+                        .where(Product.store_id == product.get('store_id')) \
+                        .values(product)
+                    session.execute(update_prod)
+                    count_error += 1
+                    # print(22222222222222, count_error)
+                finally:
+                    session.commit()
+
+            # os.abort()
+            count += 1
+
+        return 'Succes {}'.format(count)
+
+    elif data and change_base_price:
         for data_prod in data:
             product = {
                 'articul_product': str(data_prod.get("vendorCode")),
@@ -575,6 +638,7 @@ def import_product_from_wb(shop_name=None, company_id=None, uid_edit_user=None):
             count += 1
 
         return 'Succes {}'.format(count)
+
     else:
 
         return 'Some trouble import {} {}'.format(shop_name, company_id)

@@ -1,16 +1,14 @@
 import psycopg2
 #apt install python<version>-dev
 #pip install psycopg2-binary
+from project.creds import *
 
 def connect():
-    conn = psycopg2.connect(host='localhost',
-                            database='stm_app',
-                            user='user_name',
-                            password='user_pass')
-    # conn = psycopg2.connect(host='localhost',
-    #                         database='bots',
-    #                         user='user_bot',
-    #                         password='bot_pass')
+    conn = psycopg2.connect(host=db_host,
+                            database=db_name,
+                            user=db_user,
+                            password=db_pass)
+
     print("connect")
     return conn
 

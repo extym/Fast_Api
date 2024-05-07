@@ -428,6 +428,17 @@
                                     <div class="float-right ">
                                         <button type="submit" name="make" value="start_import" title="Запустить импорт товаров с маркетплейса. Задача будет выполнятся в фоне, текущую вкладку можно закрыть" class="btn btn-success" >Запустить импорт</button>
                                         <button class="btn" type="reset">  Очистить  </button>
+<!--                                        <div class="form-block">-->
+<!--                                            <input type="checkbox" class="iswitch iswitch-purple" name="change_base_price" >-->
+<!--                                        </div>-->
+                                    </div>
+
+                                    <div class="float-left" >
+                                        <div class="form-block">
+                                            <input type="checkbox" name="change_base_price"  class="iswitch iswitch-warning">
+                                            <label class="form-label" title="При включении этой функции базовая цена будет пересчитана на основе импортируемой цены и сохранена" for="edit_shop_name">Перезаписать базовые цены</label>
+
+                                        </div>
                                     </div>
                                 </div>
 
@@ -755,6 +766,9 @@
 <!-- END CONTENT -->
 
     <script src="../../static/assets/js/jquery-3.4.1.min.js" type="text/javascript"></script>
+
+    <link href="../../static/assets/plugins/ios-switch/css/switch.css" rel="stylesheet" type="text/css" media="screen"/>
+
 
 
 

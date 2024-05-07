@@ -118,44 +118,75 @@ test_data_prod = {
     'type_id': 95694
 }
 
-prod_lp = {"id": 580733565, "name": "Конфеты Raffaello миндаль и кокос, 500 г",
-           "offer_id": "LPКонфRaffaelloМинКок500г/1105", "barcode": "OZN1093790544", "buybox_price": "",
-           "category_id": 55459914, "created_at": "2023-07-23T16:21:53.415454Z",
+data_prod = {"id": 580733565,
+           "name": "Конфеты Raffaello миндаль и кокос, 500 г",
+           "offer_id": "LPКонфRaffaelloМинКок500г/1105",
+           "barcode": "OZN1093790544",
+           "buybox_price": "",
+           "category_id": 55459914,
+           "created_at": "2023-07-23T16:21:53.415454Z",
            "images": ["https://cdn1.ozone.ru/s3/multimedia-7/6710778619.jpg",
                       "https://cdn1.ozone.ru/s3/multimedia-1/6710778613.jpg",
                       "https://cdn1.ozone.ru/s3/multimedia-4/6710778616.jpg",
                       "https://cdn1.ozone.ru/s3/multimedia-x/6710778609.jpg",
-                      "https://cdn1.ozone.ru/s3/multimedia-2/6710778614.jpg"], "marketing_price": "2885.0000",
-           "min_ozon_price": "", "old_price": "8876.0000", "premium_price": "", "price": "2885.0000",
-           "recommended_price": "", "min_price": "2885.0000", "sources": [],
-           "stocks": {"coming": 0, "present": 0, "reserved": 0}, "errors": [], "vat": "0.0", "visible": True,
-           "visibility_details": {"has_price": True, "has_stock": False, "active_product": False},
-           "price_index": "0.00", "commissions": [
-        {"percent": 9.5, "min_value": 0, "value": 274.08, "sale_schema": "fbo", "delivery_amount": 0,
-         "return_amount": 0},
-        {"percent": 10.5, "min_value": 0, "value": 302.93, "sale_schema": "fbs", "delivery_amount": 0,
-         "return_amount": 0},
-        {"percent": 10.5, "min_value": 0, "value": 302.93, "sale_schema": "rfbs", "delivery_amount": 0,
-         "return_amount": 0},
-        {"percent": 10.5, "min_value": 0, "value": 302.93, "sale_schema": "fbp", "delivery_amount": 0,
-         "return_amount": 0}], "volume_weight": 2.1, "is_prepayment": False, "is_prepayment_allowed": True,
-           "images360": [], "color_image": "", "primary_image": "https://cdn1.ozone.ru/s3/multimedia-3/6710778615.jpg",
+                      "https://cdn1.ozone.ru/s3/multimedia-2/6710778614.jpg"],
+           "marketing_price": "2885.0000",
+           "min_ozon_price": "",
+           "old_price": "8876.0000",
+           "premium_price": "",
+           "price": "2885.0000",
+           "recommended_price": "",
+           "min_price": "2885.0000",
+           "sources": [],
+           "stocks": {"coming": 0, "present": 0, "reserved": 0},
+           "errors": [], "vat": "0.0", "visible": True,
+           "visibility_details": {"has_price": True,
+                                  "has_stock": False,
+                                  "active_product": False},
+           "price_index": "0.00",
+           "commissions": [
+               {"percent": 9.5, "min_value": 0, "value": 274.08, "sale_schema": "fbo", "delivery_amount": 0,
+                "return_amount": 0},
+               {"percent": 10.5, "min_value": 0, "value": 302.93, "sale_schema": "fbs", "delivery_amount": 0,
+                "return_amount": 0},
+               {"percent": 10.5, "min_value": 0, "value": 302.93, "sale_schema": "rfbs", "delivery_amount": 0,
+                "return_amount": 0},
+               {"percent": 10.5, "min_value": 0, "value": 302.93, "sale_schema": "fbp", "delivery_amount": 0,
+                "return_amount": 0}],
+           "volume_weight": 2.1,
+           "is_prepayment": False,
+           "is_prepayment_allowed": True,
+           "images360": [],
+           "color_image": "",
+           "primary_image": "https://cdn1.ozone.ru/s3/multimedia-3/6710778615.jpg",
            "status": {"state": "price_sent", "state_failed": "", "moderate_status": "approved", "decline_reasons": [],
                       "validation_state": "success", "state_name": "Готов к продаже",
                       "state_description": "Нет на складе", "is_failed": False, "is_created": True,
                       "state_tooltip": "Поставьте товар на склад Ozon или укажите его количество на своем складе",
-                      "item_errors": [], "state_updated_at": "2023-07-23T16:35:34.334347Z"}, "state": "",
-           "service_type": "IS_CODE_SERVICE", "fbo_sku": 0, "fbs_sku": 0, "currency_code": "RUB", "is_kgt": False,
-           "discounted_stocks": {"coming": 0, "present": 0, "reserved": 0}, "is_discounted": False,
-           "has_discounted_item": False, "barcodes": ["OZN1093790544"], "updated_at": "2024-01-26T12:10:15.667559Z",
-           "price_indexes": {"price_index": "NON_PROFIT",
-                             "external_index_data": {"minimal_price": "1975.0000", "minimal_price_currency": "RUB",
-                                                     "price_index_value": 1.32},
-                             "ozon_index_data": {"minimal_price": "3231.0000", "minimal_price_currency": "RUB",
-                                                 "price_index_value": 0.89},
-                             "self_marketplaces_index_data": {"minimal_price": "3747.0000",
-                                                              "minimal_price_currency": "RUB",
-                                                              "price_index_value": 0.77}},
+                      "item_errors": [], "state_updated_at": "2023-07-23T16:35:34.334347Z"},
+           "state": "",
+           "service_type": "IS_CODE_SERVICE",
+           "fbo_sku": 0,
+           "fbs_sku": 0,
+           "currency_code": "RUB",
+           "is_kgt": False,
+           "discounted_stocks": {"coming": 0, "present": 0, "reserved": 0},
+           "is_discounted": False,
+           "has_discounted_item": False,
+           "barcodes": ["OZN1093790544"],
+           "updated_at": "2024-01-26T12:10:15.667559Z",
+           "price_indexes":
+               {"price_index": "NON_PROFIT",
+                "external_index_data": {"minimal_price": "1975.0000",
+                                        "minimal_price_currency": "RUB",
+                                        "price_index_value": 1.32},
+                "ozon_index_data": {"minimal_price": "3231.0000",
+                                    "minimal_price_currency": "RUB",
+                                    "price_index_value": 0.89},
+                "self_marketplaces_index_data": {"minimal_price": "3747.0000",
+                                                 "minimal_price_currency": "RUB",
+                                                 "price_index_value": 0.77}
+                },
            "sku": 1093790547,
            "description_category_id": 17028773,
            "type_id": 96044}
@@ -262,7 +293,8 @@ prod_wb_photo = {'nmID': 225634469,
                                      {'id': 89008, 'name': 'Вес товара без упаковки (г)', 'value': 250},
                                      {'id': 126208, 'name': 'Срок годности', 'value': ['240']}],
                  'sizes': [{'chrtID': 357416295, 'techSize': '0', 'wbSize': '', 'skus': ['2039863176759']}],
-                 'createdAt': '2024-04-19T22:47:50.744639Z', 'updatedAt': '2024-04-19T22:50:54.412964Z'}
+                 'createdAt': '2024-04-19T22:47:50.744639Z',
+                 'updatedAt': '2024-04-19T22:50:54.412964Z'}
 
 
 # from datetime import datetime
@@ -291,44 +323,50 @@ def ping_oson(link):
     answer = requests.post(url=link, json=data)
     print(answer.text)
 
+
 # ping('https://samoesladkoe.i-bots.ru/api/on')
 # ping('http://localhost:3000/api/on')
 
+# old_price = data_prod.get("old_price").split('.')[0]
+# base_price = int(int(old_price) / 8)
+# print(base_price)
 
-('id', 4779)
-('old_price', None)
-('name_product', 'Набор из 4 банок напитков газированных Aziano по 350 мл (мохито, киви, апельсин, личи)')
-('status_in_shop', 'Продается')
-('type_id', 96778)
-('shop_name', 'ImportGoods')
-('discount', 0.0)
-('status_mp', 'enabled')
-('volume_weight', 2.0)
-('barcode', 'OZN1006343576')
-('store_id', '1179095')
-('description_product', None)
-('images_product', '{https://cdn1.ozone.ru/s3/multimedia-z/6644681639.jpg,https://cdn1.ozone.ru/s3/multimedia-y/6644681638.jpg,https://cdn1.ozone.ru/s3/multimedia-0/6644681640.jpg,https://cdn1.ozone.ru/s3/multimedia-v/6646032139.jpg,https://cdn1.ozone.ru/s3/multimedia-m/6646032130.jpg}')
-('shop_k_product', None)
-('cart_id', None)
-('quantity', 895)
-('photo', 'https://cdn1.ozone.ru/s3/multimedia-l/6646032129.jpg')
-('price_add_k', 0.0)
-('discount_shop_product', None)
-('brand', None)
-('reserved', None)
-('id_1c', '')
-('discount_mp_product', 0.0)
-('quantity_for_shop', None)
-('brand_id', None)
-('price_product_base', 0)
-('date_added', '2024-04-13 09:05:06')
-('set_shop_name', 'Набор из 4 банок напитков газированных Aziano по 350 мл (мохито, киви, апельсин, личи)')
-('description_product_add', None)
-('final_price', 721.0)
-('date_modifed', '2024-04-13 09:05:06')
-('external_sku', '1006343577')
-('uid_edit_user', 3)
-('articul_product', 'ССНаб4БанНапГазирAziano350млМохКивАпелЛич/205')
-('selected_mp', 'oson')
-('alias_prod_name', 'Набор из 4 банок напитков газированных Aziano по 350 мл (мохито, киви, апельсин, личи)')
-('description_category_id', '17028764')
+
+# ('id', 4779)
+# ('old_price', None)
+# ('name_product', 'Набор из 4 банок напитков газированных Aziano по 350 мл (мохито, киви, апельсин, личи)')
+# ('status_in_shop', 'Продается')
+# ('type_id', 96778)
+# ('shop_name', 'ImportGoods')
+# ('discount', 0.0)
+# ('status_mp', 'enabled')
+# ('volume_weight', 2.0)
+# ('barcode', 'OZN1006343576')
+# ('store_id', '1179095')
+# ('description_product', None)
+# ('images_product',
+#  '{https://cdn1.ozone.ru/s3/multimedia-z/6644681639.jpg,https://cdn1.ozone.ru/s3/multimedia-y/6644681638.jpg,https://cdn1.ozone.ru/s3/multimedia-0/6644681640.jpg,https://cdn1.ozone.ru/s3/multimedia-v/6646032139.jpg,https://cdn1.ozone.ru/s3/multimedia-m/6646032130.jpg}')
+# ('shop_k_product', None)
+# ('cart_id', None)
+# ('quantity', 895)
+# ('photo', 'https://cdn1.ozone.ru/s3/multimedia-l/6646032129.jpg')
+# ('price_add_k', 0.0)
+# ('discount_shop_product', None)
+# ('brand', None)
+# ('reserved', None)
+# ('id_1c', '')
+# ('discount_mp_product', 0.0)
+# ('quantity_for_shop', None)
+# ('brand_id', None)
+# ('price_product_base', 0)
+# ('date_added', '2024-04-13 09:05:06')
+# ('set_shop_name', 'Набор из 4 банок напитков газированных Aziano по 350 мл (мохито, киви, апельсин, личи)')
+# ('description_product_add', None)
+# ('final_price', 721.0)
+# ('date_modifed', '2024-04-13 09:05:06')
+# ('external_sku', '1006343577')
+# ('uid_edit_user', 3)
+# ('articul_product', 'ССНаб4БанНапГазирAziano350млМохКивАпелЛич/205')
+# ('selected_mp', 'oson')
+# ('alias_prod_name', 'Набор из 4 банок напитков газированных Aziano по 350 мл (мохито, киви, апельсин, личи)')
+# ('description_category_id', '17028764')

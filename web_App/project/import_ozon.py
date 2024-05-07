@@ -535,7 +535,7 @@ def get_product_info(product_id=None, offer_id=None, seller_data=None):
     return result
 
 
-def import_oson_data_prod(user_id=None, shop_name=None, company_id=None):
+def import_oson_data_prod(user_id=None, shop_name=None, company_id=None, update_base_price=None):
     # seller_id = db.session.execute(select(Marketplaces.seller_id)
     #                                .where(Marketplaces.shop_name == shop_name)).first()
     try:
@@ -551,14 +551,17 @@ def import_oson_data_prod(user_id=None, shop_name=None, company_id=None):
         count = 0
         for prod in current_products:
             data = get_product_info(prod.get("product_id"), prod.get("offer_id"), seller_data)
-            if data:
+            # print("ALL_DATA", data)
+            if data and update_base_price is None:
                 data_prod = data.get('result')
+                offer_id = data_prod.get("offer_id")
+                if offer_id.isdigit():
+                    offer_id = "AAA" + offer_id
                 product = {
-                    'articul_product': "00" + str(data_prod.get("offer_id")),
+                    'articul_product': offer_id,
                     'shop_name': shop_name,  # data_prod.get(""),
                     'store_id': seller_data[0],
                     'quantity': data_prod.get("stocks").get('present'),
-                    'price_product_base': '0',
                     'discount': 0.0,
                     'description_product': data_prod.get(""),
                     'photo': data_prod.get("primary_image"),
@@ -577,6 +580,69 @@ def import_oson_data_prod(user_id=None, shop_name=None, company_id=None):
                     'status_in_shop': data_prod.get("status").get("state_name"),
                     'uid_edit_user': uid_edit_user,
                     'final_price': data_prod.get('price'),
+                    'description_category_id': data_prod.get("description_category_id"),
+                    'volume_weight': data_prod.get("volume_weight"),
+                    'type_id': data_prod.get("type_id"),
+                    'barcode': data_prod.get("barcode")
+                }
+
+                count_error = 0
+                with Session(engine) as session:
+                    session.begin()
+                    smth = insert(Product).values(product)
+                    try:
+                        session.execute(smth)
+                        time.sleep(0.1)
+                        count += 1
+                        # print(555555555555)
+                    except sqlalchemy.exc.IntegrityError as error:
+                        session.rollback()
+                        session.begin()
+                        update_prod = update(Product).where(Product.articul_product == product.get('articul_product')) \
+                            .where(Product.store_id == product.get('store_id')) \
+                            .values(product)
+                        session.execute(update_prod)
+                        count_error += 1
+                        # print(22222222222222, count_error)
+                    finally:
+                        session.commit()
+
+                # os.abort()
+                count += 1
+
+            elif data and update_base_price == 'on':
+                data_prod = data.get('result')
+                offer_id = data_prod.get("offer_id")
+                old_price = data_prod.get("old_price").split('.')[0]
+                base_price = int(int(old_price) / 8)
+                print(old_price, base_price, offer_id)
+                if offer_id.isdigit():
+                    offer_id = "AAA" + offer_id
+                product = {
+                    'articul_product': offer_id,
+                    'shop_name': shop_name,  # data_prod.get(""),
+                    'store_id': seller_data[0],
+                    'quantity': data_prod.get("stocks").get('present'),
+                    'price_product_base': base_price,
+                    'final_price': data_prod.get('price'),
+                    'old_price': old_price,
+                    'discount': 0.0,
+                    'description_product': data_prod.get(""),
+                    'photo': data_prod.get("primary_image"),
+                    'id_1c': "",
+                    'date_added': time_now,
+                    'date_modifed': time_now,
+                    'selected_mp': 'oson',
+                    'name_product': data_prod.get("name"),
+                    'status_mp': 'enabled',
+                    'images_product': data_prod.get("images"),
+                    'price_add_k': 0.0,
+                    'discount_mp_product': 0.0,
+                    'set_shop_name': data_prod.get("name"),
+                    'external_sku': data_prod.get("sku"),
+                    'alias_prod_name': data_prod.get("name"),
+                    'status_in_shop': data_prod.get("status").get("state_name"),
+                    'uid_edit_user': uid_edit_user,
                     'description_category_id': data_prod.get("description_category_id"),
                     'volume_weight': data_prod.get("volume_weight"),
                     'type_id': data_prod.get("type_id"),

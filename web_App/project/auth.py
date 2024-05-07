@@ -447,10 +447,12 @@ def import_settings_post():
     if make == 'start_import':
         mp = data.get('import_mp_name')
         shop_name = data.get('import_shop_names')
+        change_base_price = data.get('change_base_price')
         if mp == 'ozon':
             job = q.enqueue_call(import_oson_data_prod(user_id=uid,
                                                        shop_name=shop_name,
-                                                       company_id=company_id))
+                                                       company_id=company_id,
+                                                       update_base_price=change_base_price))
             print(777777777777, job.get_id)
         elif mp == 'wb':
             job = q.enqueue_call(wb.import_product_from_wb(uid_edit_user=uid,
@@ -744,7 +746,7 @@ def edit_product_post():
             name_product=data.get('name_product', '0'),
             status_mp=data.get('status_mp', '0'),
             images_product=data.get('image_product', '0'),
-            price_product_base=int(data.get('price_product_base', '0')) * 100,
+            price_product_base=int(data.get('price_product_base', '0')),
             price_add_k=data.get('price_add_k', '1'),
             discount_mp_product=data.get('discount_mp_product', '0'),
             quantity=data.get('quantity', '0'),
@@ -818,7 +820,7 @@ def add_product_post():
     # print('/add_product', *data, sep=', \n')
     shop_k_product = data.get('shop_k_product', 1)
     shop_name = data.get('set_shop_name', '0')
-    price_product_base = int(data.get('price_product_base', '0')) * 100
+    price_product_base = int(data.get('price_product_base', '0'))
     prod_set = Product(
         uid_edit_user=current_user.id,
         selected_mp=data.get('select_mp', '0'),
