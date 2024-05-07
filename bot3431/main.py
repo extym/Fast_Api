@@ -266,6 +266,8 @@ async def check_is_exist_message_answer_v2(msg_id, chat_id):
     return compare, first_answer, rewrite_lead
 
 
+# print(asyncio.run(check_is_exist_message_answer_v2('ad6c351403976b0f6175b81965221000', 'u2i-PalCq8X5aU0iwwKcwfUAqQ' )))
+
 #
 # def make_lead(data):
 #     creds = get_creds()

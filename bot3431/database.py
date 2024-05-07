@@ -6,3 +6,4 @@ from  cred import *
 
 engine = create_engine(f"postgresql+psycopg2://{db_user}:{db_pass}@{db_host}/{db_name}")
 
+

@@ -210,7 +210,9 @@ def create_resp_is_exist(oem=None, brand=None, qnt=0, external_id=None):
 
 
 
-send_current_basket_to_order()
+
+
+# send_current_basket_to_order()
 
 # create_resp_is_exist(brand="STELLOX", oem="42140459SX", qnt=2, external_id=451642783)
 # get_current_client_smth(basket)

@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import schedule
+from connect import *
 import time
 from cred import *
 import requests
@@ -53,48 +54,6 @@ def get_rfc_2822():
     nowdt = utils.format_datetime(datetime.datetime.now())
 
     return nowdt
-
-
-# amo_connnect_answer = {"account_id":"d2914d60-a44a-4625-881b-d9e237592dce",
-#                        "scope_id":"8bf871d6-fc08-49e0-aac7-d5241c3542ea_d2914d60-a44a-4625-881b-d9e237592dce",
-#                        "title":"ChatIntegration","hook_api_version":"v2","is_time_window_disabled":false}
-#
-channel_key = 'c77c73cb95dae182f221fc8786866875c968a2c2'
-
-
-# scope_id = "8bf871d6-fc08-49e0-aac7-d5241c3542ea_d2914d60-a44a-4625-881b-d9e237592dce"
-
-
-#
-#  POST https://amojo.amocrm.ru/v2/origin/custom/8bf871d6-fc08-49e0-aac7-d5241c3542ea_d2914d60-a44a-4625-881b-d9e237592dce
-# Date: Fri, 08 Sep 2023 16:36:19 +0200
-# Content-Type: application/json
-# Content-MD5: a5e8ae04332a6d0aac15f01ad05d40e3
-# X-Signature: 0b7eb4f0a5be5111a074e68476042c1ad127ffe6
-# def json_default(thing):
-#     try:
-#         return dataclasses.asdict(thing)
-#     except TypeError:
-#         pass
-#     if isinstance(thing, datetime.datetime):
-#         return thing.isoformat(timespec='microseconds')
-#     raise TypeError(f"object of type {type(thing).__name__} not serializable")
-#
-#
-# def json_dumps(thing):
-#     return json.dumps(
-#         thing,
-#         default=json_default,
-#         ensure_ascii=False,
-#         sort_keys=True,
-#         indent=None,
-#         separators=(',', ':'),
-#     )
-#
-#
-# def get_hash(thing):
-#     return hashlib.md5(json_dumps(thing).encode('utf-8')).digest()
-#
 
 
 def read_link(chat_id):
@@ -1123,7 +1082,8 @@ async def rewrite_leads_v2(chat_id, user_id):  # (leads_id, price, string):
         # logging.info('try_rewrite_lead_v2_{} {} {} {} {} {}'.
         #              format(answer.status_code, user_id, chat_id, leads_id, data, url))
         if answer.ok:
-            await re_write_link_v3(chat_id, leads_id, contact_id)
+            # await re_write_link_v3(chat_id, leads_id, contact_id)
+            await execute_query_v3(query_update_contact_id,(chat_id, leads_id, contact_id))
             logging.info('ALL_RIDE_rewrite_lead_v2 {} {} {} {} {} {} {}'.
                          format(answer.status_code, user_id, chat_id, leads_id, data, url, contact_id))
         else:

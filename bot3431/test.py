@@ -307,6 +307,10 @@ chat_info_from_avito = {
     }
 }
 
+proxy = ("u2i-TOYzRVLyb9Hw_l7u2aBTVg", '4391', "https://avito.ru/sankt-peterburg/zapchasti_i_aksessuary/trw_df4110_torm.disk_per.vent.280x24_4_otv_3364311913",
+         'e737d71dcddc238d5a1db962f3fb6db9', 353207078, "TRW DF4110 Торм.диск пер.вент.280x24 4 отв",
+         True, False, 0, 0)
+
 webhook_avito_meddage = {
     'id': '97d14aac-97ac-40de-9220-4e6bdea78c5d',
     'version': 'v3.0.0',
@@ -1643,7 +1647,7 @@ ps_create_basket_answer = {
         "max_delivery_day":3,
         "comment":"451642783"}}
 
-FINAL_result = {"result":"ok","data":[{"id":76395,"oem":"42140459SX","make_name":"STELLOX","detail_name":"амортизатор передний газовый!\\ BMW E39 2.0-3.0/2.5TD/3.0D 95\u003e","cost":3762.0,"qnt":2,"qnt_confirmed":0,"qnt_accept":null,"qnt_income":null,"status":"Ожидает оплаты","status_code":"processing","comment":"451642783","created_at":"2024-05-02T16:37:34.832+03:00","order_id":62821,"status_logs":[{"status_code":"processing","status_name":"Ожидает оплаты","created_at":"2024-05-02T16:37:35.074+03:00"}]}]}
+FINAL_result = {"result":"ok","data":[{"id":76395,"oem":"42140459SX","make_name":"STELLOX","detail_name":"амортизатор передний газовый!\\ BMW E39 2.0-3.0/2.5TD/3.0D 95\u003e","cost":3762.0,"qnt":2,"qnt_confirmed":0,"qnt_accept":None,"qnt_income":None,"status":"Ожидает оплаты","status_code":"processing","comment":"451642783","created_at":"2024-05-02T16:37:34.832+03:00","order_id":62821,"status_logs":[{"status_code":"processing","status_name":"Ожидает оплаты","created_at":"2024-05-02T16:37:35.074+03:00"}]}]}
 
 
 # print(len(one) + len(two), len(tree))
@@ -1665,3 +1669,5 @@ def ran_input(n, m):
     print(line, length, num, char)
 
 # ran_input(15, 15)
+
+

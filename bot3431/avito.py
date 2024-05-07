@@ -13,7 +13,7 @@ from amo import make_message_for_amo_v2, rewrite_leads_v2, user_link
 import urllib.parse
 import hashlib
 from email import utils
-import hmac
+from connect import *
 import logging
 import os
 from bot_tg import send_get
@@ -603,18 +603,29 @@ async def get_avito_current_chat_v2(hook, check):
         except Exception as err:
             print("FUCK UP get_avito_price_string_chat {}".format(err))
 
-        proxy = {chat_id:
-                     (price,
-                      target_link,
-                      msg_id,
-                      user_id,
-                      title,
-                      first_answer,
-                      rewrite_lead,
-                      leads_id,
-                      contact_id)
-                 }
-        await wrote_link_v2(proxy)
+        # proxy = {chat_id:
+        #              (price,
+        #               target_link,
+        #               msg_id,
+        #               user_id,
+        #               title,
+        #               first_answer,
+        #               rewrite_lead,
+        #               leads_id,
+        #               contact_id)
+        # }
+        # await wrote_link_v2(proxy)
+        proxy = (chat_id,
+                 price,
+                 target_link,
+                 msg_id,
+                 user_id,
+                 title,
+                 first_answer,
+                 rewrite_lead,
+                 leads_id,
+                 contact_id)
+        await execute_query(query_write_bid, proxy)
         logging.info('WROTE_DATA_FOR___33 {}'.format(proxy))
         await rewrite_leads_v2(chat_id, user_id)
         # logging.info('TRY_REWRITE_DATA_TO_AMO_1 {} {} {} {} '.
@@ -736,8 +747,6 @@ heck = {'id': 'd8e51513-9229-4497-94c6-69dc65ffedab', 'version': 'v3.0.0',
                 'chat_id': 'u2i-YvRiaEtf8Qn~N4sh3mMKkA',
                 'user_id': 369223108, 'author_id': 459734245, 'created': 1706865998, 'type': 'text', 'chat_type': 'u2i',
                 'content': {'text': 'планируется поставка?'}, 'item_id': 4098549657}}}
-
-
 
 # get_avito_token(357717666)
 # # # get_vito_current_chat('u2i-plZ1VOkef3W2z8rMnrNHDg')
