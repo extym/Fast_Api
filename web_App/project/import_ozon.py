@@ -538,6 +538,7 @@ def get_product_info(product_id=None, offer_id=None, seller_data=None):
 def import_oson_data_prod(user_id=None, shop_name=None, company_id=None, update_base_price=None):
     # seller_id = db.session.execute(select(Marketplaces.seller_id)
     #                                .where(Marketplaces.shop_name == shop_name)).first()
+    count = 0
     try:
         seller_data = db.session \
             .execute(select(Marketplaces.seller_id, Marketplaces.key_mp)
@@ -548,7 +549,6 @@ def import_oson_data_prod(user_id=None, shop_name=None, company_id=None, update_
 
         time_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         uid_edit_user = user_id
-        count = 0
         for prod in current_products:
             data = get_product_info(prod.get("product_id"), prod.get("offer_id"), seller_data)
             # print("ALL_DATA", data)
@@ -568,7 +568,7 @@ def import_oson_data_prod(user_id=None, shop_name=None, company_id=None, update_
                     'id_1c': "",
                     'date_added': time_now,
                     'date_modifed': time_now,
-                    'selected_mp': 'oson',
+                    'selected_mp': 'ozon',
                     'name_product': data_prod.get("name"),
                     'status_mp': 'enabled',
                     'images_product': data_prod.get("images"),
@@ -632,7 +632,7 @@ def import_oson_data_prod(user_id=None, shop_name=None, company_id=None, update_
                     'id_1c': "",
                     'date_added': time_now,
                     'date_modifed': time_now,
-                    'selected_mp': 'oson',
+                    'selected_mp': 'ozon',
                     'name_product': data_prod.get("name"),
                     'status_mp': 'enabled',
                     'images_product': data_prod.get("images"),
@@ -828,24 +828,6 @@ def make_internal_import_oson(donor=None, recipient=None, k=1,
 # print(make_internal_import_oson(donor='ImportGoods', recipient='Ф-фторник'))
 
 
-def make_send_price_data(data, seller_id=None, headers=None):
-    # metod = 'https://api-seller.ozon.ru/v1/product/import/prices'
-    prices, proxy = [], {}
-    for row in data:
-        proxy.clear()
-        proxy = {
-            # "auto_action_enabled": "UNKNOWN",
-            "currency_code": "RUB",
-            "min_price": price,
-            "offer_id": row.get("offer_id"),
-            "old_price": "0",
-            "price": price,
-            "price_strategy_enabled": "UNKNOWN",
-            "product_id": 1386
-        }
-        prices.append(proxy)
-
-    return prices
 
 # def product_info_price(id_mp, seller_id):  # product_id, offer_id
 #     # url = 'https://api-seller.ozon.ru/v4/product/info/prices'

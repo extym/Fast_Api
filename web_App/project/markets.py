@@ -14,7 +14,7 @@ O3ON_headers = {
 
 
 def get_smth_from(market, metod, token=None, host=''):
-    if market == 'oson':
+    if market == 'ozon':
         host = 'https://api-seller.ozon.ru'
         headers = O3ON_headers
 
@@ -26,7 +26,7 @@ def get_smth_from(market, metod, token=None, host=''):
 
 def post_smth_to(market, metod, data, token):
     headers, link = None, None
-    if market == 'oson':
+    if market == 'ozon':
         host = 'https://api-seller.ozon.ru'
         headers = O3ON_headers
 

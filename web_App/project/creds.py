@@ -20,3 +20,12 @@ db_name = 'stm_app'
 
 
 link = 'http://stm-data.i-bots.ru/data_json.json'
+
+
+# OfficeUser1
+#
+# Email
+# ekaterinagrotter @ gmail.com
+#
+# Пароль
+# 02f!cEU8e4

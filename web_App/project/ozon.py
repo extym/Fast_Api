@@ -26,7 +26,6 @@ last_id = 'custom_last_id'
 
 metod_get_list_products = '/v2/product/list'
 get_wh_list = '/v1/warehouse/list'
-metod_get_new_orders = ''
 
 
 def write_json_skus(smth_json):
@@ -83,13 +82,6 @@ def post_get_smth(metod):
         return [], [], 0
 
 
-# post_get_smth(metod_get_list_products)
-
-
-# wh = ['OZ.RFBSнашсклДЛ', 'OZ.RFBSНашсклСДЭК', 'OZ.НашадостМиМО',
-#       'OZ.ОктКГnew', 'OZ.ОснКурьер', 'OZ.ДостКГ']
-
-
 def get_product_info(product_id, offer_id):
     metod = '/v2/product/info'
     link = host + metod
@@ -135,6 +127,32 @@ def create_data_stocks():
 
     print('create_data_stocks_onon_x100', len(result))
     return result
+
+
+def send_stocks_on():
+    pre_data = create_data_stocks()
+    metod = '/v2/products/stocks'
+    link = host + metod
+    proxy = []
+    for row in pre_data:
+        data = {'stocks': row}
+        # print('SEND_DATA', data)
+        response = requests.post(link, headers=headers, json=data)
+        answer = response.json()
+        ans = response.text
+        print('answer send_stocks_on', ans)
+        result = answer.get("result")
+        if result:
+            for row in result:
+                if len(row[
+                           "errors"]) > 0:  # and row['warehouse_id'] != 23012928587000: #TODO temporary 'warehouse_id': 23012928587000
+                    print('ERROR from send_stocks_ozon', row)
+                elif row['updated'] == False:
+                    print('ERROR update from send_stocks_ozon', row)
+                elif row['updated'] == True:  # and row['warehouse_id'] != 23012928587000:
+                    print('SUCCES update from send_stocks_on', row)
+            proxy.append(answer)
+        sleep(1)
 
 
 def create_data_stocks_from_db(seller_id=None, is_stocks_null=False):
@@ -192,49 +210,86 @@ def create_data_stocks_from_db(seller_id=None, is_stocks_null=False):
     return result
 
 
-# asyncio.run(create_data_stocks())
-# create_data_stocks_from_db(seller_id="1278621", is_stocks_null=True)
+def create_data_price_for_send(seller_id=None, from_db=True):
+    result = []
+    prices = []
+    if from_db:
+        with Session(engine) as session:
+            data = session.query(Product) \
+                .where(Product.quantity > 0) \
+                .where(Product.store_id == seller_id) \
+                .all()
+            # key = session.execute(select(Marketplaces.key_mp)
+            #                       .where(Marketplaces.seller_id == seller_id))\
+            #     .first()
+
+            for product in data:
+                proxy.clear()
+                proxy = {
+                    "auto_action_enabled": "UNKNOWN",
+                    "currency_code": "RUB",
+                    "min_price": product.price,
+                    "offer_id": product.articul_product,
+                    "old_price": product.old_price,
+                    "price": product.final_price,
+                    "price_strategy_enabled": "UNKNOWN",
+                    "product_id": product.external_sku
+                }
+
+    else:
+        #get prices from oson
+        print("From_db_false")
+
+    while len(prices) >= 1000:
+        result.append(prices[:1000])
+        del prices[:1000]
+    else:
+        result.append(prices)
+
+    print('create_data_prices_oson_x1000', len(result))
+    return result
 
 
-# def read_skus():
-#     try:
-#         with open('/var/www/html/stm/onon_skus.json', 'r') as file:
-#             items_skus = json.load(file)
-#     except:
-#         with open('onon_skus.json', 'r') as file:
-#             items_skus = json.load(file)
-#
-#     print('items_skus', len(items_skus), type(items_skus))
-#     return items_skus
+def create_data_price_for_send_v2(key_recipient=None, donor=None,
+                                          recipient=None, from_db=True):
+    result = []
+    prices = []
+    if from_db:
+        with Session(engine) as session:
+            data = session.query(Product) \
+                .where(Product.final_price > 0) \
+                .where(Product.store_id == donor) \
+                .all()
+            koef = session.execute(select(InternalImport.internal_import_markup_1)
+                                  .where(InternalImport.internal_import_store_1 == donor) \
+                                  .where(InternalImport.internal_import_store_2 == recipient)) \
+                    .first()
 
+            for product in data:
+                proxy.clear()
+                proxy = {
+                    "auto_action_enabled": "UNKNOWN",
+                    "currency_code": "RUB",
+                    "min_price": product.price,
+                    "offer_id": product.articul_product,
+                    "old_price": product.old_price,
+                    "price": product.final_price,
+                    "price_strategy_enabled": "UNKNOWN",
+                    "product_id": product.external_sku
+                }
 
-#
-# read_skus()
+    else:
+        #get prices from oson
+        print("From_db_false")
 
-def send_stocks_on():
-    pre_data = create_data_stocks()
-    metod = '/v2/products/stocks'
-    link = host + metod
-    proxy = []
-    for row in pre_data:
-        data = {'stocks': row}
-        # print('SEND_DATA', data)
-        response = requests.post(link, headers=headers, json=data)
-        answer = response.json()
-        ans = response.text
-        print('answer send_stocks_on', ans)
-        result = answer.get("result")
-        if result:
-            for row in result:
-                if len(row[
-                           "errors"]) > 0:  # and row['warehouse_id'] != 23012928587000: #TODO temporary 'warehouse_id': 23012928587000
-                    print('ERROR from send_stocks_ozon', row)
-                elif row['updated'] == False:
-                    print('ERROR update from send_stocks_ozon', row)
-                elif row['updated'] == True:  # and row['warehouse_id'] != 23012928587000:
-                    print('SUCCES update from send_stocks_on', row)
-            proxy.append(answer)
-        sleep(1)
+    while len(prices) >= 1000:
+        result.append(prices[:1000])
+        del prices[:1000]
+    else:
+        result.append(prices)
+
+    print('create_data_prices_oson_x1000', len(result))
+    return result
 
 
 def send_stocks_oson_v2(key=None, seller_id=None, is_stocks_null=False):
@@ -256,54 +311,84 @@ def send_stocks_oson_v2(key=None, seller_id=None, is_stocks_null=False):
             result = answer.get("result")
             if result:
                 for row in result:
-                    if len(row[
-                               "errors"]) > 0:  # and row['warehouse_id'] != 23012928587000: #TODO temporary 'warehouse_id': 23012928587000
+                    if len(row["errors"]) > 0:
                         print('ERROR from send_stocks_ozon', row)
                     elif row['updated'] == False:
                         print('ERROR update from send_stocks_ozon', row)
-                    elif row['updated'] == True:  # and row['warehouse_id'] != 23012928587000:
-                        print('SUCCES update from send_stocks_on', row)
+                    # elif row['updated'] == True:
+                    #     print('SUCCES update from send_stocks_on', row)
                 proxy.append(answer)
-            sleep(1)
+            sleep(0.7)
         else:
             ans = response.text
             print('answer send_stocks_on', ans)
+            sleep(0.7)
 
 
-# send_stocks_on()
-
-def product_info_price(id_mp, seller_id):  # product_id, offer_id
-    # url = 'https://api-seller.ozon.ru/v4/product/info/prices'
-    # data = {"filter": {
-    #             "offer_id": [offer_id],
-    #             "product_id": [str(product_id)],
-    #             "visibility": "ALL"
-    #         },
-    #         "last_id": "",
-    #         "limit": 100}
-    api_key = db.session.execute(select(Marketplaces.key_mp)
-                                 .where(Marketplaces.seller_id == seller_id))
-    print(api_key, type(api_key))
+def send_stocks_oson_v3(key_recipient=None, donor=None, recipient=None):
+    pre_data = create_data_stocks_from_db(seller_id=donor,
+                                          is_stocks_null=False)
     headers = {
-        'Client-Id': seller_id,
-        'Api-Key': api_key,
+        'Client-Id': recipient,
+        'Api-Key': key_recipient,
         'Content-Type': 'application/json'
     }
-    url = 'https://api-seller.ozon.ru/v3/posting/fbs/get'
-    data = {
-        "posting_number": id_mp,
-        "with": {
-            "analytics_data": False,
-            "barcodes": False,
-            "financial_data": False,
-            "product_exemplars": False,
-            "translit": False}}
-    # resp = requests.post(url=url, headers=headers, json=data)
-    # result = resp.json()
-    # print('product_id_offer_id', result)
-    # # price = result.get("result")["items"][0]["price"]["marketing_price"][:-2]
-    # order = result.get("result")
-    # return order
+    metod = '/v2/products/stocks'
+    link = host + metod
+    proxy = []
+    for row in pre_data:
+        data = {'stocks': row}
+        # os.abort()
+        response = requests.post(link, headers=headers, json=data)
+        if answer.ok:
+            answer = response.json()
+            result = answer.get("result")
+            if result:
+                for row in result:
+                    if len(row["errors"]) > 0:
+                        print('ERROR from send_stocks_ozon', row)
+                    # elif row['updated'] == False:
+                    #     print('ERROR update from send_stocks_ozon', row)
+                    # elif row['updated'] == True:
+                    #     print('SUCCES update from send_stocks_on', row)
+                proxy.append(answer)
+            sleep(0.7)
+        else:
+            ans = response.text
+            print('answer send_stocks_on', ans)
+            sleep(0.7)
+
+
+def send_product_price(key_recipient=None, recipient=None):
+    metod = 'https://api-seller.ozon.ru/v1/product/import/prices'
+    #   "limit": 1000
+    headers = {
+        'Client-Id': recipient,
+        'Api-Key': key_recipient,
+        'Content-Type': 'application/json'
+    }
+    data = create_data_price_for_send(seller_id=recipient, from_db=True)
+    count, errors = 0, 0
+    for row in data:
+        send_data = {"prices": row}
+        resp = requests.post(url=metod, headers=headers, json=send_data)
+        if resp.ok:
+            result = resp.json()
+            for line in result:
+                if not line.get('updated'):
+                    errors +=1
+                    print('product_NOT_UPDATED_offer_id {} {}'
+                          .format(line.get('offer_id'), recipient))
+                else:
+                    count += 1
+
+        else:
+            print('Some_trouble_from_export_price_oson {} {}'
+                  .format(recipient, resp.text))
+
+    return count, errors
+
+
 
 # get_product_info(38010832, "OWLT190601")
 # with app.app_context():
@@ -318,3 +403,6 @@ def product_info_price(id_mp, seller_id):  # product_id, offer_id
 # # pr = [{'id': 'MP1703473-001', 'pickup': {'deliveryServiceId': 123600, 'deliveryServiceName': 'Леруа Мерлен сервис доставки', 'warehouseId': '1200', 'timeInterval': 'Invalid Interval', 'pickupDate': '2022-12-14'}, 'products': [{'lmId': '90115665', 'vendorCode': 'BT2834B', 'price': 5860, 'qty': 3, 'comissionRate': 0}, {'lmId': '90121362', 'vendorCode': 'HPUV65ELC', 'price': 5860, 'qty': 3, 'comissionRate': 0}], 'deliveryCost': 0, 'parcelPrice': 5860, 'creationDate': '2022-12-14', 'promisedDeliveryDate': '2022-12-22', 'calculatedWeight': 4.8, 'calculatedLength': 707, 'calculatedHeight': 156, 'calculatedWidth': 686}, {'id': 'MP1703472-001', 'pickup': {'deliveryServiceId': 123600, 'deliveryServiceName': 'Леруа Мерлен сервис доставки', 'warehouseId': '1200', 'timeInterval': 'Invalid Interval', 'pickupDate': '2022-12-14'}, 'products': [{'lmId': '90115665', 'vendorCode': 'BT2834B', 'price': 5860, 'qty': 3, 'comissionRate': 0}, {'lmId': '90121362', 'vendorCode': 'HPUV65ELC', 'price': 5860, 'qty': 3, 'comissionRate': 0}], 'deliveryCost': 0, 'parcelPrice': 5860, 'creationDate': '2022-12-14', 'promisedDeliveryDate': '2022-12-22', 'calculatedWeight': 4.8, 'calculatedLength': 707, 'calculatedHeight': 156, 'calculatedWidth': 686}, {'id': 'MP1703471-001', 'pickup': {'deliveryServiceId': 123600, 'deliveryServiceName': 'Леруа Мерлен сервис доставки', 'warehouseId': '1200', 'timeInterval': 'Invalid Interval', 'pickupDate': '2022-12-14'}, 'products': [{'lmId': '90115665', 'vendorCode': 'BT2834B', 'price': 5860, 'qty': 3, 'comissionRate': 0}, {'lmId': '90121362', 'vendorCode': 'HPUV65ELC', 'price': 5860, 'qty': 3, 'comissionRate': 0}], 'deliveryCost': 0, 'parcelPrice': 5860, 'creationDate': '2022-12-14', 'promisedDeliveryDate': '2022-12-22', 'calculatedWeight': 4.8, 'calculatedLength': 707, 'calculatedHeight': 156, 'calculatedWidth': 686}]
 # pr = {'message_type': 'TYPE_NEW_POSTING', 'seller_id': 90963, 'warehouse_id': 1020000075732000, 'posting_number': '13223249-0059-1', 'in_process_at': '2023-03-18T03:56:36Z', 'products': [{'sku': 789880982, 'quantity': 1}]}
 # convert(pr)
+
+# asyncio.run(create_data_stocks())
+# create_data_stocks_from_db(seller_id="1278621", is_stocks_null=True)

@@ -21,13 +21,13 @@ from werkzeug.utils import secure_filename
 import project.wb as wb
 from project.import_ozon import import_oson_data_prod, make_internal_import_oson
 from project.worker import conn
-from project import  TEST_MODE, PHOTO_UPLOAD_FOLDER, engine
+from project import TEST_MODE, PHOTO_UPLOAD_FOLDER, engine, ozon
 from .database import Data_base_connect as Db
 from .models import *
 from . import db
 from apscheduler.schedulers.background import BackgroundScheduler
 
-from .ozon import send_stocks_oson_v2
+from .ozon import send_stocks_oson_v2, send_stocks_oson_v3
 
 import logging
 
@@ -48,11 +48,13 @@ def back_shops_tasks():
         markets = session.query(Marketplaces) \
             .filter(or_(Marketplaces.check_send_null == True,
                         Marketplaces.check_send_stocks == True,
-                        Marketplaces.check_enable_submit == True)) \
+                        Marketplaces.check_enable_submit == True,
+                        Marketplaces.enable_sync_stocks == True,
+                        Marketplaces.enable_sync_price == True)) \
             .all()
     for row in markets:
         if row.check_send_stocks and row.check_send_null:
-            if row.name_mp == 'oson':
+            if row.name_mp == 'ozon':
                 send_stocks_oson_v2(key=row.key_mp,
                                     seller_id=row.seller_id,
                                     is_stocks_null=True)
@@ -61,7 +63,7 @@ def back_shops_tasks():
                                      seller_id=row.seller_id,
                                      is_stocks_null=True)
         elif row.check_send_stocks and not row.check_send_null:
-            if row.name_mp == 'oson':
+            if row.name_mp == 'ozon':
                 send_stocks_oson_v2(key=row.key_mp,
                                     seller_id=row.seller_id,
                                     is_stocks_null=False)
@@ -71,14 +73,39 @@ def back_shops_tasks():
                                      is_stocks_null=False)
 
         if row.check_enable_submit:
-            if row.name_mp == 'oson':
+            if row.name_mp == 'ozon':
                 # get_stocks_oson_v2(key=row.key_mp,
                 #                     seller_id=row.seller_id,
                 #                     is_stocks_null=False)
+                # TODO
                 pass
-            if row.name_mp == 'wb':
+            elif row.name_mp == 'wb':
                 wb.processing_orders_wb_v2(key=row.key_mp,
                                            shop_name=row.shop_name)
+
+        if row.enable_sync_stocks:
+            ii_raw = session.query(InternalImport) \
+                .where(InternalImport.internal_import_store_1 == row.shop_name) \
+                .where(InternalImport.internal_import_role_1 == 'donor').all()
+            print(78877, ii_raw)
+            if row.name_mp == 'ozon':
+                ozon.send_stocks_oson_v3()
+            if row.name_mp == 'wb':
+                pass
+
+        if row.enable_sync_price:
+            ii_raw = session.query(InternalImport) \
+                .where(InternalImport.internal_import_store_1 == row.shop_name) \
+                .where(InternalImport.internal_import_role_1 == 'donor').all()
+            print(78888, ii_raw)
+            if row.name_mp == 'ozon':
+                # TODO Is need send price from donor or db ?
+                seller_id = row.seller_id
+                key_mp = row.key_mp
+                ozon.send_product_price(seller_id=seller_id, key_recipient=key_mp)
+
+            if row.name_mp == 'wb':
+                pass
 
     print(777, markets)
 
@@ -490,7 +517,7 @@ def import_settings_post():
             flash("Проверьте, пожалуйста, корректность вводимых данных", 'error')
             return redirect('/import_settings')
 
-    elif make == 'start_internal_import':
+    elif make == 'start__import_product': # TODO remake to 'start_internal_import_product'
         internal_import_mp_1 = data.get('internal_import_mp_1')
         internal_import_store_1 = data.get('internal_import_store_1')
         internal_import_role_1 = data.get('internal_import_role_1')
@@ -520,6 +547,12 @@ def import_settings_post():
                                                            recipient_mp=recipient_mp))
             print(989898989, job.get_id)
         # print(*data.items(), sep='\n')
+
+    elif make == 'start_internal_import_price':
+        print('!!!!!!start_internal_import_price!!!!!11')
+
+    elif make == 'check_settings':
+        print('!!!!!!check_settings!!!!!11')
 
     return redirect('/import_settings')
 
@@ -947,7 +980,9 @@ def shops():
             for row in markets:
                 current_work = {'check_send_null': False,
                                 'check_send_stocks': False,
-                                'check_enable_submit': False}
+                                'check_enable_submit': False,
+                                'enable_sync_price': False,
+                                'enable_sync_stocks': False}
                 if row.shop_name in proxy_settings.keys():
                     current = {i: True for i in proxy_settings[row.shop_name]}
                     current_work.update(current)
@@ -962,7 +997,7 @@ def shops():
 
             if len(data.keys()) > 0:
                 current_job = scheduler.add_job(back_shops_tasks, id='shops_back',
-                                                trigger='interval', minutes=15)
+                                                trigger='interval', minutes=60)
                 scheduler.start()
                 print(100000000, current_job)
                 print(111000, len(data.keys()))
@@ -985,21 +1020,13 @@ def shops():
             rows = ''
 
             raw_list_shops = db.session.query(Marketplaces) \
-                .filter_by(company_id=current_user.company_id).order_by(Marketplaces.seller_id.asc()).all()
+                        .filter_by(company_id=current_user.company_id)\
+                        .order_by(Marketplaces.seller_id.asc())\
+                .all()
             # raw_list_products = db.session.query(Product)
             # .paginate(page=30, per_page=30, error_out=False).items
             for row in raw_list_shops:
                 seller_id = row.seller_id
-                if row.mp_markup:
-                    mp_markup = row.mp_markup
-                else:
-                    mp_markup = "0"
-
-                if row.store_markup:
-                    store_markup = row.store_markup
-                else:
-                    store_markup = "0"
-
                 if row.date_modifed:
                     date_modifed = row.date_modifed
                 else:
@@ -1008,20 +1035,35 @@ def shops():
                     check_send_null = "checked"
                 else:
                     check_send_null = "unchecked"
+
                 if row.check_send_stocks:
                     check_send_stocks = "checked"
                 else:
                     check_send_stocks = "unchecked"
+
+                if row.enable_sync_stocks:
+                    enable_sync_stocks = "checked"
+                else:
+                    enable_sync_stocks = "unchecked"
+
+                if row.enable_sync_price:
+                    enable_sync_price = "checked"
+                else:
+                    enable_sync_price = "unchecked"
+
                 if row.check_enable_submit:
                     check_enable_submit = "checked"
                 else:
                     check_enable_submit = "unchecked"
+
                 rows += '<tr>' \
                         f'<td >{row.shop_name} </td>' \
                         f'<td >{row.name_mp}</td>' \
                         f'<td >{row.seller_id}</td>' \
-                        f'<td >{mp_markup}</td>' \
-                        f'<td >{store_markup}</td>' \
+                        f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="enable_sync_stocks_{seller_id}' \
+                        f'" {enable_sync_stocks} class="iswitch iswitch iswitch-primary"></div></td>' \
+                        f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="enable_sync_price_{seller_id}' \
+                        f'" {enable_sync_price} class="iswitch iswitch iswitch-primary"></div></td>' \
                         f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="check_send_stocks_{seller_id}' \
                         f'" {check_send_stocks} class="iswitch iswitch iswitch-purple"></div></td>' \
                         f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="check_send_null_{seller_id}' \
