@@ -80,7 +80,7 @@ def read_order_json():
     except:
         with open("orders.json", 'r') as file:
             result_dict = json.load(file)
-    print('result_read_order ', len(result_dict), result_dict.keys())
+    print('result_read_order ', len(result_dict))
     return result_dict
 
 

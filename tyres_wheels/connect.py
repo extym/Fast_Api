@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-from cred import DATA_PATH
+from cred import *
 import csv
 import datetime
 # from pictures import write

@@ -1,8 +1,11 @@
 import asyncio
 import json
+from base64 import b64encode
 
 import requests
-from cred import api_key_ozon_prod, api_key_ozon_admin, client_id_onon
+from requests.auth import HTTPBasicAuth
+
+from cred import api_key_ozon_prod, api_key_ozon_admin, client_id_onon, login_1c, pass_1c
 from read_json import read_json_on, read_json_ids
 from time import sleep
 
@@ -15,7 +18,11 @@ common_error = {
 }
 
 host = 'https://api-seller.ozon.ru'
+def basic_auth():
+    token = b64encode(f"{login_1c}:{pass_1c}".encode('utf-8')).decode("ascii")
+    return f'Basic {token}'
 
+print(basic_auth)
 
 
 # last_id = 'WzQ2MzcyNzEyNyw0NjM3MjcxMjdd'
@@ -202,7 +209,7 @@ def send_stocks_on():
         response = requests.post(link,  headers=headers, data=json.dumps(data))
         answer = response.json()
         ans = response.text
-        print('answer_send_stock_on_artol', ans)
+        print('answer_send_stock_on_artol', response.status_code)
         result = answer["result"]
         for row in result:
             if len(row["errors"]) > 0:
@@ -253,4 +260,4 @@ def product_info_order(id_mp):  #product_id, offer_id
 # sleep(5)
 # print(22222, post_get_assortment_v2())
 
-create_data_stocks()
+# create_data_stocks()

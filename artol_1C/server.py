@@ -1,3 +1,7 @@
+import logging
+import os
+from base64 import b64encode
+
 from gevent import monkey
 
 monkey.patch_all()
@@ -12,13 +16,21 @@ from gevent.pywsgi import WSGIServer
 import pytz
 from datetime import datetime, timedelta
 from read_json import processing_json, read_order_json, read_json_on
-from cred import token_market_dbs, token_market_fbs, url_address, headers
+from cred import *
 from ozon import product_info_order
 # from proxy import proxy_onon
 
 import urllib3
 
 urllib3.disable_warnings()
+
+logging.basicConfig(filename=os.path.join(LOG_DIR + 'artol.log'), level=logging.INFO,
+                    format="%(asctime)s %(levelname)s %(message)s")
+
+
+def basic_auth():
+    token = b64encode(f"{login_1c}:{pass_1c}".encode('utf-8')).decode("ascii")
+    return f'Basic {token}'
 
 
 def write_json(smth_json):
@@ -395,12 +407,18 @@ def create_re_cart(items):
 
 
 async def send_post(data):
+    headers = {'Content-type': 'application/json',
+               'Authorization': "Bearer " + basic_token,
+               'Content-Encoding': 'utf-8'}
     answer = requests.post(url_address, data=json.dumps(data), headers=headers, verify=False)
-    write_smth(answer)
-    write_smth(data)
+    if answer.ok:
+        logging.info('All_ride_send_order')
+    else:
+        logging.error("Error send order {} {} {}".format(answer.status_code,
+                                                         answer.text, data))
     # result = answer.text
     time = datetime.now(pytz.timezone("Africa/Nairobi")).isoformat()
-    print('answer1', str(time), answer, data)
+    # print('answer1', str(time), answer, data)
     # return result
 
 
@@ -451,7 +469,7 @@ async def onon_push():
                 = our_id, id_mp, "NEW", "NEW", "Ozon"
             order['products'] = stock[1]
             send_data = create_data_for_1c(order, "accept", "Ozon")
-            print('send_data', send_data)
+            print('send_data_artol', send_data)
             se_id = str(send_data['order']['id'])
             write_smth(' order_id_accept ' + se_id)
             await send_post(send_data)
@@ -552,7 +570,7 @@ async def order_accept():
             data = order_resp_ym(current_order, stock[0])
             current_order['our_id'] = data[1]
             send_data = create_data_for_1c(current_order, "accept", "Yandex")
-            print('send_data', send_data)
+            print('send_data_artol_2', send_data)
             if confirm_data is not True:  ## if order not test
                 se_id = str(send_data['order']['id'])
                 write_smth(' order_id_accept ' + se_id)
