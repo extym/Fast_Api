@@ -102,6 +102,9 @@ read_new_order = (" SELECT * from fresh_orders "
 read_order_items = (" SELECT * from order_items "
                     " WHERE id_mp = %s and shop_name = %s ")
 
+read_order_items_v2 = (" SELECT * from order_items "
+                    " WHERE id_mp = %s and mp = %s ")
+
 
 update_send_data_order = (" UPDATE fresh_orders SET dateSendData = NOW(), dateModifed = NOW(), ourStatus = 'SEND_TO_1C' "
                           " WHERE id_MP = %s and shop_name = %s ")

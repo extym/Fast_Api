@@ -23,15 +23,17 @@ import os
 import urllib3
 urllib3.disable_warnings()
 
-LOG_DIR = os.getcwd() + "/logs"
-print(LOG_DIR)
+# LOG_DIR = os.getcwd() + "/logs"
 
-logging.basicConfig(filename=os.path.join(LOG_DIR + '/stm_app.log'), level=logging.INFO,
+
+logging.basicConfig(filename=LOG_DIR + '/stm_app.log', level=logging.INFO,
                     format="%(asctime)s %(levelname)s %(message)s")
+
+logging.info('!!!!!!!!!!!!!!!!!!!!!! {}'.format(LOG_DIR))
 
 
 #time = datetime.now(pytz.timezone("Africa/Nairobi")).replace(microsecond=0).isoformat()
-#printt(time)  #for development
+
 another_id = {'OWLT190101': 'а0026033', 'OWLM200300': 'а0027568', 'OWLT190304': 'а0027470',
               'OWLT190403S': 'а0027471', 'OWLT190302': 'а0026027'}
 
@@ -143,7 +145,6 @@ def read_xls(files):
     proxy = {}
     for row in df:
         proxy[row[0]] = int(row[2])
-    print(type(proxy))
 
     return proxy  #dict
 
@@ -160,12 +161,11 @@ else:
 def check_allowed_filename(filename):
     result = '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED
     curr_name = filename.rsplit('.', 1)[1]
-    # print(result)
+
     return result, curr_name
 
 
 def create_data_for_1c(data):
-    #print('create_data_for_1c', data)
     list_items = data[1]
     items_pr = []
     for item in list_items:
@@ -210,14 +210,12 @@ def check_stocks(skus, warehouse_id):
     for sku in skus:
         if sku in another_id_reverse:
             sku = another_id_reverse[sku]
-            print('SKU ', sku)
         if sku in data_stocks:
             count = data_stocks[sku][2]  #.get('stock')
             if not count:
                 count = 0
             if sku in another_id:
                 sku = another_id[sku]
-                print('another', sku)
             data = {
                 "sku": sku,
                 "warehouseId": warehouse_id,
@@ -235,7 +233,6 @@ def check_stocks(skus, warehouse_id):
             count = 0
             if sku in another_id:
                 sku = another_id[sku]
-                # print('another', sku)
             data = {
                 "sku": sku,
                 "warehouseId": warehouse_id,
@@ -254,7 +251,6 @@ def check_stocks(skus, warehouse_id):
 
 # def write_order(order, created_id, shop):
 #     data = read_order_json()
-#     print('write_order', type(order))
 #     order_id = order.get("id")
 #
 #     order['created_id'] = created_id
@@ -279,7 +275,6 @@ async def rewrite_status_order_db(order_id, status, shop):
 
 def rewrite_status(order, shop):
     data = read_order_json()
-    print('re_write_order', type(order))
     order_id = order.get("id")
     status = order.get("status")
     substatus = order.get("substatus")
@@ -316,7 +311,6 @@ def day_for_stm(string):
         proxy = datta + timedelta(1)
         dtt = proxy.strftime('%d-%m-%Y')
 
-    #print('datta',dat,  dtt)
     return dtt
 
 
@@ -502,7 +496,6 @@ def counter_items(items_list):
             itemm["quantity"] = value
             lst.append(itemm)
 
-    #printt('counter_items',lst)
     return lst
 
 
@@ -609,7 +602,6 @@ def reformat_data_items(order, shop):
             sku = str(item["sku"])
             vendor_code = item["offer_id"]
             id_1c = items_ids[vendor_code][0]
-            # print('product_info_price', sku[0], vendor_code)
             #price = product_info_price(items_skus[sku][0], vendor_code)
             proxy = (
                 order["id"],
@@ -686,12 +678,10 @@ def get_json():
     ip_addr = request.environ.get('REMOTE_ADDR')  ## return ::ffff:46.21.252.7
     #'X-Forwarded-For': '46.21.252.7'
     addr = request.headers.get('X-Forwarded-For')
-    print(ip_addr, addr)
+    print("Data from", ip_addr, addr)
     if ip_addr == '::ffff:46.21.252.7' or ip_addr == '46.21.252.7'\
             or ip_addr == '62.76.102.53':
         request_data = request.get_json()
-        # alter_data = request.data
-        # print('alter_data', alter_data)
         write_json(request_data)
         write_smth_date()
 
@@ -713,7 +703,7 @@ def fail_json():
     ip_addr = request.environ.get('REMOTE_ADDR')  ## return ::ffff:46.21.252.7
     #'X-Forwarded-For': '46.21.252.7'
     addr = request.headers.get('X-Forwarded-For')
-    print(ip_addr, addr)
+    print("GET_json_from", ip_addr, addr)
     if ip_addr == '::ffff:46.21.252.7' or ip_addr == '46.21.252.7'\
             or ip_addr == '62.76.102.53':
         request_data = request.get_json()
@@ -851,7 +841,7 @@ async def status_ym():
             await execute_query(update_status_order, data)
         else:
             data = (status, order_id, "Yandex")
-            print(data)
+            print("Order_status_ym", data)
             await execute_query(rewrite_status_order, data)
             #rewrite_status(order, "Yandex")
 
@@ -881,7 +871,6 @@ def stocks_ym():
         skus = req.get('skus')
         result = check_stocks(skus, warehouseId)
         write_fake(result)
-        print(7878787, len(result.get('skus', [])))
         response = app.response_class(
             json.dumps(result),
             status=200,
@@ -918,10 +907,8 @@ def order_cancell_ym():
 @app.route('/order/new', methods=['POST'])
 async def new_order_sb():
     token = request.headers.get('Basic auth')
-    # print('from_order_new_token', token)
     if token == None or token != None:
         data_req = request.json
-        # print('data_from_order_new', data_req)
         order = data_req["data"]
         pre_proxy = order["shipments"][0]["items"]
         proxy = counter_items(pre_proxy)
@@ -993,7 +980,7 @@ async def order_cancel():
 async def fail_check():
     ip_addr = request.environ.get('REMOTE_ADDR')  ## return ::ffff:46.21.252.7
     addr = request.headers.get('X-Forwarded-For')  # 'X-Forwarded-For': '46.21.252.7'
-    print(ip_addr, addr)
+    print("Chek_orders_from", ip_addr, addr)
     if ip_addr == '::ffff:46.21.252.7' or ip_addr == '46.21.252.7' or ip_addr == '62.76.102.53':  # or ip_addr == '54.86.50.139':  #POSTMAN
         # data = get_one_order()  #query_read_order(get_new_order))
         # if data[0] is not None:
@@ -1043,6 +1030,7 @@ async def check_order():
     ip_addr = request.environ.get('REMOTE_ADDR')  ## return ::ffff:46.21.252.7
     addr = request.headers.get('X-Forwarded-For')  # 'X-Forwarded-For': '46.21.252.7'
     logging.info("WE get request from {} {}".format(ip_addr, addr))
+    print("WE get request from {} {}".format(ip_addr, addr))
     if ip_addr == '::ffff:46.21.252.7' or ip_addr == '46.21.252.7':  # or ip_addr == '54.86.50.139':  #POSTMAN
         data = get_one_order()  #query_read_order(get_new_order))
         if data[0] is not None:
@@ -1062,7 +1050,7 @@ async def check_order():
             response = json.dumps(empty_data)
             write_smth(" empty_data")
 
-    elif addr == '62.76.102.53' or ip_addr == '62.76.102.53' or ip_addr == '::1':
+    elif addr == '62.76.102.53' or ip_addr == '46.32.88.136' or ip_addr == '::1':
         data = get_one_order()  #query_read_order(get_new_order))
         if data[0] is not None:
             re_data = create_data_for_1c(data)
@@ -1138,11 +1126,8 @@ async def onon_push():
         order['our_id'], order['id'],  order['status'], order['our_status'] \
             = id_mp, our_id, "NEW", "NEW"  # TODO change place id_mp & our_id
         ref_data = reformat_data_order(order, 'Ozon')
-        #print('refdata', ref_data)
         await execute_query(query_write_order, ref_data)
         list_items = reformat_data_items(order, 'Ozon')
-        # print('redata_items', list_items)
-        # print('list_items_onon', list_items)
         await executemany_query(query_write_items, list_items)
 
         response = app.response_class(

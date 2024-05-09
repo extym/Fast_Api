@@ -111,31 +111,30 @@ def check_is_exist_in_db(query, data):
 def get_one_order():
     connection = create_connection()
     result, proxy = None, []
-    try:
-        cursor = connection.cursor()
-        cursor.execute(read_new_order)
-        result = cursor.fetchone()
-        print("Fetching single row", result)
-        if result is not None:
-            data = (result[1], result[7])
-            print("Fetching single row-------",data)
-            cursor.execute(read_order_items, data)
-            items = cursor.fetchall()
-            proxy  = [item for item in items]
+    # try:
+    cursor = connection.cursor()
+    cursor.execute(read_new_order)
+    result = cursor.fetchone()
 
-        cursor.close()
+    if result is not None:
+        data = (result[1], result[7])
+        cursor.execute(read_order_items, data)
+        # cursor.execute(read_order_items_v2, data)
+        items = cursor.fetchall()
+        print("Fetching single row-------", items)
+        proxy = [item for item in items]
 
-    except psycopg2.Error as error:
-        print("Failed to read data from table", error)
-    finally:
-        if connection:
-            connection.close()
-            print("The Sql connection is closed")
+    cursor.close()
+    print("Fetching single row", result, proxy)
+    # except psycopg2.Error as error:
+    #     print("Failed to read data from table", error)
+    # finally:
+    #     if connection:
+    #         connection.close()
+    #         print("The Sql connection is closed")
 
     return result, proxy
-# connection = create_connection()
-# create_database_query = "CREATE DATABASE stm_app"
-# create_database(connection, create_database_query)
+
 
 def maintenans_query(query):
     connection = create_connection()
@@ -154,3 +153,4 @@ def maintenans_query(query):
 # maintenans_query(create_fresh_orders_table)
 # maintenans_query(create_order_items)
 
+get_one_order()

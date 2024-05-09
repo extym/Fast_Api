@@ -16,7 +16,7 @@ import asyncio
 test_url = 'http://localhost:5500/response'
 remote_test_url = 'https://api-test.leroymerlin.ru/marketplace/merchants/v1'
 url_orders = 'https://api.leroymerlin.ru/marketplace/merchants/v1'
-print(11111111111111111111111111111111111111111111111111111111111111111, os.getcwd())
+print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!', os.getcwd())
 
 if LOCAL_MODE:
     UPLOAD_FOLDER = './'
