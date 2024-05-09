@@ -79,7 +79,8 @@ def read_links_v2():
 
 
 async def read_links_v3():
-    with open(PATH_DIR + '/links.json', 'r') as file:
+    with open(PATH_DIR + '/links.json', 'r')\
+            as file:
         links = json.load(file)
 
         return links
@@ -96,12 +97,13 @@ async def get_creds_v3(user_id):
 
 
 async def rewrite_contact(chat_id, user_id, phone_numbers):
-    need_data = await read_link_v2(chat_id)
+    # need_data = await read_link_v2(chat_id)
+    need_data = get_bid(chat_id)
     logging.info('CONTACT_ID {} {} {} {} '
                  .format(chat_id, user_id, phone_numbers, need_data))
     contact_id = 0
     if need_data:
-        contact_id = need_data[8]
+        contact_id = need_data[14]
     creds = await get_creds_v3(user_id)
     access_token = creds.get('access_token')
 
@@ -142,12 +144,11 @@ async def rewrite_contact(chat_id, user_id, phone_numbers):
                      .format(chat_id, user_id, phone_numbers))
 
 
-
-
-async def rewrite_contact_v2(chat_id=0, contact_id=0, user_id=0, amo_name='', link=None, data=None):
+async def rewrite_contact_v2(chat_id=None, contact_id=0, user_id=0, amo_name='', link=None, data=None):
     need_data = ''
     if chat_id:
-        need_data = await read_link_v2(chat_id)
+        # need_data = await read_link_v2(chat_id)
+        need_data = get_bid(chat_id)
         logging.info('CONTACT_ID {} {} {} {} '
                  .format(chat_id, user_id, need_data, data))
     if need_data and contact_id == 0:
@@ -1022,7 +1023,8 @@ async def rewrite_leads_v2(chat_id, user_id):  # (leads_id, price, string):
             contact_id = row.get('_embedded').get('contacts')[0].get('id')
         else:
             continue
-    data_link = await read_link_v2(chat_id)
+    # data_link = await read_link_v2(chat_id)
+    data_link = get_bid(chat_id)
     logging.info('Some_get from rewrite lead, we get {}'
                  .format(data_link))
     creds = await get_creds_v3(user_id)
@@ -1083,12 +1085,17 @@ async def rewrite_leads_v2(chat_id, user_id):  # (leads_id, price, string):
         #              format(answer.status_code, user_id, chat_id, leads_id, data, url))
         if answer.ok:
             # await re_write_link_v3(chat_id, leads_id, contact_id)
-            await execute_query_v3(query_update_contact_id,(chat_id, leads_id, contact_id))
+            await execute_query_v3(query_update_contact_id,(chat_id,
+                                                            leads_id, contact_id))
             logging.info('ALL_RIDE_rewrite_lead_v2 {} {} {} {} {} {} {}'.
-                         format(answer.status_code, user_id, chat_id, leads_id, data, url, contact_id))
+                         format(answer.status_code, user_id, chat_id,
+                                leads_id, data, url, contact_id))
         else:
-            logging.info('Error_rewrite_lead_v2{} {} {} {} {} {} {}'.
-                         format(answer.status_code, answer.text, user_id, chat_id, leads_id, data, url))
+            logging.info('Error_rewrite_lead_v2 status_code {}, text {},'
+                         ' user_id {}, chat_id {}, '
+                         'leads_id {}, data {}, url {}'.
+                         format(answer.status_code, answer.text, user_id,
+                                chat_id, leads_id, data, url))
     else:
         print('Leads is not found in Amo leads V2')
 
@@ -1113,16 +1120,26 @@ async def make_bonus(subdomain, lead_id: int):
     elif subdomain == 'amo3431ru':
         amo_name = '3431'
 
-    links = await read_links_v3()
+    # links = await read_links_v3()
+    bid = get_bid(leads_id=lead_id)
     bonuses, contact_id, price = 0, 0, 0
-    for key, value in links.items():
-        if len(value) == 9 and value[7] == lead_id:
-            price = value[0].replace('\xa0', '').replace(' ₽', '')
-            contact_id = value[8]
-            bonuses = int(price) * 0.05
-            logging.info('BONUSES_price {}, contact_id {}, bonuses {}, lead_id {}'.
-                         format( price, contact_id, bonuses, lead_id))
-            break
+    # for key, value in links.items():
+    #     if len(value) == 9 and value[7] == lead_id:
+    #         price = value[0].replace('\xa0', '').replace(' ₽', '')
+    #         contact_id = value[8]
+    #         bonuses = int(price) * 0.05
+    #         logging.info('BONUSES_price {}, contact_id {}, bonuses {}, lead_id {}'.
+    #                      format( price, contact_id, bonuses, lead_id))
+    #         break
+
+    if len(bid) < 0:
+        logging.info('BONUSES_TRY_price {}, contact_id {}, bonuses {}, lead_id {}'.
+                     format(price, *bid, lead_id))
+        price = bid[7].replace('\xa0', '').replace(' ₽', '')
+        contact_id = bid[14]
+        bonuses = int(price) * 0.05
+        logging.info('BONUSES_price {}, contact_id {}, bonuses {}, lead_id {}'.
+                     format( price, contact_id, bonuses, lead_id))
 
     if contact_id and bonuses:
         data_note = [{
@@ -1164,7 +1181,9 @@ async def make_bonus(subdomain, lead_id: int):
             ]
         }
 
-        await rewrite_contact_v2(data=data_bonuses, contact_id=contact_id, amo_name=amo_name, link=link)
+        await rewrite_contact_v2(data=data_bonuses,
+                                 contact_id=contact_id,
+                                 amo_name=amo_name, link=link)
 
     else:
         logging.info("Not found a candidate for bonuses {} user, {} bonuses, {} lead_id, and price - {}"

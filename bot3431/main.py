@@ -376,8 +376,9 @@ async def avito_webhook():
         author_id = hook.get('payload').get('value').get('author_id')
         chat_id = hook.get('payload').get('value').get('chat_id')
         msg_id = hook.get('payload').get('value').get('id')
-        # check = check_is_exist_message_answer(msg_id, chat_id)
-        check = await check_is_exist_message_answer_v2(msg_id, chat_id)
+        # check = await check_is_exist_message_answer_v2(msg_id, chat_id)
+        check = check_is_exist_message_in_db_v2(msg_id, chat_id)
+        logging.info('CheckFromMain {} {} {} '.format(check, chat_id, msg_id))
         try:
 
             ## system message from avito or our
@@ -404,6 +405,8 @@ async def avito_webhook():
             else:
                 try:
                     await get_avito_current_chat_v2(hook, check)
+                    logging.info('get_avito_current_chat_v2 {} {} {}'
+                                 .format(hook,check, chat_id))
                     return app.response_class(
                         status=200
                     )

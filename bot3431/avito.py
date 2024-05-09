@@ -421,7 +421,8 @@ async def make_data_for_avito_v2(data):
         chat_id = data.get('message').get('conversation').get('client_id')
     except:
         chat_id = None
-    pre_user_id = await read_links_v4(chat_id)
+    # pre_user_id = await read_links_v4(chat_id)
+    pre_user_id = get_bid(chat_id)
     if pre_user_id:
         user_id = pre_user_id[3]
         avito_token = await get_creds_avito_v2(user_id)
@@ -625,7 +626,9 @@ async def get_avito_current_chat_v2(hook, check):
                  rewrite_lead,
                  leads_id,
                  contact_id)
+        logging.info('WROTE_DATA_FOR___22 {}'.format(proxy))
         await execute_query(query_write_bid, proxy)
+        # await execute_query_v3(query_update_msg_id, (chat_id, msg_id))
         logging.info('WROTE_DATA_FOR___33 {}'.format(proxy))
         await rewrite_leads_v2(chat_id, user_id)
         # logging.info('TRY_REWRITE_DATA_TO_AMO_1 {} {} {} {} '.
@@ -654,7 +657,8 @@ async def get_avito_current_chat_v2(hook, check):
             logging.info("reTRY_GET_AVITO_CURRENT_CHAT5 {} {}"
                          .format(answer.status_code, user_id))
 
-        await re_write_link_v2(chat_id, msg_id)
+        # await re_write_link_v2(chat_id, msg_id)
+        await execute_query_v3(query_update_msg_id, (chat_id, msg_id))
 
         author_id = hook.get('payload').get('value').get('author_id')
         await make_message_for_amo_v2(hook, raw_data, author_id, False)  # True)
