@@ -23,6 +23,7 @@ from psycopg2._psycopg import IntegrityError
 
 UniqueViolation = errors.lookup('23505')
 
+
 # engine = create_engine(f"postgresql+psycopg2://{db_user}:{db_pass}@{db_host}/{db_name}")
 
 
@@ -489,12 +490,12 @@ def get_product_list_v2(seller_id=None, shop_name=None, company_id=None):
                         print('Error Api_Key for seller_id{}  shop {} get {}'
                               .format(seller_id, shop_name, answer.text))
                         send_get('Error Api_Key for seller_id{}  shop {} get {}'
-                              .format(seller_id, shop_name, answer.text))
+                                 .format(seller_id, shop_name, answer.text))
                 except Exception as err:
                     print('Error get data for seller_id {}  shop {} get {}'
                           .format(seller_id, shop_name, answer.text))
                     send_get('Error get data for seller_id {}  shop {} get {}'
-                          .format(seller_id, shop_name, answer.text))
+                             .format(seller_id, shop_name, answer.text))
                 finally:
                     count += 1
                     time.sleep(1)
@@ -530,7 +531,7 @@ def get_product_info(product_id=None, offer_id=None, seller_data=None):
         print('Some_Error_from_get_product_info {}, product_id {}, offer_id {} '
               .format(answer.text, product_id, offer_id))
         send_get('Some_Error_from_get_product_info {}, product_id {}, offer_id {} '
-              .format(answer.text, product_id, offer_id))
+                 .format(answer.text, product_id, offer_id))
 
     return result
 
@@ -688,8 +689,8 @@ def check_import_limit(seller_id):
     pass
 
 
-def make_internal_import_oson(donor=None, recipient=None, k=1,
-                              source=None, donor_mp=None, recipient_mp=None):
+def make_internal_import_oson_product(donor=None, recipient=None, k=1,
+                                      source=None, donor_mp=None, recipient_mp=None):
     # metod = 'https://api-seller.ozon.ru/v3/product/import'
     metod = 'https://api-seller.ozon.ru/v1/product/import-by-sku'
     if donor is not None and recipient is not None:
@@ -698,7 +699,8 @@ def make_internal_import_oson(donor=None, recipient=None, k=1,
             session.begin()
             recipient_data = session.execute(select(Marketplaces.seller_id,
                                                     Marketplaces.key_mp)
-                                             .where(Marketplaces.shop_name == recipient)).first()
+                                             .where(Marketplaces.shop_name == recipient)) \
+                .first()
             product_data = session.query(Product).filter_by(shop_name=donor).all()
 
         if product_data:
@@ -825,8 +827,44 @@ def make_internal_import_oson(donor=None, recipient=None, k=1,
                 return 'Check you data', donor, donor_mp, recipient_mp
 
 
-# print(make_internal_import_oson(donor='ImportGoods', recipient='Ф-фторник'))
+def make_import_export_oson_price(donor=None, recipient=None,
+                                  k=1, send_to_mp=False):
+    # metod = 'https://api-seller.ozon.ru/v1/product/import-by-sku'
+    if donor is not None and recipient is not None:
+        data = []
+        with Session(engine) as session:
+            session.begin()
+            recipient_data = session.execute(select(Marketplaces.seller_id,
+                                                    Marketplaces.key_mp)
+                                             .where(Marketplaces.shop_name == recipient)) \
+                .first()
+            product_data = session.query(Product).filter_by(shop_name=donor).all()
 
+        if product_data:
+            for row in product_data:
+                # print(22222, row )
+                #############################3
+                # Make price ended for '9'
+                price = int(row.final_price) * (1 + k / 100)
+                price = str(price).split('.')[0][:-1] + "9"
+                old_price = str(int(price) * 4)
+                ##############################3
+                item = {
+                    'final_price': price,
+                    'old_price': old_price,
+                    "date_modifed": datetime.now()
+                }
+
+                with Session(engine) as session:
+                    session.begin()
+                    session.execute(update(Product)
+                                    .where(Product.articul_product==row.articul_product)
+                                    .where(Product.shop_name==recipient).values(item))
+                    session.commit()
+
+# make_import_export_oson_price(donor='Low Price', recipient='Полиция Вкуса', k=0)
+
+# print(make_internal_import_oson(donor='ImportGoods', recipient='Ф-фторник'))
 
 
 # def product_info_price(id_mp, seller_id):  # product_id, offer_id

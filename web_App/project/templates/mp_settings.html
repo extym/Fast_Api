@@ -11,23 +11,25 @@
             <div class="page-title">
 
                 <div class="float-left">
-                    <h1 class="title">Настройки</h1>                            </div>
-
-<!--                <div class="float-right d-none">-->
-<!--                    <ol class="breadcrumb">-->
-<!--                        <li>-->
-<!--                            <a href="index.html"><i class="fa fa-home"></i>Home</a>-->
-<!--                        </li>-->
-<!--                        <li>-->
-<!--                            <a href="form-elements.html">Forms</a>-->
-<!--                        </li>-->
-<!--                        <li class="active">-->
-<!--                            <strong>Form Validations</strong>-->
-<!--                        </li>-->
-<!--                    </ol>-->
-<!--                </div>-->
+                    <h1 class="title">Настройки</h1>
+                </div>
 
             </div>
+
+             <div>
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                <div class="alert alert-warning" role="alert">
+                    {{ messages[0] }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                    {% endif %}
+                {% endwith %}
+
+                </div>
+
         </div>
         <div class="clearfix"></div>
 
@@ -45,13 +47,7 @@
                     <div class="content-body">
                         <div class="row">
                             <div class="col-lg-12 col-md-12 col-12">
-                                {% with messages = get_flashed_messages() %}
-                                {% if messages %}
-                                    <div class="notification is-danger">
-                                        {{ messages[0] }}
-                                    </div>
-                                {% endif %}
-                                {% endwith %}
+
                                 <form autocomplete="off" id="validate_mp" action="/add_mp" method="post" >
 
                                     <div class="input-group mb-3">
@@ -59,7 +55,7 @@
                                             <label class="input-group-text" for="input_name_mp">Маркетплейс</label>
                                         </div>
                                         <select class="custom-select" id="input_name_mp" name="insert_new_shop">
-                                                <option selected>Выбрать...</option>
+                                                <option selected>Выбрать</option>
                                                 <option value="yandex">ЯндексМаркет</option>
                                                 <option value="sber">СберМегаМаркет</option>
                                                 <option value="ozon">Озон</option>
@@ -93,7 +89,7 @@
                                     </div>
 
                                     <div class="float-right">
-                                        <button type="submit" class="btn btn-success">Сохранить</button>
+                                        <button type="submit" class="btn btn-primary">Сохранить</button>
                                         <button class="btn" type="reset">Очистить</button>
                                     </div>
                                 </form>
@@ -130,7 +126,7 @@
                                             <label class="input-group-text" for="edit_name_mp">Маркетплейс</label>
                                         </div>
                                         <select class="custom-select" id="edit_name_mp" name="edit_name_mp">
-                                                <option selected>Выбрать...</option>
+                                                <option selected>Выбрать</option>
                                                 <option value="yandex">ЯндексМаркет</option>
                                                 <option value="sber">СберМегаМаркет</option>
                                                 <option value="ozon">Озон</option>
@@ -170,7 +166,7 @@
                                     </div>
 
                                     <div class="float-right">
-                                        <button type="submit" class="btn btn-success">Сохранить</button>
+                                        <button type="submit" class="btn btn-primary">Сохранить</button>
                                         <button class="btn" type="reset">Очистить</button>
                                     </div>
                                 </form>
@@ -200,9 +196,9 @@
 
                                         <div class="input-group mb-3">
                                         <div class="input-group-prepend">
-                                            <label class="input-group-text" for="settings_store">Маркетплейс</label>
+                                            <label class="input-group-text" for="name_mp">Маркетплейс</label>
                                         </div>
-                                        <select class="custom-select" id="settings_store" name="settings_store">
+                                        <select class="custom-select" id="name_mp" name="name_mp">
                                                 <option selected></option>
                                                 <option value="yandex">ЯндексМаркет</option>
                                                 <option value="sber">СберМегаМаркет</option>
@@ -216,7 +212,7 @@
                                             <label class="form-label" for="formfield1">Общая наценка на маркетплейс</label>
                                             <span class="desc">% например "16"</span>
                                             <div class="controls">
-                                                <input type="text" class="form-control" id="formfield1" name="common_markup_mp" >
+                                                <input type="text" class="form-control" id="formfield1" name="mp_markup" >
                                             </div>
                                         </div>
 
@@ -314,17 +310,12 @@
 
                                 <div class="col-lg-12 col-md-12 col-12">
                                     <div class="float-right ">
-                                        <button type="submit" class="btn btn-success">Сохранить</button>
+                                        <button type="submit" class="btn btn-primary">Сохранить</button>
                                         <button class="btn" type="reset">Очистить</button>
                                     </div>
                                 </div>
 
-
-
                             </form>
-
-
-
 
                         </div>
                     </div>
@@ -346,7 +337,7 @@
                     </div>
                     <div class="modal-footer">
                         <button data-dismiss="modal" class="btn btn-default" type="button">Close</button>
-                        <button class="btn btn-success" type="button">Save changes</button>
+                        <button class="btn btn-primary" type="button">Save changes</button>
                     </div>
                 </div>
             </div>
@@ -367,7 +358,7 @@
                     </div>
                     <div class="modal-footer">
                         <button data-dismiss="modal" class="btn btn-default" type="button">Close</button>
-        {#                <button class="btn btn-success" type="button">Save changes</button>#}
+        {#                <button class="btn btn-primary" type="button">Save changes</button>#}
                     </div>
                 </div>
             </div>
@@ -404,7 +395,7 @@
                     </div>
                     <div class="modal-footer">
                         <button data-dismiss="modal" class="btn btn-default" type="button">Close</button>
-                        <button class="btn btn-success" type="button">Save changes</button>
+                        <button class="btn btn-primary" type="button">Save changes</button>
                     </div>
                 </div>
             </div>

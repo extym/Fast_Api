@@ -19,7 +19,7 @@ from werkzeug.utils import secure_filename
 
 # from project.wb import import_product_from_wb
 import project.wb as wb
-from project.import_ozon import import_oson_data_prod, make_internal_import_oson
+from project.import_ozon import import_oson_data_prod, make_internal_import_oson_product, make_import_export_oson_price
 from project.worker import conn
 from project import TEST_MODE, PHOTO_UPLOAD_FOLDER, engine, ozon
 from .database import Data_base_connect as Db
@@ -27,7 +27,7 @@ from .models import *
 from . import db
 from apscheduler.schedulers.background import BackgroundScheduler
 
-from .ozon import send_stocks_oson_v2, send_stocks_oson_v3
+from project.ozon import send_stocks_oson_v2
 
 import logging
 
@@ -233,8 +233,8 @@ def main_page():
 
 
 def check_api(key_mp, shop_id):
-
     return True
+
 
 @auth.route('/add_mp')  # /<int:uid>')
 @login_required
@@ -277,7 +277,7 @@ def add_mp_post():
         shop_id = data.get('id_mp')
         key_mp = data.get('key')
 
-        if mp == 'Выбрать...':
+        if mp == 'Выбрать':
             flash('Укажите, пожалуйста, маркетплейс', 'error')
             return render_template('mp_settings.html')
 
@@ -351,7 +351,7 @@ def add_mp_post():
         # print(job.get_id)
     if 'edit_shop' in data:
         print(33333333333333333333333, data)
-        if 'edit_shop' == 'Выбрать...' and 'edit_shop_settings' == 'Выбрать':
+        if 'edit_shop' == 'Выбрать' and 'edit_shop_settings' == 'Выбрать':
             flash('Не выбран магазин')
         if 'edit_shop_settings' != 'Выбрать' and 'key':
             mp = data.get('edit_shop')
@@ -381,7 +381,7 @@ def edit_mp_post():
         shop_id = data.get('id_mp')
         key_mp = data.get('key')
 
-        if mp == 'Выбрать...':
+        if mp == 'Выбрать':
             flash('Укажите, пожалуйста, маркетплейс', 'error')
             return redirect('/add_mp')
 
@@ -389,7 +389,7 @@ def edit_mp_post():
             flash('Укажите, пожалуйста, название магазина, желательно как на маркетплейсе', 'error')
             return redirect('/add_mp')
 
-        if shop_name != 'Выбрать' and mp != 'Выбрать...' and key_mp:
+        if shop_name != 'Выбрать' and mp != 'Выбрать' and key_mp:
             # print(1111, mp, shop_name, key_mp)
             mp = data.get('edit_shop')
             shop_name = data.get('edit_shop_name')
@@ -413,15 +413,15 @@ def edit_store_post():
     company_id = current_user.company_id
     print(*data.items(), sep='\n')
 
-    if 'settings_store' in data:
+    if 'name_mp' in data:
         settings = dict()
         if data['shop_name'] != 'Выбрать':
             for key, value in data.items():
                 if value != '':
                     settings.update({key: value})
 
-            # shop_name = settings['shop_name']
-            market = Marketplaces.query\
+            # del settings['settings_store']
+            market = Marketplaces.query \
                 .filter_by(shop_name=settings['shop_name']) \
                 .update(settings)
             db.session.commit()
@@ -439,6 +439,45 @@ def import_settings():
     if not current_user.is_authenticated:
         return redirect(url_for('main.index_main'))
     else:
+        rows, rows_mp = [], []
+        show = request.args.get('show')
+        # print(1111111111111, show, request.args.get('make'))
+        # if show:
+        #     uid = current_user.id
+        #     role = current_user.roles
+        #     need_id = current_user.company_id
+        #     user_name = current_user.name
+        #     photo = current_user.photo
+        #     if not photo or photo is None:
+        #         photo = 'prof-music-2.jpg'
+        #     internal_import_role_1 = request.args.get("internal_import_role_1")
+        #     internal_import_markup_1 = request.args.get("internal_import_markup_1")
+        #     internal_import_store_2 = request.args.get("internal_import_store_2")
+        #     internal_import_discount_2 = request.args.get("internal_import_discount_2")
+        #     internal_import_mp_1 = request.args.get("internal_import_mp_1")
+        #     internal_import_store_1 = request.args.get("internal_import_store_1")
+        #     internal_import_discount_1 = request.args.get("internal_import_discount_1")
+        #     internal_import_mp_2 = request.args.get("internal_import_mp_2")
+        #     internal_import_role_2 = request.args.get("internal_import_role_2")
+        #     internal_import_markup_2 = request.args.get("internal_import_markup_2")
+        #
+        #     return render_template('/import_settings.html',
+        #                            uid=uid, role=role,
+        #                            internal_import_role_1=internal_import_role_1,
+        #                            internal_import_markup_1=internal_import_markup_1,
+        #                            internal_import_store_2=internal_import_store_2,
+        #                            internal_import_discount_2=internal_import_discount_2,
+        #                            internal_import_mp_1=internal_import_mp_1,
+        #                            internal_import_store_1=internal_import_store_1,
+        #                            internal_import_discount_1=internal_import_discount_1,
+        #                            internal_import_mp_2=internal_import_mp_2,
+        #                            internal_import_role_2=internal_import_role_2,
+        #                            internal_import_markup_2=internal_import_markup_2,
+        #                            rows=rows, rows_mp=set(rows_mp),
+        #                            photo=photo,
+        #                            show=True,
+        #                            user_name=user_name)
+        # else:
         uid = current_user.id
         role = current_user.roles
         need_id = current_user.company_id
@@ -449,7 +488,7 @@ def import_settings():
         need_data = db.session.execute(select(Marketplaces.shop_name,
                                               Marketplaces.name_mp)
                                        .where(Marketplaces.company_id == need_id))
-        rows, rows_mp = [], []
+
         for row in need_data:
             rows.append(row[0])
             rows_mp.append(row[1])
@@ -494,7 +533,7 @@ def import_settings_post():
         internal_import_store_1 = data.get('internal_import_store_1')
         internal_import_role_1 = data.get('internal_import_role_1')
 
-        if internal_import_mp_1 != 'Выбрать...' and internal_import_store_1 != 'Выбрать...' \
+        if internal_import_mp_1 != 'Выбрать' and internal_import_store_1 != 'Выбрать' \
                 and internal_import_role_1 == 'donor':
             in_import = InternalImport(
                 internal_import_mp_1=internal_import_mp_1,
@@ -517,7 +556,7 @@ def import_settings_post():
             flash("Проверьте, пожалуйста, корректность вводимых данных", 'error')
             return redirect('/import_settings')
 
-    elif make == 'start__import_product': # TODO remake to 'start_internal_import_product'
+    elif make == 'start_internal_import_product':  # TODO remake to 'start_internal_import_product'
         internal_import_mp_1 = data.get('internal_import_mp_1')
         internal_import_store_1 = data.get('internal_import_store_1')
         internal_import_role_1 = data.get('internal_import_role_1')
@@ -527,8 +566,8 @@ def import_settings_post():
 
         if internal_import_role_1 != internal_import_role_2 and \
                 internal_import_store_1 != internal_import_store_2 and \
-                internal_import_mp_1 != 'Выбрать... ' and \
-                internal_import_mp_2 != 'Выбрать... ':
+                internal_import_mp_1 != 'Выбрать ' and \
+                internal_import_mp_2 != 'Выбрать ':
             if internal_import_role_2 == 'donor' and internal_import_role_1 == 'recipient':
                 donor = data.get('internal_import_store_2')
                 recipient = data.get('internal_import_store_1')
@@ -540,19 +579,193 @@ def import_settings_post():
                 donor_mp = data.get('internal_import_mp_1')
                 recipient_mp = data.get('internal_import_mp_2')
 
-            job = q.enqueue_call(make_internal_import_oson(donor=donor,
-                                                           recipient=recipient,
-                                                           source='front',
-                                                           donor_mp=donor_mp,
-                                                           recipient_mp=recipient_mp))
+            job = q.enqueue_call(make_internal_import_oson_product
+                                 (donor=donor,
+                                  recipient=recipient,
+                                  source='front',
+                                  donor_mp=donor_mp,
+                                  recipient_mp=recipient_mp))
             print(989898989, job.get_id)
         # print(*data.items(), sep='\n')
 
     elif make == 'start_internal_import_price':
-        print('!!!!!!start_internal_import_price!!!!!11')
+        print('!!!!!!_start_internal_import_price_!!!!!')
+        internal_import_mp_1 = data.get('internal_import_mp_1')
+        internal_import_store_1 = data.get('internal_import_store_1')
+        internal_import_role_1 = data.get('internal_import_role_1')
+        internal_import_mp_2 = data.get('internal_import_mp_2')
+        internal_import_store_2 = data.get('internal_import_store_2')
+        internal_import_role_2 = data.get('internal_import_role_2')
+        internal_import_markup_2 = data.get('internal_import_markup_2')
+
+        if internal_import_role_1 != internal_import_role_2 and \
+                internal_import_store_1 != internal_import_store_2 and \
+                internal_import_mp_1 != 'Выбрать ' and \
+                internal_import_mp_2 != 'Выбрать ':
+            if internal_import_role_2 == 'recipient' and internal_import_role_1 == 'donor':
+                job = q.enqueue_call(make_import_export_oson_price(
+                    donor=internal_import_role_1,
+                    recipient=internal_import_role_2,
+                    k=int(internal_import_markup_2),
+                    send_to_mp=False)
+                )
+                print(4545454545, job.get_id)
+        else:
+            flash("Проверьте правильность ввода данных", 'error')
 
     elif make == 'check_settings':
-        print('!!!!!!check_settings!!!!!11')
+        # print('!!!!!!check_settings!!!!!11')
+        if data.get('internal_import_mp_1') == 'Выбрать' \
+                and data.get('internal_import_store_1') == 'Выбрать' \
+                and data.get('internal_import_mp_2') == 'Выбрать' \
+                and data.get('internal_import_store_2') == 'Выбрать':
+            flash("Укажите хотя бы один магазин для которого нужен просмотр настроек", "alert")
+        else:
+            result = {k: v for k, v in data.items() if (v != '0' and v != 'Выбрать')}
+            port_set, mprt_setts = {}, {}
+            if result.get('internal_import_store_1') is not None \
+                    and result.get("internal_import_store_2") is not None:
+                import_set = db.session.scalars(select(InternalImport)
+                                                .where(
+                    InternalImport.internal_import_store_1 == data.get('internal_import_store_1'))
+                                                .where(
+                    InternalImport.internal_import_store_2 == data.get('internal_import_store_2'))) \
+                    .first()
+                try:
+                    port_set = import_set.__dict__
+                    internal_import_role_1 = port_set.get("internal_import_role_1")
+                    internal_import_markup_1 = port_set.get("internal_import_markup_1")
+                    internal_import_store_2 = port_set.get("internal_import_store_2")
+                    internal_import_discount_2 = port_set.get("internal_import_discount_2")
+                    internal_import_mp_1 = port_set.get("internal_import_mp_1")
+                    internal_import_store_1 = port_set.get("internal_import_store_1")
+                    internal_import_discount_1 = port_set.get("internal_import_discount_1")
+                    internal_import_mp_2 = port_set.get("internal_import_mp_2")
+                    internal_import_role_2 = port_set.get("internal_import_role_2")
+                    internal_import_markup_2 = port_set.get("internal_import_markup_2")
+
+                    # for row in port_set.items():
+                    #     # print(row + ' = ' + 'request.args.get("' + row + '")')
+                    #     # print(row + '=' + row + ',')
+                    #     print(row)
+
+                    uid = current_user.id
+                    role = current_user.roles
+                    need_id = current_user.company_id
+                    user_name = current_user.name
+                    photo = current_user.photo
+                    if not photo or photo is None:
+                        photo = 'prof-music-2.jpg'
+
+                    return render_template('/import_settings.html',
+                                           uid=uid, role=role,
+                                           photo=photo,
+                                           user_name=user_name,
+                                           show=True,
+                                           internal_import_role_1=internal_import_role_1,
+                                           internal_import_markup_1=internal_import_markup_1,
+                                           internal_import_store_2=internal_import_store_2,
+                                           internal_import_discount_2=internal_import_discount_2,
+                                           internal_import_mp_1=internal_import_mp_1,
+                                           internal_import_store_1=internal_import_store_1,
+                                           internal_import_discount_1=internal_import_discount_1,
+                                           internal_import_mp_2=internal_import_mp_2,
+                                           internal_import_role_2=internal_import_role_2,
+                                           internal_import_markup_2=internal_import_markup_2)
+                except:
+                    flash("Настройки для указанных магазинов не найдены. Введите требуемые настройки и сохраните их.", "alert")
+
+            elif result.get('internal_import_store_1') is not None:
+                import_set = db.session.scalars(select(InternalImport)
+                                                .where(
+                    InternalImport.internal_import_store_1 == data.get('internal_import_store_1'))
+                                                .where(
+                    InternalImport.internal_import_role_1 == data.get('internal_import_role_1'))) \
+                    .first()
+                try:
+                    port_set = import_set.__dict__
+                    internal_import_role_1 = port_set.get("internal_import_role_1")
+                    internal_import_markup_1 = port_set.get("internal_import_markup_1")
+                    internal_import_store_2 = port_set.get("internal_import_store_2")
+                    internal_import_discount_2 = port_set.get("internal_import_discount_2")
+                    internal_import_mp_1 = port_set.get("internal_import_mp_1")
+                    internal_import_store_1 = port_set.get("internal_import_store_1")
+                    internal_import_discount_1 = port_set.get("internal_import_discount_1")
+                    internal_import_mp_2 = port_set.get("internal_import_mp_2")
+                    internal_import_role_2 = port_set.get("internal_import_role_2")
+                    internal_import_markup_2 = port_set.get("internal_import_markup_2")
+
+                    uid = current_user.id
+                    role = current_user.roles
+                    need_id = current_user.company_id
+                    user_name = current_user.name
+                    photo = current_user.photo
+                    if not photo or photo is None:
+                        photo = 'prof-music-2.jpg'
+
+                    return render_template('/import_settings.html',
+                                           uid=uid, role=role,
+                                           photo=photo,
+                                           user_name=user_name,
+                                           show=True,
+                                           internal_import_role_1=internal_import_role_1,
+                                           internal_import_markup_1=internal_import_markup_1,
+                                           internal_import_store_2=internal_import_store_2,
+                                           internal_import_discount_2=internal_import_discount_2,
+                                           internal_import_mp_1=internal_import_mp_1,
+                                           internal_import_store_1=internal_import_store_1,
+                                           internal_import_discount_1=internal_import_discount_1,
+                                           internal_import_mp_2=internal_import_mp_2,
+                                           internal_import_role_2=internal_import_role_2,
+                                           internal_import_markup_2=internal_import_markup_2)
+                except:
+                    flash("Настройки для указанного магазина не найдены. Введите требуемые настройки и сохраните их.", "alert")
+
+            elif result.get('internal_import_store_2') is not None:
+                import_settings = db.session.scalars(select(InternalImport)
+                                                .where(
+                    InternalImport.internal_import_store_2 == data.get('internal_import_store_2'))
+                                                .where(
+                    InternalImport.internal_import_role_2 == data.get('internal_import_role_2'))) \
+                    .first()
+                try:
+                    mprt_setts = import_settings.__dict__
+                    internal_import_role_1 = mprt_setts.get("internal_import_role_1")
+                    internal_import_markup_1 = mprt_setts.get("internal_import_markup_1")
+                    internal_import_store_2 = mprt_setts.get("internal_import_store_2")
+                    internal_import_discount_2 = mprt_setts.get("internal_import_discount_2")
+                    internal_import_mp_1 = mprt_setts.get("internal_import_mp_1")
+                    internal_import_store_1 = mprt_setts.get("internal_import_store_1")
+                    internal_import_discount_1 = mprt_setts.get("internal_import_discount_1")
+                    internal_import_mp_2 = mprt_setts.get("internal_import_mp_2")
+                    internal_import_role_2 = mprt_setts.get("internal_import_role_2")
+                    internal_import_markup_2 = mprt_setts.get("internal_import_markup_2")
+
+                    uid = current_user.id
+                    role = current_user.roles
+                    need_id = current_user.company_id
+                    user_name = current_user.name
+                    photo = current_user.photo
+                    if not photo or photo is None:
+                        photo = 'prof-music-2.jpg'
+
+                    return render_template('/import_settings.html',
+                                           uid=uid, role=role,
+                                           photo=photo,
+                                           user_name=user_name,
+                                           show=True,
+                                           internal_import_role_1=internal_import_role_1,
+                                           internal_import_markup_1=internal_import_markup_1,
+                                           internal_import_store_2=internal_import_store_2,
+                                           internal_import_discount_2=internal_import_discount_2,
+                                           internal_import_mp_1=internal_import_mp_1,
+                                           internal_import_store_1=internal_import_store_1,
+                                           internal_import_discount_1=internal_import_discount_1,
+                                           internal_import_mp_2=internal_import_mp_2,
+                                           internal_import_role_2=internal_import_role_2,
+                                           internal_import_markup_2=internal_import_markup_2)
+                except:
+                    flash("Настройки для указанного магазина не найдены. Введите требуемые настройки и сохраните их.", "alert")
 
     return redirect('/import_settings')
 
@@ -756,9 +969,9 @@ def edit_product_post():
             else:
                 product = dict(prod[0].__dict__)
                 # print(111111111, *product.items(), sep='\n')
-            rows_shops = db.session\
+            rows_shops = db.session \
                 .execute(select(Marketplaces.shop_name)
-                                .where(Marketplaces.company_id == current_user.company_id)) \
+                         .where(Marketplaces.company_id == current_user.company_id)) \
                 .all()
             # print(rows_shops, type(rows_shops))
             rows = [row[0] for row in rows_shops]
@@ -1020,8 +1233,8 @@ def shops():
             rows = ''
 
             raw_list_shops = db.session.query(Marketplaces) \
-                        .filter_by(company_id=current_user.company_id)\
-                        .order_by(Marketplaces.seller_id.asc())\
+                .filter_by(company_id=current_user.company_id) \
+                .order_by(Marketplaces.seller_id.asc()) \
                 .all()
             # raw_list_products = db.session.query(Product)
             # .paginate(page=30, per_page=30, error_out=False).items

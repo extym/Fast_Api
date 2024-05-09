@@ -18,6 +18,19 @@
                 </div>
 
             </div>
+            <div>
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                <div class="alert alert-warning" role="alert">
+                    {{ messages[0] }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                    {% endif %}
+                {% endwith %}
+
+                </div>
         </div>
 <!--        <div class="clearfix"></div>-->
 
@@ -78,7 +91,7 @@
 
                                 <div class="col-lg-12 col-md-12 col-12">
                                     <div class="float-right ">
-                                        <button type="submit" name="make" value="start_import" title="Запустить импорт товаров с маркетплейса. Задача будет выполнятся в фоне, текущую вкладку можно закрыть" class="btn btn-success" >Запустить импорт</button>
+                                        <button type="submit" name="make" value="start_import" title="Запустить импорт товаров с маркетплейса. Задача будет выполнятся в фоне, текущую вкладку можно закрыть" class="btn btn-primary" >Запустить импорт</button>
                                         <button class="btn" type="reset">  Очистить  </button>
                                     </div>
 
@@ -91,11 +104,7 @@
                                         </div>
                                     </div>
                                 </div>
-
-
-
                             </form>
-
 
                         </div>
                     </div>
@@ -123,12 +132,17 @@
                                                 <label class="input-group-text" for="edit_name_mp">Маркетплейс</label>
                                             </div>
                                             <select class="custom-select" id="edit_name_mp" name="internal_import_mp_1">
-                                                    <option selected>Выбрать...</option>
+                                                {% if show %}
+                                                    <option selected>{{ internal_import_mp_1 }} </option>
+                                                        <option value="Выбрать" >Выбрать</option>
+                                                {% else %}
+                                                    <option selected>Выбрать</option>
                                                     <option value="yandex">ЯндексМаркет</option>
                                                     <option value="sber">СберМегаМаркет</option>
                                                     <option value="ozon">Озон</option>
                                                     <option value="wb">Вайлдбериз</option>
                                                     <option value="leroy">ЛеруаМерлен</option>
+                                                {% endif %}
                                                 </select>
                                         </div>
 
@@ -137,10 +151,15 @@
 
                                             <div class="controls">
                                                 <select class="custom-select" id="select_shop_name" name="internal_import_store_1">
-                                            <option selected>Выбрать </option>
-                                                {% for row in rows %}
-                                                <option value="{{ row }}" >{{ row }}</option>
-                                                {% endfor %}
+                                                    {% if show %}
+                                                    <option selected>{{ internal_import_store_1 }} </option>
+                                                        <option value="Выбрать" >Выбрать</option>
+                                                    {% else %}
+                                                    <option selected>Выбрать </option>
+                                                        {% for row in rows %}
+                                                        <option value="{{ row }}" >{{ row }}</option>
+                                                        {% endfor %}
+                                                    {% endif %}
 
                                                 </select>
                                             </div>
@@ -151,24 +170,35 @@
                                                 <span class="desc"></span>
                                                 <select class="form-control" id="status_store" name="internal_import_role_1">
                                                     <option></option>
-                                                    <option value="donor" selected='selected'>Магазин источник</option>
-                                                    <option value="recipient">Магазин назначения</option>
+                                                    <option value="donor" selected='selected' >Магазин источник</option>
+<!--                                                    <option value="recipient" selected='selected'>Магазин назначения</option>-->
+
                                                 </select>
                                             </div>
 
                                         <div class="form-group">
-                                            <label class="form-label" for="formfield21">Наценка на товары этого магазина для импорта</label>
+                                            <label class="form-label" title="Это наценка на цену закупки (или ее алиас - расчетную цену) для установки и трансляции цен в пределах магазина" for="formfield21">Наценка на товары этого магазина в пределах магазина</label>
                                             <span class="desc">% например "16"</span>
                                             <div class="controls">
+                                                {% if show %}
+                                                <input type="text" value="{{ internal_import_markup_1 }}" class="form-control" name="internal_import_markup_1" >
+                                                {% else %}
                                                 <input type="text" value="0" class="form-control" id="formfield21" name="internal_import_markup_1" >
+                                                {% endif %}
+
                                             </div>
                                         </div>
 
                                         <div class="form-group">
-                                            <label class="form-label" for="formfield2">Скидка на товары этого магазина для импорта</label>
+                                            <label class="form-label" title="Это скидка на цену закупки (или ее алиас - расчетную цену) для установки и трансляции цен в пределах магазина" for="formfield2">Скидка на товары этого магазина в пределах магазина</label>
                                             <span class="desc">% например "13"</span>
                                             <div class="controls">
+                                                {% if show %}
+                                                <input type="text" value="{{ internal_import_discount_1 }}" class="form-control" name="internal_import_discount_1" >
+                                                {% else %}
                                                 <input type="text" value="0" class="form-control" id="formfield2" name="internal_import_discount_1" >
+                                                {% endif %}
+
                                             </div>
                                         </div>
 
@@ -176,30 +206,23 @@
                                     </div>
                                     <div class="col-lg-6 col-md-6 col-6">
 
-<!--                                        <div class="input-group mb-3">-->
-<!--                                        <div class="input-group-prepend">-->
-<!--                                            <label class="input-group-text" for="input_shop_name">Магазин</label>-->
-<!--                                        </div>-->
-<!--                                        <select class="custom-select" id="input_shop_name" name="set_shop_settings">-->
-<!--                                        <option selected>Выбрать </option>-->
-<!--                                            {% for row in rows %}-->
-<!--                                            <option value="{{ row }}" >{{ row }}</option>-->
-<!--                                            {% endfor %}-->
-
-<!--                                        </select>-->
-<!--                                        </div>-->
 
                                         <div class="input-group mb-3">
                                         <div class="input-group-prepend">
                                             <label class="input-group-text" for="edit_settings_mp">Маркетплейс</label>
                                         </div>
                                         <select class="custom-select" id="edit_settings_mp" name="internal_import_mp_2">
-                                                <option selected>Выбрать...</option>
+                                            {% if show %}
+                                                <option selected>{{ internal_import_mp_2 }} </option>
+                                                <option value="Выбрать" >Выбрать</option>
+                                            {% else %}
+                                                <option selected>Выбрать</option>
                                                 <option value="yandex">ЯндексМаркет</option>
                                                 <option value="sber">СберМегаМаркет</option>
                                                 <option value="ozon">Озон</option>
                                                 <option value="wb">Вайлдбериз</option>
                                                 <option value="leroy">ЛеруаМерлен</option>
+                                            {% endif %}
                                             </select>
                                     </div>
 
@@ -208,10 +231,15 @@
 
                                             <div class="controls">
                                                 <select class="custom-select" id="edit_shop_name" name="internal_import_store_2">
-                                            <option selected>Выбрать </option>
-                                                {% for row in rows %}
-                                                <option value="{{ row }}" >{{ row }}</option>
-                                                {% endfor %}
+                                                    {% if show %}
+                                                    <option selected>{{ internal_import_store_2 }} </option>
+                                                        <option value="Выбрать" >Выбрать</option>
+                                                    {% else %}
+                                                    <option selected>Выбрать </option>
+                                                        {% for row in rows %}
+                                                        <option value="{{ row }}" >{{ row }}</option>
+                                                        {% endfor %}
+                                                    {% endif %}
 
                                                 </select>
                                             </div>
@@ -222,24 +250,33 @@
                                                 <span class="desc"></span>
                                                 <select class="form-control" id="status_store_2" name="internal_import_role_2">
                                                     <option></option>
-                                                    <option value="donor" >Магазин источник</option>
                                                     <option value="recipient" selected='selected'>Магазин назначения</option>
                                                 </select>
                                             </div>
 
                                         <div class="form-group">
-                                            <label class="form-label" for="formfield5">Дополнительная наценка на товары магазина</label>
+                                            <label class="form-label" for="formfield5">Наценка для импорта на товары этого магазина</label>
                                             <span class="desc">% например "33"</span>
                                             <div class="controls">
-                                                <input type="text" value="0" class="form-control" id="formfield5" name="internal_import_markup_2" >
+                                                {% if show %}
+                                                    <input type="text" value="{{ internal_import_markup_2 }}" class="form-control"  name="internal_import_markup_2" >
+                                                {% else %}
+                                                    <input type="text" value="0" class="form-control" id="formfield5" name="internal_import_markup_2" >
+                                                {% endif %}
+
                                             </div>
                                         </div>
 
                                         <div class="form-group">
-                                            <label class="form-label" for="formfield6">Дополнительная скидка на товары магазина</label>
+                                            <label class="form-label" for="formfield6">Скидка для импорта на товары этого магазина</label>
                                             <span class="desc">% например "23"</span>
                                             <div class="controls">
-                                                <input type="text" value="0" class="form-control" id="formfield6" name="internal_import_discount_2" >
+                                                {% if show %}
+                                                    <input type="text" value="{{ internal_import_discount_2 }}" class="form-control"  name="internal_import_discount_2" >
+                                                {% else %}
+                                                    <input type="text" value="0" class="form-control" id="formfield6" name="internal_import_discount_2" >
+                                                {% endif %}
+
                                             </div>
                                         </div>
 
@@ -248,7 +285,7 @@
 
                                 <div class="col-lg-12 col-md-12 col-12">
                                     <div class="float-right ">
-                                        <button type="submit" name="make" value="save_internal_import" class="btn btn-success">СОХРАНИТЬ</button>
+                                        <button type="submit" name="make" value="save_internal_import" class="btn btn-primary">СОХРАНИТЬ</button>
                                         <button class="btn" type="reset">Очистить</button>
                                     </div>
 
@@ -263,7 +300,7 @@
                                                 </button>
                                                 <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1" style="will-change: transform;">
                                                     <li class="dropdown-item" role="presentation"><button class="btn" type="submit" name="make"  value="start_internal_import_product" title="Запуск разового импорта товаров возможен после сохранения настроек импорта. Чтобы запустить импорт укажите маркетплейс, магазин источник и маркетплейс, магазин назначения">Запустить импорт товаров</button></li>
-                                                    <li class="dropdown-item" role="presentation"><button class="btn" type="submit" name="make" value="start_internal_import_price" title="Запуск разового импорта цен возможен после сохранения настроек импорта. Чтобы запустить импорт укажите: маркетплейс и магазин источник; маркетплейс и магазин назначения; коэффициент цены импорта в процентах. По умолчанию коэффициент 1 или 100%">Запустить импорт цен</button></li>
+                                                    <li class="dropdown-item" role="presentation"><button class="btn" type="submit" name="make" value="start_internal_import_price" title="Запуск разового импорта цен возможен после сохранения настроек импорта. Чтобы запустить импорт укажите: маркетплейс и магазин источник; маркетплейс и магазин назначения; коэффициент цены импорта в процентах. По умолчанию коэффициент 1 или 0%">Запустить импорт цен   </button></li>
                                                 </ul>
                                             </div>
                                             <button class="btn" type="reset" title="Очистить форму" >  Очистить  </button>
@@ -303,7 +340,7 @@
                     </div>
                     <div class="modal-footer">
                         <button data-dismiss="modal" class="btn btn-default" type="button">Close</button>
-                        <button class="btn btn-success" type="button">Save changes</button>
+                        <button class="btn btn-primary" type="button">Save changes</button>
                     </div>
                 </div>
             </div>
@@ -324,7 +361,7 @@
                     </div>
                     <div class="modal-footer">
                         <button data-dismiss="modal" class="btn btn-default" type="button">Close</button>
-        {#                <button class="btn btn-success" type="button">Save changes</button>#}
+        {#                <button class="btn btn-primary" type="button">Save changes</button>#}
                     </div>
                 </div>
             </div>
@@ -399,7 +436,7 @@
                     </div>
                     <div class="modal-footer">
                         <button data-dismiss="modal" class="btn btn-default" type="button">Close</button>
-                        <button class="btn btn-success" type="button">Save changes</button>
+                        <button class="btn btn-primary" type="button">Save changes</button>
                     </div>
                 </div>
             </div>
