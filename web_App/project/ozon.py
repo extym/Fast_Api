@@ -274,7 +274,7 @@ def create_data_price_for_send(seller_id=None, from_db=True):
                     "old_price": old_price,
                     "price": final_price,
                     "price_strategy_enabled": "UNKNOWN",
-                    "product_id": product.articul_product
+                    "product_id": product.product_id
                 }
                 print("Make data price - seller_id {}. data price {}, k={}"
                       .format(seller_id, proxy, koeff))
