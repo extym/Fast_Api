@@ -59,7 +59,8 @@ def get_orders_v2(customer_id, marketplace_id):
     while marketplace_id != result:
         params = {
             'search[customer_id_eq]': customer_id,
-            'search[marketplace_id_eq]': marketplace_id,
+            # 'search[marketplace_id_eq]': marketplace_id,
+            'search[order_items_attributes][0][comment_eq]': str(marketplace_id),
             'per_page': 20,
             'page': page
         }
@@ -68,6 +69,7 @@ def get_orders_v2(customer_id, marketplace_id):
         answer = requests.get(url, auth=token_ps, params=params)
         if answer.ok:
             data = answer.json()
+            print(22222222, answer.text)
             result_list = [i for i in data.get('orders')
                            if i.get('marketplace_id') == marketplace_id]
 
@@ -88,12 +90,12 @@ def get_orders_v2(customer_id, marketplace_id):
             if page >= 5:
                 break
 
-    # print(7777, result_list)
+    print(7777, result_list, marketplace_id, type(marketplace_id))
     try:
         datas = ' '.join([str(i.get('id')) for i in result_list[0].get('order_items')])
     except:
         datas = ''
-    # print('datas', datas)
+    print('datas', datas)
     return datas
 
 
@@ -280,13 +282,21 @@ def create_resp_if_not_exist(list_items, link,
 
     return global_result_make_basket
 
+
 # send_current_basket_to_order()
 
 # create_resp_is_exist(brand="STELLOX", oem="42140459SX", qnt=2, external_id=451642783)
 # get_current_client_smth(basket)
 
+ym_orders = [459439792, 459438203, 459412869, 459372108, 459349047, 459339840, 459295293, 459282888, 459271641,
+             459270442, 459234214, 459203644, 459196400, 459188985, 459188686, 459179825, 459170546, 459158382,
+             459097786, 459091113, 459086634, 459051043, 459049573, 459048159, 459048159, 459037290, 459007002,
+             458955474, 458936875, 458883613, 458811366, 458520720, 458426347, 458355458, 458355264, 458250383,
+             458172884]
+ym_orders_short = [459439792, 459438203, 459412869, 459372108, 459349047, 459339840, 459295293, 459282888, 459271641]
 
 # get_orders_v2(710, marketplace_id='9009797416999')
+get_orders_v2(2063, marketplace_id="459439792")
 
 # get_smth('/regions.json')
 # get_smth("/orders.json")

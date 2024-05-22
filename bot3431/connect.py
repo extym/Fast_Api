@@ -137,6 +137,20 @@ async def execute_query_v3(query, data):
                 print(f"The ERROR from execute_query '{err}' occured ")
 
 
+def execute_query_return_v3(query, data):
+    raw_data = []
+    with create_connection() as conn:
+        conn.autocommit = True
+        with conn.cursor() as cursor:
+            try:
+                cursor.execute(query, [data])
+                raw_data = cursor.fetchall()
+                print("Query from execute_query executed successfully")
+            except OperationalError as err:
+                print(f"The ERROR from execute_query '{err}' occured ")
+
+    return raw_data
+
 async def executemany_query(query, data):
     connection = create_connection()
     connection.autocommit = True
@@ -271,6 +285,51 @@ def check_is_exist_message_in_db_v2(msg_id, chat_id):
 # check_order( query_read_order, ("MP2713064-001", 'Leroy'))
 
 
+def check_order_exist(query, data):
+    result = False
+    status = None
+    with create_connection() as conn:
+        conn.autocommit = True
+        with conn.cursor() as cursor:
+            try:
+                cursor.execute(query, [data])
+                raw_data = cursor.fetchone()
+                if raw_data is not None:
+                    result = True
+                    status = raw_data[10]
+                print(f"Query from execute_query {raw_data, status} executed successfully")
+            except OperationalError as err:
+                print(f"The ERROR from execute_query '{err}' occured ")
+
+    return result, status
+
+
+
+def execute_query_return_bool(query, data):
+    with create_connection() as conn:
+        conn.autocommit = True
+        with conn.cursor() as cursor:
+            try:
+                cursor.execute(query, data)
+                return True
+                print("Query from execute_query executed successfully")
+            except OperationalError as err:
+                print(f"The ERROR from execute_query '{err}' occured ")
+                return False
+
+
+def executemany_return_bool(query, data):
+    with create_connection() as conn:
+        conn.autocommit = True
+        with conn.cursor() as cursor:
+            try:
+                cursor.executemany(query, data)
+                return True
+                print("Query from execute_query executed successfully")
+            except OperationalError as err:
+                print(f"The ERROR from execute_query '{err}' occured ")
+                return False
+
 def maintenans_query(query):
     connection = create_connection()
     connection.autocommit = True
@@ -305,6 +364,21 @@ query_check_is_message_exist = "SELECT msg_id, first_answer, rewrite_leads FROM 
 query_get_bid_for_chat_id = "SELECT * FROM fresh_bids WHERE chat_id = %s"
 
 query_get_bid_for_lead_id = "SELECT * FROM fresh_bids WHERE leads_id = %s"
+
+query_get_all_shops = "SELECT * FROM stores WHERE mp_name= %s"
+
+query_is_exist_order = "SELECT * FROM fresh_orders WHERE order_id_mp = %s"
+
+query_write_order = "INSERT INTO  fresh_orders ( order_id_mp, mp_name, shipment_date," \
+                    " date_added, status, substatus, payment_type, delivery, summ_order, client_id_ps )" \
+                    "VALUES (%s, %s, %s, now(), %s, %s, %s, %s, %s, %s)"
+
+query_write_items = " INSERT INTO order_items ( order_id_mp, mp_name, offer_id, " \
+                    " id_1c, quantity, price ) " \
+                    " VALUES ( %s, %s, %s, %s, %s, %s )"
+
+query_add_settings_ym = (" INSERT INTO stores "
+                         "( client_id, key_store, api_key_ps, upload_link)")
 
 proxy = ("u2i-TOYzRVLyb9Hw_l7u2aBTVg", '4391',
          "https://avito.ru/sankt-peterburg/zapchasti_i_aksessuary/trw_df4110_torm.disk_per.vent.280x24_4_otv_3364311913",

@@ -67,7 +67,7 @@ def get_id_1c(offer_id):
     return None
 
 
-def reformat_data_order(order, mp):
+def reformat_data_order(order, mp, client_id_ps):
     result, result_items = None, None
     if mp == 'Yandex':
         try:
@@ -82,7 +82,8 @@ def reformat_data_order(order, mp):
             order["substatus"],
             order["paymentType"],
             order["delivery"]["type"],
-            order["buyerTotalBeforeDiscount"]
+            order["buyerTotalBeforeDiscount"],
+            client_id_ps
         )
 
         result_items = []
@@ -186,7 +187,7 @@ def reformat_data_order(order, mp):
 
 
 def make_orders_to_ps(source=None):
-    campain_list = execute_query_return_v3(query_get_all_shops)
+    campain_list = execute_query_return_v3(query_get_all_shops, "Yandex")
     if len(campain_list) > 0:
         for campain in campain_list:
             # orders_data = get_current_orders(campain[3])
@@ -207,7 +208,8 @@ def make_orders_to_ps(source=None):
 
                     # sys.exit()
                     if not check[0]:
-                        data_order = reformat_data_order(order, 'Yandex')
+                        data_order = reformat_data_order(order, 'Yandex', campain[1])
+                        print(order, 'Yandex', campain[1])
                         write_order = execute_query_return_bool(query_write_order,
                                                                 data_order[0])
                         write_items = executemany_return_bool(query_write_items,

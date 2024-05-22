@@ -13,7 +13,7 @@ from gevent.pywsgi import WSGIServer
 import datetime
 import requests
 from maintenance import shorter_data
-from excel_read import read_xlsx
+from excel_read import read_xlsx, read_xlsx_v2
 import csv
 from avito import *
 from amo import *
@@ -22,7 +22,6 @@ import logging
 from bot_tg import send_get
 from parts_soft import make_data_for_request_v2
 import connect as conn
-
 
 urllib3.disable_warnings()
 
@@ -336,6 +335,7 @@ def get_token_token():
 def test():
     return 'OK phone'
 
+
 #
 # @app.route('/form-data', methods=['POST'])
 # def get_data():
@@ -384,7 +384,7 @@ async def avito_webhook():
         try:
 
             ## system message from avito or our
-            if author_id == 1 or check[0]: # or (author_id in sender_ids and msg != bot_answer):
+            if author_id == 1 or check[0]:  # or (author_id in sender_ids and msg != bot_answer):
                 return app.response_class(
                     status=200
                 )
@@ -408,7 +408,7 @@ async def avito_webhook():
                 try:
                     await get_avito_current_chat_v2(hook, check)
                     logging.info('get_avito_current_chat_v2 {} {} {}'
-                                 .format(hook,check, chat_id))
+                                 .format(hook, check, chat_id))
                     return app.response_class(
                         status=200
                     )
@@ -418,7 +418,7 @@ async def avito_webhook():
                     return app.response_class(
                         status=200
                     )
-        except Exception as  error:
+        except Exception as error:
             logging.error('Web_hook_fuckup {} {}'.format(error, hook))
             return app.response_class(
                 status=200
@@ -557,8 +557,8 @@ async def download():
                 if not market:
                     flash("Выберите маркетплейс для загружаемого файла")
                     return redirect(request.url)
-                data = read_xlsx(file)
-                # print(2222222222222, data)
+                # data = read_xlsx(file)
+                data = read_xlsx_v2(file, market)
                 await make_data_for_request_v2(data, market)
                 if data:
                     flash("File upload successfully")
@@ -585,14 +585,14 @@ async def add_store():
         upload_link = data.get('upload_link')
         print(33333333, market, key_store, store_id, upload_link)
 
-        if (market == '235' or market == '2063' or market == '2063')\
+        if (market == '235' or market == '2063' or market == '2063') \
                 and store_id != '' and key_store != '' and upload_link != '':
             result = conn.execute_query_v2(query_add_settings_ym,
-                                        (market,
-                                         key_store,
-                                         store_id,
-                                         api_key_ps,
-                                         upload_link))
+                                           (market,
+                                            key_store,
+                                            store_id,
+                                            api_key_ps,
+                                            upload_link))
             if result[0]:
                 flash('Настройки удачно сохранены')
             else:
@@ -600,10 +600,10 @@ async def add_store():
 
         elif market != '' and key_store != '' and upload_link != '':
             result = conn.execute_query_v2(query_add_settings_without_ym,
-                                        (market,
-                                         key_store,
-                                         api_key_ps,
-                                         upload_link))
+                                           (market,
+                                            key_store,
+                                            api_key_ps,
+                                            upload_link))
             if result[0]:
                 flash('Настройки удачно сохранены')
             else:
@@ -618,7 +618,7 @@ async def add_store():
 
 if __name__ == '__main__':
     # #Debug/Development
-    #run app in debug mode on port 5000
+    # run app in debug mode on port 5000
     app.run(debug=True, host='0.0.0.0', port=8880)
     # Production
     # http_server = WSGIServer(('', 8880), app)
