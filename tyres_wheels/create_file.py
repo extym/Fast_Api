@@ -2,11 +2,11 @@ import json
 import sys
 from xml.dom import minidom
 import datetime
-
+from pictures import dowload_images
 from main import get_new_pages_v2
 from prepare_data_export import get_need_data, get_need_data_v2
-# from copy_connect import check_and_write
-from copy_connect import check_write_json, check_and_write_v3, standart_product_v2
+from connect import check_and_write_v4, check_write_json_v4, standart_product_v2
+# from copy_connect import check_write_json, check_and_write_v3, standart_product_v2
 from getcsv import standart_wheels_csv
 from get_json import standart_wheels_from_json
 from cred import DATA_IMG, DATA_PATH
@@ -23,7 +23,6 @@ need_cats = ['NEO', 'Wheels UP', 'iFree', 'CARWEL', 'КИК', 'Tech-Line', 'Carw
 # need_cats.extend(ll)
 # print(7777, set(need_cats))
 
-# check_and_write()
 
 def clean_standart_data():
     data = {}
@@ -144,21 +143,41 @@ def create_ym_xml(stocks_is_null=False, without_db=False):
         textMinQuantityOffer = root.createTextNode('2')
         minQuantityOfferChild.appendChild(textMinQuantityOffer)
         offerChild.appendChild(minQuantityOfferChild)
-    
-    
-    # csv_data = standart_wheels_csv()
-    # json_data = standart_wheels_from_json()
-    # need_data = check_and_write_v3()
+
+        # <weight>3.1</weight>
+        weightOfferChild = root.createElement('weight')
+        textWeightOffer = root.createTextNode('7.6')
+        weightOfferChild.appendChild(textWeightOffer)
+        offerChild.appendChild(weightOfferChild)
+
+        # <dimensions>22.1/40.425/22.1</dimensions>
+        dimensionsOfferChild = root.createElement('dimensions')
+        textDimensionsOffer = root.createTextNode('65/65/27')
+        dimensionsOfferChild.appendChild(textDimensionsOffer)
+        offerChild.appendChild(dimensionsOfferChild)
     
     
     def create_need_data(without_db=False):
+        json_data, csv_data = {}, {}
         if not without_db:
-            csv_data = standart_wheels_csv()
-            json_data = standart_wheels_from_json()
-            data = check_and_write_v3()
+            try:
+                csv_data = standart_wheels_csv()
+            except:
+                print("We don't get csv")
+            try:
+                json_data = standart_wheels_from_json()
+            except:
+                print("We don't get json")
+            data = check_and_write_v4()
         else:
-            csv_data = standart_wheels_csv(without_db=True)
-            json_data = standart_wheels_from_json(without_db=True)
+            try:
+                csv_data = standart_wheels_csv(without_db=True)
+            except:
+                pass
+            try:
+                json_data = standart_wheels_from_json(without_db=True)
+            except:
+                pass
             data = standart_product_v2(get_new_pages_v2())
     
         pre_csv_data = {key: value for key, value in csv_data.items() if int(value[0][4]) >= 4}
@@ -214,7 +233,7 @@ def create_ym_xml(stocks_is_null=False, without_db=False):
                                  str(row[0][3]))
                     counter += 1
         except Exception as error:
-            print('some_fuck_up_need_data {} {} {} {}'.format
+            print('some_fuck_up_need_ym_data {} {} {} {}'.format
                   (error, type(row[0][4]), row[0][4], row))
             continue
             # sys.exit()
@@ -249,9 +268,12 @@ def create_ym_xml(stocks_is_null=False, without_db=False):
     # with open(DATA_IMG + "sber.xml", "wb") as f:
     #     f.write(xml_str)
 
+    clean_standart_data()
+    dowload_images()
 
-# create_ym_xml(without_db=True, stocks_is_null=False)
-create_ym_xml()
-clean_standart_data()
+
+create_ym_xml(without_db=True, stocks_is_null=False)
+# create_ym_xml()
+# clean_standart_data()
 
 

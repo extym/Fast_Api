@@ -10,7 +10,7 @@ import requests
 from cred import *
 # from getcsv import get_tyres_csv
 from categories import *
-from pictures import dowload_images
+
 
 
 def write(smth):
@@ -132,7 +132,6 @@ def standart_product(dictionary, in_stock):
         result = [category_id, name, description, price, in_stock, enabled, product_code, vendor, meta_d, meta_k,
                   params, koeff, meta_h1], image_tuple
 
-
     return result
 
 
@@ -156,6 +155,8 @@ def standart_product_v2(list_wheels_json):
             vendor = dictionary.get('vendor').replace('"', '')
             category_id = categories_wheels\
                 .get(vendor, cats_wheels_upper.get(vendor.upper(), 7000))
+            if category_id is None:
+                print(555555555555555, dictionary)
             price_opt = int(dictionary.get('price').strip('"').replace('\xa0', '').split('.')[0])
             price = float(dictionary.get('RoznicaPrice').strip('"').replace('\xa0', '').split('.')[0])
             rule = False
@@ -199,8 +200,12 @@ def standart_product_v2(list_wheels_json):
                 ],
                 image_tuple,
                 options,
-                rule,
+                rule, 
                 price_opt)})
+
+            # result = ([category_id, name, description, price, in_stock, enabled, product_code, vendor, meta_d, meta_k,
+            #            params, koeff, meta_h1, category], image_tuple, options)
+            # global_result.append(result)
 
         except:
             # print("FUCKUP_standart_product_v2", dictionary)
@@ -293,10 +298,12 @@ def params_options(dictionary, product_id):
 def create_connection():
     connx = None
     try:
-        connx = mysql.connector.connect(user=local_user_db, database=local_name_db,
-                                        password=local_pass_db, host=local_host_db)
-        # connx = mysql.connector.connect(user=user_db, database=name_db,
-        #                                 password=pass_db, host=host_db)
+        if LOCAL_MODE:
+            connx = mysql.connector.connect(user=local_user_db, database=local_name_db,
+                                            password=local_pass_db, host=local_host_db)
+        else:
+            connx = mysql.connector.connect(user=user_db, database=name_db,
+                                            password=pass_db, host=host_db)
     except ConnectionError as error:
         print(f'We have ERROR CREATE_CONN {error}')
 
@@ -320,13 +327,39 @@ def make_query_get_id(connection, query, data_query):
 
 
 def make_query_get_id_v2( query, data_query):
-    with create_connection() as connection:
-        with connection.cursor() as cursor:
-            cursor.execute(query, data_query)
-            connection.commit()
-            lastrow_id = cursor.lastrowid
+    connection = create_connection()
+    if connection.is_connected():
+        cursor = connection.cursor()
+        cursor.execute(query, data_query)
+        connection.commit()
+        lastrow_id = cursor.lastrowid
+        cursor.close()
+
+        connection.close()
 
     return lastrow_id
+
+
+def make_query_v2(query, data_query):
+    connection = create_connection()
+    if connection.is_connected():
+        cursor = connection.cursor()
+        cursor.execute(query, data_query)
+        connection.commit()
+
+        cursor.close()
+        connection.close()
+
+
+def make_query_many_v2(query, data_query):
+    connection = create_connection()
+    if connection.is_connected():
+        cursor = connection.cursor()
+        cursor.executemany(query, data_query)
+        connection.commit()
+
+        cursor.close()
+        connection.close()
 
 
 def makery(connection, query, data):
@@ -354,6 +387,12 @@ def create_database(connection, query):
         print(f"The error DATABASE CREATE '{e}' occurred")
 
 
+add_product_picture = ("UPDATE avl_products SET default_picture = %s  WHERE productID = %s")
+
+update = ("UPDATE avl_products SET Price = %s, in_stock = %s, enabled = %s, date_modified = NOW()  "
+                 "WHERE categoryID = %s AND product_code = %s")
+
+add_options = ("INSERT INTO avl_product_options_values (optionID, productID, option_value) VALUES (%s, %s, %s)")
 
 add_product = ("INSERT INTO avl_products "
                "(categoryID, name, description, Price, in_stock, enabled, product_code, date_added, date_modified, eproduct_filename, meta_description, meta_keywords, params, koeff, meta_h1) "  # params
@@ -419,6 +458,7 @@ def check_and_write_v3():
         if category in [1, 4, 5, 7]:  ###wheels only
             is_exist = check_is_exist(data_product[0][6], data_product[0][0])
             if not is_exist[0] and quantity >= 4:
+                product_id = make_query_get_id(connection, add_product, data_product[0])  # cursor.lastrowid
                 product_id = make_query_get_id(connection, add_product, data_product[0])  # cursor.lastrowid
                 # ij_data.append(prepare_get_image(product_id, data_product[1]))
                 ij_data.append({product_id: data_product[1]})
@@ -525,14 +565,105 @@ def check_and_write_v3():
     return standart_copy
 
 
+def check_and_write_v4():
+    data_from = get_new_pages_v2()
+    standart = standart_product_v2(data_from)
+    standart_copy = standart.copy()
+    ij_data, proxy = [], []
+    count = 0
+    for key, data_product in standart.items():
+        # try:
+        category = data_product[0].pop(-1)  # [-1]
+        provider = data_product[0].pop(-1)
+        quantity = data_product[0][4]
+        if category in [1, 4, 5, 7]:  ###wheels only
+            is_exist = check_is_exist(data_product[0][6], data_product[0][0])
+            if not is_exist[0] and quantity >= 4:
+                product_id = make_query_get_id_v2(add_product, data_product[0])
+                ij_data.append({product_id: data_product[1]})
+                picture_id = make_query_get_id_v2(add_pictures,
+                                               [product_id, data_product[1][0]])
+                proxy_data = [picture_id, product_id]
+                make_query_v2(add_product_picture,  proxy_data)
+                data_options = params_optwheels(data_product[2], product_id)
+                # for option in data_options:
+                #     make_query_v2(add_options, option)
+                make_query_many_v2(add_options, data_options)
+
+            elif is_exist[0]:
+                category_id = data_product[0][0]
+                product_code = data_product[0][6]
+                price_for_site = data_product[0][3]
+                if quantity >= 4 and [is_exist[1], is_exist[2]] != [quantity, data_product[0][3]]:
+                    enabled = 1
+                    new_data = [price_for_site, quantity, enabled, category_id, product_code]
+                    make_query_v2(update, new_data)
+                elif quantity < 4 and is_exist[1] != quantity:
+                    enabled = 0
+                    new_data = [price_for_site, quantity, enabled, category_id, product_code]
+                    make_query_v2(update, new_data)
+                    del standart_copy[key]
+
+        elif category == 12:
+            try:
+                is_exist = check_is_exist(data_product[0][6], data_product[0][0])
+                if not is_exist[0] and quantity >= 4:
+                    product_id = make_query_get_id_v2(add_product, data_product[0])
+                    ij_data.append({product_id: data_product[1]})
+                    picture_id = make_query_get_id_v2(add_pictures,
+                                                   [product_id, data_product[1][0]])
+                    proxy_data = [picture_id, product_id]
+                    make_query_v2(add_product_picture, proxy_data)
+
+                    data_options_tyres = params_optyres(data_product[2], product_id)
+                    # for option in data_options_tyres:
+                    #     make_query_v2(add_options, option)
+                    make_query_many_v2(add_options, data_options_tyres)
+                elif is_exist[0]:
+                    category_id = data_product[0][0]  # because we get data from csv and has category_id
+                    product_code = data_product[0][6]
+                    price_for_site = data_product[0][3]
+                    if quantity >= 4 and [is_exist[1], is_exist[2]] != [quantity, data_product[0][3]]:
+                        enabled = 1
+                        new_data = [price_for_site, quantity, enabled, category_id, product_code]
+                        make_query_v2(update, new_data)
+                    elif quantity < 4 and is_exist[1] != quantity:
+                        # print(is_exist[1], 'quantity23 -', category_id, product_code, ' -now', quantity)
+                        enabled = 0
+                        new_data = [price_for_site, quantity, enabled, category_id, product_code]
+                        make_query_v2(update, new_data)
+
+            except mysql.connector.Error as err:
+                write("S_thing went wrong connector tyres: {}".format(err))
+                # write(str(data_product))
+                print("S_thing went wrong connector tyres: {}".format(err))
+                print('wrong connector tyres', str(data_product))
+                continue
+            except KeyError as e:
+                write("S_thing went wrong KeyError tyres---: {}".format(e))
+                # write(str(data_product))
+                print("S_thing went wrong KeyError tyres---: {}".format(e))
+                print('wrong connector tyres3', str(data_product))
+                continue
+
+        else:
+            print('pass', category)
+            continue
+
+    rewrite_pictures_data(ij_data)
+    print('For_write_pictures_data', len(ij_data))
+    print('from_check_and_write_4_errors', count)
+    # dowload_images()
+
+    return standart_copy
+
+
 def check_write_json(data_from_json):
     rewrite_standart_data(data_from_json)
     ij_data, proxy = [], []
     count = 0
     connection = create_connection()
     for key, data_product in data_from_json.items():
-        # try:
-        # print(data_product)
         category = data_product[0].pop(-1)  # [-1]
         provider = data_product[0].pop(-1)
         quantity = data_product[0][4]
@@ -550,15 +681,11 @@ def check_write_json(data_from_json):
                     makery(connection, 'add_options', option)
 
             elif is_exist[0]:
-                # category_id = categories_wheels[data_product[0][7]]
                 category_id = data_product[0][0]
                 product_code = data_product[0][6]
-                # if product_code == 'WHS520654':
-                #     print('!' * 250)
                 price_for_site = data_product[0][3]
                 if quantity >= 4 and [is_exist[1], is_exist[2]] != [quantity, data_product[0][3]]:
                     enabled = 1
-                    # new_data = [quantity, enabled, category_id, price_for_site, product_code]
                     new_data = [price_for_site, quantity, enabled, category_id, product_code]
                     makery(connection, 'update', new_data)
                     # print('Is_exist_product {} in_stock {}, price {}, income_data from {} -in_stock {}, price {}'
@@ -629,6 +756,86 @@ def check_write_json(data_from_json):
     print('write_pictures_link_2', len(ij_data))
     # write('from_check_and_write errors ' +  str(count))
     print('from_check_and_write_errors_json', count)
+
+
+def check_write_json_v4(data_from_json):
+    rewrite_standart_data(data_from_json)
+    ij_data, proxy = [], []
+    count = 0
+    for key, data_product in data_from_json.items():
+        category = data_product[0].pop(-1)  # [-1]
+        provider = data_product[0].pop(-1)
+        quantity = data_product[0][4]
+        if category in [1, 4, 5, 7]:  # and quantity >= 4: ###wheels only
+            is_exist = check_is_exist(data_product[0][6], data_product[0][0])
+            if not is_exist[0] and quantity >= 4:
+                product_id = make_query_get_id_v2(add_product, data_product[0])
+                ij_data.append({product_id: data_product[1]})
+                picture_id = make_query_get_id_v2(add_pictures,
+                                               [product_id, data_product[1][0]])
+                proxy_data = [picture_id, product_id]
+                make_query_v2(add_product_picture, proxy_data)
+                data_options = params_optwheels(data_product[2], product_id)
+                # for option in data_options:
+                #     make_query_v2(add_options, option)
+                make_query_many_v2(add_options, data_options)
+
+            elif is_exist[0]:
+                category_id = data_product[0][0]
+                product_code = data_product[0][6]
+                price_for_site = data_product[0][3]
+                if quantity >= 4 and [is_exist[1], is_exist[2]] != [quantity, data_product[0][3]]:
+                    enabled = 1
+                    new_data = [price_for_site, quantity, enabled, category_id, product_code]
+                    make_query_v2(update, new_data)
+                elif quantity < 4 and is_exist[1] != quantity:
+                    enabled = 0
+                    new_data = [price_for_site, quantity, enabled, category_id, product_code]
+                    make_query_v2(update, new_data)
+
+        elif category == 12:
+            try:
+                is_exist = check_is_exist(data_product[0][6], data_product[0][0])
+                if not is_exist[0] and quantity >= 4:
+                    product_id = make_query_get_id_v2(add_product, data_product[0])
+                    ij_data.append({product_id: data_product[1]})
+                    picture_id = make_query_get_id_v2(add_pictures,
+                                                   [product_id, data_product[1][0]])
+                    proxy_data = [picture_id, product_id]
+                    make_query_v2(add_product_picture, proxy_data)
+                    data_options_tyres = params_optyres(data_product[2], product_id)
+                    # for option in data_options_tyres:
+                    #     make_query_v2(add_options, option)
+                    make_query_many_v2(add_options, data_options_tyres)
+                elif is_exist[0]:
+                    category_id = data_product[0][0]  # because we get data from csv and has category_id
+                    product_code = data_product[0][6]
+                    price_for_site = data_product[0][3]
+                    if quantity >= 4 and [is_exist[1], is_exist[2]] != [quantity, data_product[0][3]]:
+                        enabled = 1
+                        new_data = [price_for_site, quantity, enabled, category_id, product_code]
+                        make_query_v2(update, new_data)
+                    elif quantity < 4 and is_exist[1] != quantity:
+                        enabled = 0
+                        new_data = [price_for_site, quantity, enabled, category_id, product_code]
+                        make_query_v2(update, new_data)
+
+            except mysql.connector.Error as err:
+                print("S_thing went wrong connector tyres: {}".format(err))
+                print('wrong connector tyres', str(data_product))
+                continue
+            except KeyError as e:
+                print("S_thing went wrong KeyError tyres---: {}".format(e))
+                print('wrong connector tyres3', str(data_product))
+                continue
+
+        else:
+            print('pass', category)
+            continue
+
+    rewrite_pictures_data(ij_data)
+    print('write_pictures_link_4', len(ij_data))
+    print('from_check_and_write_v4_errors_json', count)
 
 
 def get_smth_please():

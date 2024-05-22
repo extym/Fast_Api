@@ -6,8 +6,15 @@ from cred import DATA_PATH, magic_link_csv, magic_link_csv2
 import wget
 import csv
 import datetime
-from connect import check_write_json, rewrite_standart_data
+from connect import check_write_json, check_write_json_v4
 from categories import *
+from urllib.request import urlretrieve
+import urllib3
+urllib3.disable_warnings()
+
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
+
 
 tn = datetime.datetime.now()
 ts = datetime.datetime.timestamp(tn) * 1000
@@ -16,18 +23,14 @@ type_data = ['wheels', 'tyres']
 url2 = magic_link_csv + date
 url = magic_link_csv2 + date
 
-print(url, url2)
+# print(url, url2)
 # sys.exit()
-# try:
-#     result = wget.download(url, out='/usr/local/bin/fuck_debian/tyres_wheels/proxy_wheels.csv')
-#     result2 = wget.download(url2, out='/usr/local/bin/fuck_debian/tyres_wheels/proxy_tyres.csv')
-# except:
-try:
-    result = wget.download(url, out=DATA_PATH + '/proxy_wheels.csv')
-    result2 = wget.download(url2, out=DATA_PATH + '/proxy_tyres.csv')
-except:
-    pass
 
+# try:
+#     result = wget.download(url, out=DATA_PATH + '/proxy_wheels.csv')
+#     result2 = wget.download(url2, out=DATA_PATH + '/proxy_tyres.csv')
+# except:
+#     print('Fuck_up download csv')
 
 name = ['sku', 'title', 'brand_sku', 'gtin', 'season', 'brand', 'model', 'diameter', 'width', 'profile', 'load_index',
         'speed_index', 'pins', 'runflat', 'homologation', 'production_year', 'sale', 'price', 'price_retail',
@@ -50,38 +53,45 @@ def id_generator(size=8, chars=string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
 
-# with open('./proxy_wheels (1).csv', 'r') as file:
-#     count = 0
-#     liist = []
-#     reader = csv.reader(file, delimiter = '\t')
-#     for row in reader:
-#         if  row[3] not in liist and row[3] != 'brand':
-#             liist.append(row[3])
-#             count += 1
-#         elif row[3] == 'brand':
-#            # print(row)
-#             pass
-
 
 def get_data_csv():
-    with open(DATA_PATH + '/proxy_tyres (1).csv', 'r') as file:
-        reader = csv.reader(file, delimiter='\t')
-        proxy = []
-        for row in reader:
-            proxy.append(row)
-    print('get_data_csv', type(row), '--------', len(proxy))
+    proxy = []
+    try:
+        # result2 = wget.download(url2, out=DATA_PATH + '/proxy_tyres.csv')
+        # with open(DATA_PATH + '/proxy_tyres (1).csv', 'r') as file:
+        path2, data = urlretrieve(url2)
+        with open(path2, 'r') as file:
+            reader = csv.reader(file, delimiter='\t')
+            for row in reader:
+                proxy.append(row)
+        print(' get_data_csv_tyres ', '-------- ', len(proxy))
+    except:
+        print('Fuck_up download tyres csv')
+
     return proxy
+
 
 
 def get_data_wheels_csv():
-    with open(DATA_PATH + '/proxy_wheels (1).csv', 'r') as file:
-        reader = csv.reader(file, delimiter='\t')
-        proxy = []
-        for row in reader:
-            proxy.append(row)
-    print('get_data_wheels_csv', type(row), '--------', len(proxy))
-    # print(row)
+    proxy = []
+    try:
+        # result = wget.download(url, out=DATA_PATH + '/proxy_wheels.csv')
+        # with open(DATA_PATH + '/proxy_wheels (1).csv', 'r') as file:
+
+        path, data = urlretrieve(url)
+        with open(path, 'r') as file:
+            reader = csv.reader(file, delimiter='\t')
+            for row in reader:
+                proxy.append(row)
+        print('get_data_wheels_csv ', '-------- ', len(proxy))
+    except:
+        print('Fuck_up download wheels csv')
+
     return proxy
+
+
+
+# get_data_wheels_csv()
 
 
 def count_price(string, size):
@@ -162,7 +172,9 @@ def standart_tyres_csv():
                         [category_id, name, description, price,
                          in_stock, enabled, product_code, vendor, meta_d, meta_k,
                          params, koeff, meta_h1, provider, category],
-                        image_tuple, options, rule
+                        image_tuple,
+                        options,
+                        rule
                     )})
                 # result = ([category_id, name, description, price, in_stock, enabled, product_code, vendor, meta_d, meta_k,
                 #  params, koeff, meta_h1, category], image_tuple, options)
@@ -177,11 +189,11 @@ def standart_tyres_csv():
     mem = sys.getsizeof(proxy_data)
 
     print(mem / 1000, 'Kb--')
+    print("ALL_RIDE_get_tyres_csv ()".format(len(global_result)))
     return global_result
 
 
-
-def standart_wheels_csv():
+def standart_wheels_csv(without_db=False):
     data = get_data_wheels_csv()
     global_result = {}
     for i in range(1, len(data)):
@@ -204,11 +216,11 @@ def standart_wheels_csv():
                 # check category wheels and tyres
                 product_code = data[i][2]
                 diameter = data[i][7].split(' / ')[0]  # 16 'diameter'
-                width = data[i][7].split(' / ')[1].strip("0").replace('.', ',').strip(',')  #20
+                width = data[i][7].split(' / ')[1].strip("0").replace('.', ',').strip(',')  # 20
                 hole = 'D' + data[i][12].strip("0").replace('.', ',')  # 19
                 bolts_spacing = data[i][8] + '/' + \
-                                data[i][9].strip("0").replace('.', ',')  #17
-                et = 'ET' + data[i][11].strip("0").replace('.', ',').strip(',')  #18
+                                data[i][9].strip("0").replace('.', ',')  # 17
+                et = 'ET' + data[i][11].strip("0").replace('.', ',').strip(',')  # 18
                 sku = data[i][0]
                 name_picture = '777777777'
                 image_url = data[i][16]  # image_link
@@ -239,7 +251,10 @@ def standart_wheels_csv():
                         [category_id, name, description, price, in_stock,
                          enabled, product_code, vendor, meta_d, meta_k,
                          params, koeff, meta_h1, provider, category],
-                        image_tuple, options, rule
+                        image_tuple,
+                        options,
+                        rule,
+                        price_opt
                     )})
                 # result = ([category_id, name, description, price, in_stock, enabled, product_code, vendor, meta_d, meta_k,
                 #            params, koeff, meta_h1, category], image_tuple, options)
@@ -247,16 +262,21 @@ def standart_wheels_csv():
             except Exception as er:
                 print('fuckup standart getcsv {} {}'.format(er, data[i]))
 
-    # rewrite_standart_data(global_result)
-    check_write_json(global_result)
+    if not without_db:
+        check_write_json_v4(global_result)
+        data = standart_tyres_csv()
+        mems = sys.getsizeof(data)
+        print('from_csv', mems / 1000, 'Kb')
+        check_write_json_v4(data)
+
     print('ALL_RIDE_get_wheels_csv ', len(global_result))
     return global_result
 
 
-data = standart_tyres_csv()
-mems = sys.getsizeof(data)
-print('from_csv', mems / 1000, 'Kb')
-check_write_json(data)
+# data = standart_tyres_csv()
+# mems = sys.getsizeof(data)
+# print('from_csv', mems / 1000, 'Kb')
+# check_write_json(data)
 
 # data = get_data_wheels_csv()
 # mems = sys.getsizeof(data)

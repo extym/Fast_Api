@@ -1,7 +1,7 @@
 import json
 import sys
 
-from copy_connect import check_write_json
+from connect import check_write_json_v4
 import requests
 import random
 import string
@@ -12,7 +12,6 @@ from categories import *
 
 
 def get_data_from_json():
-
     ##WORK
     r = requests.get(magic_link_json)
     data = r.json()
@@ -79,7 +78,7 @@ def get_price(product):
     if price / 1.18 >= price_opt:
         rule = True
 
-    return price, rule
+    return price, rule, price_opt
 
 
 def get_price_tires(product):
@@ -104,8 +103,7 @@ def id_generator(size=8, chars=string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
 
-
-def standart_wheels_from_json():
+def standart_wheels_from_json(without_db=False):
     wheels = get_data_from_json()[0]
     diction, proxy = {}, []
     for prod in wheels:
@@ -123,11 +121,14 @@ def standart_wheels_from_json():
             elif vendor == '':
                 break
             # check category wheels and tyres
-            category_id = categories_wheels.get(vendor, categories_wheels_upper.get(vendor.upper))
-            if category_id:
+            category_id = categories_wheels.get(vendor, categories_wheels_upper.get(vendor.upper()))
+            if not category_id:
                 category_id = cats_wheels_upper.get(vendor.upper(), 4000)
-            # print(prod)
-            price, rule = get_price(prod)
+                print(444000, prod)
+            price_data = get_price(prod)
+            price = price_data[0]
+            rule = price_data[1]
+            price_opt = price_data[2]
             name_picture = '77777777'
             product_code = prod['cae']
             image_url = prod.get('img_big_my')
@@ -144,7 +145,7 @@ def standart_wheels_from_json():
             options = {
                 'et': 'ET' + str(prod.get('et')).replace('.', ','),  # 18
                 "bolts_spacing": str(prod.get('bolts_count'))  # 17
-                                 + '/' +  
+                                 + '/' +
                                  str(prod.get('bolts_spacing'))
                                  .replace('.', ','),
                 'diameter': str(prod.get('diameter')),
@@ -161,7 +162,8 @@ def standart_wheels_from_json():
                     ],
                     image_tuple,
                     options,
-                    rule
+                    rule,
+                    price_opt
                 )})
 
         except Exception as error:
@@ -169,19 +171,83 @@ def standart_wheels_from_json():
                   .format(error, prod))
             continue
 
-    # print(diction)
-    check_write_json(diction)
+    if not without_db:
+        check_write_json_v4(diction)
+
+        tires = get_data_from_json()[1]
+        tttires = standart_tires_from_json(tires)  # return dict
+        check_write_json_v4(tttires)
+
+    print("ALL_RIDE_get_wheels_json {}".format(len(diction.keys())))
 
     return diction
+
+
+def standart_addons_from_json(without_db=True, data=None):
+    if not data:
+        data = get_data_from_json()[0]
+    diction, proxy = {}, []
+    for prod in data:
+        # try:
+        in_stock = count(prod)
+        if in_stock >= 4:
+            enabled = 1
+        else:
+            enabled = 0
+        name = prod['name']
+        vendor = prod['brand']
+        description = name  # prod.get("rim_type") + ' диск ' + vendor + name
+        if vendor == 'Carwel':
+            description = name
+        elif vendor == '':
+            break
+        # check category wheels and tyres
+        category_id = categories_wheels.get(vendor, categories_wheels_upper.get(vendor.upper()))
+        if not category_id:
+            category_id = cats_wheels_upper.get(vendor.upper(), 4000)
+            print(444000, prod)
+        category_id = 4
+        price_data = get_price(prod)
+        price = price_data[0]
+        rule = price_data[1]
+        price_opt = price_data[2]
+        name_picture = '77777777'
+        product_code = prod['cae']
+        image_url = prod.get('img_big_my')
+        if image_url:
+            name_picture = vendor.replace(' ', '') + '_' + product_code + '.png'
+        image_tuple = (name_picture, image_url)
+        koeff = 1
+        meta_d = 'литые диски ' + name + ' в интернет-магазине шин и дисков 1000koles.ru'
+        meta_k = 'литые диски, легкосплавные диски, колеса, цена, купить, в Москве, в интернет-магазине'
+        meta_h1 = ' '
+        params = 1
+        provider = '4tochki'
+        category = 5
+
+        options = {}
+
+        diction = (
+            [
+                category_id, name, description, price, in_stock,
+                enabled, product_code, vendor, meta_d, meta_k,
+                params, koeff, meta_h1, provider, category
+            ],
+            image_tuple,
+            options,
+            rule,
+            price_opt
+        )
+
+    return diction
+
+
+# print(standart_addons_from_json(without_db=True, data=ventil_LS))
 
 
 def standart_tires_from_json(tyres):
     diction = {}
     for prod in tyres:
-        # print('tires_from_json', prod)
-
-        # sys.exit()
-
         in_stock = count(prod)
         if in_stock >= 4:
             enabled = 1
@@ -234,23 +300,14 @@ def standart_tires_from_json(tyres):
                 options,
                 rule
             )})
-        # result = ([category_id, name, description, price, in_stock, enabled,
-        #            product_code, vendor, meta_d, meta_k,
-        #            params, koeff, meta_h1, category], image_tuple, options)
-        # diction.append(result)
 
-    # print('tires_from_json', diction)
     return diction
-
-
 
 # standart_wheels_from_json()
 # wwwheels = wheels_from_json(wheels)
 
-tires = get_data_from_json()[1]
-tttires = standart_tires_from_json(tires)  # return dict
-check_write_json(tttires)
+# tires = get_data_from_json()[1]
+# tttires = standart_tires_from_json(tires)  # return dict
+# check_write_json(tttires)
 
 # check_write_json(wwwheels)
-
-
