@@ -52,10 +52,13 @@ def write_categories_vendor():
 def get_client_logic():
     session = Session()
     session.auth = HTTPBasicAuth(login, password)
-    client = Client('https://3logic.ru/ws/soap/soap.php?wsdl',
-                    transport=Transport(session=session))
+    try:
+        client = Client('https://3logic.ru/ws/soap/soap.php?wsdl',
+                        transport=Transport(session=session))
 
-    return client
+        return client
+    except Exception as error:
+        print("Error get clien 3logic {}".format(error))
 
 
 def get_category_list():  # getCategoryList
@@ -69,21 +72,25 @@ def get_category_list():  # getCategoryList
 def get_product_list(category_id: int):
     get_image = True
     get_description = True
-    product_list = get_client_logic().service.getProductList(category_id, get_image, get_description)
-
-    # print('getProductList', len(product_list))
-    return zeep.helpers.serialize_object(product_list)
+    client = get_client_logic()
+    try:
+        product_list = client.service.getProductList(category_id, get_image, get_description)
+        return zeep.helpers.serialize_object(product_list)
+    except Exception as error:
+        print('Error getProductList wsdl {}',format(error))
 
 
 def get_price_list(mat_ids):
     client = SudsClient(url='https://3logic.ru/ws/soap/soap.php?wsdl',
                     transport=HttpAuthenticated(username=login, password=password))
+    # try:
     response = client.service.getPriceList(mat_ids)
     # ll = [asdict(i) for i in response]
-
     return {i['mat_id']: {'price': i['price'] * 1.05, 'stock': i['remain']} for i in response if
               (i['no_price'] != 1 and i['remain'] != 0)}
-
+    # except:
+    #     print("Error 3logic get_price_list", mat_ids)
+    #     return {}
 
 def get_brand_list():
     product_list = get_client_logic().service.getBrandList()
@@ -200,7 +207,7 @@ def create_csv_for_category_from_logic():  ##for import goods only (maybe)
             except Exception as error:
                 print('Some_fuck_up_logic {} \n {}'.format(error, prod))
                 continue
-        # print(3311111133, len(ids), ids)
+        print(3311111133, len(ids), ids)
         price_list = get_price_list(ids)
         # print(3333333, len(price_list), price_list)
         pro_result_list = []
@@ -256,3 +263,6 @@ def create_csv_for_category_from_logic():  ##for import goods only (maybe)
 # asyncio.run(save_categories_vendor(data_list))
 # create_csv_for_category_from_logic()
 # write_categories_vendor()
+
+
+# print(get_client_logic())

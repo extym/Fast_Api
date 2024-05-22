@@ -139,7 +139,11 @@ def create_csv_for_category_from_treolan():
                     proxy = dict()
                     proxy['published'] = category_ids[category_id][2]
                     proxy['category_id'] = site_category_name
-                    proxy['target_price'] = round(float(prod.get('price')) * 1.05, 2)
+                    try:
+                        proxy['target_price'] = round(float(prod.get('price')) * 1.05, 2)
+                    except:
+                        print("Error not found price treolan", prod)
+                        continue
                     currency = prod.get('recommendedcurrency', prod.get('currency'))
                     proxy['full_price'] = str(proxy['target_price']) + ' ' + currency
                     if currency == 'RUB':
@@ -185,6 +189,7 @@ def create_csv_for_category_from_treolan():
                                 extrasaction='ignore', fieldnames=base_fields)
         writer.writeheader()
         writer.writerows(allpro)
+
 
 # get_categories_treolan()
 # get_cats_treolan()

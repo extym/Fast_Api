@@ -141,7 +141,11 @@ def create_csv_for_category_from_marvel_v2():
                     proxy['quantity'] = prod.get('AvailableForB2BOrderQty')
                     proxy['category_id'] = category_id
                     proxy['id'] = prod_id
-                    proxy['price'] = int(prod.get('WarePriceRUB').split(',')[0]) * 1.05
+                    price = prod.get('WarePriceRUB')
+                    if price:
+                        proxy['price'] = int(price.split(',')[0]) * 1.05
+                    else:
+                        continue
                     proxy['brand'] = prod.get('WareVendor')
                     proxy['published'] = category_ids[pre_category_id][2]
                     proxy['name'] = prod.get('WareFullName')
