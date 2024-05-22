@@ -1,4 +1,6 @@
 import asyncio
+import datetime
+
 import csv
 import json
 
@@ -141,7 +143,10 @@ def create_csv_for_category_from_merlion():
     # site_category_path = {key: value[2] for key, value in category_ids.items()}
     base_fields = ['category_id', 'Name', 'item_id', 'quantity', 'Brand', 
                    'Vendor_part', 'price', 'published', 'image', 'currency']
-    date = get_shipment_dates()  # 2023-11-19
+    try:
+        date = get_shipment_dates()[0].get('Date')  # 2023-11-19
+    except:
+        date = datetime.datetime.strftime(datetime.datetime.now() + datetime.timedelta(days=3), "%Y-%m-%d")
     allpro = []
     for key in category_groups.keys():
         result_list = []
@@ -151,7 +156,7 @@ def create_csv_for_category_from_merlion():
                 prod = {}
                 try:
                     site_category_name = category_ids[category_id][1]
-                    add_data = get_available_stock_price(category_id, date[0].get('Date'))
+                    add_data = get_available_stock_price(category_id, date)
                     # print(category_id, add_data)
                     data = get_current_category(category_id)
                     image_data = get_images(category_id)
@@ -224,5 +229,7 @@ def create_csv_for_category_from_merlion():
 # get_catalog_merlion(url_test_re)
 # write_categories_merlion()
 # asyncio.run(save_categories_vendor())
-# get_shipment_methods()
+# print(get_shipment_methods())
 # create_csv_for_category_from_merlion()
+#
+# print(datetime.datetime.strftime(datetime.datetime.now()+ datetime.timedelta(days=1), "%Y-%m-%d"))

@@ -25,10 +25,10 @@ from merlion import create_csv_for_category_from_merlion
 schedule.every(16900).seconds.do(get_netlab_token)
 schedule.every(120).minutes.do(create_csv_for_category_from_marvel_v2)
 schedule.every(120).minutes.do(create_csv_for_category_from_netlab_v4)
-schedule.every(120).minutes.do(create_csv_for_category_from_treolan)
 schedule.every(120).minutes.do(create_csv_for_category_from_ocs_v3)
 schedule.every(120).minutes.do(create_csv_for_category_from_logic)
-# schedule.every(120).minutes.do(create_csv_for_category_from_merlion)
+schedule.every(120).minutes.do(create_csv_for_category_from_merlion)
+schedule.every(120).minutes.do(create_csv_for_category_from_treolan)
 # schedule.every(10).minutes.do(job_wb)
 # #
 while True:

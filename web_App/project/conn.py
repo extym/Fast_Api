@@ -4,6 +4,8 @@ import os
 import psycopg2
 from psycopg2 import OperationalError
 
+from project.creds import db_user, db_host, db_name, db_pass
+
 # from project.conn_maintenance import *
 
 
@@ -159,6 +161,7 @@ password varchar NOT NULL,
 name TEXT NOT NULL,
 company_id TEXT,
 roles TEXT,
+photo text,
 date_Added varchar,
 date_Modifed varchar,
 UNIQUE (email)
@@ -529,10 +532,10 @@ def create_connection():
     connection = None
     try:
         connection = psycopg2.connect(
-            database='stm_app',
-            user='user_name',
-            password='user_pass',
-            host='localhost',
+            database=db_name,
+            user=db_user,
+            password=db_pass,
+            host=db_host,
             port=5432
         )
         # print("Connection to DB successfully")
@@ -641,16 +644,16 @@ async def write_order(query1: str = None, data1: object = None,
         try:
             with connection.cursor() as cursor:
                 cursor.execute(query1, data1)
-                print("Query from write_order executed successfully")
+                print("Query write_order executed successfully")
         except OperationalError as err:
-            print(f"The ERROR from write_order '{err}' occured ")
+            print(f"The ERROR write_order '{err}' occured ")
 
         try:
             with connection.cursor() as cursor:
                 cursor.executemany(query2, data2)
-                print("Query from write_order executed successfully")
+                print("Query write_order_items executed successfully")
         except OperationalError as err:
-            print(f"The ERROR from write_order '{err}' occured ")
+            print(f"The ERROR write_order_items '{err}' occured ")
 
 
 def execute_query_return_id(connection, query, data):

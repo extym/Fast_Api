@@ -1,13 +1,15 @@
 # def orders_add():
+from base64 import b64encode
 from datetime import datetime
 import json
 
 import pytz
 import requests
 from gevent import sleep
-from cred import token_market_dbs, token_market_fbs,  client_id, token_ym
+from cred import token_market_dbs, token_market_fbs, client_id, token_ym
 
 import urllib3
+
 urllib3.disable_warnings()
 
 # file  = open('data_json.json', 'r')
@@ -118,6 +120,8 @@ order = {
 
 
 time = datetime.now(pytz.timezone("Africa/Nairobi")).replace(microsecond=0).isoformat()
+
+
 def write_smth(smth):
     f = open('no_test.txt', 'a')
     f.write(str(time) + str(smth) + '\n')
@@ -147,6 +151,7 @@ def make_cancel(order_id, status, substatus, campaign_id):
 
     return result
 
+
 def send_post_to_market(metod, data, campaign_id):
     url = 'https://api.partner.market.yandex.ru/v2'
     headers = {'Content-type': 'application/json',
@@ -156,6 +161,7 @@ def send_post_to_market(metod, data, campaign_id):
     answer = requests.post(url_address, data=json.dumps(data), headers=headers, verify=False)
     write_smth(answer)
     # print('answer', str(time), answer)
+
 
 def send_get_to_market(metod):
     url = 'https://api.partner.market.yandex.ru/v2'
@@ -167,7 +173,6 @@ def send_get_to_market(metod):
     print(str(time), answer)
     response = answer.json()
     print(str(time), response)
-
 
 
 def send_del_to_market(id):
@@ -195,43 +200,43 @@ def send_get_ym():
     # response = answer.json()
     # print(str(time), response)
 
-# send_get_ym()
 
-# def send_post(data):
-#     #sleep(6)
-#     url_address = 'https://92.39.143.137:14723/Trade/hs/post/order/post'
-#     headers = {'Content-type': 'application/json',
-#                'Authorization': 'Basic 0JzQsNGA0LrQtdGC0L/Qu9C10LnRgdGLOjExMQ==',
-#                'Content-Encoding': 'utf-8'}
-#
-#     answer = requests.post(url_address, data=json.dumps(data), headers=headers, verify=False)
-#     write_smth(answer)
-#     result = answer.status_code
-#
-#     # datas = json.dumps(data)
-#     print('answer1', str(time), answer)
-#     # response = answer.json()
-#     # print(datetime.datetime.now(), response)
-#     return result
+# send_get_ym()
+from cred import login_1c, pass_1c
+
+
+def basic_auth(username, password):
+    token = b64encode(f"{username}:{password}".encode('utf-8')).decode("ascii")
+    return f'Basic {token}'
+
+
+# print(basic_auth(login_1c, pass_1c))
+
 
 def send_test_post(data):
     # sleep(6)
-    url_address = 'http://localhost:5000/json'  #'https://92.39.143.137:14723/Trade/hs/post/order/post'
+    url_address = 'https://92.39.143.137:14723/Trade/hs/post/order/post' # 'http://localhost:5000/json'  #
     headers = {'Content-type': 'application/json',
-               'Authorization': 'Basic 0JzQsNGA0LrQtdGC0L/Qu9C10LnRgdGLOjExMQ==',
+               'Authorization': 'Basic 0JzQsNGA0LrQtdGC0L/Qu9C10LnRgdGLOkZobmprbVJodGdqY25tMjAyNA==',
                'Content-Encoding': 'utf-8'}
 
     answer = requests.post(url_address, data=json.dumps(data), headers=headers, verify=False)
 
     write_smth(answer)
-    #print('answer', str(time), answer)
+    print('answer', str(time), answer.text)
     # response = answer.json()
     # print(datetime.datetime.now(), response)
 
 
+order_current = {'order': {'shop': 'Yandex', 'businessId': 820380, 'id': '0259938547', 'paymentType': 'PREPAID',
+                           'delivery': 'PICKUP', 'status': 'accept', 'date': '16-05-2024',
+                           'items': [{'shopSku': '16ec4c3b-2ee5-11eb-9554-0025900f1d29', 'count': 1, 'price': 1028.0}]}}
+
+send_test_post(order_current)
+
 def send_test_post_cart():
     # sleep(6)
-    url_address = 'http://46.173.219.89/api/stocs'  #'https://92.39.143.137:14723/Trade/hs/post/order/post'
+    url_address = 'http://46.173.219.89/api/stocs'  # 'https://92.39.143.137:14723/Trade/hs/post/order/post'
     headers = {'Content-type': 'application/json',
                'Authorization': 'BA00000126859FCF',
                'Content-Encoding': 'utf-8'}
@@ -239,9 +244,9 @@ def send_test_post_cart():
     answer = requests.post(url_address, headers=headers, verify=False)
 
     write_smth(answer)
-    #print('answer', str(time), answer)
+    # print('answer', str(time), answer.text)
     # response = answer.json()
     # print(datetime.datetime.now(), response)
 
-#send_test_post(order)
-#send_test_post_cart()
+# send_test_post(order)
+# send_test_post_cart()

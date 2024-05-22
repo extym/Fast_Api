@@ -1,5 +1,5 @@
 
-LOCAL_MODE = 0
+LOCAL_MODE = 1
 if LOCAL_MODE:
     CRED_PATH = './'
     CSV_PATH = './'

@@ -33,7 +33,7 @@ def get_new_pages():
     data_product = data['data']['product']
     print(data['data']['product'][0], sep='\n')
 
-    print(datetime.datetime.now(), 'data_product2 - ', len(data_product))
+    # print(datetime.datetime.now(), 'data_product2 - ', len(data_product))
     # post_smth(data_product, 0, '0')
     mems = sys.getsizeof(data_product)
     print(mems / 1000, 'Kb')
@@ -47,7 +47,7 @@ def get_new_pages_v2():
     data = xmltodict.parse(resp.text)
     data_product = data['data']['product']
     # print(data['data']['product'][0], sep='\n')
-    print(datetime.datetime.now(), 'data_product2 - ', len(data_product))
+    # print(datetime.datetime.now(), 'data_product2 - ', len(data_product))
     # post_smth(data_product, 0, '0')
     mems = sys.getsizeof(data_product)
     print(mems / 1000, 'Kb')
@@ -96,7 +96,7 @@ def get_wheels():
             print(f'page--{i}', 'Fuck JSON DECODE: {}'.format(error))
             continue
 
-    print(datetime.datetime.now(), 'data_product2 - ', len(data_product))
+    # print(datetime.datetime.now(), 'data_product2 - ', len(data_product))
     # post_smth(data_product, 0, '0')
     mems = sys.getsizeof(data_product)
     print(mems / 1000, 'Kb')

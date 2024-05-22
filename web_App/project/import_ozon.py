@@ -537,8 +537,6 @@ def get_product_info(product_id=None, offer_id=None, seller_data=None):
 
 
 def import_oson_data_prod(user_id=None, shop_name=None, company_id=None, update_base_price=None):
-    # seller_id = db.session.execute(select(Marketplaces.seller_id)
-    #                                .where(Marketplaces.shop_name == shop_name)).first()
     count = 0
     try:
         seller_data = db.session \
@@ -551,11 +549,13 @@ def import_oson_data_prod(user_id=None, shop_name=None, company_id=None, update_
         time_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         uid_edit_user = user_id
         for prod in current_products:
-            data = get_product_info(prod.get("product_id"), prod.get("offer_id"), seller_data)
+            offer_id = prod.get("offer_id")
+            product_id = prod.get("product_id")
+            data = get_product_info(product_id, offer_id, seller_data)
             # print("ALL_DATA", data)
             if data and update_base_price is None:
                 data_prod = data.get('result')
-                offer_id = data_prod.get("offer_id")
+                # offer_id = data_prod.get("offer_id")
                 if offer_id.isdigit():
                     offer_id = "AAA" + offer_id
                 product = {
@@ -563,8 +563,10 @@ def import_oson_data_prod(user_id=None, shop_name=None, company_id=None, update_
                     'shop_name': shop_name,  # data_prod.get(""),
                     'store_id': seller_data[0],
                     'quantity': data_prod.get("stocks").get('present'),
+                    'product_id': product_id,
                     'discount': 0.0,
                     'description_product': data_prod.get(""),
+                    'old_price': data_prod.get("old_price"),
                     'photo': data_prod.get("primary_image"),
                     'id_1c': "",
                     'date_added': time_now,
@@ -610,6 +612,7 @@ def import_oson_data_prod(user_id=None, shop_name=None, company_id=None, update_
 
                 # os.abort()
                 count += 1
+                time.sleep(0.2)
 
             elif data and update_base_price == 'on':
                 data_prod = data.get('result')
@@ -626,9 +629,10 @@ def import_oson_data_prod(user_id=None, shop_name=None, company_id=None, update_
                     'quantity': data_prod.get("stocks").get('present'),
                     'price_product_base': base_price,
                     'final_price': data_prod.get('price'),
+                    'product_id': product_id,
                     'old_price': old_price,
                     'discount': 0.0,
-                    'description_product': data_prod.get(""),
+                    'description_product': data_prod.get("description"),
                     'photo': data_prod.get("primary_image"),
                     'id_1c': "",
                     'date_added': time_now,
@@ -673,9 +677,10 @@ def import_oson_data_prod(user_id=None, shop_name=None, company_id=None, update_
 
                 # os.abort()
                 count += 1
+                time.sleep(0.2)
 
             else:
-                time.sleep(0.1)
+                time.sleep(0.2)
                 continue
 
         print('Successfully import {} from {} store'.format(count, shop_name))
@@ -694,7 +699,7 @@ def make_internal_import_oson_product(donor=None, recipient=None, k=1,
     # metod = 'https://api-seller.ozon.ru/v3/product/import'
     metod = 'https://api-seller.ozon.ru/v1/product/import-by-sku'
     if donor is not None and recipient is not None:
-        data = []
+        pre_data = []
         with Session(engine) as session:
             session.begin()
             recipient_data = session.execute(select(Marketplaces.seller_id,
@@ -708,7 +713,7 @@ def make_internal_import_oson_product(donor=None, recipient=None, k=1,
                 # print(22222, row )
                 #############################3
                 # Make price ended for '9'
-                price = int(row.price) * (1 + k / 100)
+                price = int(row.price_product_base) * (1 + k / 100)
                 price = str(price).split('.')[0][:-1] + "9"
                 old_price = str(int(price) * 4)
                 ##############################3
@@ -721,8 +726,9 @@ def make_internal_import_oson_product(donor=None, recipient=None, k=1,
                     'vat': '0',  # TODO make it's not magic num
                     'currency_code': 'RUB'
                 }
-                data.append(item)
-
+                pre_data.append(item)
+            # print(1111, recipient_data[0], recipient_data[1])
+            data = {"items": pre_data}
             header = {
                 'Client-Id': recipient_data[0],
                 'Api-Key': recipient_data[1],
@@ -815,15 +821,18 @@ def make_internal_import_oson_product(donor=None, recipient=None, k=1,
                         return "Всё ок", count, len(result), count_error
 
                 else:
-                    return "Что-то пошло не так", \
-                        answer.status_code, \
-                        answer.text, \
-                        recipient_mp
+                    print('Error make_response_internal_import_oson_product'
+                          ' status_code {},  recipient_mp {}, answer.text {}'
+                    .format(answer.status_code, recipient_mp, answer.text))
+                    return "Что-то пошло не так с запросом на сервер озона"
 
             elif donor_mp == 'ozon' and recipient_mp == 'wb':
                 pass
 
             else:
+                print('Error make_internal_import_oson_product'
+                      ' status_code {},  recipient_mp {}, donor_mp {}'
+                      .format(donor, donor_mp, recipient_mp))
                 return 'Check you data', donor, donor_mp, recipient_mp
 
 
@@ -858,47 +867,23 @@ def make_import_export_oson_price(donor=None, recipient=None,
                 with Session(engine) as session:
                     session.begin()
                     session.execute(update(Product)
-                                    .where(Product.articul_product==row.articul_product)
-                                    .where(Product.shop_name==recipient).values(item))
+                                    .where(Product.articul_product == row.articul_product)
+                                    .where(Product.shop_name == recipient).values(item))
                     session.commit()
+
+            print('All Ride make_internal_import_oson_product'
+                  ' donor_mp {}, recipient {}'
+                  .format(donor, recipient))
+            return "All ride"
+        else:
+            print('Error make_internal_import_oson_product'
+                  ' donor_mp {}, recipient {}'
+                  .format(donor, recipient))
+            return "NOT all ride"
 
 # make_import_export_oson_price(donor='Low Price', recipient='Полиция Вкуса', k=0)
 
 # print(make_internal_import_oson(donor='ImportGoods', recipient='Ф-фторник'))
-
-
-# def product_info_price(id_mp, seller_id):  # product_id, offer_id
-#     # url = 'https://api-seller.ozon.ru/v4/product/info/prices'
-#     # data = {"filter": {
-#     #             "offer_id": [offer_id],
-#     #             "product_id": [str(product_id)],
-#     #             "visibility": "ALL"
-#     #         },
-#     #         "last_id": "",
-#     #         "limit": 100}
-#     api_key = db.session.execute(select(Marketplaces.key_mp)
-#                                      .where(Marketplaces.seller_id == seller_id))
-#     print(api_key, type(api_key))
-#     headers = {
-#         'Client-Id': seller_id,
-#         'Api-Key': api_key,
-#         'Content-Type': 'application/json'
-#     }
-#     url = 'https://api-seller.ozon.ru/v3/posting/fbs/get'
-#     data = {
-#         "posting_number": id_mp,
-#         "with": {
-#             "analytics_data": False,
-#             "barcodes": False,
-#             "financial_data": False,
-#             "product_exemplars": False,
-#             "translit": False}}
-#     # resp = requests.post(url=url, headers=headers, json=data)
-#     # result = resp.json()
-#     # print('product_id_offer_id', result)
-#     # # price = result.get("result")["items"][0]["price"]["marketing_price"][:-2]
-#     # order = result.get("result")
-#     # return order
 
 
 # product_info_price('34253142-0058-7', 1713959)

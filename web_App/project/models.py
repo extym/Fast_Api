@@ -32,7 +32,6 @@ class ConsultUsers(db.Model, UserMixin):
     date_modifed = db.Column(db.String(250))
 
 
-
 class Product(db.Model):
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
@@ -47,6 +46,7 @@ class Product(db.Model):
     price_product_base = db.Column(db.Integer())
     final_price = db.Column(db.String(250))
     old_price = db.Column(db.String(250))
+    product_id = db.Column(db.Integer)
     discount = db.Column(db.Double())
     description_product = db.Column(db.String(250))
     photo = db.Column(db.String(250))
@@ -94,7 +94,7 @@ class AttributesProduct(db.Model):
     created_at = db.Column(db.String(250))
     images = db.Column(db.String(250))
     marketing_price = db.Column(db.String(250))
-    min_ozon_price= db.Column(db.String(250))
+    min_ozon_price = db.Column(db.String(250))
     old_price = db.Column(db.String(250))
     premium_price = db.Column(db.String(250))
     price = db.Column(db.String(250))
@@ -146,7 +146,7 @@ class Sales(db.Model):
 
 
 class SalesToday(db.Model):
-    __tablename__='order_items'
+    __tablename__ = 'order_items'
     id = db.Column(db.Integer, primary_key=True)
     shop_order_id = db.Column(db.String(250))
     mp_order_id = db.Column(db.String(250), primary_key=True)
@@ -174,7 +174,6 @@ class SalesToday(db.Model):
 
 
 class Marketplaces(db.Model):
-
     id = db.Column(db.Integer(), primary_key=True)
     user_id = db.Column(db.String(50))
     seller_id = db.Column(db.String(50))
@@ -183,14 +182,14 @@ class Marketplaces(db.Model):
     shop_name = db.Column(db.String(50))
     shop_id = db.Column(db.Integer())
     company_id = db.Column(db.String(50))
-    warehouses = db.Column(db.Integer())
+    tags = db.Column(db.Integer())
     mp_discount = db.Column(db.Double())
     mp_markup = db.Column(db.Double())
     store_discount = db.Column(db.Double())
     store_markup = db.Column(db.Double())
     check_send_null = db.Column(db.Boolean())
-    check_send_stocks = db.Column(db.Boolean())
-    check_enable_submit = db.Column(db.Boolean())
+    send_common_stocks = db.Column(db.Boolean())
+    enable_orders_submit = db.Column(db.Boolean())
     enable_sync_price = db.Column(db.Boolean())
     enable_sync_stocks = db.Column(db.Boolean())
     is_1c = db.Column(db.Boolean())
@@ -199,7 +198,6 @@ class Marketplaces(db.Model):
 
 
 class InternalImport(db.Model):
-
     id = db.Column(db.Integer(), primary_key=True)
     internal_import_mp_1 = db.Column(db.String(50))
     internal_import_store_1 = db.Column(db.String(50))
@@ -213,7 +211,6 @@ class InternalImport(db.Model):
     internal_import_markup_2 = db.Column(db.Integer())
     company_id = db.Column(db.String(50))
     user_id = db.Column(db.String(50))
-
 
 
 #

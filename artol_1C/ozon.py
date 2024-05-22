@@ -182,7 +182,7 @@ def create_data_stocks():
 
     # write_json_skus(proxy_skus)
     # print('create_data_skus_onon', len(proxy_skus))
-    print('create_data_stocks_artol_onon_x100', len(result), result)
+    print('create_data_stocks_artol_onon_x100', len(result))
     return result
 
 

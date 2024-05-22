@@ -132,6 +132,7 @@ def standart_product(dictionary, in_stock):
         result = [category_id, name, description, price, in_stock, enabled, product_code, vendor, meta_d, meta_k,
                   params, koeff, meta_h1], image_tuple
 
+
     return result
 
 
@@ -154,7 +155,7 @@ def standart_product_v2(list_wheels_json):
                 description = name
             vendor = dictionary.get('vendor').replace('"', '')
             category_id = categories_wheels\
-                .get(vendor, cats_wheels_upper.get(vendor.upper()), 7000)
+                .get(vendor, cats_wheels_upper.get(vendor.upper(), 7000))
             price_opt = int(dictionary.get('price').strip('"').replace('\xa0', '').split('.')[0])
             price = float(dictionary.get('RoznicaPrice').strip('"').replace('\xa0', '').split('.')[0])
             rule = False
@@ -198,11 +199,8 @@ def standart_product_v2(list_wheels_json):
                 ],
                 image_tuple,
                 options,
-                rule)})
-
-            # result = ([category_id, name, description, price, in_stock, enabled, product_code, vendor, meta_d, meta_k,
-            #            params, koeff, meta_h1, category], image_tuple, options)
-            # global_result.append(result)
+                rule,
+                price_opt)})
 
         except:
             # print("FUCKUP_standart_product_v2", dictionary)
@@ -321,6 +319,16 @@ def make_query_get_id(connection, query, data_query):
     return lastrow_id
 
 
+def make_query_get_id_v2( query, data_query):
+    with create_connection() as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(query, data_query)
+            connection.commit()
+            lastrow_id = cursor.lastrowid
+
+    return lastrow_id
+
+
 def makery(connection, query, data):
     cursor = connection.cursor(buffered=True)
     # url = 'http://localhost:7770/random/choice'
@@ -346,9 +354,7 @@ def create_database(connection, query):
         print(f"The error DATABASE CREATE '{e}' occurred")
 
 
-# cursor = cnx.cursor(buffered=True)
 
-# current structure db for wheels
 add_product = ("INSERT INTO avl_products "
                "(categoryID, name, description, Price, in_stock, enabled, product_code, date_added, date_modified, eproduct_filename, meta_description, meta_keywords, params, koeff, meta_h1) "  # params
                "VALUES (%s, %s, %s, %s, %s, %s, %s, NOW(), NOW(), %s, %s, %s, %s, %s, %s)")
@@ -414,7 +420,6 @@ def check_and_write_v3():
             is_exist = check_is_exist(data_product[0][6], data_product[0][0])
             if not is_exist[0] and quantity >= 4:
                 product_id = make_query_get_id(connection, add_product, data_product[0])  # cursor.lastrowid
-                product_id = make_query_get_id(connection, add_product, data_product[0])  # cursor.lastrowid
                 # ij_data.append(prepare_get_image(product_id, data_product[1]))
                 ij_data.append({product_id: data_product[1]})
                 # print('ij_data-13,4', len(ij_data), ij_data[-1])
@@ -437,8 +442,8 @@ def check_and_write_v3():
                     enabled = 1
                     new_data = [price_for_site, quantity, enabled, category_id, product_code]
                     makery(connection, 'update', new_data)
-                    print('Is_exist_product {} in_stock {}, price {}, income_data from {} -in_stock {}, price {}'
-                          .format(product_code, is_exist[1], is_exist[2], provider, quantity, price_for_site))
+                    # print('Is_exist_product {} in_stock {}, price {}, income_data from {} -in_stock {}, price {}'
+                    #       .format(product_code, is_exist[1], is_exist[2], provider, quantity, price_for_site))
                 elif quantity < 4 and is_exist[1] != quantity:
                     # print(is_exist[1], 'quantity13 -', quantity)
                     enabled = 0
@@ -548,16 +553,16 @@ def check_write_json(data_from_json):
                 # category_id = categories_wheels[data_product[0][7]]
                 category_id = data_product[0][0]
                 product_code = data_product[0][6]
-                if product_code == 'WHS520654':
-                    print('!' * 250)
+                # if product_code == 'WHS520654':
+                #     print('!' * 250)
                 price_for_site = data_product[0][3]
                 if quantity >= 4 and [is_exist[1], is_exist[2]] != [quantity, data_product[0][3]]:
                     enabled = 1
                     # new_data = [quantity, enabled, category_id, price_for_site, product_code]
                     new_data = [price_for_site, quantity, enabled, category_id, product_code]
                     makery(connection, 'update', new_data)
-                    print('Is_exist_product {} in_stock {}, price {}, income_data from {} -in_stock {}, price {}'
-                          .format(product_code, is_exist[1], is_exist[2], provider, quantity, price_for_site))
+                    # print('Is_exist_product {} in_stock {}, price {}, income_data from {} -in_stock {}, price {}'
+                    #       .format(product_code, is_exist[1], is_exist[2], provider, quantity, price_for_site))
                 elif quantity < 4 and is_exist[1] != quantity:
                     # print(is_exist[1], 'quantity13 -', quantity)
                     enabled = 0
@@ -621,7 +626,7 @@ def check_write_json(data_from_json):
 
     connection.close()
     rewrite_pictures_data(ij_data)
-    print('write_pictures_data_2', len(ij_data))
+    print('write_pictures_link_2', len(ij_data))
     # write('from_check_and_write errors ' +  str(count))
     print('from_check_and_write_errors_json', count)
 

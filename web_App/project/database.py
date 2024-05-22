@@ -19,7 +19,7 @@ class Data_base_connect():
     def __init__(self):
 
         self.host = 'localhost',
-        self.database = 'stm_app',
+        self.database = 'web_app',
         self.user = 'user_name',
         self.password = 'user_pass',
         # self.host = 'localhost',
@@ -31,7 +31,7 @@ class Data_base_connect():
         self.curs = None
         # try:
         self.conn = psycopg2.connect(host='localhost',
-                            database='stm_app',
+                            database='web_app',
                             user='user_name',
                             password='user_pass')
         # self.conn = psycopg2.connect(host='localhost',
@@ -60,11 +60,11 @@ class Data_base_connect():
 
 
 
-    def insert_new_mp(self, uid, shop_id, shop_name, mp, key, company_id):
+    def insert_new_mp(self, uid, shop_id, shop_name, mp, key, company_id, tags=None):
         self.conn.autocommit=True
         self.curs = self.conn.cursor()
-        self.curs.execute("INSERT INTO marketplaces (user_id, seller_id, shop_name, name_mp, key_mp, company_id, date_added)"
-                          "values (%s, %s, %s, %s, %s, %s, NOW())", (uid, shop_id, shop_name, mp, key, company_id))
+        self.curs.execute("INSERT INTO marketplaces (user_id, seller_id, shop_name, name_mp, key_mp, company_id, tags, date_added)"
+                          "values (%s, %s, %s, %s, %s, %s, %s, NOW())", (uid, shop_id, shop_name, mp, key, company_id, tags))
         self.curs.close()
 
     def update_mp(self, shop_name, mp, key):

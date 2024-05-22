@@ -4686,8 +4686,12 @@ code {
     background-color: rgba(var(--orange-rgb), 1.0);
     color: #ffffff;
 }
-.badge-info {
+.badge-info-old {
     background-color: rgba(35, 183, 229, 1.0);
+    color: #ffffff;
+}
+.badge-info {
+    background-color: rgba(169, 35, 229, 1.0);
     color: #ffffff;
 }
 .badge-warning {

@@ -7,7 +7,7 @@ categories_wheels = {'Inverno': 1988, 'Jantsa': 1989, 'rFR': 1181, 'RADIUS': 199
                      'Maxion': 1973, 'Tracston': 1975, 'Alutec': 1736, 'ANTERA': 64, 'ATS': 1081, 'BBS': 1737,
                      'Borbet': 1738,
                      'Carwel': 1969, 'Fondmetal': 1084, 'iFree': 628, 'KHOMEN': 1968, 'MAK': 1739,
-                     'MANDRUS': 1887,
+                     'MANDRUS': 1887, 'Premium Series': 4001, 'ZEPP 4х4': 4002, 'ZEPP': 4003, 'YZ': 4004,
                      'NEO': 1786, 'REPLAY': 1221, 'Tech-Line': 1735, 'Venti': 1718, 'КиК': 1782, 'Евродиск': 62,
                      'MOMO': 1785, 'MSW': 1885, 'Neo': 1786, 'OZ': 55, 'Replay': 1221, 'Rial': 1777, 'RST': 1960,
                      'Sparco': 1970, 'Tech Line': 1735, 'K&K': 1782, 'OE': 1883, 'Скад': 1926, 'TSW': 1083,
@@ -24,6 +24,20 @@ categories_wheels = {'Inverno': 1988, 'Jantsa': 1989, 'rFR': 1181, 'RADIUS': 199
 
 ex = [1782, 1181, 1139, 1735, 1968, 1973, 1084]
 
+ventil_LS = [{"cae":"S022678",
+             "price_yamka":11,
+             "price_yamka_rozn":13,
+             "rest_yamka":"более 40",
+             "cae":"S022678",
+             "brand":"LS",
+             "name":"Вентиль TR414 SM, LS",
+             "img_small":"https://4tochki.ru/pictures/other/Ventili/Ventili/small/S022678.png",
+             "img_big_pish":"https://4tochki.ru/pictures/other/Ventili/Ventili/big/S022678.png",
+             "img_big_my":"https://api-b2b.pwrs.ru/1614/pictures/other/Ventili/Ventili/src/big_S022678.png",
+             "quantity":0,"weight":0,"applicability":"","color":"","material":"","shape":"","volume":0}]
+
+
+
 special_wheels = {'Inverno': 1988, 'Jantsa': 1989, 'RADIUS': 1990, 'ГАЗ': 1991, 'LF Works': 1992,
                      'Remain': 1993, 'rtr': 1994, 'BLACK RHINO': 1995, 'BEYERN': 1897, 'REDBOURNE': 1901,
                      'LUMARAI': 1898, 'Nitro': 1876,
@@ -33,7 +47,7 @@ special_wheels = {'Inverno': 1988, 'Jantsa': 1989, 'RADIUS': 1990, 'ГАЗ': 199
                      'MANDRUS': 1887, 'Venti': 1718, 'КиК': 1782, 'Евродиск': 62,
                      'MOMO': 1785, 'MSW': 1885, 'Neo': 1786, 'OZ': 55, 'Replay': 1221, 'Rial': 1777, 'RST': 1960,
                      'Sparco': 1970, 'Tech Line': 1735, 'OE': 1883, 'Скад': 1926, 'TSW': 1083,
-                     'Magnetto': 723,
+                     'Magnetto': 723, 'Premium Series': 4001, 'ZEPP 4х4': 4002, 'ZEPP': 4003, 'YZ': 4004,
                      'LS': 1139, 'LegeArtis': 1138, 'LegeArtis Concept': 1140, 'Trebl': 532, 'FR replica': 1181,
                      'Yamato': 1145, 'N2O': 1720, 'PDW': 1182, 'CrossStreet': 1873, 'Yokatta': 1143, "NZ": 1134,
                      'Alcasta': 1130,

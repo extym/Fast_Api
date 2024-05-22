@@ -77,7 +77,7 @@ def get_product(categories):
         resp = answer.json()
     except:
         resp = ''
-        print('answer', answer.text)
+        print('Error answer server ocs', answer.text)
 
     return resp
 
@@ -89,7 +89,7 @@ def get_content_batch(list_ids):
     # print("categories_banch", len(categories), categories)
 
     answer = requests.post(url, json=list_ids, headers=headers)
-    print(444444444, type(answer.json().get('result')))
+    # print(444444444, type(answer.json().get('result')))
     return answer.json().get('result')
 
 
@@ -110,7 +110,7 @@ def get_product_banch(categories):
         return answer.status_code, resp
     elif answer.status_code == 403:
         resp = answer.text
-        print('answer', answer.text)
+        print('Error answer server ocs for banch', answer.text)
         return answer.status_code, resp
 
 
