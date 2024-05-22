@@ -1,3 +1,6 @@
+import logging
+import os
+
 from gevent import monkey
 
 monkey.patch_all()
@@ -12,7 +15,7 @@ from gevent.pywsgi import WSGIServer
 import pytz
 from datetime import datetime, timedelta
 from read_json import processing_json, read_order_json, read_json_on
-from cred import token_market_dbs, token_market_fbs, url_address, headers
+from cred import token_market_dbs, token_market_fbs, url_address, headers_1с
 from ozon import product_info_order
 # from proxy import proxy_onon
 
@@ -20,6 +23,12 @@ import urllib3
 
 urllib3.disable_warnings()
 
+
+LOG_DIR = os.getcwd() + "/logs"
+print(LOG_DIR)
+
+logging.basicConfig(filename=os.path.join(LOG_DIR + '/stm_app.log'), level=logging.INFO,
+                    format="%(asctime)s %(levelname)s %(message)s")
 
 def write_json(smth_json):
     try:
@@ -395,12 +404,13 @@ def create_re_cart(items):
 
 
 async def send_post(data):
-    answer = requests.post(url_address, data=json.dumps(data), headers=headers, verify=False)
+    answer = requests.post(url_address, data=json.dumps(data), headers=headers_1с, verify=False)
     write_smth(answer)
     write_smth(data)
     # result = answer.text
     time = datetime.now(pytz.timezone("Africa/Nairobi")).isoformat()
-    print('answer1', str(time), answer, data)
+    logging.info('Send order artol {} {} {}'.format(time, data, answer.text))
+    # print('answer1', str(time), answer, data)
     # return result
 
 
@@ -445,13 +455,13 @@ async def onon_push():
         order = product_info_order(id_mp)
         # order = proxy_onon["result"]   #FOR TEST ONLY
         stock = check_is_accept_onon(order['products'])
-        print('stock', stock[0], order['products'])
+        print('stock_artol_NEW_POSTING', stock[0], order['products'])
         if stock[0]:
             order['our_id'], order['id'], order['status'], order['our_status'], order['shop'] \
                 = our_id, id_mp, "NEW", "NEW", "Ozon"
             order['products'] = stock[1]
             send_data = create_data_for_1c(order, "accept", "Ozon")
-            print('send_data', send_data)
+            print('send_data_artol', send_data)
             se_id = str(send_data['order']['id'])
             write_smth(' order_id_accept ' + se_id)
             await send_post(send_data)

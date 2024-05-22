@@ -175,7 +175,7 @@ def create_data_stocks():
 
     # write_json_skus(proxy_skus)
     # print('create_data_skus_onon', len(proxy_skus))
-    print('create_data_stocks_artol_onon_x100', len(result), result)
+    print('create_data_stocks_artol_onon_x100', len(result))
     return result
 
 
@@ -253,4 +253,4 @@ def product_info_order(id_mp):  #product_id, offer_id
 # sleep(5)
 # print(22222, post_get_assortment_v2())
 
-create_data_stocks()
+# create_data_stocks()
