@@ -134,17 +134,17 @@ def back_shops_tasks():
             if row.name_mp == 'ozon':
                 ozon.send_product_price(key_recipient=row.key_mp,
                                         recipient=row.seller_id)
-                print('Send_product_price oson - seller_id {} recipient {}'
+                print('Send_product_price oson - len key {} recipient {}'
                               .format(len(row.key_mp), row.seller_id))
                 logging.DEBUG('Send_product_price oson - seller_id {} recipient {}'
                               .format(len(row.key_mp), row.seller_id))
 
             if row.name_mp == 'wb':
                 wb.send_price_to_wb(seller_id=row.seller_id, sourse='web')
-                print('Send_stocks_wb_v2 - seller_id {} is_stocks_null {}'
-                              .format(len(row.key_mp), row.seller_id))
-                logging.DEBUG('Send_stocks_wb_v2 - seller_id {} is_stocks_null {}'
-                              .format(len(row.key_mp), row.seller_id))
+                print('Send_stocks_wb_v2 - seller_id {} '
+                              .format(row.seller_id))
+                logging.DEBUG('Send_stocks_wb_v2 - seller_id {} '
+                              .format( row.seller_id))
 
     print(777, markets)
 
