@@ -17,6 +17,7 @@ db = SQLAlchemy()
 TEST_MODE = 1
 LOCAL_MODE = 1
 if LOCAL_MODE:
+
     interval = 6
 else:
     interval = 120
@@ -28,7 +29,7 @@ def create_app():
                 static_folder='templates/static')
 
     app.config['SECRET_KEY'] = 'secret-key-goes-here'
-    app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql+psycopg2://user_name:user_pass@localhost/stm_app"
+    app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql+psycopg2://user_name:user_pass@localhost/web_app"
     app.config['USER_ENABLE_EMAIL'] = False
 
     db.init_app(app)

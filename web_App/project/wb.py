@@ -1,3 +1,4 @@
+import logging
 import time
 from datetime import datetime, timedelta
 import random
@@ -22,7 +23,6 @@ link = 'https://suppliers-api.wildberries.ru'
 l = 'https://suppliers-api.wildberries.ru/api/v3/supplies'
 
 
-
 # wh = [{"name": "Обычный склад СТМ", "id": 664706, "name_1C": "WB.НашсклСТМ"},
 #       {"name": "Сверхгабаритный товар", "id": 730558, "name_1C": "WB.СверхГБсклNEW"}]  # ,
 
@@ -43,8 +43,8 @@ def proxy_time_1():
     return pt
 
 
-def day_for_stm(string):
-    datta = datetime.strptime(string, '%Y-%m-%d')
+def day_for_stm(time_string):
+    datta = datetime.strptime(time_string, '%Y-%m-%d')
     dat = datta.weekday()
     dtt = datta.strftime('%d-%m-%Y')
     if 1 <= dat <= 4:
@@ -114,7 +114,7 @@ def make_send_data():
     return warehouse
 
 
-def make_send_data_v2(key=None, seller_id=None, is_stocks_null=False):
+def make_send_data_stocks_v2(key=None, seller_id=None, is_stocks_null=False):
     warehouse = {}
     outlets_data = get_wh(key=key)
     outlets = [i['id'] for i in outlets_data[1] if outlets_data[0] == 200]
@@ -156,6 +156,152 @@ def make_send_data_v2(key=None, seller_id=None, is_stocks_null=False):
     return warehouse
 
 
+def make_send_data_stocks_v3(key_wh_recip=None, seller_id=None):
+    warehouse = {}
+    outlets_data = get_wh(key=key_wh_recip)
+    outlets = [i['id'] for i in outlets_data[1] if outlets_data[0] == 200]
+
+    with Session(engine) as session:
+        data = session.query(Product) \
+            .where(Product.quantity > 0) \
+            .where(Product.store_id == seller_id) \
+            .all()
+        # TODO fix it - products maybe in to different warehouses
+        # все товары на все склады
+        for w_house in outlets:
+            stocks = []
+            for row in data:
+                proxy = {
+                    'sku': row.external_sku,
+                    'amount': row.quantity
+                }
+                stocks.append(proxy)
+
+        warehouse[w_house] = {'stocks': stocks}
+
+    print(warehouse.keys())
+    return warehouse
+
+
+def create_data_price_for_send_wb(seller_id=None, from_db=True):
+    result = []
+    prices = []
+    if from_db:
+        with Session(engine) as session:
+            data = session.query(Product) \
+                .where(Product.quantity > 0) \
+                .where(Product.store_id == seller_id) \
+                .all()
+            koeff = session.scalars(select(Marketplaces.store_markup)
+                                    .where(Marketplaces.seller_id == seller_id)) \
+                .first()
+            # print(koeff)
+            for product in data:
+                #############################
+                # TODO make func custom price WB
+                # Make price ended for '9'
+                discount = int(product.discount)
+                pre_price = int(product.price_product_base) * 2
+                price = str(pre_price).split('.')[0][:-1] + "9"
+                if discount > 0:
+                    next_price = int(price) + int(price) * (discount + 5) / 100
+                else:
+                    next_price = int(price) + int(price) * 5 / 100
+                final_price = next_price * 100 / koeff
+                ##############################
+                proxy = {
+                    "nmID": product.external_sku,
+                    "price": final_price,
+                    "discount": product.discount
+                }
+                prices.append(proxy)
+
+    else:
+        # get prices from oson
+        print("price_From_db_false")
+
+    while len(prices) >= 1000:
+        result.append(prices[:1000])
+        del prices[:1000]
+    else:
+        result.append(prices)
+
+    print('create_data_prices_oson_x1000', len(result))
+    return result
+
+
+def send_price_to_wb(seller_id=None, sourse=None):
+    api_key = ''
+    with Session(engine) as session:
+        session.begin()
+        data_keys = session.scalars(select(Marketplaces)
+                                    .where(Marketplaces.seller_id == seller_id) \
+                                    .where(Marketplaces.name_mp == "wb")) \
+            .all()
+    for datas in data_keys:
+        if 'Цены и скидки' in datas.tags:
+            api_key = datas.key_mp
+        else:
+            print('!!!!!!!!!!_api_key_ERROR seller_id {}, key tags {}'
+                  .format(seller_id, datas.tags))
+            return "Error in cred keys"
+
+    if sourse is None:
+        os.abort()
+    else:
+        data = create_data_price_for_send_wb(seller_id=seller_id)
+        for row in data:
+            metod = f'https://discounts-prices-api.wb.ru/api/v2/upload/task'
+            headers = {'Content-type': 'application/json',
+                       'Authorization': api_key}
+            send_data = {
+                'data': row
+            }
+            answer = requests.put(metod, data=json.dumps(send_data), headers=headers)
+            if answer.ok:
+                print('All_ride_send to WB - wh {} stocks {}'
+                      .format(seller_id, len(data)))
+            else:
+                print('All_ride_send to WB - wh {} stocks {} - result {}'
+                      .format(seller_id, len(data), answer.text))
+
+
+def make_import_export_wb_price(donor=None, recipient=None,
+                                  k=1):
+    if donor is not None and recipient is not None:
+        data = []
+        with Session(engine) as session:
+            session.begin()
+            recipient_data = session.execute(select(Marketplaces.seller_id,
+                                                    Marketplaces.key_mp)
+                                             .where(Marketplaces.shop_name == recipient)) \
+                .first()
+            product_data = session.query(Product).filter_by(shop_name=donor).all()
+
+        if product_data:
+            for row in product_data:
+                # print(22222, row )
+                #############################
+                # TODO is need it is for wb separately ?
+                # Make price ended for '9'
+                price = int(row.final_price) * (1 + k / 100)
+                price = str(price).split('.')[0][:-1] + "9"
+                old_price = str(int(price) * 4)
+                ##############################3
+                item = {
+                    'final_price': price,
+                    'old_price': old_price,
+                    "date_modifed": datetime.now()
+                }
+
+                with Session(engine) as session:
+                    session.begin()
+                    session.execute(update(Product)
+                                    .where(Product.articul_product == row.articul_product)
+                                    .where(Product.shop_name == recipient).values(item))
+                    session.commit()
+
+
 def send_stocks_wb():
     data = make_send_data()
     for key, value in data.items():
@@ -170,21 +316,72 @@ def send_stocks_wb():
         # print('send_stocks_wb', key, re_data, len(value['stocks']), value)
 
 
-def send_stocks_wb_v2(api_key=None, seller_id=None, is_stocks_null=None):
-    data = make_send_data_v2(key=api_key, seller_id=seller_id,
-                             is_stocks_null=is_stocks_null)
-    for wh_id, value in data.items():
-        metod = f'https://suppliers-api.wildberries.ru/api/v3/stocks/{wh_id}'
-        headers = {'Content-type': 'application/json',
-                   'Authorization': api_key}
-        print('SEND_WB', wh_id, len(value['stocks']))
-        answer = requests.put(metod, data=json.dumps(value), headers=headers)
-        if answer.ok:
-            print('All_ride_send to WB - wh {} stocks {}'
-                  .format(wh_id, len(wh_id)))
+def send_stocks_wb_v2(seller_id=None, is_stocks_null=None, sourse=None):
+    api_key = ''
+    with Session(engine) as session:
+        session.begin()
+        data_keys = session.scalars(select(Marketplaces)
+                                    .where(Marketplaces.seller_id == seller_id) \
+                                    .where(Marketplaces.name_mp == "wb")) \
+            .all()
+    for datas in data_keys:
+        if 'Маркетплейс' in datas.tags:
+            api_key = datas.key_mp
         else:
-            print('All_ride_send to WB - wh {} stocks {} - result {}'
-                  .format(wh_id, len(wh_id), answer.text))
+            print('!!!!!!!!!!_api_key_ERROR seller_id {}, key tags {}'
+                  .format(seller_id, datas.tags))
+            return "Error in cred keys"
+
+    if sourse is None:
+        os.abort()
+    else:
+        data = make_send_data_stocks_v2(key=api_key, seller_id=seller_id,
+                                        is_stocks_null=is_stocks_null)
+        for wh_id, value in data.items():
+            metod = f'https://suppliers-api.wildberries.ru/api/v3/stocks/{wh_id}'
+            headers = {'Content-type': 'application/json',
+                       'Authorization': api_key}
+            print('SEND_WB', wh_id, len(value['stocks']))
+            answer = requests.put(metod, data=json.dumps(value), headers=headers)
+            if answer.ok:
+                print('All_ride_send to WB - wh {} stocks {}'
+                      .format(wh_id, len(wh_id)))
+            else:
+                print('All_ride_send to WB - wh {} stocks {} - result {}'
+                      .format(wh_id, len(wh_id), answer.text))
+
+# send_stocks_wb_v2(seller_id='admin100500')
+
+def send_stocks_wb_v3(donor=None, recipient=None):
+    key_wh_recip, key_recipient = '', ''
+    with Session(engine) as session:
+        session.begin()
+        data_keys = session.execute(select(Marketplaces)
+                                    .where(Marketplaces.shop_name == recipient) \
+                                    .where(Marketplaces.name_mp == "wb")) \
+            .all()
+    for datas in data_keys:
+        if 'Маркетплейс' in datas.tags:
+            key_wh_recip = datas.mp_key
+            key_recipient = datas.mp_key
+
+    if key_wh_recip != ''  and key_recipient != '':
+        data = make_send_data_stocks_v3(key_wh_recip=key_wh_recip, seller_id=donor)
+        for wh_id, value in data.items():
+            metod = f'https://suppliers-api.wildberries.ru/api/v3/stocks/{wh_id}'
+            headers = {'Content-type': 'application/json',
+                       'Authorization': key_recipient}
+            print('SEND_WB', wh_id, len(value['stocks']))
+            answer = requests.put(metod, data=json.dumps(value), headers=headers)
+            if answer.ok:
+                print('All_ride_send to WB - wh {} stocks {}'
+                      .format(wh_id, len(wh_id)))
+            else:
+                print('All_ride_send to WB - wh {} stocks {} - result {}'
+                      .format(wh_id, len(wh_id), answer.text))
+    else:
+        logging.error("Some error with keys from send_stocks_wb_v3 - donor {}, res {}"
+                      .format(donor, recipient))
 
 
 def check_is_exist(id_mp, shop):
@@ -328,7 +525,7 @@ def get_id_1c_v2(vendor_code, shop_name):
 
 
 async def processing_orders_wb(shop_name=None, company_id=None):
-    # orders = proxy_wb_orders["orders"]    # FOR TEST ONLY TODO
+    # orders = proxy_wb_orders["orders"]
     data = get_new_orders_wb(shop_name=shop_name, company_id=company_id)
     if data[0] == 200:
         orders = data[1].get("orders")
@@ -339,7 +536,7 @@ async def processing_orders_wb(shop_name=None, company_id=None):
             if check:
                 continue
             else:
-                shipment_Date = proxy_time_1()  # order["createdAt"] #TODO plus 1 day?
+                shipment_Date = proxy_time_1()  # order["createdAt"]
                 status = "CREATED"
                 our_status = "NEW"
                 payment_Type = "PREPAID"
@@ -365,7 +562,7 @@ async def processing_orders_wb(shop_name=None, company_id=None):
 
 
 def processing_orders_wb_v2(shop_name=None, key=None):
-    # orders = proxy_wb_orders["orders"]    # FOR TEST ONLY TODO
+    # orders = proxy_wb_orders["orders"]    # FOR TEST ONLY
     data = get_new_orders_wb_v2(key=key)
     if data[0] == 200:
         orders = data[1].get("orders")
@@ -376,7 +573,7 @@ def processing_orders_wb_v2(shop_name=None, key=None):
             if check:
                 continue
             else:
-                shipment_Date = proxy_time_1()  # order["createdAt"] #TODO plus 1 day?
+                shipment_Date = proxy_time_1()  # order["createdAt"]
                 status = "CREATED"
                 our_status = "NEW"
                 payment_Type = "PREPAID"
@@ -392,7 +589,7 @@ def processing_orders_wb_v2(shop_name=None, key=None):
                           status, our_status, payment_Type, delivery)
                 execute_query_v3(query_write_order, result)
                 items_data = (id_mp, our_id, "wb", shop_name, "NEW", vendor_code,
-                              id_1c, quantity, summ_order,  article, article_mp)
+                              id_1c, quantity, summ_order, article, article_mp)
                 print('items_data_WB', items_data)
                 executemany_query_v3(query_write_items_v2, [items_data])
         print(f"Write {len(orders)} orders WB")
@@ -642,7 +839,6 @@ def import_product_from_wb(shop_name=None, company_id=None,
     else:
 
         return 'Some trouble import {} {}'.format(shop_name, company_id)
-
 
 # get_product_cards(shop_name='Полиция Вкуса', company_id='AdminTheRock')
 # asyncio.run(processing_orders_wb(shop_name='Полиция Вкуса', company_id='AdminTheRock'))

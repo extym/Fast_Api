@@ -16,7 +16,7 @@ chat_id = '-4034247798'
 db_user = 'user_name'
 db_pass = 'user_pass'
 db_host = 'localhost'
-db_name = 'stm_app'
+db_name = 'web_app'
 
 
 link = 'http://stm-data.i-bots.ru/data_json.json'

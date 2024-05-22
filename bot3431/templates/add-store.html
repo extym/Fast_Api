@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Загрузить новый файл.</title>
+</head>
+<body>
+ {% with messages = get_flashed_messages() %}
+   {% if messages %}
+     <ul class="flashes">
+        {% for message in messages %}
+         <div class="message_flash">{{ message }}</div>
+        {% endfor %}
+    </ul>
+  {% endif %}
+ {% endwith %}
+
+    <h1>Загрузить новый файл.</h1>
+    <form method=post enctype=multipart/form-data>
+      <input type=file name=file>
+      <input type=submit value=Upload>
+
+
+        <select name="market" id="file">
+
+        <option value="">--Выберите маркетплейс--</option>
+        <option value="710">Сбер-1</option>
+        <option value="715">Сбер-2</option>
+        <option value="235">Яндекс</option>
+            </select>
+
+      {{message}}
+    </form>
+{{download_link}}
+</body>
+</html>

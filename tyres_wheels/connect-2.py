@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-from cred import DATA_PATH
+from cred import *
 import csv
 import datetime
 # from pictures import write
@@ -8,7 +8,7 @@ import json
 import mysql.connector
 from main import get_wheels, get_new_pages
 import requests
-from getcsv import standart_tyres_csv
+# from getcsv import standart_tyres_csv
 from categories import categories_summer, categories_wheels, categories_winter, categories_allseason
 
 
@@ -36,10 +36,6 @@ def is_in_stocks(dictionary):
                 quantity += in_stock
 
     return quantity
-
-
-# def isin_stock(list_data):
-#     pass
 
 
 def write_pictures_data(listt):
@@ -171,9 +167,9 @@ def params_options_tyres(dictionary, product_id):
         if option == 16:
             data_options_tyres.append((option, product_id, radius))
         elif option == 15:
-            data_options_tyres.append((option, product_id, width_tyres))
-        elif option == 14:
             data_options_tyres.append((option, product_id, h_profil))
+        elif option == 14:
+            data_options_tyres.append((option, product_id, width_tyres))
 
     return data_options_tyres
 
