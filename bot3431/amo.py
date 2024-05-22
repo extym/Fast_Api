@@ -750,7 +750,7 @@ def get_amo_unsorted_list():
     else:
         data = answer.json()
         need_data = data.get('_embedded').get('unsorted')
-        # print(333, need_data[0])
+
         return answer.status_code, need_data
 
 
@@ -775,7 +775,7 @@ def get_amo_current_leads(leads_id, amo_name):
     else:
         data = answer.json()
         # need_data = data.get('_embedded').get('unsorted')
-        print(333, data)
+        print(337777777777777773, data)
         return answer.status_code, data
 
 
@@ -889,7 +889,7 @@ def get_amo_events(avito_id=0, amo_name=None):
     if answer.ok:
         data = answer.json()
         # need_data = data.get('_embedded').get('unsorted')
-        print(333, data)
+        print(38888888888888888833, data)
     else:
         logging.error('fuck_up {} {} '.format(answer.status_code, answer.text))
 

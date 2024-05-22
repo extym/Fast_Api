@@ -2,7 +2,7 @@ import asyncio
 import json
 
 import requests
-from cred import api_key_ozon_prod, api_key_ozon_admin
+from cred import api_key_ozon_prod, api_key_ozon_admin, client_id
 from read_json import read_json_on
 from time import sleep
 
@@ -15,7 +15,7 @@ common_error = {
 }
 
 host = 'https://api-seller.ozon.ru'
-client_id = '90963'
+
 
 last_id = 'WzQ2MzcyNzEyNyw0NjM3MjcxMjdd'
 
@@ -117,7 +117,7 @@ def create_data_stocks():
     while len(stocks) >= 100:
         result.append(stocks[:100])
         del stocks[:100]
-        print('stocks', stocks)
+        # print('stocks_oson_stm', stocks)
     else:
         result.append(stocks)
 
@@ -160,12 +160,12 @@ def send_stocks_on():
         result = answer.get("result")
         if result:
             for row in result:
-                if len(row["errors"]) > 0:  # and row['warehouse_id'] != 23012928587000: #TODO temporary 'warehouse_id': 23012928587000
+                if len(row["errors"]) > 0:
                     print('ERROR from send_stocks_ozon', row)
                 elif row['updated'] == False:
                     print('ERROR update from send_stocks_ozon', row)
-                elif row['updated'] == True:  # and row['warehouse_id'] != 23012928587000:
-                    print('SUCCES update from send_stocks_on', row)
+                # elif row['updated'] == True:
+                #     print('SUCCES update from send_stocks_on', row)
             proxy.append(answer)
         sleep(1)
 

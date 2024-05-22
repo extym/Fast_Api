@@ -2,35 +2,75 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Загрузить новый файл.</title>
+    <title>Cоздать новое подключение</title>
 </head>
 <body>
  {% with messages = get_flashed_messages() %}
    {% if messages %}
      <ul class="flashes">
-        {% for message in messages %}
-         <div class="message_flash">{{ message }}</div>
-        {% endfor %}
+
+         <div class="message_flash">{{ messages[0] }}</div>
+
     </ul>
   {% endif %}
  {% endwith %}
 
-    <h1>Загрузить новый файл.</h1>
-    <form method=post enctype=multipart/form-data>
-      <input type=file name=file>
-      <input type=submit value=Upload>
+    <h1>Cоздать новое подключение</h1>
+    <form method=post action="/add_store">
+        <div>
+        <select name="market" id="wtr" style="width: 310px" >
 
-
-        <select name="market" id="file">
-
-        <option value="">--Выберите маркетплейс--</option>
-        <option value="710">Сбер-1</option>
-        <option value="715">Сбер-2</option>
-        <option value="235">Яндекс</option>
+            <option selected value="">--Выберите маркетплейс--</option>
+            <option value="710">Сбер-1</option>
+            <option value="715">Сбер-2</option>
+            <option value="1972">Сбер-3</option>
+            <option value="1973">Сбер-4</option>
+            <option value="235">Яндекс-1</option>
+            <option value="2063">Яндекс-2</option>
+            <option value="235">Яндекс-3</option>
             </select>
+        </div>
+        <br>
+        <div>
+            <div>
+            <label id="" >Для магазина из Яндекс-Маркета, введите значение campainID из ЛК ЯМ</label>
 
-      {{message}}
+            </div>
+
+            <input type="text" style="width: 300px" name="store_id" title="Для магазина из Яндекс Маркета введите значение campainID из ЛК ЯМ" placeholder="Введите campainID магазина">
+        </div>
+
+        <br>
+        <div>
+            <div>
+            <label id="key_store" >Введите токен для этого магазина из маркетплейса</label>
+
+            </div>
+            <input type="text"  name="key_store" title="Введите токен для этого магазина из маркетплейса" placeholder="Введите ключ магазина" style="width: 300px">
+        </div>
+        <br>
+        <div>
+            <div>
+            <label id="api_key_ps">Введите API ключ parts-soft сгенерированный в настройках контрагента</label>
+
+            </div>
+            <input type="text" name="api_key_ps" title="Введите API ключ parts-soft сгенерированный в настройках контрагента" style="width: 300px" placeholder="Введите API ключ parts-soft">
+        </div>
+        <br>
+        <div>
+            <div>
+            <label id="upload_link" >Введите ссылку на выгрузку, которая выгружается на этот магазин</label>
+
+            </div>
+            <input type="text" name="upload_link" title="Введите ссылку на выгрузку, которая выгружается на этот магазин" style="width: 300px" placeholder="Ссылка на выгрузку">
+        </div>
+        <br>
+        <div>
+            <input type=submit value="Сохранить">
+        </div>
+
+
     </form>
-{{download_link}}
+
 </body>
 </html>

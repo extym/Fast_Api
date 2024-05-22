@@ -21,6 +21,8 @@ import urllib3
 import logging
 from bot_tg import send_get
 from parts_soft import make_data_for_request_v2
+import connect as conn
+
 
 urllib3.disable_warnings()
 
@@ -559,8 +561,6 @@ async def download():
                     flash("File upload successfully")
                     return redirect(request.url)
 
-
-
             file.save(os.path.join(UPLOAD_FOLDER, filename))
 
             # download_link = redirect(url_for('download_file', name=filename))
@@ -570,10 +570,53 @@ async def download():
     return render_template('index.html')
 
 
+@app.route('/add_store', methods=['get', 'post'])
+async def add_store():
+    if request.method == 'POST':
+        print(22222222222222222, request.form.to_dict())
+        data = request.form.to_dict()
+        market = data.get('market')
+        store_id = data.get('store_id')
+        key_store = data.get('key_store')
+        api_key_ps = data.get('api_key_ps')
+        upload_link = data.get('upload_link')
+        print(33333333, market, key_store, store_id, upload_link)
+
+        if (market == '235' or market == '2063' or market == '2063')\
+                and store_id != '' and key_store != '' and upload_link != '':
+            result = conn.execute_query_v2(query_add_settings_ym,
+                                        (market,
+                                         key_store,
+                                         store_id,
+                                         api_key_ps,
+                                         upload_link))
+            if result[0]:
+                flash('Настройки удачно сохранены')
+            else:
+                flash(f"Ошибка сохранения {result[1]}")
+
+        elif market != '' and key_store != '' and upload_link != '':
+            result = conn.execute_query_v2(query_add_settings_without_ym,
+                                        (market,
+                                         key_store,
+                                         api_key_ps,
+                                         upload_link))
+            if result[0]:
+                flash('Настройки удачно сохранены')
+            else:
+                flash(f"Ошибка сохранения {result[1]}")
+        else:
+            flash("Проверьте полноту введенных данных")
+
+        return redirect('/add_store')
+
+    return render_template('/add-store.html')
+
+
 if __name__ == '__main__':
     # #Debug/Development
-    ##run app in debug mode on port 5000
-    # app.run(debug=True, host='0.0.0.0', port=5000)
+    #run app in debug mode on port 5000
+    app.run(debug=True, host='0.0.0.0', port=8880)
     # Production
-    http_server = WSGIServer(('', 8880), app)
-    http_server.serve_forever()
+    # http_server = WSGIServer(('', 8880), app)
+    # http_server.serve_forever()

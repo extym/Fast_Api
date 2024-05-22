@@ -307,7 +307,8 @@ chat_info_from_avito = {
     }
 }
 
-proxy = ("u2i-TOYzRVLyb9Hw_l7u2aBTVg", '4391', "https://avito.ru/sankt-peterburg/zapchasti_i_aksessuary/trw_df4110_torm.disk_per.vent.280x24_4_otv_3364311913",
+proxy = ("u2i-TOYzRVLyb9Hw_l7u2aBTVg", '4391',
+         "https://avito.ru/sankt-peterburg/zapchasti_i_aksessuary/trw_df4110_torm.disk_per.vent.280x24_4_otv_3364311913",
          'e737d71dcddc238d5a1db962f3fb6db9', 353207078, "TRW DF4110 Торм.диск пер.вент.280x24 4 отв",
          True, False, 0, 0)
 
@@ -1633,21 +1634,27 @@ respose_ym = {
                   "boxes": [{"id": 567390693, "fulfilmentId": "451530744-1"}]}]}, "buyer": {"type": "PERSON"},
          "taxSystem": "USN", "cancelRequested": True}]}
 
-
 ps_create_basket_answer = {
-    "result":"ok",
-    "data":{
-        "id":9288,
-        "oem":"4214-0459-SX",
-        "make_name":"STELLOX",
-        "detail_name":"амортизатор передний газовый!\\ BMW E39 2.0-3.0/2.5TD/3.0D 95\u003e",
-        "cost":3762.0,
-        "qnt":2,
-        "min_delivery_day":1,
-        "max_delivery_day":3,
-        "comment":"451642783"}}
+    "result": "ok",
+    "data": {
+        "id": 9288,
+        "oem": "4214-0459-SX",
+        "make_name": "STELLOX",
+        "detail_name": "амортизатор передний газовый!\\ BMW E39 2.0-3.0/2.5TD/3.0D 95\u003e",
+        "cost": 3762.0,
+        "qnt": 2,
+        "min_delivery_day": 1,
+        "max_delivery_day": 3,
+        "comment": "451642783"}}
 
-FINAL_result = {"result":"ok","data":[{"id":76395,"oem":"42140459SX","make_name":"STELLOX","detail_name":"амортизатор передний газовый!\\ BMW E39 2.0-3.0/2.5TD/3.0D 95\u003e","cost":3762.0,"qnt":2,"qnt_confirmed":0,"qnt_accept":None,"qnt_income":None,"status":"Ожидает оплаты","status_code":"processing","comment":"451642783","created_at":"2024-05-02T16:37:34.832+03:00","order_id":62821,"status_logs":[{"status_code":"processing","status_name":"Ожидает оплаты","created_at":"2024-05-02T16:37:35.074+03:00"}]}]}
+FINAL_result = {"result": "ok", "data": [{"id": 76395, "oem": "42140459SX", "make_name": "STELLOX",
+                                          "detail_name": "амортизатор передний газовый!\\ BMW E39 2.0-3.0/2.5TD/3.0D 95\u003e",
+                                          "cost": 3762.0, "qnt": 2, "qnt_confirmed": 0, "qnt_accept": None,
+                                          "qnt_income": None, "status": "Ожидает оплаты", "status_code": "processing",
+                                          "comment": "451642783", "created_at": "2024-05-02T16:37:34.832+03:00",
+                                          "order_id": 62821, "status_logs": [
+        {"status_code": "processing", "status_name": "Ожидает оплаты",
+         "created_at": "2024-05-02T16:37:35.074+03:00"}]}]}
 
 
 # print(len(one) + len(two), len(tree))
@@ -1668,6 +1675,67 @@ def ran_input(n, m):
 
     print(line, length, num, char)
 
+
 # ran_input(15, 15)
 
+yandex_order = {'id': 459557016, 'status': 'PROCESSING', 'substatus': 'STARTED', 'creationDate': '17-05-2024 13:53:35',
+                'currency': 'RUR', 'itemsTotal': 6128.0, 'deliveryTotal': 0.0, 'buyerItemsTotal': 6128.0,
+                'buyerTotal': 6128.0, 'buyerItemsTotalBeforeDiscount': 7382.0, 'buyerTotalBeforeDiscount': 7382.0,
+                'paymentType': 'PREPAID', 'paymentMethod': 'YANDEX', 'fake': False,
+                'items': [
+                    {'id': 600992416, 'offerId': 'MILESDG11078',
+                     'offerName': 'MILES DG11078 Амортизатор передний левый (OPEL ASTRA H/ZAFIRA 04-) (KYB 339703) DG11078',
+                     'price': 3064.0, 'buyerPrice': 3064.0, 'buyerPriceBeforeDiscount': 3691.0, 'priceBeforeDiscount': 3691.0,
+                     'count': 1, 'vat': 'NO_VAT', 'shopSku': 'MILESDG11078', 'subsidy': 627.0,
+                     'partnerWarehouseId': '0f2b9b09-b610-438a-9a97-d8f70d652df0',
+                     'subsidies': [{'type': 'SUBSIDY', 'amount': 627.0}]},
+                    {'id': 600992417,
+                     'offerId': 'MILESDG21078',
+                    'offerName': 'MILES DG21078 Амортизатор передний правый (OPEL ASTRA H/ZAFIRA 04-) (KYB 339702) DG21078',
+                    'price': 3064.0, 'buyerPrice': 3064.0,
+                    'buyerPriceBeforeDiscount': 3691.0,
+                    'priceBeforeDiscount': 3691.0, 'count': 1,
+                    'vat': 'NO_VAT', 'shopSku': 'MILESDG21078',
+                    'subsidy': 627.0,
+                    'partnerWarehouseId': '0f2b9b09-b610-438a-9a97-d8f70d652df0',
+                    'subsidies': [{'type': 'SUBSIDY', 'amount': 627.0}]}],
+                'subsidies': [{'type': 'SUBSIDY', 'amount': 1254.0}],
+                'delivery': {'type': 'PICKUP', 'serviceName': 'Самовывоз', 'price': 0.0,
+                             'deliveryPartnerType': 'YANDEX_MARKET',
+                             'dates': {'fromDate': '29-05-2024', 'toDate': '29-05-2024', 'fromTime': '09:00:00',
+                                       'toTime': '18:00:00'},
+                             'region': {'id': 54, 'name': 'Екатеринбург', 'type': 'CITY',
+                                        'parent': {'id': 121110, 'name': 'Муниципальное образование Екатеринбург',
+                                                   'type': 'REPUBLIC_AREA',
+                                                   'parent': {'id': 11162, 'name': 'Свердловская область',
+                                                              'type': 'REPUBLIC', 'parent': {'id': 52,
+                                                                                             'name': 'Уральский федеральный округ',
+                                                                                             'type': 'COUNTRY_DISTRICT',
+                                                                                             'parent': {'id': 225,
+                                                                                                        'name': 'Россия',
+                                                                                                        'type': 'COUNTRY'}}}}},
+                             'address': {'country': 'Россия', 'postcode': '620105', 'city': 'Екатеринбург',
+                                         'street': 'улица Рябинина',
+                                         'gps': {'latitude': 56.786582, 'longitude': 60.496378}},
+                             'deliveryServiceId': 522767, 'liftPrice': 0.0, 'outletCode': '20368', 'shipments': [
+                        {'id': 454246228, 'shipmentDate': '24-05-2024', 'shipmentTime': '11:30',
+                         'boxes': [{'id': 571559010, 'fulfilmentId': '459557016-1'}]}]}, 'buyer': {'type': 'PERSON'},
+                'taxSystem': 'USN', 'cancelRequested': False}
+
+
+from cred import ps_YM_II_api_key
+def get_test(oem, brand):
+    print(3333, oem, brand)
+    # sys.exit()
+    params = {
+        "api_key": ps_YM_II_api_key,
+        "oem": oem,
+        "make_name": brand,
+        "without_cross": True
+    }
+    metod = "/backend/price_items/api/v1/search/get_offers_by_oem_and_make_name"
+    url = "http://3431.ru" + metod
+    answer = requests.get(url, params=params)
+    print(111111111111111111111, answer.text)
+    print(2222222222222, answer.url)
 
