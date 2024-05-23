@@ -85,9 +85,10 @@ def back_shops_tasks():
                 .where(InternalImport.internal_import_role_2 == 'recipient') \
                 .first()
             store_1 = ii_raw.internal_import_store_1
+            seller_id = row.seller_id
             if row.name_mp == 'ozon':
                 oson.send_stocks_oson_v3(key_recipient=key,
-                                         donor=store_1,
+                                         donor_name=store_1,
                                          recipient=seller_id)
                 print('Send_stocks_oson_v3 - donor {}, recipient {}'
                       .format(store_1, row.seller_id))

@@ -178,53 +178,82 @@ def send_stocks_on():
         sleep(1)
 
 
-def create_data_stocks_from_db(seller_id=None, is_stocks_null=False):
+def create_data_stocks_from_db(seller_id=None, seller_name=None, is_stocks_null=False):
     result = []
     stocks = []
-    if not is_stocks_null:
+    if not seller_id:
         with Session(engine) as session:
-            data = session.query(Product) \
-                .where(Product.quantity > 0) \
-                .where(Product.store_id == seller_id) \
-                .all()
-            key = session.execute(select(Marketplaces.key_mp)
+            key_seller_data = session.scalars(select(Marketplaces.key_mp, Marketplaces.seller_id)
                                   .where(Marketplaces.shop_name == seller_id)) \
                 .first()
-            print('SELLER_ID_1 {}, key {}, type key {}'.format(seller_id, key, type(key)))
-            outlets_data = post_smth_v2(get_wh_list, seller_id=seller_id, key=key[0])
-            outlets = [i['warehouse_id'] for i in outlets_data[1].get('result') if outlets_data[0] == 200]
-            for product in data:
-                proxy = {
-                    'offer_id': product.articul_product,
-                    'product_id': product.external_sku,
-                    'stock': product.quantity
-                }
-                for wh in outlets:
-                    proxy['warehouse_id'] = wh
-                    pr = proxy.copy()
-                    stocks.append(pr)
+            seller_id = key_seller_data[1]
+            key = key_seller_data[0]
+            print('SELLER_ID_1 {}, key {}, type key {}'.format(seller_id, key_seller_data[0]))
+            # outlets_data = post_smth_v2(get_wh_list, seller_id=seller_id, key=key)
+            # outlets = [i['warehouse_id'] for i in outlets_data[1].get('result') if outlets_data[0] == 200]
+            # data = session.query(Product) \
+            #     .where(Product.quantity > 0) \
+            #     .where(Product.store_id == seller_id) \
+            #     .all()
+            #
+            # for product in data:
+            #     if not is_stocks_null:
+            #         quantity = product.quantity
+            #     else:
+            #         quantity = "0"
+            #     proxy = {
+            #         'offer_id': product.articul_product,
+            #         'product_id': product.external_sku,
+            #         'stock':
+            #     }
+            #     for wh in outlets:
+            #         proxy['warehouse_id'] = wh
+            #         pr = proxy.copy()
+            #         stocks.append(pr)
     else:
         with Session(engine) as session:
             key = session.execute(select(Marketplaces.key_mp)
                                   .where(Marketplaces.seller_id == seller_id)) \
                 .first()
             print('SELLER_ID_2 {}, key {}, type key {}'.format(seller_id, key, type(key)))
-        print('SELLER_ID_3 {}, key {}, type key {}'.format(seller_id, key, type(key)))
-        outlets_data = post_smth_v2(get_wh_list, seller_id=seller_id, key=key[0])
-        outlets = [i['warehouse_id'] for i in outlets_data[1].get('result') if outlets_data[0] == 200]
-        data = post_smth_v2(metod_get_list_products, seller_id=seller_id, key=key[0])
-        # print(77777, data[1].get('result'), data)
-        if data[0] == 200:
-            for product in data[1].get('result'):
-                proxy = {
-                    'offer_id': product['offer_id'],
-                    'product_id': product['product_id'],
-                    'stock': 0
-                }
-                for wh in outlets:
-                    proxy['warehouse_id'] = wh
-                    pr = proxy.copy()
-                    stocks.append(pr)
+        # print('SELLER_ID_3 {}, key {}, type key {}'.format(seller_id, key, type(key)))
+        # outlets_data = post_smth_v2(get_wh_list, seller_id=seller_id, key=key[0])
+        # outlets = [i['warehouse_id'] for i in outlets_data[1].get('result') if outlets_data[0] == 200]
+        # data = post_smth_v2(metod_get_list_products, seller_id=seller_id, key=key[0])
+        # # print(77777, data[1].get('result'), data)
+        # if data[0] == 200:
+        #     for product in data[1].get('result'):
+        #         proxy = {
+        #             'offer_id': product['offer_id'],
+        #             'product_id': product['product_id'],
+        #             'stock': 0
+        #         }
+        #         for wh in outlets:
+        #             proxy['warehouse_id'] = wh
+        #             pr = proxy.copy()
+        #             stocks.append(pr)
+
+    outlets_data = post_smth_v2(get_wh_list, seller_id=seller_id, key=key)
+    outlets = [i['warehouse_id'] for i in outlets_data[1].get('result') if outlets_data[0] == 200]
+    data = session.query(Product) \
+        .where(Product.quantity > 0) \
+        .where(Product.store_id == seller_id) \
+        .all()
+
+    for product in data:
+        if not is_stocks_null:
+            quantity = product.quantity
+        else:
+            quantity = "0"
+        proxy = {
+            'offer_id': product.articul_product,
+            'product_id': product.external_sku,
+            'stock': quantity
+        }
+        for wh in outlets:
+            proxy['warehouse_id'] = wh
+            pr = proxy.copy()
+            stocks.append(pr)
 
     while len(stocks) >= 100:
         result.append(stocks[:100])
@@ -238,7 +267,6 @@ def create_data_stocks_from_db(seller_id=None, is_stocks_null=False):
     return result
 
 
-# create_data_stocks_from_db(seller_id="1179095")
 
 def create_data_price_for_send(seller_id=None, from_db=True):
     result = []
@@ -395,8 +423,8 @@ def send_stocks_oson_v2(key=None, seller_id=None, is_stocks_null=False):
             sleep(0.6)
 
 
-def send_stocks_oson_v3(key_recipient=None, donor=None, recipient=None):
-    pre_data = create_data_stocks_from_db(seller_id=donor,
+def send_stocks_oson_v3(key_recipient=None, donor_name=None, recipient=None):
+    pre_data = create_data_stocks_from_db(seller_name=donor_name,
                                           is_stocks_null=False)
     headers = {
         'Client-Id': recipient,
@@ -427,13 +455,13 @@ def send_stocks_oson_v3(key_recipient=None, donor=None, recipient=None):
                 proxy.append(answer)
             oson_logger.info('ALL RIDE send_stocks_oson - answer {}, donor {},'
                              ' recipient {}, updated {}, errors update {}'
-                             .format(response.text, donor, recipient, count, error))
+                             .format(response.text, donor_name, recipient, count, error))
             sleep(0.6)
         else:
 
             oson_logger.info('Error send_stocks_oson - answer {}, donor {},'
                              ' recipient {}, len key_recip {}'
-                             .format(response.text, donor, recipient, len(key_recipient)))
+                             .format(response.text, donor_name, recipient, len(key_recipient)))
             print('answer send_stocks_on', response.text)
             sleep(0.6)
 
