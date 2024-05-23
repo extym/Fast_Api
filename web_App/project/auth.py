@@ -1765,7 +1765,7 @@ def upload_prices_table():
             rows.append(row[0])
             rows_mp.append(row[1])
 
-        return render_template('/upload_prices_settings.html',
+        return render_template('/upload_price_settings.html',
                                uid=uid, role=role,
                                rows=rows, rows_mp=set(rows_mp),
                                photo=photo,
@@ -2063,7 +2063,7 @@ def upload_prices_settings():
         rows.append(row[0])
         rows_mp.append(row[1])
 
-    return render_template('/upload_prices_settings.html',
+    return render_template('/upload_price_settings.html',
                            uid=uid, role=role,
                            rows=rows, rows_mp=set(rows_mp),
                            photo=photo,

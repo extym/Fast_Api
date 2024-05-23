@@ -168,6 +168,24 @@ UNIQUE (email)
 )
 """
 
+create_upload_price = """
+CREATE TABLE IF NOT EXISTS upload_price (
+id SERIAL PRIMARY KEY,
+name varchar NOT NULL,
+koef_price varchar, 
+distributor TEXT NOT NULL,
+dist_login text,
+dist_pass text,
+link TEXT,
+is_null_stocks bool,
+is_scheduler bool,
+date_Added varchar,
+date_Modifed varchar,
+user_modifed int,
+UNIQUE (distributor, link)
+)
+"""
+
 create_consult_users = """
 CREATE TABLE IF NOT EXISTS consult_users (
 id SERIAL PRIMARY KEY,

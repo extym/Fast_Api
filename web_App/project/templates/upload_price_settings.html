@@ -14,7 +14,7 @@
             <div class="page-title">
 
                 <div class="float-left">
-                    <h1 class="title">Настройки импорта</h1>
+                    <h1 class="title">Настройки экспорта</h1>
                 </div>
 
             </div>
@@ -36,83 +36,83 @@
 
 <!--        <div class="row margin-0">-->
 
+<!--                <section class="box ">-->
+<!--                    <header class="panel_header">-->
+<!--                        <h2 class="title float-left">Запустить импорт товаров из маркетплейса в таблицу</h2>-->
+<!--                        <div class="actions panel_actions float-right">-->
+<!--                            <i class="box_toggle fa fa-chevron-down"></i>-->
+<!--                            <i class="box_setting fa fa-cog" data-toggle="modal" href="#section-settings"></i>-->
+<!--                            <i class="box_close fa fa-times"></i>-->
+<!--                        </div>-->
+<!--                    </header>-->
+<!--                    <div class="content-body">    <div class="row">-->
+
+<!--                            <form id="general_valid" action="/import_settings" method="post" novalidate="novalidate" style="width: 100%;">-->
+
+<!--                                <div class="row margin-0">-->
+<!--                                    <div class="col-lg-6 col-md-6 col-6">-->
+
+
+<!--                                        <div class="form-group">-->
+<!--&lt;!&ndash;                                            <label class="form-label" for="select_mp_name">Выбрать Маркетплейс</label>&ndash;&gt;-->
+
+<!--                                            <div class="controls">-->
+<!--                                                <select class="custom-select" id="select_mp_name" name="import_mp_name">-->
+<!--                                            <option selected>Выбрать Маркетплейс</option>-->
+<!--                                                {% for row in rows_mp %}-->
+<!--                                                <option value="{{ row }}" >{{ row }}</option>-->
+<!--                                                {% endfor %}-->
+
+<!--                                                </select>-->
+<!--                                            </div>-->
+<!--                                        </div>-->
+
+
+<!--                                    </div>-->
+<!--                                    <div class="col-lg-6 col-md-6 col-6">-->
+
+
+<!--                                        <div class="form-group">-->
+<!--&lt;!&ndash;                                        <label class="form-label" for="import_shop_names">Выбрать Магазин</label>&ndash;&gt;-->
+
+<!--                                        <div class="controls">-->
+<!--                                            <select class="custom-select" id="import_shop_names" name="import_shop_names">-->
+<!--                                        <option selected>Выбрать Магазин</option>-->
+<!--                                            {% for row in rows %}-->
+<!--                                            <option value="{{ row }}" >{{ row }}</option>-->
+<!--                                            {% endfor %}-->
+
+<!--                                            </select>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+
+<!--                                    </div>-->
+<!--                                </div>-->
+
+<!--                                <div class="col-lg-12 col-md-12 col-12">-->
+<!--                                    <div class="float-right ">-->
+<!--                                        <button type="submit" name="make" value="start_import" title="Запустить импорт товаров с маркетплейса. Задача будет выполнятся в фоне, текущую вкладку можно закрыть" class="btn btn-primary" >Запустить импорт</button>-->
+<!--                                        <button class="btn" type="reset">  Очистить  </button>-->
+<!--                                    </div>-->
+
+
+<!--                                    <div class="float-left" >-->
+<!--                                        <div class="form-block">-->
+<!--                                            <input type="checkbox" name="change_base_price"  class="iswitch iswitch-warning">-->
+<!--                                            <label class="form-label" title="При включении этой функции базовая цена будет пересчитана на основе импортируемой цены и сохранена" for="edit_shop_name">Перезаписать базовые цены</label>-->
+
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </form>-->
+
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </section>-->
+
                 <section class="box ">
                     <header class="panel_header">
-                        <h2 class="title float-left">Запустить импорт товаров из маркетплейса в таблицу</h2>
-                        <div class="actions panel_actions float-right">
-                            <i class="box_toggle fa fa-chevron-down"></i>
-                            <i class="box_setting fa fa-cog" data-toggle="modal" href="#section-settings"></i>
-                            <i class="box_close fa fa-times"></i>
-                        </div>
-                    </header>
-                    <div class="content-body">    <div class="row">
-
-                            <form id="general_valid" action="/import_settings" method="post" novalidate="novalidate" style="width: 100%;">
-
-                                <div class="row margin-0">
-                                    <div class="col-lg-6 col-md-6 col-6">
-
-
-                                        <div class="form-group">
-<!--                                            <label class="form-label" for="select_mp_name">Выбрать Маркетплейс</label>-->
-
-                                            <div class="controls">
-                                                <select class="custom-select" id="select_mp_name" name="import_mp_name">
-                                            <option selected>Выбрать Маркетплейс</option>
-                                                {% for row in rows_mp %}
-                                                <option value="{{ row }}" >{{ row }}</option>
-                                                {% endfor %}
-
-                                                </select>
-                                            </div>
-                                        </div>
-
-
-                                    </div>
-                                    <div class="col-lg-6 col-md-6 col-6">
-
-
-                                        <div class="form-group">
-<!--                                        <label class="form-label" for="import_shop_names">Выбрать Магазин</label>-->
-
-                                        <div class="controls">
-                                            <select class="custom-select" id="import_shop_names" name="import_shop_names">
-                                        <option selected>Выбрать Магазин</option>
-                                            {% for row in rows %}
-                                            <option value="{{ row }}" >{{ row }}</option>
-                                            {% endfor %}
-
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-12 col-md-12 col-12">
-                                    <div class="float-right ">
-                                        <button type="submit" name="make" value="start_import" title="Запустить импорт товаров с маркетплейса. Задача будет выполнятся в фоне, текущую вкладку можно закрыть" class="btn btn-primary" >Запустить импорт</button>
-                                        <button class="btn" type="reset">  Очистить  </button>
-                                    </div>
-
-
-                                    <div class="float-left" >
-                                        <div class="form-block">
-                                            <input type="checkbox" name="change_base_price"  class="iswitch iswitch-warning">
-                                            <label class="form-label" title="При включении этой функции базовая цена будет пересчитана на основе импортируемой цены и сохранена" for="edit_shop_name">Перезаписать базовые цены</label>
-
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-
-                        </div>
-                    </div>
-                </section>
-
-                <section class="box ">
-                    <header class="panel_header">
-                        <h2 class="title float-left">Настроить импорт между магазинами </h2>
+                        <h2 class="title float-left">Настроить выгрузку для магазина </h2>
                         <div class="actions panel_actions float-right">
                             <i class="box_toggle fa fa-chevron-down"></i>
                             <i class="box_setting fa fa-cog" data-toggle="modal" href="#section-settings"></i>
@@ -163,6 +163,37 @@
 
                                                 </select>
                                             </div>
+                                        </div>
+
+<!--                                        <div class="col-lg-12 col-md-12 col-12">-->
+                                        <div class="form-group">
+                                            <h4>Checkbox Buttons</h4>
+                                            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                                <label class="btn btn-secondary active">
+                                                    <input type="checkbox" checked="" autocomplete="off"> Active
+                                                </label>
+                                                <label class="btn btn-secondary">
+                                                    <input type="checkbox" autocomplete="off"> Check
+                                                </label>
+                                                <label class="btn btn-secondary">
+                                                    <input type="checkbox" autocomplete="off"> Check
+                                                </label>
+                                            </div>
+
+                                            <h4>Radio Buttons</h4>
+                                            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                                <label class="btn btn-secondary">
+                                                    <input type="radio" name="options" id="option1" autocomplete="off" checked=""> Active
+                                                </label>
+                                                <label class="btn btn-secondary">
+                                                    <input type="radio" name="options" id="option2" autocomplete="off"> Radio
+                                                </label>
+                                                <label class="btn btn-secondary active">
+                                                    <input type="radio" name="options" id="option3" autocomplete="off"> Radio
+                                                </label>
+                                            </div>
+
+
                                         </div>
 
                                         <div class="form-group">
