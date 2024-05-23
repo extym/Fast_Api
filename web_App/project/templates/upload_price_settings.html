@@ -1,0 +1,449 @@
+{% extends "base-layout.html"%}
+{##}
+
+    <!-- BEGIN BODY -->
+{% block content %}
+        <!-- START TOPBAR -->
+        <!-- END TOPBAR -->
+
+<!-- START CONTENT -->
+<section id="main-content" class=" ">
+    <section class="wrapper main-wrapper" style=''>
+
+        <div class='col-xl-12 col-lg-12 col-md-12 col-12'>
+            <div class="page-title">
+
+                <div class="float-left">
+                    <h1 class="title">Настройки импорта</h1>
+                </div>
+
+            </div>
+            <div>
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                <div class="alert alert-warning" role="alert">
+                    {{ messages[0] }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                    {% endif %}
+                {% endwith %}
+
+                </div>
+        </div>
+<!--        <div class="clearfix"></div>-->
+
+<!--        <div class="row margin-0">-->
+
+                <section class="box ">
+                    <header class="panel_header">
+                        <h2 class="title float-left">Запустить импорт товаров из маркетплейса в таблицу</h2>
+                        <div class="actions panel_actions float-right">
+                            <i class="box_toggle fa fa-chevron-down"></i>
+                            <i class="box_setting fa fa-cog" data-toggle="modal" href="#section-settings"></i>
+                            <i class="box_close fa fa-times"></i>
+                        </div>
+                    </header>
+                    <div class="content-body">    <div class="row">
+
+                            <form id="general_valid" action="/import_settings" method="post" novalidate="novalidate" style="width: 100%;">
+
+                                <div class="row margin-0">
+                                    <div class="col-lg-6 col-md-6 col-6">
+
+
+                                        <div class="form-group">
+<!--                                            <label class="form-label" for="select_mp_name">Выбрать Маркетплейс</label>-->
+
+                                            <div class="controls">
+                                                <select class="custom-select" id="select_mp_name" name="import_mp_name">
+                                            <option selected>Выбрать Маркетплейс</option>
+                                                {% for row in rows_mp %}
+                                                <option value="{{ row }}" >{{ row }}</option>
+                                                {% endfor %}
+
+                                                </select>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                    <div class="col-lg-6 col-md-6 col-6">
+
+
+                                        <div class="form-group">
+<!--                                        <label class="form-label" for="import_shop_names">Выбрать Магазин</label>-->
+
+                                        <div class="controls">
+                                            <select class="custom-select" id="import_shop_names" name="import_shop_names">
+                                        <option selected>Выбрать Магазин</option>
+                                            {% for row in rows %}
+                                            <option value="{{ row }}" >{{ row }}</option>
+                                            {% endfor %}
+
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-12 col-md-12 col-12">
+                                    <div class="float-right ">
+                                        <button type="submit" name="make" value="start_import" title="Запустить импорт товаров с маркетплейса. Задача будет выполнятся в фоне, текущую вкладку можно закрыть" class="btn btn-primary" >Запустить импорт</button>
+                                        <button class="btn" type="reset">  Очистить  </button>
+                                    </div>
+
+
+                                    <div class="float-left" >
+                                        <div class="form-block">
+                                            <input type="checkbox" name="change_base_price"  class="iswitch iswitch-warning">
+                                            <label class="form-label" title="При включении этой функции базовая цена будет пересчитана на основе импортируемой цены и сохранена" for="edit_shop_name">Перезаписать базовые цены</label>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </section>
+
+                <section class="box ">
+                    <header class="panel_header">
+                        <h2 class="title float-left">Настроить импорт между магазинами </h2>
+                        <div class="actions panel_actions float-right">
+                            <i class="box_toggle fa fa-chevron-down"></i>
+                            <i class="box_setting fa fa-cog" data-toggle="modal" href="#section-settings"></i>
+                            <i class="box_close fa fa-times"></i>
+                        </div>
+                    </header>
+                    <div class="content-body">    <div class="row">
+
+                            <form id="general_validate" action="/import_settings" method="post" novalidate="novalidate" style="width: 100%;">
+
+                                <div class="row margin-0">
+                                    <div class="col-lg-6 col-md-6 col-6">
+
+
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <label class="input-group-text" for="edit_name_mp">Маркетплейс</label>
+                                            </div>
+                                            <select class="custom-select" id="edit_name_mp" name="internal_import_mp_1">
+                                                {% if show %}
+                                                    <option selected>{{ internal_import_mp_1 }} </option>
+                                                        <option value="Выбрать" >Выбрать</option>
+                                                {% else %}
+                                                    <option selected>Выбрать</option>
+                                                    <option value="yandex">ЯндексМаркет</option>
+                                                    <option value="sber">СберМегаМаркет</option>
+                                                    <option value="ozon">Озон</option>
+                                                    <option value="wb">Вайлдбериз</option>
+                                                    <option value="leroy">ЛеруаМерлен</option>
+                                                {% endif %}
+                                                </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label" for="edit_shop_name">Выбрать Магазин</label>
+
+                                            <div class="controls">
+                                                <select class="custom-select" id="select_shop_name" name="internal_import_store_1">
+                                                    {% if show %}
+                                                    <option selected>{{ internal_import_store_1 }} </option>
+                                                        <option value="Выбрать" >Выбрать</option>
+                                                    {% else %}
+                                                    <option selected>Выбрать </option>
+                                                        {% for row in rows %}
+                                                        <option value="{{ row }}" >{{ row }}</option>
+                                                        {% endfor %}
+                                                    {% endif %}
+
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                                <label class="form-label" for="status_store">Статус магазина</label>
+                                                <span class="desc"></span>
+                                                <select class="form-control" id="status_store" name="internal_import_role_1">
+                                                    <option></option>
+                                                    <option value="donor" selected='selected' >Магазин источник</option>
+<!--                                                    <option value="recipient" selected='selected'>Магазин назначения</option>-->
+
+                                                </select>
+                                            </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label" title="Это наценка на цену закупки (или ее алиас - расчетную цену) для установки и трансляции цен в пределах магазина" for="formfield21">Наценка на товары этого магазина в пределах магазина</label>
+                                            <span class="desc">% например "16"</span>
+                                            <div class="controls">
+                                                {% if show %}
+                                                <input type="text" value="{{ internal_import_markup_1 }}" class="form-control" name="internal_import_markup_1" >
+                                                {% else %}
+                                                <input type="text" value="0" class="form-control" id="formfield21" name="internal_import_markup_1" >
+                                                {% endif %}
+
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label" title="Это скидка на цену закупки (или ее алиас - расчетную цену) для установки и трансляции цен в пределах магазина" for="formfield2">Скидка на товары этого магазина в пределах магазина</label>
+                                            <span class="desc">% например "13"</span>
+                                            <div class="controls">
+                                                {% if show %}
+                                                <input type="text" value="{{ internal_import_discount_1 }}" class="form-control" name="internal_import_discount_1" >
+                                                {% else %}
+                                                <input type="text" value="0" class="form-control" id="formfield2" name="internal_import_discount_1" >
+                                                {% endif %}
+
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                    <div class="col-lg-6 col-md-6 col-6">
+
+
+                                        <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="edit_settings_mp">Маркетплейс</label>
+                                        </div>
+                                        <select class="custom-select" id="edit_settings_mp" name="internal_import_mp_2">
+                                            {% if show %}
+                                                <option selected>{{ internal_import_mp_2 }} </option>
+                                                <option value="Выбрать" >Выбрать</option>
+                                            {% else %}
+                                                <option selected>Выбрать</option>
+                                                <option value="yandex">ЯндексМаркет</option>
+                                                <option value="sber">СберМегаМаркет</option>
+                                                <option value="ozon">Озон</option>
+                                                <option value="wb">Вайлдбериз</option>
+                                                <option value="leroy">ЛеруаМерлен</option>
+                                            {% endif %}
+                                            </select>
+                                    </div>
+
+                                        <div class="form-group">
+                                        <label class="form-label" for="edit_shop_name">Выбрать Магазин</label>
+
+                                            <div class="controls">
+                                                <select class="custom-select" id="edit_shop_name" name="internal_import_store_2">
+                                                    {% if show %}
+                                                    <option selected>{{ internal_import_store_2 }} </option>
+                                                        <option value="Выбрать" >Выбрать</option>
+                                                    {% else %}
+                                                    <option selected>Выбрать </option>
+                                                        {% for row in rows %}
+                                                        <option value="{{ row }}" >{{ row }}</option>
+                                                        {% endfor %}
+                                                    {% endif %}
+
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                                <label class="form-label" for="status_store_2">Статус магазина</label>
+                                                <span class="desc"></span>
+                                                <select class="form-control" id="status_store_2" name="internal_import_role_2">
+                                                    <option></option>
+                                                    <option value="recipient" selected='selected'>Магазин назначения</option>
+                                                </select>
+                                            </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label" for="formfield5">Наценка для импорта на товары этого магазина</label>
+                                            <span class="desc">% например "33"</span>
+                                            <div class="controls">
+                                                {% if show %}
+                                                    <input type="text" value="{{ internal_import_markup_2 }}" class="form-control"  name="internal_import_markup_2" >
+                                                {% else %}
+                                                    <input type="text" value="0" class="form-control" id="formfield5" name="internal_import_markup_2" >
+                                                {% endif %}
+
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label" for="formfield6">Скидка для импорта на товары этого магазина</label>
+                                            <span class="desc">% например "23"</span>
+                                            <div class="controls">
+                                                {% if show %}
+                                                    <input type="text" value="{{ internal_import_discount_2 }}" class="form-control"  name="internal_import_discount_2" >
+                                                {% else %}
+                                                    <input type="text" value="0" class="form-control" id="formfield6" name="internal_import_discount_2" >
+                                                {% endif %}
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-12 col-md-12 col-12">
+                                    <div class="float-right ">
+                                        <button type="submit" name="make" value="save_internal_import" class="btn btn-primary">СОХРАНИТЬ</button>
+                                        <button class="btn" type="reset">Очистить</button>
+                                    </div>
+
+<!--                                    <div class="float-left">-->
+                                        <div class="row btn-texticons">
+
+                                        <div class="btn-group bottom15 right15">
+                                            <div class="dropdown">
+                                                <button class="btn btn-primary dropdown-toggle" type="submit" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="false">
+                                                    Запустить импорт
+                                                    <span class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1" style="will-change: transform;">
+                                                    <li class="dropdown-item" role="presentation"><button class="btn" type="submit" name="make"  value="start_internal_import_product" title="Запуск разового импорта товаров возможен после сохранения настроек импорта. Чтобы запустить импорт укажите маркетплейс, магазин источник и маркетплейс, магазин назначения">Запустить импорт товаров</button></li>
+                                                    <li class="dropdown-item" role="presentation"><button class="btn" type="submit" name="make" value="start_internal_import_price" title="Запуск разового импорта цен возможен после сохранения настроек импорта. Чтобы запустить импорт укажите: маркетплейс и магазин источник; маркетплейс и магазин назначения; коэффициент цены импорта в процентах. По умолчанию коэффициент 1 или 0%">Запустить импорт цен   </button></li>
+                                                </ul>
+                                            </div>
+                                            <button class="btn" type="reset" title="Очистить форму" >  Очистить  </button>
+                                        </div>
+
+
+<!--                                    </div>-->
+
+                                    </div>
+                                      <div class="btn-sizes">
+                                          <p>
+                                              <button type="submit" name="make" value="check_settings" class="btn btn-default btn-block">Проверить настройки магазина</button>
+                                        </p>
+                                    </div>
+                                </div>
+
+                            </form>
+
+                        </div>
+                    </div>
+                </section>
+
+
+
+        <!-- modal start -->
+        <div class="modal fade" id="ultraModal-27" tabindex="-1" role="dialog" aria-labelledby="ultraModal-Label" aria-hidden="true">
+            <div class="modal-dialog animated zoomIn">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Save data success</h4><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+
+                    </div>
+                    <div class="modal-body">
+
+                        Данные сохранены
+
+                    </div>
+                    <div class="modal-footer">
+                        <button data-dismiss="modal" class="btn btn-default" type="button">Close</button>
+                        <button class="btn btn-primary" type="button">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- modal end -->
+        <!-- modal start -->
+        <div class="modal fade" id="ultraModal-28" tabindex="-1" role="dialog" aria-labelledby="ultraModal-Label" aria-hidden="true">
+            <div class="modal-dialog animated zoomIn">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Save unsuccess</h4><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+
+                    </div>
+                    <div class="modal-body">
+
+                        Body goes here...
+
+                    </div>
+                    <div class="modal-footer">
+                        <button data-dismiss="modal" class="btn btn-default" type="button">Close</button>
+        {#                <button class="btn btn-primary" type="button">Save changes</button>#}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- modal end -->
+
+    </section>
+</section>
+
+
+<!-- END CONTENT -->
+
+    <script src="../../static/assets/js/jquery-3.4.1.min.js" type="text/javascript"></script>
+
+    <link href="../../static/assets/plugins/ios-switch/css/switch.css" rel="stylesheet" type="text/css" media="screen"/>
+
+
+
+
+        <!-- LOAD FILES AT PAGE END FOR FASTER LOADING -->
+
+
+        <!-- CORE JS FRAMEWORK - START -->
+<!--        <script src="../../static/assets/js/jquery-3.4.1.min.js" type="text/javascript"></script>-->
+<!--        <script src="../../static/assets/js/popper.min.js" type="text/javascript"></script>-->
+<!--        &lt;!&ndash; <script src="../../static/assets/js/jquery.easing.min.js" type="text/javascript"></script>  &ndash;&gt;-->
+<!--        <script src="../../static/assets/plugins/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>-->
+<!--        <script src="../../static/assets/plugins/pace/pace.min.js" type="text/javascript"></script>-->
+
+<!--        <script src="../../static/assets/plugins/perfect-scrollbar/perfect-scrollbar.min.js" type="text/javascript"></script>-->
+<!--        <script src="../../static/assets/plugins/viewport/viewportchecker.js" type="text/javascript"></script>-->
+        <!-- CORE JS FRAMEWORK - END -->
+
+
+        <!-- OTHER SCRIPTS INCLUDED ON THIS PAGE - START -->
+<!--        <script src="../../static/assets/plugins/jquery-validation/js/jquery.validate.min.js" type="text/javascript"></script> <script src="../../static/assets/plugins/jquery-validation/js/additional-methods.min.js" type="text/javascript"></script> <script src="../../static/assets/js/form-validation.js" type="text/javascript"></script> &lt;!&ndash; OTHER SCRIPTS INCLUDED ON THIS PAGE - END &ndash;&gt;-->
+
+
+        <!-- CORE TEMPLATE JS - START -->
+<!--        <script src="../../static/assets/js/scripts.js" type="text/javascript"></script>-->
+        <!-- END CORE TEMPLATE JS - END -->
+
+        <!-- Sidebar Graph - START -->
+<!--        <script src="../../static/assets/plugins/sparkline-chart/jquery.sparkline.min.js" type="text/javascript"></script>-->
+<!--        <script src="../../static/assets/js/chart-sparkline.js" type="text/javascript"></script>-->
+        <!-- Sidebar Graph - END -->
+
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+        <!-- General section box modal start -->
+        <div class="modal" id="section-settings" tabindex="-1" role="dialog" aria-labelledby="ultraModal-Label" aria-hidden="true">
+            <div class="modal-dialog animated bounceInDown">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">Section Settings</h4>
+                    </div>
+                    <div class="modal-body">
+
+                        Body goes here...
+
+                    </div>
+                    <div class="modal-footer">
+                        <button data-dismiss="modal" class="btn btn-default" type="button">Close</button>
+                        <button class="btn btn-primary" type="button">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- modal end -->
+{#    </body>#}
+{#</html>#}
+
+
+
