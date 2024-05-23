@@ -190,6 +190,7 @@ def create_data_stocks_from_db(seller_id=None, is_stocks_null=False):
             key = session.execute(select(Marketplaces.key_mp)
                                   .where(Marketplaces.seller_id == seller_id)) \
                 .first()
+            print('SELLER_ID_1 {}, key {}, type key {}'.format(seller_id, key, type(key)))
             outlets_data = post_smth_v2(get_wh_list, seller_id=seller_id, key=key[0])
             outlets = [i['warehouse_id'] for i in outlets_data[1].get('result') if outlets_data[0] == 200]
             for product in data:
@@ -207,6 +208,8 @@ def create_data_stocks_from_db(seller_id=None, is_stocks_null=False):
             key = session.execute(select(Marketplaces.key_mp)
                                   .where(Marketplaces.seller_id == seller_id)) \
                 .first()
+            print('SELLER_ID_2 {}, key {}, type key {}'.format(seller_id, key, type(key)))
+        print('SELLER_ID_3 {}, key {}, type key {}'.format(seller_id, key, type(key)))
         outlets_data = post_smth_v2(get_wh_list, seller_id=seller_id, key=key[0])
         outlets = [i['warehouse_id'] for i in outlets_data[1].get('result') if outlets_data[0] == 200]
         data = post_smth_v2(metod_get_list_products, seller_id=seller_id, key=key[0])
