@@ -32,7 +32,7 @@ def read_xlsx(file):
         shipment_date = row[13][:-5]
 
     print(*row, sep='\n')
-    print(1111111111, shipment_date, maxy)
+    print(11221111, shipment_date, maxy)
     return sorted(maxy), shipment_date
 
 def read_xlsx_v2(file, market):
@@ -47,6 +47,7 @@ def read_xlsx_v2(file, market):
         for row in df:
             try:
                 maxy.append(int(row[0]))
+
             except:
                 continue
             shipment_date = row[11]
@@ -56,7 +57,7 @@ def read_xlsx_v2(file, market):
             shipment_date = row[13][:-5]
 
     # print(*row, sep='\n')
-    print(1111111111, maxy)
+    print(1111111111, maxy, type(maxy[0]))
     return sorted(maxy), shipment_date
 
 
