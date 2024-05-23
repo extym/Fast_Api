@@ -188,7 +188,7 @@ def create_data_stocks_from_db(seller_id=None, is_stocks_null=False):
                 .where(Product.store_id == seller_id) \
                 .all()
             key = session.execute(select(Marketplaces.key_mp)
-                                  .where(Marketplaces.seller_id == seller_id)) \
+                                  .where(Marketplaces.shop_name == seller_id)) \
                 .first()
             print('SELLER_ID_1 {}, key {}, type key {}'.format(seller_id, key, type(key)))
             outlets_data = post_smth_v2(get_wh_list, seller_id=seller_id, key=key[0])
