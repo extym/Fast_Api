@@ -56,44 +56,79 @@ async def change_status(ids: str):
 def get_orders_v2(customer_id, marketplace_id):
     result, result_list = '', []
     page, error = 0, 0
-    while marketplace_id != result:
-        params = {
-            'search[customer_id_eq]': customer_id,
-            'search[marketplace_id_eq]': marketplace_id,
-            'per_page': 20,
-            'page': page
-        }
-        url = ps_link + "/orders.json"
-        token_ps = HTTPBasicAuth(admin_ps_login, admin_ps_pass)
-        answer = requests.get(url, auth=token_ps, params=params)
-        if answer.ok:
-            data = answer.json()
-            result_list = [i for i in data.get('orders')
-                           if i.get('marketplace_id') == marketplace_id]
+    if customer_id == '710' or customer_id == '715' or customer_id == '235':
+        while marketplace_id != result:
+            params = {
+                'search[customer_id_eq]': customer_id,
+                'search[marketplace_id_eq]': str(marketplace_id),
+                'per_page': 20,
+                'page': page
+            }
+            url = ps_link + "/orders.json"
+            token_ps = HTTPBasicAuth(admin_ps_login, admin_ps_pass)
+            answer = requests.get(url, auth=token_ps, params=params)
+            print(123123123, answer.text)
+            if answer.ok:
+                data = answer.json()
+                result_list = [i for i in data.get('orders')
+                               if i.get('marketplace_id') == str(marketplace_id)]
 
-            if result_list:
-                result = marketplace_id
+                if result_list:
+                    result = marketplace_id
+                else:
+                    page += 1
+                    print('page ', page)
+                if page >= 5:
+                    bot_tg.send_get('So many pages {} for {} in {}'.format(page, marketplace_id, customer_id))
+                    break
             else:
-                page += 1
-                print('page ', page)
-            if page >= 5:
-                bot_tg.send_get('So many pages {} for {} in {}'.format(page, marketplace_id, customer_id))
-                break
-        else:
-            error += 1
-            logging.info('Some trouble with access parts-soft - status {} text {}'
-                         .format(answer.status_code, answer.text))
-            bot_tg.send_get('Some trouble with access parts-soft - status {} text {}'
-                            .format(answer.status_code, answer.text))
-            if page >= 5:
-                break
+                error += 1
+                logging.info('Some trouble with access parts-soft - status {} text {}'
+                             .format(answer.status_code, answer.text))
+                bot_tg.send_get('Some trouble with access parts-soft - status {} text {}'
+                                .format(answer.status_code, answer.text))
+                if page >= 5:
+                    break
+    elif customer_id == '2063':
+        while marketplace_id != result:
+            params = {
+                'search[customer_id_eq]': customer_id,
+                # 'search[order_items_attributes][0][comment_eq]': marketplace_id,
+                'search[order_items_comment_eq]': marketplace_id,
+                'per_page': 30,
+                'page': page
+            }
+            url = ps_link + "/orders.json"
+            token_ps = HTTPBasicAuth(admin_ps_login, admin_ps_pass)
+            answer = requests.get(url, auth=token_ps, params=params)
+            # print(2222222, answer.url)
+            if answer.ok:
+                data = answer.json()
+                result_list = [i for i in data.get('orders')
+                               if i.get('order_items')[0]['comment'] == marketplace_id ]
 
-    # print(7777, result_list)
+                if result_list:
+                    result = marketplace_id
+                else:
+                    page += 1
+                    print('page ', page)
+                if page >= 3:
+                    bot_tg.send_get('So many pages {} for {} in {}'.format(page, marketplace_id, customer_id))
+                    break
+            else:
+                error += 1
+                logging.info('Some trouble with access parts-soft - status {} text {}'
+                             .format(answer.status_code, answer.text))
+                bot_tg.send_get('Some trouble with access parts-soft - status {} text {}'
+                                .format(answer.status_code, answer.text))
+                if page >= 5:
+                    break
+
     try:
         datas = ' '.join([str(i.get('id')) for i in result_list[0].get('order_items')])
     except:
         datas = ''
-    # print('datas', datas)
+    print('datas', datas)
     return datas
 
 
@@ -103,18 +138,25 @@ async def make_data_for_request_v2(data_file, market):
     shipment_date = data_file[1]
     for number in data_file[0]:
         item_ids = get_orders_v2(market, marketplace_id=str(number))
-        proxy += item_ids.strip() + ' '
-        count += 1
+        if item_ids:
+            proxy += item_ids.strip() + ' '
+            count += 1
+        else:
+            continue
 
-    result = await change_status(proxy.strip())
-    if result:
-        logging.info("All_ride_Rewrite {} statuses for all {} from market {} at {}"
-                     .format(count, len(data_file[0]), market, shipment_date))
-        bot_tg.send_get("All_ride_Rewrite {} statuses for all {} from market {} at {}"
-                        .format(count, len(data_file[0]), market, shipment_date))
+    if len(proxy) > 0:
+        result = await change_status(proxy.strip())
+        if result:
+            logging.info("All_ride_Rewrite {} statuses for all {} from market {} at {}"
+                         .format(count, len(data_file[0]), market, shipment_date))
+            bot_tg.send_get("All_ride_Rewrite {} statuses for all {} from market {} at {}"
+                            .format(count, len(data_file[0]), market, shipment_date))
+        else:
+            bot_tg.send_get("Error_Rewrite {} statuses for all {} from market {} at {}"
+                            .format(count, len(data_file[0]), market, shipment_date))
     else:
-        bot_tg.send_get("Fuck_up_Rewrite {} statuses for all {} from market {} at {}"
-                        .format(count, len(data_file[0]), market, shipment_date))
+        bot_tg.send_get("Not found orders to_Rewrite  from market {} at {}"
+                        .format(market, shipment_date))
 
     print('All_order_items', proxy)
 
@@ -280,13 +322,21 @@ def create_resp_if_not_exist(list_items, link,
 
     return global_result_make_basket
 
+
 # send_current_basket_to_order()
 
 # create_resp_is_exist(brand="STELLOX", oem="42140459SX", qnt=2, external_id=451642783)
 # get_current_client_smth(basket)
 
+ym_orders = [459439792, 459438203, 459412869, 459372108, 459349047, 459339840, 459295293, 459282888, 459271641,
+             459270442, 459234214, 459203644, 459196400, 459188985, 459188686, 459179825, 459170546, 459158382,
+             459097786, 459091113, 459086634, 459051043, 459049573, 459048159, 459048159, 459037290, 459007002,
+             458955474, 458936875, 458883613, 458811366, 458520720, 458426347, 458355458, 458355264, 458250383,
+             458172884]
+ym_orders_short = [459439792, 459438203, 459412869, 459372108, 459349047, 459339840, 459295293, 459282888, 459271641]
 
 # get_orders_v2(710, marketplace_id='9009797416999')
+# get_orders_v2("2063", marketplace_id="462477099")
 
 # get_smth('/regions.json')
 # get_smth("/orders.json")
