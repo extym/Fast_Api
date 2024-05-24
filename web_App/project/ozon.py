@@ -83,7 +83,7 @@ def post_smth_v2(metod, seller_id=None, key=None):
         data = response.json()
         oson_logger.info("ALL RIDE From post smth - metod {}, seller_id {}, len_key {}, len data.keys {}"
                          .format(metod, seller_id, len(key), len(data.keys())))
-        print('post_get_smth_onon_v2', data.keys())
+        # print('post_get_smth_onon_v2', data.get('result'))
         return response.status_code, data
     else:
         oson_logger.info("ERROR From post smth - metod {}, seller_id {}, len_key {}, answer {}"
@@ -212,7 +212,7 @@ def create_data_stocks_from_db(seller_id=None, seller_name=None, is_stocks_null=
             #         stocks.append(pr)
     else:
         with Session(engine) as session:
-            key = session.execute(select(Marketplaces.key_mp)
+            key = session.scalars(select(Marketplaces.key_mp)
                                   .where(Marketplaces.seller_id == seller_id)) \
                 .first()
             print('SELLER_ID_2 {}, key {}, type key {}'.format(seller_id, key, type(key)))
@@ -514,4 +514,4 @@ def send_product_price(key_recipient=None, recipient=None):
 # convert(pr)
 
 # asyncio.run(create_data_stocks())
-# create_data_stocks_from_db(seller_id="1278621", is_stocks_null=True)
+# create_data_stocks_from_db(seller_id="1278621", is_stocks_null=False)
