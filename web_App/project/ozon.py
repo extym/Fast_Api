@@ -181,14 +181,17 @@ def send_stocks_on():
 def create_data_stocks_from_db(seller_id=None, seller_name=None, is_stocks_null=False):
     result = []
     stocks = []
+    print('SELLER_ID_create_data_stocks seller_id {}, seller_name {}, is_stocks_null {}'
+          .format(seller_id, seller_name, is_stocks_null))
     if not seller_id:
         with Session(engine) as session:
-            key_seller_data = session.scalars(select(Marketplaces.key_mp, Marketplaces.seller_id)
+            key_seller_data = session.execute(select(Marketplaces.key_mp, Marketplaces.seller_id)
                                   .where(Marketplaces.shop_name == seller_name)) \
                 .first()
             seller_id = key_seller_data[1]
             key = key_seller_data[0]
-            print('SELLER_ID_1 {}, key {}, type key {}'.format(seller_id, key_seller_data[0]))
+            print('SELLER_ID_1 {}, key_seller_data {}, seller_name {}'
+                  .format(seller_id, key_seller_data, seller_name))
             # outlets_data = post_smth_v2(get_wh_list, seller_id=seller_id, key=key)
             # outlets = [i['warehouse_id'] for i in outlets_data[1].get('result') if outlets_data[0] == 200]
             # data = session.query(Product) \
@@ -266,7 +269,7 @@ def create_data_stocks_from_db(seller_id=None, seller_name=None, is_stocks_null=
     print('create_data_stocks_oson_x100', len(result))
     return result
 
-
+create_data_stocks_from_db(seller_name="Low Price", is_stocks_null=False)
 
 def create_data_price_for_send(seller_id=None, from_db=True):
     result = []
@@ -425,7 +428,7 @@ def send_stocks_oson_v2(key=None, seller_id=None, is_stocks_null=False):
 
 def send_stocks_oson_v3(key_recipient=None, donor_name=None, recipient=None):
     print('SEND_STOCK_OSON_v3 len key{}, recipient {}, donor_name {}'
-          .format(len(key_recipient), recipient, donor_name))
+          .format(key_recipient, recipient, donor_name))
     pre_data = create_data_stocks_from_db(seller_name=donor_name,
                                           is_stocks_null=False)
     headers = {
