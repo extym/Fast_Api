@@ -90,16 +90,16 @@ def back_shops_tasks():
                 oson.send_stocks_oson_v3(key_recipient=key,
                                          donor_name=store_1,
                                          recipient=seller_id)
-                print('Send_stocks_oson_v3 - donor {}, recipient {}'
-                      .format(store_1, row.seller_id))
-                logging.DEBUG('Send_stocks_oson_v3 - donor {}, recipient {}'
-                              .format(store_1, row.seller_id))
+                print('Send_stocks_oson_v3 - donor {}, recipient {}, type sellerId {}'
+                      .format(store_1, seller_id, type(seller_id)))
+                # logging.DEBUG('Send_stocks_oson_v3 - donor {}, recipient {}'
+                #               .format(store_1, seller_id))
             if row.name_mp == 'wb':
                 wb.send_stocks_wb_v3(donor=store_1,
                                      recipient=seller_id)
-                print('Send_stocks_oson_v3 - donor {}, recipient {}'
+                print('send_stocks_wb_v3 - donor {}, recipient {}'
                       .format(store_1, seller_id))
-                logging.DEBUG('Send_stocks_oson_v3 - donor {}, recipient {}'
+                logging.DEBUG('send_stocks_wb_v3 - donor {}, recipient {}'
                               .format(store_1, seller_id))
 
         if row.enable_orders_submit:

@@ -7,7 +7,7 @@ import requests
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from project.models import *
-from project import engine
+from project import engine, bot_tg
 from project.creds import *
 # from read_json import read_json_on
 from time import sleep
@@ -83,11 +83,13 @@ def post_smth_v2(metod, seller_id=None, key=None):
         data = response.json()
         oson_logger.info("ALL RIDE From post smth - metod {}, seller_id {}, len_key {}, len data.keys {}"
                          .format(metod, seller_id, len(key), len(data.keys())))
-        # print('post_get_smth_onon_v2', data.get('result'))
+        print('post_get_smth_onon_v2', data.get('result'))
         return response.status_code, data
     else:
         oson_logger.info("ERROR From post smth - metod {}, seller_id {}, len_key {}, answer {}"
                          .format(metod, seller_id, len(key), response.text))
+        bot_tg.send_get("ERROR From post smth - metod {}, seller_id {}, answer {}"
+                        .format(metod, seller_id, response.text))
         print('post_get_smth_onon_v2 {}'.format(response.text))
         return response.status_code, response.text
 
@@ -186,7 +188,7 @@ def create_data_stocks_from_db(seller_id=None, seller_name=None, is_stocks_null=
     if not seller_id:
         with Session(engine) as session:
             key_seller_data = session.execute(select(Marketplaces.key_mp, Marketplaces.seller_id)
-                                  .where(Marketplaces.shop_name == seller_name)) \
+                                              .where(Marketplaces.shop_name == seller_name)) \
                 .first()
             seller_id = key_seller_data[1]
             key = key_seller_data[0]
@@ -269,7 +271,6 @@ def create_data_stocks_from_db(seller_id=None, seller_name=None, is_stocks_null=
     print('create_data_stocks_oson_x100', len(result))
     return result
 
-create_data_stocks_from_db(seller_name="Low Price", is_stocks_null=False)
 
 def create_data_price_for_send(seller_id=None, from_db=True):
     result = []
@@ -328,9 +329,6 @@ def create_data_price_for_send(seller_id=None, from_db=True):
                      .format(seller_id, from_db, len(result)))
     print('create_data_prices_oson_x1000', len(result))
     return result
-
-
-# create_data_price_for_send(seller_id='1179095', from_db=True)
 
 
 def create_data_price_for_send_v2(koef_recipient=None, donor=None,
