@@ -184,7 +184,7 @@ def create_data_stocks_from_db(seller_id=None, seller_name=None, is_stocks_null=
     if not seller_id:
         with Session(engine) as session:
             key_seller_data = session.scalars(select(Marketplaces.key_mp, Marketplaces.seller_id)
-                                  .where(Marketplaces.shop_name == seller_id)) \
+                                  .where(Marketplaces.shop_name == seller_name)) \
                 .first()
             seller_id = key_seller_data[1]
             key = key_seller_data[0]
@@ -424,6 +424,8 @@ def send_stocks_oson_v2(key=None, seller_id=None, is_stocks_null=False):
 
 
 def send_stocks_oson_v3(key_recipient=None, donor_name=None, recipient=None):
+    print('SEND_STOCK_OSON_v3 len key{}, recipient {}, donor_name {}'
+          .format(len(key_recipient), recipient, donor_name))
     pre_data = create_data_stocks_from_db(seller_name=donor_name,
                                           is_stocks_null=False)
     headers = {
