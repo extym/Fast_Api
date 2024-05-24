@@ -121,7 +121,7 @@
                     </header>
                     <div class="content-body">    <div class="row">
 
-                            <form id="general_validate" action="/import_settings" method="post" novalidate="novalidate" style="width: 100%;">
+                            <form id="general_validate" action="/upload_prices_settings" method="post" novalidate="novalidate" style="width: 100%;">
 
                                 <div class="row margin-0">
                                     <div class="col-lg-6 col-md-6 col-6">
@@ -165,69 +165,78 @@
                                             </div>
                                         </div>
 
-<!--                                        <div class="col-lg-12 col-md-12 col-12">-->
                                         <div class="form-group">
-                                            <h4>Checkbox Buttons</h4>
+
+                                            <label class="form-label" for="status_store">Включить выгрузку</label>
+                                                <span class="desc"></span>
+
+<!--                                            <h6>Checkbox Buttons</h6>-->
                                             <div class="btn-group btn-group-toggle" data-toggle="buttons">
                                                 <label class="btn btn-secondary active">
-                                                    <input type="checkbox" checked="" autocomplete="off"> Active
+                                                    <input type="checkbox" checked="" autocomplete="off"> Включено
                                                 </label>
                                                 <label class="btn btn-secondary">
-                                                    <input type="checkbox" autocomplete="off"> Check
+                                                    <input type="checkbox" autocomplete="off"> Включить нулевые остатки
+                                                </label>
+<!--                                                <label class="btn btn-secondary">-->
+<!--                                                    <input type="checkbox" autocomplete="off"> Check-->
+<!--                                                </label>-->
+                                            </div>
+
+
+<!--                                            <h6>Radio Buttons</h6>-->
+                                            <h6> </h6>
+
+                                            <label class="form-label" for="option1">Выгружать в формате</label>
+                                                <span class="desc"></span>
+                                            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                                <label class="btn btn-secondary">
+                                                    <input type="radio" name="options" id="option1" autocomplete="off" checked=""> XML
                                                 </label>
                                                 <label class="btn btn-secondary">
-                                                    <input type="checkbox" autocomplete="off"> Check
+                                                    <input type="radio" name="options" id="option2" autocomplete="off"> CSV
+                                                </label>
+                                                <label class="btn btn-secondary active">
+                                                    <input type="radio" name="options" id="option3" autocomplete="off"> XLS
                                                 </label>
                                             </div>
 
-                                            <h4>Radio Buttons</h4>
-                                            <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                                <label class="btn btn-secondary">
-                                                    <input type="radio" name="options" id="option1" autocomplete="off" checked=""> Active
-                                                </label>
-                                                <label class="btn btn-secondary">
-                                                    <input type="radio" name="options" id="option2" autocomplete="off"> Radio
-                                                </label>
-                                                <label class="btn btn-secondary active">
-                                                    <input type="radio" name="options" id="option3" autocomplete="off"> Radio
-                                                </label>
-                                            </div>
-
+<!--                                            </div>-->
 
                                         </div>
 
-                                        <div class="form-group">
-                                                <label class="form-label" for="status_store">Статус магазина</label>
-                                                <span class="desc"></span>
-                                                <select class="form-control" id="status_store" name="internal_import_role_1">
-                                                    <option></option>
-                                                    <option value="donor" selected='selected' >Магазин источник</option>
-<!--                                                    <option value="recipient" selected='selected'>Магазин назначения</option>-->
+<!--                                        <div class="form-group">-->
+<!--                                                <label class="form-label" for="status_store">Статус магазина</label>-->
+<!--                                                <span class="desc"></span>-->
+<!--                                                <select class="form-control" id="status_store" name="internal_import_role_1">-->
+<!--                                                    <option></option>-->
+<!--                                                    <option value="donor" selected='selected' >Магазин источник</option>-->
+<!--&lt;!&ndash;                                                    <option value="recipient" selected='selected'>Магазин назначения</option>&ndash;&gt;-->
 
-                                                </select>
-                                            </div>
+<!--                                                </select>-->
+<!--                                            </div>-->
 
                                         <div class="form-group">
-                                            <label class="form-label" title="Это наценка на цену закупки (или ее алиас - расчетную цену) для установки и трансляции цен в пределах магазина" for="formfield21">Наценка на товары этого магазина в пределах магазина</label>
-                                            <span class="desc">% например "16"</span>
+                                            <label class="form-label" title="" for="formfield21">Наценка на товары этого магазина</label>
+                                            <span class="desc">% например "18"</span>
                                             <div class="controls">
                                                 {% if show %}
-                                                <input type="text" value="{{ internal_import_markup_1 }}" class="form-control" name="internal_import_markup_1" >
+                                                <input type="text" value="{{ upload_prices_markup }}" class="form-control" name="upload_prices_markup" >
                                                 {% else %}
-                                                <input type="text" value="0" class="form-control" id="formfield21" name="internal_import_markup_1" >
+                                                <input type="text" value="0" class="form-control" id="formfield21" name="upload_prices_markup" >
                                                 {% endif %}
 
                                             </div>
                                         </div>
 
                                         <div class="form-group">
-                                            <label class="form-label" title="Это скидка на цену закупки (или ее алиас - расчетную цену) для установки и трансляции цен в пределах магазина" for="formfield2">Скидка на товары этого магазина в пределах магазина</label>
-                                            <span class="desc">% например "13"</span>
+                                            <label class="form-label" title="Скидка для значения 'старой цены' (old price)" for="formfield2">Скидка для значения 'старой цены' (old price)</label>
+                                            <span class="desc">% например "15"</span>
                                             <div class="controls">
                                                 {% if show %}
-                                                <input type="text" value="{{ internal_import_discount_1 }}" class="form-control" name="internal_import_discount_1" >
+                                                <input type="text" value="{{ upload_price_discount }}" class="form-control" name="upload_price_discount" >
                                                 {% else %}
-                                                <input type="text" value="0" class="form-control" id="formfield2" name="internal_import_discount_1" >
+                                                <input type="text" value="0" class="form-control" id="formfield2" name="upload_price_discount" >
                                                 {% endif %}
 
                                             </div>

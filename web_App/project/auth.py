@@ -1789,18 +1789,18 @@ def upload_prices_settings():
             shop_name = data.get('import_shop_names')
             change_base_price = data.get('change_base_price')
             if mp == 'ozon':
-                job = q.enqueue_call(import_oson_data_prod(user_id=uid,
-                                                           shop_name=shop_name,
-                                                           company_id=company_id,
-                                                           update_base_price=change_base_price))
+                # job = q.enqueue_call(import_oson_data_prod(user_id=uid,
+                #                                            shop_name=shop_name,
+                #                                            company_id=company_id,
+                #                                            update_base_price=change_base_price))
                 print(777777777777, job.get_id)
             elif mp == 'wb':
-                job = q.enqueue_call(wb.import_product_from_wb(uid_edit_user=uid,
-                                                               shop_name=shop_name,
-                                                               company_id=company_id))
+                # job = q.enqueue_call(wb.import_product_from_wb(uid_edit_user=uid,
+                #                                                shop_name=shop_name,
+                #                                                company_id=company_id))
                 print(88888888888, job.get_id)
     
-            return redirect('/import_settings')
+            return redirect('/upload_prices_settings')
     
         elif make == 'save_internal_import':
             internal_import_mp_1 = data.get('internal_import_mp_1')
@@ -1828,7 +1828,7 @@ def upload_prices_settings():
                 flash("Настройки удачно сохранены", 'success')
             else:
                 flash("Проверьте, пожалуйста, корректность вводимых данных", 'error')
-                return redirect('/import_settings')
+                return redirect('/upload_prices_settings')
     
         elif make == 'start_internal_import_product': 
             internal_import_mp_1 = data.get('internal_import_mp_1')
@@ -2044,7 +2044,7 @@ def upload_prices_settings():
                         flash("Настройки для указанного магазина не найдены. Введите требуемые настройки и сохраните их.",
                               "alert")
     
-        return redirect('/import_settings')
+        return redirect('/upload_prices_settings')
 
     rows, rows_mp = [], []
     show = request.args.get('show')
