@@ -3125,4 +3125,34 @@ response_ps_get_orders = {
          "marketplace_id": None, "load_order_client_number": None, "order_email_subject": None,
          "created_at": "2024-05-22T13:44:36.901+03:00", "updated_at": "2024-05-22T13:44:37.693+03:00"}]}
 
+result_from_ps = {
+    "result":"ok",
+    "data":{
+        "id":11176,
+        "oem":"0701099SX",
+        "make_name":"STELLOX",
+        "detail_name":"07-01099-SX_к-кт сцепления!\\ Honda CR-V 2.0 95\u003e","cost":5993.0,
+        "qnt":1,"min_delivery_day":1,"max_delivery_day":1,
+        "comment":"463481305"
+    }}
+
+FINAL_result = {
+    "result":"ok",
+    "data":[
+        {
+            "id":87102,
+            "oem":"0701099SX",
+            "make_name":"STELLOX",
+            "detail_name":"07-01099-SX_к-кт сцепления!\\ Honda CR-V 2.0 95\u003e",
+            "cost":5993.0,"qnt":1,"qnt_confirmed":0,
+            "qnt_accept":None,"qnt_income":None,
+            "status":"Ожидает оплаты",
+            "status_code":"processing",
+            "comment":"463481305",
+            "created_at":"2024-05-24T16:01:32.449+03:00",
+            "order_id":71333,
+            "status_logs":[
+                {"status_code":"processing",
+                 "status_name":"Ожидает оплаты",
+                 "created_at":"2024-05-24T16:01:32.648+03:00"}]}]}
 

@@ -8,20 +8,68 @@ from psycopg2 import OperationalError
 # from conn_maintenance import *
 from cred import *
 
+
+create_fresh_orders = """
+CREATE TABLE IF NOT EXISTS fresh_orders (
+id SERIAL PRIMARY KEY,
+order_id_mp varchar NOT NULL,
+our_order_id varchar,
+date_Added varchar,
+date_Modifed varchar,
+date_Send_Data varchar,
+data_1c varchar,
+mp_name text,
+target_link text,
+client_id_ps text,
+shipment_date varchar,
+order_create_date varchar,
+status TEXT,
+substatus text, 
+our_status TEXT, 
+is_cancelled bool,
+mp_feachers varchar,
+payment_Type TEXT,
+summ_Order varchar,
+bussines_Id TEXT,
+delivery varchar, 
+UNIQUE (order_id_mp)
+)
+"""
+
 create_order_items = """
 CREATE TABLE IF NOT EXISTS order_items (
-    id PRIMARY KEY,
-    chat_id varchar NOT NULL,
-    FOREIGN KEY (chat_id)
-        REFERENCES fresh_bids (id)   ### id - ??????  
+    id serial PRIMARY KEY,
+    order_id_mp varchar NOT NULL,
+    FOREIGN KEY (order_id_mp)
+        REFERENCES fresh_orders (order_id_mp)
         ON UPDATE CASCADE ON DELETE CASCADE,
     our_order_id varchar,
-    shop_name TEXT NOT NULL,
-    our_status TEXT NOT NULL, 
-    vendor_code varchar NOT NULL,
-    id_1c varchar NOT NULL,
-    quantity varchar NOT NULL, 
-    price varchar)
+    mp_name text,
+    store_name text,
+    offer_id text,
+    our_status text, 
+    vendor_code text, 
+    vendor text,
+    id_1C varchar,
+    quantity int,
+    price text
+)
+"""
+
+create_stores = """
+CREATE TABLE IF NOT EXISTS stores (
+id SERIAL PRIMARY KEY,
+client_id varchar,
+key_store varchar, 
+compain_id TEXT,
+date_Added varchar,
+date_Modifed varchar,
+user_id int,
+api_key_ps TEXT,
+upload_link TEXT,
+mp_name TEXT,
+UNIQUE (client_id)
+)
 """
 
 create_customers = """
@@ -378,7 +426,12 @@ query_write_items = " INSERT INTO order_items ( order_id_mp, mp_name, offer_id, 
                     " VALUES ( %s, %s, %s, %s, %s, %s )"
 
 query_add_settings_ym = (" INSERT INTO stores "
-                         "( client_id, key_store, api_key_ps, upload_link)")
+                         "(client_id, key_store, campain_id, api_key_ps, upload_link) "
+                         "VALUES ( %s, %s, %s, %s, %s )")
+
+query_add_settings_without_ym = (" INSERT INTO stores "
+                         "(client_id, key_store, api_key_ps, upload_link) "
+                         "VALUES ( %s, %s, %s, %s )")
 
 proxy = ("u2i-TOYzRVLyb9Hw_l7u2aBTVg", '4391',
          "https://avito.ru/sankt-peterburg/zapchasti_i_aksessuary/trw_df4110_torm.disk_per.vent.280x24_4_otv_3364311913",
@@ -428,6 +481,9 @@ def rewrite_bid_from_2_json(file, file2):
 
 
 # maintenans_query(create_fresh_bids)
+maintenans_query(create_fresh_orders)
+maintenans_query(create_order_items)
+maintenans_query(create_stores)
 # execute_query_v2(query_write_bid, proxy)
 # print(get_bid("u2i-TOYzRVLyb9Hw_l7u2aBTVg"))
 # print(check_is_exist_in_db(query_check_is_message_exist, ("u2i-TOYzRVLyb9Hw_l7u2aBTVg",)))
