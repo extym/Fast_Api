@@ -644,14 +644,14 @@ async def write_order(query1: str = None, data1: object = None,
         try:
             with connection.cursor() as cursor:
                 cursor.execute(query1, data1)
-                print("Query write_order executed successfully")
+                # print("Query write_order executed successfully")
         except OperationalError as err:
             print(f"The ERROR write_order '{err}' occured ")
 
         try:
             with connection.cursor() as cursor:
                 cursor.executemany(query2, data2)
-                print("Query write_order_items executed successfully")
+                # print("Query write_order_items executed successfully")
         except OperationalError as err:
             print(f"The ERROR write_order_items '{err}' occured ")
 

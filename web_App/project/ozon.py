@@ -81,18 +81,20 @@ def post_smth_v2(metod, seller_id=None, key=None):
     response = requests.post(link, headers=headers)
     if response.ok:
         data = response.json()
-        oson_logger.info("ALL RIDE From post smth - metod {}, seller_id {}, len_key {}, len data.keys {}"
-                         .format(metod, seller_id, len(key), len(data.keys())))
+        oson_logger.info("ALL RIDE From post smth - metod {}, seller_id {}, len_key {}, len data.result {}"
+                         .format(metod, seller_id, len(key), len(data.get('result'))))
         print('post_get_smth_onon_v2', data.get('result'))
         return response.status_code, data
     else:
         oson_logger.info("ERROR From post smth - metod {}, seller_id {}, len_key {}, answer {}"
                          .format(metod, seller_id, len(key), response.text))
-        bot_tg.send_get("ERROR From post smth - metod {}, seller_id {}, answer {}"
-                        .format(metod, seller_id, response.text))
+        # bot_tg.send_get("ERROR From post smth - metod {}, seller_id {}, answer {}"
+        #                 .format(metod, seller_id, response.text))
         print('post_get_smth_onon_v2 {}'.format(response.text))
         return response.status_code, response.text
 
+
+# post_smth_v2(get_wh_list, seller_id="1179095", key="19cb01e0-4098-4587-b0ec-55c5c60b830c")
 
 def post_get_smth(metod):
     link = host + metod
@@ -126,120 +128,88 @@ def get_product_info(product_id, offer_id):
     return result
 
 
-def create_data_stocks():
-    data_read = read_json_on()
+# def create_data_stocks():
+#     data_read = read_json_on()
+#     result = []
+#     stocks = []
+#     current_assortment = post_get_smth(metod_get_list_products)[0]
+#     for product in current_assortment:
+#         proxy = {}
+#         if product['offer_id'] in data_read.keys():
+#             proxy['offer_id'] = product['offer_id']
+#             proxy['product_id'] = product['product_id']
+#             proxy['stock'] = data_read[product['offer_id']][2]
+#             outlets = data_read[product['offer_id']][3]
+#             for wh in outlets:
+#                 proxy['warehouse_id'] = wh
+#                 pr = proxy.copy()
+#                 stocks.append(pr)
+#
+#     while len(stocks) >= 100:
+#         result.append(stocks[:100])
+#         del stocks[:100]
+#         # print('stocks', stocks)
+#     else:
+#         result.append(stocks)
+#
+#     print('create_data_stocks_onon_x100', len(result))
+#     return result
+
+
+# def send_stocks_on():
+#     pre_data = create_data_stocks()
+#     metod = '/v2/products/stocks'
+#     link = host + metod
+#     proxy = []
+#     for row in pre_data:
+#         data = {'stocks': row}
+#         # print('SEND_DATA', data)
+#         response = requests.post(link, headers=headers, json=data)
+#         answer = response.json()
+#         ans = response.text
+#         print('answer send_stocks_on', ans)
+#         result = answer.get("result")
+#         if result:
+#             for row in result:
+#                 if len(row[
+#                            "errors"]) > 0:
+#                     print('ERROR from send_stocks_ozon', row)
+#                 elif row['updated'] == False:
+#                     print('ERROR update from send_stocks_ozon', row)
+#                 elif row['updated'] == True:  # and row['warehouse_id'] != 23012928587000:
+#                     print('SUCCES update from send_stocks_on', row)
+#             proxy.append(answer)
+#         sleep(1)
+
+
+def create_data_stocks_from_db(seller_id=None, donor_name=None,
+                               recip_name=None, is_stocks_null=False):
     result = []
     stocks = []
-    current_assortment = post_get_smth(metod_get_list_products)[0]
-    for product in current_assortment:
-        proxy = {}
-        if product['offer_id'] in data_read.keys():
-            proxy['offer_id'] = product['offer_id']
-            proxy['product_id'] = product['product_id']
-            proxy['stock'] = data_read[product['offer_id']][2]
-            outlets = data_read[product['offer_id']][3]
-            for wh in outlets:
-                proxy['warehouse_id'] = wh
-                pr = proxy.copy()
-                stocks.append(pr)
-
-    while len(stocks) >= 100:
-        result.append(stocks[:100])
-        del stocks[:100]
-        # print('stocks', stocks)
-    else:
-        result.append(stocks)
-
-    print('create_data_stocks_onon_x100', len(result))
-    return result
-
-
-def send_stocks_on():
-    pre_data = create_data_stocks()
-    metod = '/v2/products/stocks'
-    link = host + metod
-    proxy = []
-    for row in pre_data:
-        data = {'stocks': row}
-        # print('SEND_DATA', data)
-        response = requests.post(link, headers=headers, json=data)
-        answer = response.json()
-        ans = response.text
-        print('answer send_stocks_on', ans)
-        result = answer.get("result")
-        if result:
-            for row in result:
-                if len(row[
-                           "errors"]) > 0:
-                    print('ERROR from send_stocks_ozon', row)
-                elif row['updated'] == False:
-                    print('ERROR update from send_stocks_ozon', row)
-                elif row['updated'] == True:  # and row['warehouse_id'] != 23012928587000:
-                    print('SUCCES update from send_stocks_on', row)
-            proxy.append(answer)
-        sleep(1)
-
-
-def create_data_stocks_from_db(seller_id=None, seller_name=None, is_stocks_null=False):
-    result = []
-    stocks = []
-    print('SELLER_ID_create_data_stocks seller_id {}, seller_name {}, is_stocks_null {}'
-          .format(seller_id, seller_name, is_stocks_null))
+    print('SELLER_ID_create_data_stocks seller_id {}, seller_name (donor_name) {},'
+          ' recip_name {},  is_stocks_null {}'
+          .format(seller_id, donor_name, recip_name, is_stocks_null))
     if not seller_id:
         with Session(engine) as session:
-            key_seller_data = session.execute(select(Marketplaces.key_mp, Marketplaces.seller_id)
-                                              .where(Marketplaces.shop_name == seller_name)) \
+            key_seller_data = session.execute(
+                select(Marketplaces.key_mp, Marketplaces.seller_id)
+                        .where(Marketplaces.shop_name == recip_name)) \
                 .first()
             seller_id = key_seller_data[1]
             key = key_seller_data[0]
             print('SELLER_ID_1 {}, key_seller_data {}, seller_name {}'
-                  .format(seller_id, key_seller_data, seller_name))
-            # outlets_data = post_smth_v2(get_wh_list, seller_id=seller_id, key=key)
-            # outlets = [i['warehouse_id'] for i in outlets_data[1].get('result') if outlets_data[0] == 200]
-            # data = session.query(Product) \
-            #     .where(Product.quantity > 0) \
-            #     .where(Product.store_id == seller_id) \
-            #     .all()
-            #
-            # for product in data:
-            #     if not is_stocks_null:
-            #         quantity = product.quantity
-            #     else:
-            #         quantity = "0"
-            #     proxy = {
-            #         'offer_id': product.articul_product,
-            #         'product_id': product.external_sku,
-            #         'stock':
-            #     }
-            #     for wh in outlets:
-            #         proxy['warehouse_id'] = wh
-            #         pr = proxy.copy()
-            #         stocks.append(pr)
+                  .format(seller_id, key_seller_data, recip_name))
+
     else:
         with Session(engine) as session:
             key = session.scalars(select(Marketplaces.key_mp)
                                   .where(Marketplaces.seller_id == seller_id)) \
                 .first()
             print('SELLER_ID_2 {}, key {}, type key {}'.format(seller_id, key, type(key)))
-        # print('SELLER_ID_3 {}, key {}, type key {}'.format(seller_id, key, type(key)))
-        # outlets_data = post_smth_v2(get_wh_list, seller_id=seller_id, key=key[0])
-        # outlets = [i['warehouse_id'] for i in outlets_data[1].get('result') if outlets_data[0] == 200]
-        # data = post_smth_v2(metod_get_list_products, seller_id=seller_id, key=key[0])
-        # # print(77777, data[1].get('result'), data)
-        # if data[0] == 200:
-        #     for product in data[1].get('result'):
-        #         proxy = {
-        #             'offer_id': product['offer_id'],
-        #             'product_id': product['product_id'],
-        #             'stock': 0
-        #         }
-        #         for wh in outlets:
-        #             proxy['warehouse_id'] = wh
-        #             pr = proxy.copy()
-        #             stocks.append(pr)
 
     outlets_data = post_smth_v2(get_wh_list, seller_id=seller_id, key=key)
     outlets = [i['warehouse_id'] for i in outlets_data[1].get('result') if outlets_data[0] == 200]
+    print()
     data = session.query(Product) \
         .where(Product.quantity > 0) \
         .where(Product.store_id == seller_id) \
@@ -414,20 +384,21 @@ def send_stocks_oson_v2(key=None, seller_id=None, is_stocks_null=False):
 
             logging.DEBUG('All Ride Send_stocks_oson_v2 - seller_id {}, is_stocks_null {},'
                           ' len key {}, updated {}, errors {}.'
-                          .format(seller_id, is_stocks_null.len(key), count, error))
+                          .format(seller_id, is_stocks_null, len(key), count, error))
             sleep(0.6)
         else:
             logging.DEBUG('Trouble_stocks_oson_v2 - seller_id {}, is_stocks_null {},'
                           ' len key {}, updated {}, errors {}, answer {}'
-                          .format(seller_id, is_stocks_null.len(key), count, error, response.text))
-            print('answer send_stocks_on', response.text)
+                          .format(seller_id, is_stocks_null, len(key), count, error, response.text))
+            print('answer send_stocks_oson_v2', response.text)
             sleep(0.6)
 
 
 def send_stocks_oson_v3(key_recipient=None, donor_name=None, recipient=None):
-    print('SEND_STOCK_OSON_v3 len key{}, recipient {}, donor_name {}'
+    print('SEND_STOCK_OSON_start_v3 len key {}, recipient {}, donor_name {}'
           .format(key_recipient, recipient, donor_name))
     pre_data = create_data_stocks_from_db(seller_name=donor_name,
+                                          recip_name=recipient,
                                           is_stocks_null=False)
     headers = {
         'Client-Id': recipient,
@@ -465,7 +436,7 @@ def send_stocks_oson_v3(key_recipient=None, donor_name=None, recipient=None):
             oson_logger.info('Error send_stocks_oson - answer {}, donor {},'
                              ' recipient {}, len key_recip {}'
                              .format(response.text, donor_name, recipient, len(key_recipient)))
-            print('answer send_stocks_on', response.text)
+            print('answer send_stocks_on_v3', response.text)
             sleep(0.6)
 
 
@@ -484,16 +455,16 @@ def send_product_price(key_recipient=None, recipient=None):
         resp = requests.post(url=metod, headers=headers, json=send_data)
         if resp.ok:
             result = resp.json()
-            for line in result:
+            for line in result.get('result'):
                 if not line.get('updated'):
                     errors += 1
                     # print('product_NOT_UPDATED_offer_id {} {}'
                     #       .format(line.get('offer_id'), recipient))
                 else:
                     count += 1
-            oson_logger.info('product_NOT_UPDATED_offer_id {}, '
-                             'recipient {}, errors {}, updated {}'
-                             .format(line.get('offer_id'), recipient, errors, count))
+            oson_logger.info('product_UPDATED_price_offer_id '
+                             'recipient {}, errors {}, count {}'
+                             .format(recipient, errors, count))
 
         else:
             oson_logger.info('Some_trouble_from_export_price_oson -'
@@ -501,6 +472,8 @@ def send_product_price(key_recipient=None, recipient=None):
                              .format(recipient, resp.text, len(data)))
 
     return count, errors
+
+
 
 # get_product_info(38010832, "OWLT190601")
 # with app.app_context():

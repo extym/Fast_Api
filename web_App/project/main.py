@@ -292,7 +292,7 @@ def product_info_price(id_mp, seller_id):
     # 'message': 'Unknown posting number "55200317-0207-4"',
     # 'details': []}
     result = resp.json()
-    print('product_id_offer_id', result['result']['posting_number'])
+    # print('product_id_offer_id', result['result']['posting_number'])
     order = result.get("result")
     if order:
         return order
@@ -355,7 +355,7 @@ async def onon_push():
             order = product_info_price(id_mp, seller_id)
 
             if order:
-                print('new_order_onon', order['posting_number'])
+                # print('new_order_onon', order['posting_number'])
                 order['our_id'], order['id'], order['status'], order['our_status'] \
                     = our_id, id_mp, "NEW", "NEW"  # TODO change place id_mp & our_id
                 ref_data = reformat_data_order(order, 'Ozon')
@@ -406,7 +406,7 @@ async def onon_push():
             status=403
         )
 
-    print('api_on_response', response)
+    # print('api_on_response', response)
     return response
 
 
