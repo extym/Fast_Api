@@ -436,7 +436,7 @@ def send_stocks_oson_v3(key_recipient=None, donor_name=None, recipient=None):
     print('SEND_STOCK_OSON_start_v3 len key {}, recipient {}, donor_name {}'
           .format(key_recipient, recipient, donor_name))
     pre_data = create_data_stocks_from_db_v3(donor_name=donor_name,
-                                             recip_name=recipient,
+                                             recip_id=recipient,
                                              is_stocks_null=False)
     headers = {
         'Client-Id': recipient,
