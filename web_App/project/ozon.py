@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 import json
 import logging
 import os
@@ -182,34 +183,21 @@ def get_product_info(product_id, offer_id):
 #         sleep(1)
 
 
-def create_data_stocks_from_db(seller_id=None, donor_name=None,
-                               recip_name=None, is_stocks_null=False):
+def create_data_stocks_from_db_v2(seller_id=None, is_stocks_null=False):
     result = []
     stocks = []
-    print('SELLER_ID_create_data_stocks seller_id {}, seller_name (donor_name) {},'
-          ' recip_name {},  is_stocks_null {}'
-          .format(seller_id, donor_name, recip_name, is_stocks_null))
-    if not seller_id:
-        with Session(engine) as session:
-            key_seller_data = session.execute(
-                select(Marketplaces.key_mp, Marketplaces.seller_id)
-                        .where(Marketplaces.shop_name == recip_name)) \
-                .first()
-            seller_id = key_seller_data[1]
-            key = key_seller_data[0]
-            print('SELLER_ID_1 {}, key_seller_data {}, seller_name {}'
-                  .format(seller_id, key_seller_data, recip_name))
+    print('{} SELLER_create_data_stocks seller_id {}, is_stocks_null {}'
+          .format(datetime.datetime.now(), seller_id, is_stocks_null))
 
-    else:
-        with Session(engine) as session:
-            key = session.scalars(select(Marketplaces.key_mp)
-                                  .where(Marketplaces.seller_id == seller_id)) \
-                .first()
-            print('SELLER_ID_2 {}, key {}, type key {}'.format(seller_id, key, type(key)))
+    with Session(engine) as session:
+        key = session.scalars(select(Marketplaces.key_mp)
+                              .where(Marketplaces.seller_id == seller_id)) \
+            .first()
+        print('SELLER_2 {}, key {}, type key {}'.format(seller_id, key, type(key)))
 
     outlets_data = post_smth_v2(get_wh_list, seller_id=seller_id, key=key)
     outlets = [i['warehouse_id'] for i in outlets_data[1].get('result') if outlets_data[0] == 200]
-    print()
+
     data = session.query(Product) \
         .where(Product.quantity > 0) \
         .where(Product.store_id == seller_id) \
@@ -238,6 +226,56 @@ def create_data_stocks_from_db(seller_id=None, donor_name=None,
 
     oson_logger.info("From create_data_stocks_oson x100 - seller_id {}, is_stocks_null {}, len result {}"
                      .format(seller_id, is_stocks_null, len(result)))
+    print('create_data_stocks_oson_x100', len(result))
+    return result
+
+
+def create_data_stocks_from_db_v3(donor_name=None,
+                                  recip_id=None, is_stocks_null=False):
+    result = []
+    stocks = []
+    print('{} SELLER_ID_create_data_stocks donor_name {},'
+          ' recip_id {},  is_stocks_null {}'
+          .format(datetime.datetime.now(), donor_name, recip_id, is_stocks_null))
+    with Session(engine) as session:
+        key = session.scalars(select(Marketplaces.key_mp)
+                                          .where(Marketplaces.seller_id == recip_id)) \
+            .first()
+
+        print('{} SELLER_ID_1 {}, key {}, seller_id {}'
+              .format(datetime.datetime.now(), key, recip_id))
+
+    outlets_data = post_smth_v2(get_wh_list, seller_id=recip_id, key=key)
+    outlets = [i['warehouse_id'] for i in outlets_data[1].get('result') if outlets_data[0] == 200]
+    print()
+    data = session.query(Product) \
+        .where(Product.quantity > 0) \
+        .where(Product.shop_name == donor_name) \
+        .all()
+
+    for product in data:
+        if not is_stocks_null:
+            quantity = product.quantity
+        else:
+            quantity = "0"
+        proxy = {
+            'offer_id': product.articul_product,
+            'product_id': product.external_sku,
+            'stock': quantity
+        }
+        for wh in outlets:
+            proxy['warehouse_id'] = wh
+            pr = proxy.copy()
+            stocks.append(pr)
+
+    while len(stocks) >= 100:
+        result.append(stocks[:100])
+        del stocks[:100]
+    else:
+        result.append(stocks)
+
+    oson_logger.info("From create_data_stocks_oson x100 - seller_id {}, is_stocks_null {}, len result {}"
+                     .format(recip_id, is_stocks_null, len(result)))
     print('create_data_stocks_oson_x100', len(result))
     return result
 
@@ -353,8 +391,8 @@ def create_data_price_for_send_v2(koef_recipient=None, donor=None,
 
 
 def send_stocks_oson_v2(key=None, seller_id=None, is_stocks_null=False):
-    pre_data = create_data_stocks_from_db(seller_id=seller_id,
-                                          is_stocks_null=is_stocks_null)
+    pre_data = create_data_stocks_from_db_v2(seller_id=seller_id,
+                                             is_stocks_null=is_stocks_null)
     headers = {
         'Client-Id': seller_id,
         'Api-Key': key,
@@ -397,9 +435,9 @@ def send_stocks_oson_v2(key=None, seller_id=None, is_stocks_null=False):
 def send_stocks_oson_v3(key_recipient=None, donor_name=None, recipient=None):
     print('SEND_STOCK_OSON_start_v3 len key {}, recipient {}, donor_name {}'
           .format(key_recipient, recipient, donor_name))
-    pre_data = create_data_stocks_from_db(donor_name=donor_name,
-                                          recip_name=recipient,
-                                          is_stocks_null=False)
+    pre_data = create_data_stocks_from_db_v3(donor_name=donor_name,
+                                             recip_name=recipient,
+                                             is_stocks_null=False)
     headers = {
         'Client-Id': recipient,
         'Api-Key': key_recipient,
@@ -472,8 +510,6 @@ def send_product_price(key_recipient=None, recipient=None):
                              .format(recipient, resp.text, len(data)))
 
     return count, errors
-
-
 
 # get_product_info(38010832, "OWLT190601")
 # with app.app_context():

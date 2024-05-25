@@ -570,7 +570,7 @@ async def execute_query_v4(query=None, query2=None, data=None):
             cursor.execute(query, data)
         if query2:
             cursor.execute(query2, data)
-            print("Query from execute_query_v2 executed successfully")
+            # print("Query from execute_query_v2 executed successfully")
 
     except OperationalError as err:
         print(f"The ERROR from execute_query '{err}' occured ")

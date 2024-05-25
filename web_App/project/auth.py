@@ -90,8 +90,8 @@ def back_shops_tasks():
                 oson.send_stocks_oson_v3(key_recipient=key,
                                          donor_name=store_1,
                                          recipient=seller_id)
-                print('Send_stocks_oson_v3 - donor {}, recipient {}, type sellerId {}'
-                      .format(store_1, seller_id, type(seller_id)))
+                print('Send_stocks_oson_v3 - donor_name {}, recipient_id {}, key_recipient {}'
+                      .format(store_1, seller_id, key))
                 # logging.DEBUG('Send_stocks_oson_v3 - donor {}, recipient {}'
                 #               .format(store_1, seller_id))
             if row.name_mp == 'wb':

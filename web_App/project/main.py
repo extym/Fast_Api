@@ -375,8 +375,8 @@ async def onon_push():
             order_id = resp["posting_number"]
             order_status = resp.get('new_state')
             seller_id = str(resp.get('seller_id'))
-            print('INFO CANCELED ORDER - status {} from {}'
-                  .format(order_status, resp))
+            # print('INFO CANCELED ORDER - status {} from {}'
+            #       .format(order_status, resp))
             shop_name = Marketplaces.query. \
                 filter_by(seller_id=seller_id).first().shop_name
             data = (order_status, "canceled", order_id, shop_name)
