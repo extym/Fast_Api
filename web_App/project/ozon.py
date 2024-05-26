@@ -401,7 +401,7 @@ def send_stocks_oson_v2(key=None, seller_id=None, is_stocks_null=False):
     metod = '/v2/products/stocks'
     link = host + metod
     proxy = []
-    count, error = '', ''
+    count, error = 0, 0
     for row in pre_data:
         data = {'stocks': row}
         response = requests.post(link, headers=headers, json=data)
@@ -446,7 +446,7 @@ def send_stocks_oson_v3(key_recipient=None, donor_name=None, recipient=None):
     metod = '/v2/products/stocks'
     link = host + metod
     proxy = []
-    count, error = '', ''
+    count, error = 0, 0
     for row in pre_data:
         data = {'stocks': row}
         # os.abort()
@@ -461,7 +461,7 @@ def send_stocks_oson_v3(key_recipient=None, donor_name=None, recipient=None):
                         error += 1
                     # elif row['updated'] == False:
                     #     print('ERROR update from send_stocks_ozon', row)
-                    elif row['updated'] == True:
+                    elif row['updated']:
                         count += 1
                     #     print('SUCCES update from send_stocks_on', row)
                 proxy.append(answer)
