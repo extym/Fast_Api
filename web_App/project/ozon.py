@@ -242,7 +242,7 @@ def create_data_stocks_from_db_v3(donor_name=None,
                                           .where(Marketplaces.seller_id == recip_id)) \
             .first()
 
-        print('{} SELLER_ID_1 {}, key {}, seller_id {}'
+        print('{} SELLER_ID_1 key {}, seller_id {}'
               .format(datetime.datetime.now(), key, recip_id))
 
     outlets_data = post_smth_v2(get_wh_list, seller_id=recip_id, key=key)
