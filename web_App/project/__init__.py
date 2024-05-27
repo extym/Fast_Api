@@ -22,7 +22,7 @@ if LOCAL_MODE:
 else:
     interval = 120
 PHOTO_UPLOAD_FOLDER = 'project/templates/static/data/profile/'
-engine = create_engine(f"postgresql+psycopg2://{db_user}:{db_pass}@{db_host}/{db_name}")
+engine = create_engine(f"postgresql+psycopg2://{db_user}:{db_pass}@{db_host}/{db_name}", pool_size=20, max_overflow=30)
 
 def create_app():
     app = Flask(__name__,

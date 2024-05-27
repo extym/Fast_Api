@@ -68,7 +68,7 @@ def back_shops_tasks():
                                          is_stocks_null=True)
                 print('Send_stocks_oson_v2 - len_key {}, seller_id {}, is_stocks_null {}'
                       .format(len(key), seller_id, True))
-                logging.DEBUG('Send_stocks_oson_v2 - len_key {}, seller_id {}, is_stocks_null {}'
+                logging.info('Send_stocks_oson_v2 - len_key {}, seller_id {}, is_stocks_null {}'
                               .format(len(key), seller_id, True))
             if row.name_mp == 'wb':
                 wb.send_stocks_wb_v2(sourse='web',
@@ -76,7 +76,7 @@ def back_shops_tasks():
                                      is_stocks_null=True)
                 print('Send_stocks_wb_v2 - len_key {}, seller_id {}, is_stocks_null {}'
                       .format(len(key), seller_id, True))
-                logging.DEBUG('Send_stocks_wb_v2 - len_key {}, seller_id {}, is_stocks_null {}'
+                logging.info('Send_stocks_wb_v2 - len_key {}, seller_id {}, is_stocks_null {}'
                               .format(len(key), seller_id, True))
 
         if row.send_common_stocks:
@@ -85,21 +85,21 @@ def back_shops_tasks():
                 .where(InternalImport.internal_import_role_2 == 'recipient') \
                 .first()
             store_1 = ii_raw.internal_import_store_1
-            seller_id = row.seller_id
+            # seller_id = row.seller_id
             if row.name_mp == 'ozon':
                 oson.send_stocks_oson_v3(key_recipient=key,
                                          donor_name=store_1,
                                          recipient=seller_id)
                 print('Send_stocks_oson_v3 - donor_name {}, recipient_id {}, key_recipient {}'
                       .format(store_1, seller_id, key))
-                # logging.DEBUG('Send_stocks_oson_v3 - donor {}, recipient {}'
-                #               .format(store_1, seller_id))
+                logging.info('Send_stocks_oson_v3 - donor {}, recipient {}'
+                              .format(store_1, seller_id))
             if row.name_mp == 'wb':
                 wb.send_stocks_wb_v3(donor=store_1,
                                      recipient=seller_id)
                 print('send_stocks_wb_v3 - donor {}, recipient {}'
                       .format(store_1, seller_id))
-                logging.DEBUG('send_stocks_wb_v3 - donor {}, recipient {}'
+                logging.info('send_stocks_wb_v3 - donor {}, recipient {}'
                               .format(store_1, seller_id))
 
         if row.enable_orders_submit:
@@ -114,7 +114,7 @@ def back_shops_tasks():
                                            shop_name=shop_name)
                 print('Processing_orders_wb_v2 - len_key {}, shop_name {}'
                       .format(len(key), shop_name))
-                logging.DEBUG('Processing_orders_wb_v2 - len_key {}, shop_name {}'
+                logging.info('Processing_orders_wb_v2 - len_key {}, shop_name {}'
                               .format(len(key), shop_name))
 
         if row.enable_sync_stocks:
@@ -124,7 +124,7 @@ def back_shops_tasks():
                                          is_stocks_null=False)
                 print('Send_stocks_oson_v2 - seller_id {} is_stocks_null {}'
                       .format(seller_id, False))
-                logging.DEBUG('Send_stocks_oson_v2 - seller_id {} is_stocks_null {}'
+                logging.info('Send_stocks_oson_v2 - seller_id {} is_stocks_null {}'
                               .format(seller_id, False))
             if row.name_mp == 'wb':
                 wb.send_stocks_wb_v2(seller_id=seller_id,
@@ -132,7 +132,7 @@ def back_shops_tasks():
                                      sourse='web')
                 print('Send_stocks_wb_v2 - seller_id {} is_stocks_null {}'
                       .format(seller_id, False))
-                logging.DEBUG('Send_stocks_wb_v2 - seller_id {} is_stocks_null {}'
+                logging.info('Send_stocks_wb_v2 - seller_id {} is_stocks_null {}'
                               .format(seller_id, False))
 
         if row.enable_sync_price:
@@ -140,16 +140,16 @@ def back_shops_tasks():
                 ozon.send_product_price(key_recipient=key,
                                         recipient=seller_id)
                 print('Send_product_price oson - seller_id {} recipient {}'
-                      .format(len(row.key_mp), row.seller_id))
-                logging.DEBUG('Send_product_price oson - seller_id {} recipient {}'
-                              .format(len(key), seller_id))
+                      .format(len(key), row.seller_id))
+                logging.info('Send_product_price oson - key {}, recipient_id {}'
+                              .format(key, seller_id))
 
             if row.name_mp == 'wb':
                 wb.send_price_to_wb(seller_id=seller_id, sourse='web')
                 print('Send_stocks_wb_v2 - seller_id {} is_stocks_null {}'
                       .format(len(key), seller_id))
-                logging.DEBUG('Send_stocks_wb_v2 - seller_id {} is_stocks_null {}'
-                              .format(len(key), seller_id))
+                logging.info('Send_stocks_wb_v2 - seller_id {} is_stocks_null {}'
+                              .format(key, seller_id))
 
     print(777, markets)
 

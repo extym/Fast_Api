@@ -24,7 +24,7 @@ from psycopg2._psycopg import IntegrityError
 UniqueViolation = errors.lookup('23505')
 
 
-# engine = create_engine(f"postgresql+psycopg2://{db_user}:{db_pass}@{db_host}/{db_name}")
+# engine = create_engine(f"postgresql+psycopg2://{db_user}:{db_pass}@{db_host}/{db_name}", pool_size=20, max_overflow=30)
 
 
 def write_smth(smth):
