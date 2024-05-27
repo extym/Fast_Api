@@ -380,12 +380,12 @@ def send_stocks_oson_v2(key=None, seller_id=None, is_stocks_null=False):
                     #     print('SUCCES update from send_stocks_on', row)
                 proxy.append(answer)
 
-            logging.DEBUG('All Ride Send_stocks_oson_v2 - seller_id {}, is_stocks_null {},'
+            logging.info('All Ride Send_stocks_oson_v2 - seller_id {}, is_stocks_null {},'
                           ' len key {}, updated {}, errors {}.'
                           .format(seller_id, is_stocks_null.len(key), count, error))
             sleep(0.6)
         else:
-            logging.DEBUG('Trouble_stocks_oson_v2 - seller_id {}, is_stocks_null {},'
+            logging.info('Trouble_stocks_oson_v2 - seller_id {}, is_stocks_null {},'
                           ' len key {}, updated {}, errors {}, answer {}'
                           .format(seller_id, is_stocks_null.len(key), count, error, response.text))
             print('answer send_stocks_on', response.text)
