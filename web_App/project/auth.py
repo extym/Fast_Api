@@ -139,7 +139,7 @@ def back_shops_tasks():
             if row.name_mp == 'ozon':
                 ozon.send_product_price(key_recipient=key,
                                         recipient=seller_id)
-                print('Send_product_price oson - seller_id {} recipient {}'
+                print('Send_product_price oson - len key {},  seller_id {}'
                       .format(len(key), row.seller_id))
                 logging.info('Send_product_price oson - key {}, recipient_id {}'
                               .format(key, seller_id))
@@ -151,7 +151,7 @@ def back_shops_tasks():
                 logging.info('Send_stocks_wb_v2 - seller_id {} is_stocks_null {}'
                               .format(key, seller_id))
 
-    print(777, markets)
+    # print(777, markets)
 
 
 def allowed_file(filename):

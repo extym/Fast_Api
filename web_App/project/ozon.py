@@ -292,7 +292,7 @@ def create_data_price_for_send(seller_id=None, from_db=True):
             koeff = session.scalars(select(Marketplaces.store_markup)
                                     .where(Marketplaces.seller_id == seller_id)) \
                 .first()
-            print('KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKk', koeff, type(seller_id))
+            print('KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKk', koeff, seller_id, type(seller_id))
             for product in data:
                 #############################
                 # TODO make func custom price oson
@@ -527,3 +527,4 @@ def send_product_price(key_recipient=None, recipient=None):
 
 # asyncio.run(create_data_stocks())
 # create_data_stocks_from_db(seller_id="1278621", is_stocks_null=False)
+# create_data_price_for_send(seller_id="1278621", from_db=True)
