@@ -1,0 +1,472 @@
+{% extends "base-layout.html"%}
+{##}
+
+    <!-- BEGIN BODY -->
+{% block content %}
+<link href="../../static/assets/plugins/tagsinput/css/bootstrap-tagsinput.css" rel="stylesheet" type="text/css" media="screen"/>
+<!-- START CONTENT -->
+<section id="main-content" class=" ">
+    <section class="wrapper main-wrapper" style=''>
+
+        <div class='col-xl-12 col-lg-12 col-md-12 col-12'>
+            <div class="page-title">
+
+                <div class="float-left">
+                    <h1 class="title">Настройки поставщиков</h1>
+                </div>
+
+            </div>
+
+             <div>
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                <div class="alert alert-warning" role="alert">
+                    {{ messages[0] }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                    {% endif %}
+                {% endwith %}
+
+                </div>
+        </div>
+
+        <div class="clearfix"></div>
+
+        <div class="row margin-0">
+            <div class="col-xl-6">
+                <section class="box ">
+                    <header class="panel_header">
+                        <h2 class="title float-left">добавить поставщика</h2>
+                        <div class="actions panel_actions float-right">
+                            <i class="box_toggle fa fa-chevron-down"></i>
+                            <i class="box_setting fa fa-cog" data-toggle="modal" href="#section-settings"></i>
+                            <i class="box_close fa fa-times"></i>
+                        </div>
+                    </header>
+                    <div class="content-body">
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-12">
+
+                                <form autocomplete="off" id="validate_mp" action="/add_mp" method="post" >
+
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="input_name_mp">Поставщик</label>
+                                        </div>
+                                        <select class="custom-select" id="input_name_mp" name="insert_new_shop">
+                                            {% if show_wb %}
+                                                <option selected value="{{ mp }}" >{{ mp }}</option>
+                                                <option value="Выбрать" >Выбрать</option>
+                                            {% else %}
+                                            <option selected>Выбрать</option>
+                                                <option value="merlion">Мерлион</option>
+                                                <option value="marvel">Марвел</option>
+                                                <option value="ocs">OSC</option>
+                                                <option value="netlab">Нетлаб</option>
+                                                <option value="logic">3Лоджик</option>
+                                            {% endif %}
+                                            </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label" for="formfield15">Название</label>
+                                        <span class="desc"> ООО "Салют"</span>
+                                        <div class="controls">
+                                            {% if show_wb %}
+                                            <input type="text" value="{{ shop_name }}" class="form-control"  name="name" autocomplete="off">
+                                            {% else %}
+                                            <input type="text" value="" class="form-control" id="formfield15" name="name" autocomplete="off">
+                                            {% endif %}
+
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label" for="formfield25">ID на маркете</label>
+                                        <span class="desc"> например 1234567</span>
+                                        <div class="controls">
+                                            {% if show_wb %}
+                                            <input autocomplete="off" value="{{ id_mp }}" type="text" class="form-control"  name="id_mp"  >
+                                            {% else %}
+                                            <input autocomplete="new-password" id="formfield25" type="text" class="form-control"  name="id_mp"  >
+                                            {% endif %}
+
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label" for="formfield33">Ключ API</label>
+                                        <span class="desc">например a5f64e91-ac50-4a9e-a3c5-38a412f4a44c</span>
+                                        <div class="controls">
+                                            {% if show_wb %}
+                                            <input type="password" value="{{ key_mp }}" class="form-control"  name="key" autocomplete="off" >
+                                            {% else %}
+                                            <input type="password" value="" class="form-control" id="formfield33" name="key" autocomplete="off" >
+                                            {% endif %}
+
+                                        </div>
+                                    </div>
+
+                                    {% if show_wb %}
+                                    <div class="form-group">
+                                        <label class="form-label" for="tagsinput-1">Оставьте теги, которые описывают права ключа API WB</label>
+                                        <br>
+                                        <span class="desc">Удалите не нужные и сохраните ключ</span>
+                                        <div class="controls">
+                                            <input type="text" name="tags" class="form-control" id="tagsinput-1" data-role="tagsinput" value="Контент,Цены и скидки,Маркетплейс,Статистика,Аналитика,Продвижение" />
+
+                                        </div>
+                                    </div>
+                                    {% endif %}
+
+                                    <div class="float-right">
+                                        <button type="submit" class="btn btn-primary" >Сохранить</button>
+                                        <button class="btn" type="reset">Очистить</button>
+                                    </div>
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+                </section></div>
+
+            <div class="col-xl-6">
+                <section class="box ">
+                    <header class="panel_header">
+                        <h2 class="title float-left">Редактировать магазин</h2>
+                        <div class="actions panel_actions float-right">
+                            <i class="box_toggle fa fa-chevron-down"></i>
+                            <i class="box_setting fa fa-cog" data-toggle="modal" href="#section-settings"></i>
+                            <i class="box_close fa fa-times"></i>
+                        </div>
+                    </header>
+                    <div class="content-body">
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-12">
+                                {% with messages = get_flashed_messages() %}
+                                {% if messages %}
+                                    <div class="notification danger">
+                                        {{ messages[0] }}
+                                    </div>
+                                {% endif %}
+                                {% endwith %}
+                                <form autocomplete="off" name="validate_edit_mp" action="/edit_mp" method="post" >
+
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="edit_name_mp">Маркетплейс</label>
+                                        </div>
+                                        <select class="custom-select" id="edit_name_mp" name="edit_name_mp">
+                                                <option selected>Выбрать</option>
+                                                <option value="yandex">ЯндексМаркет</option>
+                                                <option value="sber">СберМегаМаркет</option>
+                                                <option value="ozon">Озон</option>
+                                                <option value="wb">Вайлдбериз</option>
+                                                <option value="leroy">ЛеруаМерлен</option>
+                                            </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label" for="edit_shop_name">Выбрать Магазин</label>
+
+                                        <div class="controls">
+                                            <select class="custom-select" id="edit_shop_name" name="edit_shop_names">
+                                        <option selected>Выбрать </option>
+                                            {% for row in rows %}
+                                            <option value="{{ row }}" >{{ row }}</option>
+                                            {% endfor %}
+
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label" for="formfield2">ID на маркете</label>
+                                        <span class="desc"> например 1234567</span>
+                                        <div class="controls">
+                                            <input autocomplete="new-password" id="formfield2" type="text" class="form-control"  name="id_mp"  >
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label" for="formfield31">Ключ API</label>
+                                        <span class="desc">например a5f64e91-ac50-4a9e-a3c5-38a412f4a44c</span>
+                                        <div class="controls">
+                                            <input type="password" class="form-control" id="formfield31" name="key" autocomplete="off" >
+                                        </div>
+                                    </div>
+
+                                    <div class="float-right">
+                                        <button type="submit" class="btn btn-primary">Сохранить</button>
+                                        <button class="btn" type="reset">Очистить</button>
+                                    </div>
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+                </section></div>
+
+
+            <div class="col-xl-12">
+                <section class="box ">
+                    <header class="panel_header">
+                        <h2 class="title float-left">Настройки магазинов </h2>
+                        <div class="actions panel_actions float-right">
+                            <i class="box_toggle fa fa-chevron-down"></i>
+                            <i class="box_setting fa fa-cog" data-toggle="modal" href="#section-settings"></i>
+                            <i class="box_close fa fa-times"></i>
+                        </div>
+                    </header>
+                    <div class="content-body">    <div class="row">
+
+                            <form id="general_validate" action="/edit_store" method="post" novalidate="novalidate" style="width: 100%;">
+
+                                <div class="row margin-0">
+                                    <div class="col-lg-6 col-md-6 col-6">
+
+                                        <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="name_mp">Маркетплейс</label>
+                                        </div>
+                                        <select class="custom-select" id="name_mp" name="name_mp">
+                                                <option selected></option>
+                                                <option value="yandex">ЯндексМаркет</option>
+                                                <option value="sber">СберМегаМаркет</option>
+                                                <option value="ozon">Озон</option>
+                                                <option value="wb">Вайлдбериз</option>
+                                                <option value="leroy">ЛеруаМерлен</option>
+                                            </select>
+                                    </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label" for="formfield1">Общая наценка на маркетплейс</label>
+                                            <span class="desc">% например "16"</span>
+                                            <div class="controls">
+                                                <input type="text" class="form-control" id="formfield1" name="mp_markup" >
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label" for="formfield24">Общая скидка на маркетплейс</label>
+                                            <span class="desc">% например "13"</span>
+                                            <div class="controls">
+                                                <input type="text" class="form-control" id="formfield24" name="mp_discount" >
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label" for="formfield21">Общая наценка для "Цена до скидки"</label>
+                                            <span class="desc">% например "16"</span>
+                                            <div class="controls">
+                                                <input type="text" class="form-control" id="formfield21" name="price_before" >
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label" for="formfield3">Добавить артикул на маркетплейс</label>
+                                            <span class="desc">можно несколько через запятую</span>
+                                            <div class="controls">
+                                                <input type="text" class="form-control" id="formfield3" name="add_articul_mp" >
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label" for="formfield4">Исключить артикул из маркетплейса</label>
+                                            <span class="desc">можно несколько через запятую</span>
+                                            <div class="controls">
+                                                <input type="text" class="form-control" id="formfield4" name="extract_articul_mp" >
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                    <div class="col-lg-6 col-md-6 col-6">
+
+                                        <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="input_shop_name">Магазин</label>
+                                        </div>
+                                        <select class="custom-select" id="input_shop_name" name="shop_name">
+                                        <option selected>Выбрать </option>
+                                            {% for row in rows %}
+                                            <option value="{{ row }}" >{{ row }}</option>
+                                            {% endfor %}
+
+                                        </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label" for="formfield5">Дополнительная наценка на магазин</label>
+                                            <span class="desc">% например "33"</span>
+                                            <div class="controls">
+                                                <input type="text" class="form-control" id="formfield5" name="store_markup" >
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label" for="formfield6">Дополнительная скидка на магазин</label>
+                                            <span class="desc">% например "23"</span>
+                                            <div class="controls">
+                                                <input type="text" class="form-control" id="formfield6" name="store_discount" >
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label" for="formfield22">Дополнительная наценка для "Цена до скидки"</label>
+                                            <span class="desc">% например "16"</span>
+                                            <div class="controls">
+                                                <input type="text" class="form-control" id="formfield22" name="shop_add_price_before" >
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label" for="formfield7">Добавить артикул в магазин</label>
+                                            <span class="desc">можно несколько через запятую</span>
+                                            <div class="controls">
+                                                <input type="text" class="form-control" id="formfield7" name="formfield7" >
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label" for="formfield11">Исключить артикул из магазина</label>
+                                            <span class="desc">можно несколько через запятую</span>
+                                            <div class="controls">
+                                                <input type="text" class="form-control" id="formfield11" name="extract_articul_shop" >
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-12 col-md-12 col-12">
+                                    <div class="float-right ">
+                                        <button type="submit" class="btn btn-primary">Сохранить</button>
+                                        <button class="btn" type="reset">Очистить</button>
+                                    </div>
+                                </div>
+
+                            </form>
+
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- modal start -->
+<!--        <div class="modal fade" id="ultraModal-27" tabindex="-1" role="dialog" aria-labelledby="ultraModal-Label" aria-hidden="true">-->
+<!--            <div class="modal-dialog animated zoomIn">-->
+<!--                <div class="modal-content">-->
+<!--                    <div class="modal-header">-->
+<!--                        <h4 class="modal-title">Save data success</h4><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>-->
+
+<!--                    </div>-->
+<!--                    <div class="modal-body">-->
+
+<!--                        Данные сохранены-->
+
+<!--                    </div>-->
+<!--                    <div class="modal-footer">-->
+<!--                        <button data-dismiss="modal" class="btn btn-default" type="button">Close</button>-->
+<!--                        <button class="btn btn-primary" type="button">Save changes</button>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+        <!-- modal end -->
+        <!-- modal start -->
+<!--        <div class="modal fade" id="ultraModal-28" tabindex="-1" role="dialog" aria-labelledby="ultraModal-Label" aria-hidden="true">-->
+<!--            <div class="modal-dialog animated zoomIn">-->
+<!--                <div class="modal-content">-->
+<!--                    <div class="modal-header">-->
+<!--                        <h4 class="modal-title">Save unsuccess</h4><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>-->
+
+<!--                    </div>-->
+<!--                    <div class="modal-body">-->
+
+<!--                        Body goes here...-->
+
+<!--                    </div>-->
+<!--                    <div class="modal-footer">-->
+<!--                        <button data-dismiss="modal" class="btn btn-default" type="button">Close</button>-->
+<!--        {#                <button class="btn btn-primary" type="button">Save changes</button>#}-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+        <!-- modal end -->
+
+    </section>
+</section>
+
+
+<!-- END CONTENT -->
+
+    <script src="../../static/assets/js/jquery-3.4.1.min.js" type="text/javascript"></script>
+
+ OTHER SCRIPTS INCLUDED ON THIS PAGE - START
+        <script src="../../static/assets/plugins/jquery-ui/smoothness/jquery-ui.min.js" type="text/javascript"></script>
+        <script src="../../static/assets/plugins/datepicker/js/datepicker.js" type="text/javascript"></script>
+        <script src="../../static/assets/plugins/daterangepicker/js/moment.min.js" type="text/javascript"></script>
+        <script src="../../static/assets/plugins/daterangepicker/js/daterangepicker.js" type="text/javascript"></script>
+        <script src="../../static/assets/plugins/timepicker/js/bootstrap-timepicker.min.js" type="text/javascript"></script>
+        <script src="../../static/assets/plugins/datetimepicker/js/bootstrap-datetimepicker.min.js" type="text/javascript"></script>
+        <script src="../../static/assets/plugins/datetimepicker/js/locales/bootstrap-datetimepicker.fr.js" type="text/javascript"></script>
+        <script src="../../static/assets/plugins/colorpicker/js/bootstrap-colorpicker.min.js" type="text/javascript"></script>
+        <script src="../../static/assets/plugins/tagsinput/js/bootstrap-tagsinput.js" type="text/javascript"></script>
+        <script src="../../static/assets/plugins/select2/select2.min.js" type="text/javascript"></script>
+        <script src="../../static/assets/plugins/typeahead/typeahead.bundle.js" type="text/javascript"></script>
+        <script src="../../static/assets/plugins/typeahead/handlebars.min.js" type="text/javascript"></script>
+        <script src="../../static/assets/plugins/multi-select/js/jquery.multi-select.js" type="text/javascript"></script>
+        <script src="../../static/assets/plugins/multi-select/js/jquery.quicksearch.js" type="text/javascript"></script>
+                    <!-- OTHER SCRIPTS INCLUDED ON THIS PAGE - END -->
+
+                    <!-- OTHER SCRIPTS INCLUDED ON THIS PAGE - START -->
+        <link href="../../static/assets/plugins/jquery-ui/smoothness/jquery-ui.min.css" rel="stylesheet" type="text/css" media="screen"/>
+        <link href="../../static/assets/plugins/datepicker/css/datepicker.css" rel="stylesheet" type="text/css" media="screen"/>
+        <link href="../../static/assets/plugins/daterangepicker/css/daterangepicker-bs3.css" rel="stylesheet" type="text/css" media="screen"/>
+        <link href="../../static/assets/plugins/timepicker/css/bootstrap-timepicker.css" rel="stylesheet" type="text/css" media="screen"/>
+        <link href="../../static/assets/plugins/datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet" type="text/css" media="screen"/>
+        <link href="../../static/assets/plugins/colorpicker/css/bootstrap-colorpicker.min.css" rel="stylesheet" type="text/css" media="screen"/>
+        <link href="../../static/assets/plugins/ios-switch/css/switch.css" rel="stylesheet" type="text/css" media="screen"/>
+        <link href="../../static/assets/plugins/tagsinput/css/bootstrap-tagsinput.css" rel="stylesheet" type="text/css" media="screen"/>
+        <link href="../../static/assets/plugins/select2/select2.css" rel="stylesheet" type="text/css" media="screen"/>
+        <link href="../../static/assets/plugins/typeahead/css/typeahead.css" rel="stylesheet" type="text/css" media="screen"/>
+        <link href="../../static/assets/plugins/multi-select/css/multi-select.css" rel="stylesheet" type="text/css" media="screen"/>
+                 <!-- OTHER SCRIPTS INCLUDED ON THIS PAGE - END -->
+
+
+{% endblock %}
+
+
+
+
+
+
+        <!-- General section box modal start -->
+        <div class="modal" id="section-settings" tabindex="-1" role="dialog" aria-labelledby="ultraModal-Label" aria-hidden="true">
+            <div class="modal-dialog animated bounceInDown">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">Section Settings</h4>
+                    </div>
+                    <div class="modal-body">
+
+                        Body goes here...
+
+                    </div>
+                    <div class="modal-footer">
+                        <button data-dismiss="modal" class="btn btn-default" type="button">Close</button>
+                        <button class="btn btn-primary" type="button">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- modal end -->
+
+
+

@@ -2070,6 +2070,24 @@ def upload_prices_settings():
                            user_name=user_name)
 
 
+@auth.route('/distributor-settings', methods=['GET', 'POST'])
+@login_required
+def distributor_settings():
+    if not current_user.is_authenticated:
+        return redirect(url_for('main.index_main'))
+    else:
+        rows = []
+        rows_mp = []
+        role = current_user.roles
+        photo = current_user.photo
+        user_name = current_user.name
+        return render_template('distributor-settings.html',
+                               role=role,
+                               rows=rows, rows_mp=set(rows_mp),
+                               photo=photo,
+                               user_name=user_name)
+
+
 @auth.app_errorhandler(404)
 def page_not_found(error):
     if not current_user.is_authenticated:
