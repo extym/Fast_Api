@@ -854,7 +854,7 @@ def make_import_export_oson_price(donor=None, recipient=None,
                 # print(22222, row )
                 #############################3
                 # Make price ended for '9'
-                price = int(row.final_price) * (1 + k / 100)
+                price = int(row.final_price) * (1 + int(k) / 100)
                 price = str(price).split('.')[0][:-1] + "9"
                 old_price = str(int(price) * 4)
                 ##############################3

@@ -287,12 +287,12 @@ def create_data_price_for_send(seller_id=None, from_db=True):
         with Session(engine) as session:
             data = session.query(Product) \
                 .where(Product.quantity > 0) \
-                .where(Product.seller_id == seller_id) \
+                .where(Product.store_id == seller_id) \
                 .all()
             koeff = session.scalars(select(Marketplaces.store_markup)
                                     .where(Marketplaces.seller_id == seller_id)) \
                 .first()
-            print('KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKk', koeff)
+            print('KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKk', koeff, type(seller_id))
             for product in data:
                 #############################
                 # TODO make func custom price oson
@@ -303,7 +303,7 @@ def create_data_price_for_send(seller_id=None, from_db=True):
                 if not koeff:
                     koeff = 0
                 if koeff > 0:
-                    final_price = int(price) * (1 + koeff / 100)
+                    final_price = int(price) * (1 + int(koeff) / 100)
                     final_price = str(final_price).split('.')[0]
                 else:
                     final_price = price
@@ -357,7 +357,7 @@ def create_data_price_for_send_v2(koef_recipient=None, donor=None,
             for product in data:
                 #############################3
                 # Make price ended for '9'
-                price = int(product.final_price) * (1 + koef_recipient / 100)
+                price = int(product.final_price) * (1 + int(koef_recipient) / 100)
                 final_price = str(price).split('.')[0][:-1] + "9"
                 old_price = str(int(price) * 4)
                 ##############################

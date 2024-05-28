@@ -207,7 +207,7 @@ def create_data_price_for_send_wb(seller_id=None, from_db=True):
                     next_price = int(price) + int(price) * (discount + 5) / 100
                 else:
                     next_price = int(price) + int(price) * 5 / 100
-                final_price = next_price * 100 / koeff
+                final_price = next_price * 100 / int(koeff)
                 ##############################
                 proxy = {
                     "nmID": product.external_sku,
@@ -284,7 +284,7 @@ def make_import_export_wb_price(donor=None, recipient=None,
                 #############################
                 # TODO is need it is for wb separately ?
                 # Make price ended for '9'
-                price = int(row.final_price) * (1 + k / 100)
+                price = int(row.final_price) * (1 + int(k) / 100)
                 price = str(price).split('.')[0][:-1] + "9"
                 old_price = str(int(price) * 4)
                 ##############################3
