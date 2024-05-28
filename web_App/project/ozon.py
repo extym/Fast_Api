@@ -287,12 +287,12 @@ def create_data_price_for_send(seller_id=None, from_db=True):
         with Session(engine) as session:
             data = session.query(Product) \
                 .where(Product.quantity > 0) \
-                .where(Product.store_id == seller_id) \
+                .where(Product.seller_id == seller_id) \
                 .all()
             koeff = session.scalars(select(Marketplaces.store_markup)
                                     .where(Marketplaces.seller_id == seller_id)) \
                 .first()
-            # print('KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKk', koeff)
+            print('KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKk', koeff)
             for product in data:
                 #############################
                 # TODO make func custom price oson
@@ -319,7 +319,7 @@ def create_data_price_for_send(seller_id=None, from_db=True):
                     "price_strategy_enabled": "UNKNOWN",
                     "product_id": product.product_id
                 }
-                print("Make data price - seller_id {}. data price {}, k={}"
+                print("Make data price - seller_id {},  data price {}, k={}"
                       .format(seller_id, proxy, koeff))
                 prices.append(proxy)
 
@@ -420,12 +420,12 @@ def send_stocks_oson_v2(key=None, seller_id=None, is_stocks_null=False):
                     #     print('SUCCES update from send_stocks_on', row)
                 proxy.append(answer)
 
-            logging.DEBUG('All Ride Send_stocks_oson_v2 - seller_id {}, is_stocks_null {},'
+            logging.info('All Ride Send_stocks_oson_v2 - seller_id {}, is_stocks_null {},'
                           ' len key {}, updated {}, errors {}.'
                           .format(seller_id, is_stocks_null, len(key), count, error))
             sleep(0.6)
         else:
-            logging.DEBUG('Trouble_stocks_oson_v2 - seller_id {}, is_stocks_null {},'
+            logging.info('Trouble_stocks_oson_v2 - seller_id {}, is_stocks_null {},'
                           ' len key {}, updated {}, errors {}, answer {}'
                           .format(seller_id, is_stocks_null, len(key), count, error, response.text))
             print('answer send_stocks_oson_v2', response.text)
