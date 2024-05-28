@@ -3156,3 +3156,122 @@ FINAL_result = {
                  "status_name":"Ожидает оплаты",
                  "created_at":"2024-05-24T16:01:32.648+03:00"}]}]}
 
+FINAL_result_2 = {"result":"ok",
+"data":[
+	{"id":88128,
+	"oem":"HF516606",
+	"make_name":"HOFER",
+	"detail_name":"Стойка передняя ВАЗ 2110 газонапол. левая (неразбор.)",
+	"cost":2985.0,"qnt":1,
+	"qnt_confirmed":0,"qnt_accept":None,
+	"qnt_income":None,
+	"status":"Ожидает оплаты",
+	"status_code":"processing",
+	"comment":"464012724","created_at":"2024-05-27T11:59:17.465+03:00",
+	"order_id":72152,
+	"status_logs":[
+		{"status_code":"processing",
+		"status_name":"Ожидает оплаты",
+		"created_at":"2024-05-27T11:59:17.684+03:00"
+		}
+	]
+	},
+    {
+	"id":88129,
+	"oem":"HF516608","make_name":"HOFER",
+	"detail_name":"Стойка передняя ВАЗ 2110 газонапол. правая (неразбор.)",
+	"cost":2985.0,"qnt":1,"qnt_confirmed":0,
+	"qnt_accept":None,"qnt_income":None,
+	"status":"Ожидает оплаты",
+	"status_code":"processing","comment":"464012724",
+	"created_at":"2024-05-27T11:59:17.477+03:00",
+	"order_id":72152,
+	"status_logs":
+        [
+            {
+                "status_code":"processing",
+                "status_name":"Ожидает оплаты",
+                "created_at":"2024-05-27T11:59:17.723+03:00"
+            }
+		]
+	}
+	]
+}
+
+
+ps_order_status_types = {
+    "status":"OK",
+    "order_status_types":[
+        {
+            "id":3,
+            "name":"В заказе",
+            "code":"v-zakaze",
+            "description":"",
+            "color":"5fbf00","position":None,
+            "confirmation_body":"",
+            "send_confirm":False,
+            "font_color":"ffffff",
+            "default":False,
+            "id_1c":None,
+            "sms":"",
+            "send_sms":False,
+            "notify_overdue_reaction":False,
+            "notify_overdue_reaction_day":2,
+            "overdue_sms_template":"",
+            "send_overdue_sms":False,
+            "admin_notify_overdue_reaction":True,
+            "destroy_overdue_reaction":False,
+            "destroy_overdue_reaction_day":None,
+            "wait_group_overdue":False,
+            "destroy_status_comment":"",
+            "is_priority":True,"send_to_outdated":False,
+            "is_set_on_accept_product_return":None,
+            "sms_discount_groups":[],"email_discount_groups":[],
+            "disable_check_status":False},
+        {"id":11,"name":"Возврат",
+         "code":"vozvrat","description":"","color":"ff7f00","position":None,
+         "confirmation_body":"{{order_item.detail_name}} {{order_item.oem}} {{order_item.make_name}}, статус заказа изменился на {{order_item.status.name}}, кол. заказано {{order_item.qnt}}, актуальное кол. {{order_item.current_qnt}}",
+         "send_confirm":False,"font_color":"ffffff",
+         "default":False,"id_1c":None,"sms":"",
+         "send_sms":False,"notify_overdue_reaction":False,
+         "notify_overdue_reaction_day":3,"overdue_sms_template":"",
+         "send_overdue_sms":False,"admin_notify_overdue_reaction":False,
+         "destroy_overdue_reaction":False,"destroy_overdue_reaction_day":None,
+         "wait_group_overdue":False,"destroy_status_comment":"","is_priority":True,
+         "send_to_outdated":False,"is_set_on_accept_product_return":None,
+         "sms_discount_groups":[],"email_discount_groups":[],"disable_check_status":False},
+        {"id":9,"name":"Отказ","code":"otkaz","description":"","color":"ff0000",
+         "position":None,"confirmation_body":"","send_confirm":False,
+         "font_color":"ffffff","default":False,"id_1c":None,"sms":"","send_sms":False,
+         "notify_overdue_reaction":False,"notify_overdue_reaction_day":4,
+         "overdue_sms_template":"","send_overdue_sms":False,
+         "admin_notify_overdue_reaction":True,"destroy_overdue_reaction":True,
+         "destroy_overdue_reaction_day":7,"wait_group_overdue":False,
+         "destroy_status_comment":"","is_priority":True,"send_to_outdated":False,
+         "is_set_on_accept_product_return":None,"sms_discount_groups":[],
+         "email_discount_groups":[],"disable_check_status":False},
+        {"id":7,"name":"Пришло на центральный склад","code":"prishlo",
+         "description":"","color":"d4ffaa","position":None,
+         "confirmation_body":"{{order_item.status.confirmation_body}}",
+         "send_confirm":True,"font_color":"000000","default":False,"id_1c":None,
+         "sms":"Заказ прибыл {{order_item.detail_name}}{{order_item.make_name}}",
+         "send_sms":True,"notify_overdue_reaction":True,"notify_overdue_reaction_day":1,
+         "overdue_sms_template":"Ваш заказ №{{order.order_id}} перешел в статус {{status.name}}",
+         "send_overdue_sms":True,"admin_notify_overdue_reaction":True,
+         "destroy_overdue_reaction":False,"destroy_overdue_reaction_day":None,
+         "wait_group_overdue":True,"destroy_status_comment":"","is_priority":True,
+         "send_to_outdated":False,"is_set_on_accept_product_return":None,
+         "sms_discount_groups":[5,28,8,25,2,3,24,4,1,23],
+         "email_discount_groups":[5,28,8,25,2,3,24,4,1,23],"disable_check_status":False},
+        {"id":20,"name":"Возвращено","code":"vozvrat","description":"","color":"b2b2b2",
+         "position":None,"confirmation_body":"","send_confirm":False,"font_color":"56ff56",
+         "default":False,"id_1c":None,"sms":"","send_sms":False,"notify_overdue_reaction":False,
+         "notify_overdue_reaction_day":3,"overdue_sms_template":"","send_overdue_sms":False,
+         "admin_notify_overdue_reaction":False,"destroy_overdue_reaction":False,
+         "destroy_overdue_reaction_day":None,"wait_group_overdue":False,
+         "destroy_status_comment":"","is_priority":False,"send_to_outdated":False,
+         "is_set_on_accept_product_return":None,"sms_discount_groups":[],
+         "email_discount_groups":[],"disable_check_status":False},
+        {"id":23,"name":"В ПРОДАЖУ","code":"prishlo","description":"","color":"ff7f00","position":None,"confirmation_body":"","send_confirm":False,"font_color":"000000","default":False,"id_1c":None,"sms":"","send_sms":False,"notify_overdue_reaction":False,"notify_overdue_reaction_day":30,"overdue_sms_template":"","send_overdue_sms":False,"admin_notify_overdue_reaction":False,"destroy_overdue_reaction":False,"destroy_overdue_reaction_day":None,"wait_group_overdue":False,"destroy_status_comment":"","is_priority":False,"send_to_outdated":False,"is_set_on_accept_product_return":None,"sms_discount_groups":[],"email_discount_groups":[],"disable_check_status":False},
+        {"id":2,"name":"В работе","code":"commit","description":"","color":"d4ffaa","position":None,"confirmation_body":"","send_confirm":False,"font_color":"000000","default":False,"id_1c":None,"sms":"","send_sms":False,"notify_overdue_reaction":False,"notify_overdue_reaction_day":3,"overdue_sms_template":"","send_overdue_sms":False,"admin_notify_overdue_reaction":True,"destroy_overdue_reaction":False,"destroy_overdue_reaction_day":None,"wait_group_overdue":False,"destroy_status_comment":"","is_priority":False,"send_to_outdated":False,"is_set_on_accept_product_return":None,"sms_discount_groups":[],"email_discount_groups":[],"disable_check_status":False},
+        {"id":8,"name":"Выдано","code":"vydano","description":"","color":"ffff00","position":None,"confirmation_body":"{{order_item.status.confirmation_body}}","send_confirm":False,"font_color":"000000","default":False,"id_1c":None,"sms":"Спасибо за заказ, вам начислены бонусы ","send_sms":True,"notify_overdue_reaction":False,"notify_overdue_reaction_day":3,"overdue_sms_template":"","send_overdue_sms":False,"admin_notify_overdue_reaction":False,"destroy_overdue_reaction":False,"destroy_overdue_reaction_day":None,"wait_group_overdue":False,"destroy_status_comment":"","is_priority":False,"send_to_outdated":False,"is_set_on_accept_product_return":None,"sms_discount_groups":[5,28,8,25,2,9,3,24,4,1,23],"email_discount_groups":[1],"disable_check_status":False},{"id":21,"name":"Готово к выдаче","code":"prishlo","description":"","color":"aaff56","position":None,"confirmation_body":"","send_confirm":False,"font_color":"000000","default":False,"id_1c":None,"sms":"","send_sms":False,"notify_overdue_reaction":True,"notify_overdue_reaction_day":3,"overdue_sms_template":"","send_overdue_sms":False,"admin_notify_overdue_reaction":False,"destroy_overdue_reaction":False,"destroy_overdue_reaction_day":None,"wait_group_overdue":False,"destroy_status_comment":"","is_priority":False,"send_to_outdated":False,"is_set_on_accept_product_return":None,"sms_discount_groups":[],"email_discount_groups":[],"disable_check_status":False},{"id":5,"name":"Готово к отгрузке поставщиком","code":"transit","description":"","color":"e2e2e2","position":None,"confirmation_body":"","send_confirm":False,"font_color":"000000","default":False,"id_1c":None,"sms":"","send_sms":False,"notify_overdue_reaction":False,"notify_overdue_reaction_day":3,"overdue_sms_template":"","send_overdue_sms":False,"admin_notify_overdue_reaction":False,"destroy_overdue_reaction":False,"destroy_overdue_reaction_day":None,"wait_group_overdue":False,"destroy_status_comment":"","is_priority":False,"send_to_outdated":False,"is_set_on_accept_product_return":None,"sms_discount_groups":[],"email_discount_groups":[],"disable_check_status":False},{"id":17,"name":"Обрабатывается","code":"processing","description":"","color":"5656ff","position":None,"confirmation_body":"","send_confirm":False,"font_color":"aaff56","default":False,"id_1c":None,"sms":"","send_sms":False,"notify_overdue_reaction":False,"notify_overdue_reaction_day":3,"overdue_sms_template":"","send_overdue_sms":False,"admin_notify_overdue_reaction":True,"destroy_overdue_reaction":False,"destroy_overdue_reaction_day":None,"wait_group_overdue":False,"destroy_status_comment":"","is_priority":False,"send_to_outdated":False,"is_set_on_accept_product_return":None,"sms_discount_groups":[],"email_discount_groups":[],"disable_check_status":False},{"id":24,"name":"Ожидает на перемещение","code":"commit","description":"","color":"cccccc","position":None,"confirmation_body":"","send_confirm":False,"font_color":"","default":False,"id_1c":None,"sms":"","send_sms":True,"notify_overdue_reaction":False,"notify_overdue_reaction_day":3,"overdue_sms_template":"","send_overdue_sms":True,"admin_notify_overdue_reaction":False,"destroy_overdue_reaction":False,"destroy_overdue_reaction_day":None,"wait_group_overdue":False,"destroy_status_comment":"","is_priority":False,"send_to_outdated":False,"is_set_on_accept_product_return":None,"sms_discount_groups":[5,28,8,25,2,3,24,4,1,23],"email_discount_groups":[],"disable_check_status":False},{"id":13,"name":"Ожидает оплаты","code":"processing","description":"","color":"ffff00","position":None,"confirmation_body":"","send_confirm":False,"font_color":"000000","default":False,"id_1c":None,"sms":"","send_sms":False,"notify_overdue_reaction":False,"notify_overdue_reaction_day":3,"overdue_sms_template":"","send_overdue_sms":False,"admin_notify_overdue_reaction":True,"destroy_overdue_reaction":False,"destroy_overdue_reaction_day":None,"wait_group_overdue":False,"destroy_status_comment":"","is_priority":False,"send_to_outdated":False,"is_set_on_accept_product_return":None,"sms_discount_groups":[29],"email_discount_groups":[29],"disable_check_status":False},{"id":6,"name":"Отгружено поставщиком","code":"supplier-accept","description":"","color":"007f3f","position":None,"confirmation_body":"{{order_item.status.confirmation_body}}","send_confirm":False,"font_color":"ffffff","default":False,"id_1c":None,"sms":"","send_sms":False,"notify_overdue_reaction":False,"notify_overdue_reaction_day":7,"overdue_sms_template":"","send_overdue_sms":False,"admin_notify_overdue_reaction":False,"destroy_overdue_reaction":False,"destroy_overdue_reaction_day":None,"wait_group_overdue":False,"destroy_status_comment":"","is_priority":False,"send_to_outdated":False,"is_set_on_accept_product_return":None,"sms_discount_groups":[],"email_discount_groups":[2,3],"disable_check_status":True},{"id":27,"name":"Подготовка к возврату по просрочке.","code":"prishlo","description":"","color":"3f7f00","position":None,"confirmation_body":"","send_confirm":False,"font_color":"000000","default":False,"id_1c":None,"sms":"","send_sms":False,"notify_overdue_reaction":False,"notify_overdue_reaction_day":3,"overdue_sms_template":"","send_overdue_sms":False,"admin_notify_overdue_reaction":True,"destroy_overdue_reaction":False,"destroy_overdue_reaction_day":None,"wait_group_overdue":False,"destroy_status_comment":"","is_priority":False,"send_to_outdated":False,"is_set_on_accept_product_return":None,"sms_discount_groups":[],"email_discount_groups":[5,28,8,25,2,3,24,4,1,23],"disable_check_status":False},{"id":26,"name":"Пришло на ПВЗ Лахта","code":"prishlo","description":"","color":"7fff00","position":None,"confirmation_body":"","send_confirm":True,"font_color":"000000","default":False,"id_1c":None,"sms":"Ваш заказ находится на пункте выдачи Лахта","send_sms":True,"notify_overdue_reaction":False,"notify_overdue_reaction_day":3,"overdue_sms_template":"","send_overdue_sms":False,"admin_notify_overdue_reaction":False,"destroy_overdue_reaction":False,"destroy_overdue_reaction_day":None,"wait_group_overdue":False,"destroy_status_comment":"","is_priority":False,"send_to_outdated":False,"is_set_on_accept_product_return":None,"sms_discount_groups":[5,28,25,2,3,24,4,1,23],"email_discount_groups":[],"disable_check_status":False},{"id":25,"name":"Пришло на ПВЗ Руставелли","code":"prishlo","description":"","color":"7fff00","position":None,"confirmation_body":"","send_confirm":True,"font_color":"","default":False,"id_1c":None,"sms":"","send_sms":False,"notify_overdue_reaction":True,"notify_overdue_reaction_day":3,"overdue_sms_template":"","send_overdue_sms":False,"admin_notify_overdue_reaction":False,"destroy_overdue_reaction":False,"destroy_overdue_reaction_day":None,"wait_group_overdue":True,"destroy_status_comment":"","is_priority":False,"send_to_outdated":False,"is_set_on_accept_product_return":None,"sms_discount_groups":[5,28,25,2,3,24,4,1,23],"email_discount_groups":[],"disable_check_status":False},{"id":4,"name":"Размещено у поставщика","code":"supplier-commit","description":"","color":"c4c2c2","position":None,"confirmation_body":"Вы можете вывести его в шаблоне {{order_item.status.confirmation_body}}","send_confirm":False,"font_color":"ffffff","default":False,"id_1c":None,"sms":"","send_sms":False,"notify_overdue_reaction":False,"notify_overdue_reaction_day":3,"overdue_sms_template":"Заказ просрочен {{order_item.detail_name}} {{order_item.oem}} {{order_item.make_name}}, статус заказа изменился на {{order_item.status.name}}, кол. заказано {{order_item.qnt}}, актуальное кол. {{order_item.current_qnt}}","send_overdue_sms":False,"admin_notify_overdue_reaction":True,"destroy_overdue_reaction":False,"destroy_overdue_reaction_day":3,"wait_group_overdue":False,"destroy_status_comment":"","is_priority":False,"send_to_outdated":False,"is_set_on_accept_product_return":None,"sms_discount_groups":[],"email_discount_groups":[],"disable_check_status":False},{"id":22,"name":"Резерв. Готов к выдаче","code":"prishlo","description":"","color":"d4aaff","position":None,"confirmation_body":"","send_confirm":False,"font_color":"000000","default":False,"id_1c":None,"sms":"","send_sms":False,"notify_overdue_reaction":True,"notify_overdue_reaction_day":3,"overdue_sms_template":"","send_overdue_sms":False,"admin_notify_overdue_reaction":True,"destroy_overdue_reaction":False,"destroy_overdue_reaction_day":7,"wait_group_overdue":False,"destroy_status_comment":"","is_priority":False,"send_to_outdated":False,"is_set_on_accept_product_return":None,"sms_discount_groups":[],"email_discount_groups":[],"disable_check_status":False},{"id":10,"name":"Снят","code":"snyat","description":"","color":"ff0000","position":None,"confirmation_body":" {{order_item.status.confirmation_body}}","send_confirm":False,"font_color":"ffffff","default":False,"id_1c":None,"sms":"","send_sms":False,"notify_overdue_reaction":False,"notify_overdue_reaction_day":3,"overdue_sms_template":"","send_overdue_sms":False,"admin_notify_overdue_reaction":False,"destroy_overdue_reaction":False,"destroy_overdue_reaction_day":None,"wait_group_overdue":False,"destroy_status_comment":"","is_priority":False,"send_to_outdated":False,"is_set_on_accept_product_return":None,"sms_discount_groups":[22,30,16,10,17,11,18,19,12,20,26,14,15,29,13,7,6],"email_discount_groups":[21,27,22,30,16,10,17,11,18,19,20,29,13,7,6],"disable_check_status":False}]}

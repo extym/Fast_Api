@@ -286,7 +286,7 @@ def make_orders_to_ps(delta_time:int=1):
 
 
 # make_orders_to_ps(delta_time=4)
-make_orders_to_ps()
+# make_orders_to_ps()
 # We need - get vendor code with offer_id
 # check price ?
 

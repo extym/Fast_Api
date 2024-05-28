@@ -93,6 +93,7 @@ UNIQUE (id)
 )
 """
 
+
 create_fresh_bids = """
 CREATE TABLE IF NOT EXISTS fresh_bids (
 id SERIAL PRIMARY KEY,
