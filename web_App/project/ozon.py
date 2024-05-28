@@ -260,7 +260,7 @@ def create_data_price_for_send(seller_id=None, from_db=True):
                 if not koeff:
                     koeff = 0
                 if koeff > 0:
-                    final_price = int(price) * (1 + koeff / 100)
+                    final_price = int(price) * (1 + int(koeff) / 100)
                     final_price = str(final_price).split('.')[0]
                 else:
                     final_price = price
