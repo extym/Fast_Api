@@ -123,7 +123,7 @@ UNIQUE (chat_id)
 """
 
 
-logging.basicConfig(filename='logs/webhook.log', level=logging.INFO,
+logging.basicConfig(filename=LOG_DIR + './webhook.log', level=logging.INFO,
                     format="%(asctime)s %(levelname)s %(message)s")
 
 
@@ -165,7 +165,7 @@ async def execute_query(query, data):
     cursor = connection.cursor()
     try:
         cursor.execute(query, data)
-        print("Query from execute_query executed successfully")
+        # print("Query from execute_query executed successfully")
 
     except OperationalError as err:
         print(f"The ERROR from execute_query '{err}' occured ")
@@ -180,7 +180,7 @@ async def execute_query_v3(query, data):
         with conn.cursor() as cursor:
             try:
                 cursor.execute(query, data)
-                print("Query from execute_query executed successfully")
+                # print("Query from execute_query executed successfully")
             except OperationalError as err:
                 print(f"The ERROR from execute_query '{err}' occured ")
 
@@ -193,7 +193,7 @@ def execute_query_return_v3(query, data):
             try:
                 cursor.execute(query, [data])
                 raw_data = cursor.fetchall()
-                print("Query from execute_query executed successfully")
+                # print("Query from execute_query executed successfully")
             except OperationalError as err:
                 print(f"The ERROR from execute_query '{err}' occured ")
 
@@ -345,7 +345,7 @@ def check_order_exist(query, data):
                 if raw_data is not None:
                     result = True
                     status = raw_data[10]
-                print(f"Query from execute_query {raw_data, status} executed successfully")
+                # print(f"Query from execute_query {raw_data, status} executed successfully")
             except OperationalError as err:
                 print(f"The ERROR from execute_query '{err}' occured ")
 
@@ -360,7 +360,7 @@ def execute_query_return_bool(query, data):
             try:
                 cursor.execute(query, data)
                 return True
-                print("Query from execute_query executed successfully")
+                # print("Query from execute_query executed successfully")
             except OperationalError as err:
                 print(f"The ERROR from execute_query '{err}' occured ")
                 return False
@@ -373,7 +373,7 @@ def executemany_return_bool(query, data):
             try:
                 cursor.executemany(query, data)
                 return True
-                print("Query from execute_query executed successfully")
+                # print("Query from execute_query executed successfully")
             except OperationalError as err:
                 print(f"The ERROR from execute_query '{err}' occured ")
                 return False
@@ -424,6 +424,9 @@ query_write_order = "INSERT INTO  fresh_orders ( order_id_mp, mp_name, shipment_
 query_write_items = " INSERT INTO order_items ( order_id_mp, mp_name, offer_id, " \
                     " id_1c, quantity, price ) " \
                     " VALUES ( %s, %s, %s, %s, %s, %s )"
+
+update_order_and_items = " UPDATE fresh_orders SET status = %s " \
+                         " WHERE order_id_mp = %s "
 
 query_add_settings_ym = (" INSERT INTO stores "
                          "(client_id, key_store, campain_id, api_key_ps, upload_link) "
@@ -481,9 +484,9 @@ def rewrite_bid_from_2_json(file, file2):
 
 
 # maintenans_query(create_fresh_bids)
-maintenans_query(create_fresh_orders)
-maintenans_query(create_order_items)
-maintenans_query(create_stores)
+# maintenans_query(create_fresh_orders)
+# maintenans_query(create_order_items)
+# maintenans_query(create_stores)
 # execute_query_v2(query_write_bid, proxy)
 # print(get_bid("u2i-TOYzRVLyb9Hw_l7u2aBTVg"))
 # print(check_is_exist_in_db(query_check_is_message_exist, ("u2i-TOYzRVLyb9Hw_l7u2aBTVg",)))
