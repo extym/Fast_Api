@@ -457,9 +457,9 @@ def send_product_price(key_recipient=None, recipient=None):
                     #       .format(line.get('offer_id'), recipient))
                 else:
                     count += 1
-            oson_logger.info('product_NOT_UPDATED_offer_id {}, '
+            oson_logger.info('product_result_UPDATED '
                              'recipient {}, errors {}, updated {}'
-                             .format(line.get('offer_id'), recipient, errors, count))
+                             .format(recipient, errors, count))
 
         else:
             oson_logger.info('Some_trouble_from_export_price_oson -'

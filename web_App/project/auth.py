@@ -2081,6 +2081,28 @@ def distributor_settings():
         role = current_user.roles
         photo = current_user.photo
         user_name = current_user.name
+        if request.method == 'POST':
+            data = request.form.to_dict()
+            print(55555, data)
+
+            if data.get('edit_name_dist') == 'Выбрать':
+                flash('Не выбран поставщик. Укажите поставщика.')
+            if data.get('check_settings') is not None:
+                #return current settings that distributor
+                distributor = Distributor.query.filter_by(data.get('edit_name_dist')).first()
+                key_api_dist = distributor.key_api_dist
+                login_api_dist = distributor.login_api_dist
+                return render_template('distributor-settings.html',
+                                       role=role, rows=rows,
+                                       key_api_dist=key_api_dist,
+                                       login_api_dist=login_api_dist,
+                                       distributor=distributor,
+                                       photo=photo,
+                                       user_name=user_name)
+
+
+            return redirect(url_for('auth.distributor_settings'))
+
         return render_template('distributor-settings.html',
                                role=role,
                                rows=rows, rows_mp=set(rows_mp),

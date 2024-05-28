@@ -56,56 +56,36 @@
                                             <label class="input-group-text" for="input_name_mp">Поставщик</label>
                                         </div>
                                         <select class="custom-select" id="input_name_mp" name="insert_new_shop">
-                                            {% if show_wb %}
-                                                <option selected value="{{ mp }}" >{{ mp }}</option>
-                                                <option value="Выбрать" >Выбрать</option>
-                                            {% else %}
                                             <option selected>Выбрать</option>
                                                 <option value="merlion">Мерлион</option>
                                                 <option value="marvel">Марвел</option>
                                                 <option value="ocs">OSC</option>
                                                 <option value="netlab">Нетлаб</option>
                                                 <option value="logic">3Лоджик</option>
-                                            {% endif %}
                                             </select>
                                     </div>
 
                                     <div class="form-group">
-                                        <label class="form-label" for="formfield15">Название</label>
-                                        <span class="desc"> ООО "Салют"</span>
+                                        <label class="form-label" for="formfield16">Ссылка на API</label>
+                                        <span class="desc">Например 'http://services.netlab.ru/rest/'</span>
                                         <div class="controls">
-                                            {% if show_wb %}
-                                            <input type="text" value="{{ shop_name }}" class="form-control"  name="name" autocomplete="off">
-                                            {% else %}
-                                            <input type="text" value="" class="form-control" id="formfield15" name="name" autocomplete="off">
-                                            {% endif %}
-
+                                            <input type="text" value="" class="form-control" id="formfield16" name="api_link" autocomplete="off">
                                         </div>
                                     </div>
 
                                     <div class="form-group">
-                                        <label class="form-label" for="formfield25">ID на маркете</label>
+                                        <label class="form-label" for="formfield26">Логин API у поставщика</label>
                                         <span class="desc"> например 1234567</span>
                                         <div class="controls">
-                                            {% if show_wb %}
-                                            <input autocomplete="off" value="{{ id_mp }}" type="text" class="form-control"  name="id_mp"  >
-                                            {% else %}
-                                            <input autocomplete="new-password" id="formfield25" type="text" class="form-control"  name="id_mp"  >
-                                            {% endif %}
-
+                                            <input autocomplete="new-password" id="formfield26" type="text" class="form-control"  name="login_api_dist"  >
                                         </div>
                                     </div>
 
                                     <div class="form-group">
-                                        <label class="form-label" for="formfield33">Ключ API</label>
+                                        <label class="form-label" for="formfield34">Ключ API</label>
                                         <span class="desc">например a5f64e91-ac50-4a9e-a3c5-38a412f4a44c</span>
                                         <div class="controls">
-                                            {% if show_wb %}
-                                            <input type="password" value="{{ key_mp }}" class="form-control"  name="key" autocomplete="off" >
-                                            {% else %}
-                                            <input type="password" value="" class="form-control" id="formfield33" name="key" autocomplete="off" >
-                                            {% endif %}
-
+                                            <input type="password" value="" class="form-control" id="formfield34" name="key_api_dist" autocomplete="off" >
                                         </div>
                                     </div>
 
@@ -135,7 +115,7 @@
             <div class="col-xl-6">
                 <section class="box ">
                     <header class="panel_header">
-                        <h2 class="title float-left">Редактировать магазин</h2>
+                        <h2 class="title float-left">Редактировать поставщика</h2>
                         <div class="actions panel_actions float-right">
                             <i class="box_toggle fa fa-chevron-down"></i>
                             <i class="box_setting fa fa-cog" data-toggle="modal" href="#section-settings"></i>
@@ -152,55 +132,76 @@
                                     </div>
                                 {% endif %}
                                 {% endwith %}
-                                <form autocomplete="off" name="validate_edit_mp" action="/edit_mp" method="post" >
+                                <form autocomplete="off" name="validate_edit_mp" action="/distributor-settings" method="post" >
 
                                     <div class="input-group mb-3">
                                         <div class="input-group-prepend">
-                                            <label class="input-group-text" for="edit_name_mp">Маркетплейс</label>
+                                            <label class="input-group-text" for="edit_name_dist">Поставщик</label>
                                         </div>
-                                        <select class="custom-select" id="edit_name_mp" name="edit_name_mp">
-                                                <option selected>Выбрать</option>
-                                                <option value="yandex">ЯндексМаркет</option>
-                                                <option value="sber">СберМегаМаркет</option>
-                                                <option value="ozon">Озон</option>
-                                                <option value="wb">Вайлдбериз</option>
-                                                <option value="leroy">ЛеруаМерлен</option>
+                                        <select class="custom-select" id="edit_name_dist" name="edit_name_dist">
+                                            {% if show %}
+                                                <option selected value="{{ mp }}" >{{ mp }}</option>
+                                                <option value="Выбрать" >Выбрать</option>
+                                            {% else %}
+                                            <option selected>Выбрать</option>
+                                                <option value="merlion">Мерлион</option>
+                                                <option value="marvel">Марвел</option>
+                                                <option value="ocs">OSC</option>
+                                                <option value="netlab">Нетлаб</option>
+                                                <option value="logic">3Лоджик</option>
+                                                <option value="treolan">Треолан</option>
+                                            {% endif %}
                                             </select>
                                     </div>
 
                                     <div class="form-group">
-                                        <label class="form-label" for="edit_shop_name">Выбрать Магазин</label>
-
+                                        <label class="form-label" for="formfield15">Ссылка на API</label>
+                                        <span class="desc">Например 'http://services.netlab.ru/rest/'</span>
                                         <div class="controls">
-                                            <select class="custom-select" id="edit_shop_name" name="edit_shop_names">
-                                        <option selected>Выбрать </option>
-                                            {% for row in rows %}
-                                            <option value="{{ row }}" >{{ row }}</option>
-                                            {% endfor %}
+                                            {% if show %}
+                                            <input type="text" value="{{ api_link }}" class="form-control"  name="api_link" autocomplete="off">
+                                            {% else %}
+                                            <input type="text" value="" class="form-control" id="formfield15" name="api_link" autocomplete="off">
+                                            {% endif %}
 
-                                            </select>
                                         </div>
                                     </div>
 
                                     <div class="form-group">
-                                        <label class="form-label" for="formfield2">ID на маркете</label>
+                                        <label class="form-label" for="formfield25">Логин API у поставщика</label>
                                         <span class="desc"> например 1234567</span>
                                         <div class="controls">
-                                            <input autocomplete="new-password" id="formfield2" type="text" class="form-control"  name="id_mp"  >
+                                            {% if show %}
+                                            <input autocomplete="off" value="{{ login_api_dist }}" type="text" class="form-control"  name="login_api_dist"  >
+                                            {% else %}
+                                            <input autocomplete="new-password" id="formfield25" type="text" class="form-control"  name="login_api_dist"  >
+                                            {% endif %}
+
                                         </div>
                                     </div>
 
                                     <div class="form-group">
-                                        <label class="form-label" for="formfield31">Ключ API</label>
+                                        <label class="form-label" for="formfield33">Ключ API</label>
                                         <span class="desc">например a5f64e91-ac50-4a9e-a3c5-38a412f4a44c</span>
                                         <div class="controls">
-                                            <input type="password" class="form-control" id="formfield31" name="key" autocomplete="off" >
+                                            {% if show_wb %}
+                                            <input type="password" value="{{ key_api_dist }}" class="form-control"  name="key_api_dist" autocomplete="off" >
+                                            {% else %}
+                                            <input type="password" value="" class="form-control" id="formfield33" name="key_api_dist" autocomplete="off" >
+                                            {% endif %}
+
                                         </div>
                                     </div>
 
                                     <div class="float-right">
                                         <button type="submit" class="btn btn-primary">Сохранить</button>
                                         <button class="btn" type="reset">Очистить</button>
+
+                                    </div>
+
+                                    <div class="float-left">
+                                        <button type="submit" name="check_settings" value="check" class="btn ">Проверить</button>
+
                                     </div>
                                 </form>
 
