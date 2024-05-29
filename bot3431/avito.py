@@ -767,7 +767,7 @@ heck = {'id': 'd8e51513-9229-4497-94c6-69dc65ffedab', 'version': 'v3.0.0',
 # get_current_balance()
 # enable_avito_webhook(363810872)
 # enable_avito_webhook(375811020)
-get_current_hook()
+# get_current_hook()
 # disable_avito_webhook(10138154)
 # enable_avito_webhook('rota')
 # print(read_links())

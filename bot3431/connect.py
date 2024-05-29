@@ -56,6 +56,8 @@ CREATE TABLE IF NOT EXISTS order_items (
 )
 """
 
+
+
 create_stores = """
 CREATE TABLE IF NOT EXISTS stores (
 id SERIAL PRIMARY KEY,
@@ -72,24 +74,29 @@ UNIQUE (client_id)
 )
 """
 
+
 create_customers = """
 CREATE TABLE IF NOT EXISTS customers (
-id SERIAL PRIMARY KEY,
-user_id varchar NOT NULL,
-seller_id varchar NOT NULL, 
-name_mp TEXT NOT NULL,
-key_mp varchar NOT NULL,
-shop_name TEXT NOT NULL,
-shop_id TEXT,
-company_id TEXT,
-warehouses TEXT,
-date_Added varchar,
-date_Modifed varchar,
-mp_discount float4,
-mp_markup float4,
-store_discount float4,
-store_markup float4,
-UNIQUE (id)
+    id serial PRIMARY KEY,
+    order_id_mp varchar NOT NULL,
+    FOREIGN KEY (order_id_mp)
+        REFERENCES fresh_orders (order_id_mp)
+        ON UPDATE CASCADE,
+    our_order_id varchar,
+    mp_name text,
+    store_name text,
+    our_status text, 
+    summ_order int,
+    phone text,
+    email text,
+    fias_regionId varchar,
+    fias_destinationId varchar,
+    geo_lat varchar,
+    geo_lon varchar,
+    regionKladrId varchar,
+    regionWithType varchar,
+    cityWithType varchar,
+    order_create_date varchar
 )
 """
 
@@ -418,13 +425,18 @@ query_get_all_shops = "SELECT * FROM stores WHERE mp_name= %s"
 
 query_is_exist_order = "SELECT * FROM fresh_orders WHERE order_id_mp = %s"
 
-query_write_order = "INSERT INTO  fresh_orders ( order_id_mp, mp_name, shipment_date," \
+query_write_order = "INSERT INTO  fresh_orders ( order_id_mp, mp_name, shipment_date, order_create_date, " \
                     " date_added, status, substatus, payment_type, delivery, summ_order, client_id_ps )" \
-                    "VALUES (%s, %s, %s, now(), %s, %s, %s, %s, %s, %s)"
+                    "VALUES (%s, %s, %s, %s, now(), %s, %s, %s, %s, %s, %s)"
 
 query_write_items = " INSERT INTO order_items ( order_id_mp, mp_name, offer_id, " \
                     " id_1c, quantity, price ) " \
                     " VALUES ( %s, %s, %s, %s, %s, %s )"
+query_write_customer = " INSERT INTO customers ( order_id_mp, mp_name, order_create_date, " \
+                       " summ_order, phone, email, fias_regionId, fias_destinationId,  " \
+                       " geo_lat, geo_lon, regionKladrId, regionWithType, cityWithType) " \
+                       " VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s )"
+
 
 update_order_and_items = " UPDATE fresh_orders SET status = %s " \
                          " WHERE order_id_mp = %s "

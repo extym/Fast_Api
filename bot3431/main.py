@@ -209,6 +209,47 @@ def write_incoming(proxy_tuple):
         file.write('\n')
 
 
+def token_generator(size=10, chars=string.ascii_uppercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
+
+
+def order_resp_sb(global_result, is_new):
+    id_create = None
+    if global_result:
+        data = {
+                "data": {},
+                "meta": {},
+                "success": 1
+            }
+        if is_new:
+            id_create = token_generator()
+
+    else:
+        data = {
+                "data": {},
+                "meta": {},
+                "success": 0
+            }
+
+    return data, id_create
+
+
+def counter_items(items_list):
+    pr, lst = {}, []
+    for item in items_list:
+        proxy_offer_id = item['offerId']
+        pr[proxy_offer_id] = pr.get(proxy_offer_id, 0) + 1
+    for itemm in items_list:
+        if itemm["offerId"] in pr.keys():
+            value = pr.pop(itemm["offerId"])
+            itemm["quantity"] = value
+            lst.append(itemm)
+
+    return lst
+
+
+
+
 def check_is_exist_message_answer(msg_id, chat_id):
     '''
     data = {"chat_id": ["price", "link", "msg_id", avito_id: int, name(?), first_answer: bool]}
@@ -269,37 +310,132 @@ async def check_is_exist_message_answer_v2(msg_id, chat_id):
 
 # print(asyncio.run(check_is_exist_message_answer_v2('ad6c351403976b0f6175b81965221000', 'u2i-PalCq8X5aU0iwwKcwfUAqQ' )))
 
-#
-# def make_lead(data):
-#     creds = get_creds()
-#     access_token = creds.get('access_token')
-#     data_send = make_data(data)
-#     headers = {
-#         'Authorization': 'Bearer ' + access_token
-#     }
-#     metod = '/api/v4/leads'
-#     link = url + metod
-#     answer = requests.post(link, headers=headers, json=data_send)
-#     print(2345, answer.text)
-#
-#     return answer.text
-#
-#
-# def make_lead_complex(data):
-#     creds = get_creds()
-#     access_token = creds.get('access_token')
-#     data_send = make_compex_data(data)
-#     headers = {
-#         'Authorization': 'Bearer ' + access_token
-#     }
-#     metod = '/api/v4/leads/complex'
-#     link = url + metod
-#     answer = requests.post(link, headers=headers, json=data_send)
-#     result = answer.text
-#     # print(result)
-#     write_result(result)
-#
-#     return result
+def reformat_data_order(order, shop):
+    result = None
+    if shop == 'Yandex':
+        try:
+            day = reverse_time(order["delivery"]["shipments"][0]["shipmentDate"])
+        except:
+            day = reverse_time(order['delivery']['dates']['fromDate'])
+        result = (
+            order["id"],
+            order["our_id"],
+            shop,   #order["shop"],
+            day_for_stm(day),
+            order["status"],
+            order["our_status"],
+            order["paymentType"],
+            order["delivery"]["type"]
+        )
+
+    elif shop == 'Ozon':
+        time = order["shipment_date"].split('T')[0]
+
+        result = (
+            order['id'],
+            order["our_id"],
+            shop,
+            day_for_stm(time), #reverse_time()
+            order["status"],
+            order["our_status"],
+            "PREPAID",
+            order["delivery_method"]["warehouse_id"]
+        )
+
+    elif shop == 'Sber':
+        time = order["shipments"][0]["shipping"]["shippingDate"].split('T')[0]
+        result = (
+            order["shipments"][0]["shipmentId"],
+            order['our_id'],
+            shop,  #order["shop"],
+            day_for_stm(time),  #reverse_time(time),
+            order["status"],
+            order["our_status"],
+            "PREPAID",  #order['data'].get("paymentType"),
+            order["shipments"][0]['fulfillmentMethod']
+        )
+
+    # elif shop == 'Leroy':
+    #     result = (
+    #         order['order']["id"],
+    #         order['order']["our_id"],
+    #         order['order']["shop"],
+    #         order['order']["date"],
+    #         order['order']["status"],
+    #         order['order']["paymentType"],
+    #         order['order']["delivery"]
+    #     )
+    #
+    # elif shop == 'WB':
+    #     result = (
+    #         order['order']["businessId"],
+    #         order['order']["id"],
+    #         order['order']["shop"],
+    #         order['order']["date"],
+    #         order['order']["status"],
+    #         order['order']["paymentType"],
+    #         order['order']["delivery"]
+    #     )
+
+    return result
+
+
+def reformat_data_items(order, shop):
+    result = []
+    if shop == 'Yandex':
+        list_items = order['items']
+        for item in list_items:
+            proxy = (
+                order["id"],
+                order["our_id"],
+                shop,
+                order["our_status"],
+                item["offerId"],
+                item["id_1c"],
+                item["count"],
+                item["price"] + item.get("subsidy")
+            )
+            result.append(proxy)
+
+    elif shop == 'Ozon':
+        result = []
+        list_items = order['products']
+        items_ids = read_json_ids() #ids 1C
+        for item in list_items:
+            sku = str(item["sku"])
+            vendor_code = item["offer_id"]
+            id_1c = items_ids[vendor_code][0]
+            #price = product_info_price(items_skus[sku][0], vendor_code)
+            proxy = (
+                order["id"],
+                order["our_id"],
+                shop,
+                order["our_status"],
+                vendor_code,
+                id_1c, #1c
+                item["quantity"],
+                item["price"][:-2]  #price
+            )
+            result.append(proxy)
+
+    elif shop == 'Sber':
+        list_items = order["count_items"]
+        result = []
+        for item in list_items:
+            proxy = (
+                order["shipments"][0]["shipmentId"],
+                order["our_id"],
+                shop,
+                order["our_status"],
+                item["offerId"],
+                item["id_1c"],
+                item["quantity"],
+                item["price"]
+            )
+            result.append(proxy)
+
+    return result
+
 
 
 app = Flask(__name__,
@@ -336,36 +472,58 @@ def test():
     return 'OK phone'
 
 
-#
-# @app.route('/form-data', methods=['POST'])
-# def get_data():
-#     addr = request.headers.get('X-Forwarded-For')
-#     if addr == '195.16.42.18' or addr == '185.2.32.202':
-#         data = request.form
-#         # print('data', type(data), data)
-#         try:
-#             sity = data.get('form_fields[32119][values][0]')
-#             name = data.get('form_fields[32121][values][0]')
-#             phone = data.get("form_fields[32127][values][0]")  # "('caller_num')
-#             source = data.get('form_fields[32120][values][0]')
-#             mark = data.get('form_fields[32124][values][0]')
-#             first_name = data.get('form_fields[32126][values][0]')  # ('caller_name')
-#             call_result = data.get('form_fields[32122][values][0]')
-#             comment = data.get('form_fields[32123][values][0]')
-#             target = data.get('form_fields[32121][values][0]')
-#             proxy = (sity, name, phone, source, mark, first_name, call_result, comment, target)
-#             # print('sity', sity,  type(proxy), proxy)
-#             result = make_lead_complex(proxy)
-#             write_incoming(proxy)
-#             print('result_send_data', result)
-#         except:
-#             print('ERROR make lead')
-#
-#         return 'OK'
-#
-#     else:
-#         print('response from ', addr)
-#         return app.response_class(status=402)
+@app.route('/order/new', methods=['GET', 'POST'])
+def new_order_sber():
+    token = request.headers.get('Basic auth')
+    if token == None or token != None:
+        data_req = request.json
+        order = data_req["data"]
+        pre_proxy = order["shipments"][0]["items"]
+        proxy = counter_items(pre_proxy)
+
+        # проверяем наличие for order
+        # stock = check_is_accept_sb(proxy)
+        # order["count_items"] = stock[1]
+        # if stock[0]:
+        #     data = order_resp_sb(stock[0], True)
+
+        data = order_resp_sb(True, True)
+        order['our_id'], order['status'], order['our_status'] \
+            = data[1], "NEW", "NEW"
+        ref_data = reformat_data_order(order, 'Sber')
+        execute_query(query_write_order, ref_data)
+        data_items = reformat_data_items(order, 'Sber')
+        executemany_query(query_write_items, data_items)
+        data_confirm = confirm_data_sb(order)
+        post_smth_sb('order/confirm', data_confirm)
+
+        response = app.response_class(
+            json.dumps(data[0]),
+            status=200,
+            content_type='application/json'
+        )
+
+        # else:
+        #     data = order_resp_sb(False, True)
+        #     print('response_order_new', data[0])
+        #     response = app.response_class(
+        #         json.dumps(data),
+        #         status=200,
+        #         content_type='application/json'
+        #     )
+
+
+    else:
+        response = app.response_class(
+            status=403
+        )
+
+    return response
+
+
+@app.route('/order/cancel', methods=['GET', 'POST'])
+def cancel_order_sber():
+    pass
 
 
 @app.route('/webhook', methods=['GET', 'POST'])
