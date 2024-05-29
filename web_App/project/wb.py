@@ -261,9 +261,14 @@ def send_price_to_wb(seller_id=None, sourse=None):
             if answer.ok:
                 print('All_ride_send to WB - wh {} stocks {}'
                       .format(seller_id, len(data)))
+                send_get("Отправлено цены селлеру {}: удачно  из {} доступных."
+                         .format(seller_id, len(data)))
+
             else:
                 print('All_ride_send to WB - wh {} stocks {} - result {}'
                       .format(seller_id, len(data), answer.text))
+                send_get("НЕ отправлено цены селлеру {}: удачно  из {} доступных - result {}."
+                         .format(seller_id, len(data), answer.text))
 
 
 def make_import_export_wb_price(donor=None, recipient=None,

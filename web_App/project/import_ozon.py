@@ -478,7 +478,7 @@ def get_product_list_v2(seller_id=None, shop_name=None, company_id=None):
                 last_id = assortment.get('result').get('last_id')
                 if len(proxy) > 999:
                     items.extend(proxy)
-                    print(888888888888888, len(items))
+                    # print(888888888888888, len(items))
                 else:
                     requesting = False
                     items.extend(proxy)
@@ -606,7 +606,7 @@ def import_oson_data_prod(user_id=None, shop_name=None, company_id=None, update_
                             .values(product)
                         session.execute(update_prod)
                         count_error += 1
-                        # print(22222222222222, count_error)
+                        print(22222222222222, update_prod, product)
                     finally:
                         session.commit()
 
@@ -619,7 +619,7 @@ def import_oson_data_prod(user_id=None, shop_name=None, company_id=None, update_
                 offer_id = data_prod.get("offer_id")
                 old_price = data_prod.get("old_price").split('.')[0]
                 base_price = int(int(old_price) / 8)
-                print(old_price, base_price, offer_id)
+                print(1111111, old_price, base_price, offer_id)
                 if offer_id.isdigit():
                     offer_id = "AAA" + offer_id
                 product = {
@@ -671,7 +671,7 @@ def import_oson_data_prod(user_id=None, shop_name=None, company_id=None, update_
                             .values(product)
                         session.execute(update_prod)
                         count_error += 1
-                        # print(22222222222222, count_error)
+                        print(222221111111111333333322, update_prod, product)
                     finally:
                         session.commit()
 

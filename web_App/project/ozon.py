@@ -14,6 +14,7 @@ from project import engine, bot_tg
 from time import sleep
 # from project import db
 from project.conn import maintenans_query
+from project.bot_tg import send_get
 
 LOG_DIR = os.getcwd() + '/logs'
 # logging.basicConfig(level=logging.DEBUG, filename=LOG_DIR + '/oson_log.log',
@@ -298,9 +299,14 @@ def create_data_price_for_send(seller_id=None, from_db=True):
                 #############################
                 # TODO make func custom price oson
                 # Make price ended for '9'
-                pre_price = int(product.price_product_base) * 2
-                price = str(pre_price).split('.')[0][:-1] + "9"
-                # print(22222, price, pre_price)
+                price_product_base = product.price_product_base
+                # print(22222, price_product_base, product.articul_product)
+                if price_product_base:
+                    pre_price = int(price_product_base) * 2
+                    price = str(pre_price).split('.')[0][:-1] + "9"
+                    # print(22222, price, pre_price)
+                else:
+                    continue
                 if not koeff:
                     koeff = 0
                 if koeff > 0:
@@ -510,6 +516,8 @@ def send_product_price(key_recipient=None, recipient=None):
                              ' recipient {}, answer {}, len data {}'
                              .format(recipient, resp.text, len(data)))
 
+    send_get("Отправлено цены селлеру {}: удачно {}, неудачно {} из {} доступных."
+             .format(recipient, count, errors, len(data)))
     return count, errors
 
 # get_product_info(38010832, "OWLT190601")
@@ -528,4 +536,4 @@ def send_product_price(key_recipient=None, recipient=None):
 
 # asyncio.run(create_data_stocks())
 # create_data_stocks_from_db(seller_id="1278621", is_stocks_null=False)
-# create_data_price_for_send(seller_id="1278621", from_db=True)
+create_data_price_for_send(seller_id="1278621", from_db=True)
