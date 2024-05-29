@@ -367,7 +367,7 @@ def get_raw_avito_token(file):
         "grant_type": "client_credentials"
     }
     answer = requests.post(url=url, headers=headers, data=data)
-    print(answer.text)
+    print(22222, answer.text)
     update_creds_avito(answer.text)
 
 
