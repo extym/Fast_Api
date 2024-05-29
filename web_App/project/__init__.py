@@ -29,7 +29,7 @@ def create_app():
                 static_folder='templates/static')
 
     app.config['SECRET_KEY'] = 'secret-key-goes-here'
-    app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql+psycopg2://user_name:user_pass@localhost/web_app"
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql+psycopg2://{db_user}:{db_pass}@{db_host}/{db_name}"
     app.config['USER_ENABLE_EMAIL'] = False
 
     db.init_app(app)

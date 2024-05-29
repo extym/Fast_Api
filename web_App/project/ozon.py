@@ -9,10 +9,11 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from project.models import *
 from project import engine, bot_tg
-from project.creds import *
+# from project.creds import *
 # from read_json import read_json_on
 from time import sleep
-from project import db
+# from project import db
+from project.conn import maintenans_query
 
 LOG_DIR = os.getcwd() + '/logs'
 # logging.basicConfig(level=logging.DEBUG, filename=LOG_DIR + '/oson_log.log',
@@ -97,36 +98,36 @@ def post_smth_v2(metod, seller_id=None, key=None):
 
 # post_smth_v2(get_wh_list, seller_id="1179095", key="19cb01e0-4098-4587-b0ec-55c5c60b830c")
 
-def post_get_smth(metod):
-    link = host + metod
-    response = requests.post(link, headers=headers)
-    if response.ok:
-        data = response.json()
-        print('post_get_smth', data)  # (data['result']['items']), type(data['result']['items']))
-        result = data['result']['items']
-        total = data['result']['total']
-        last_id = data['result']['last_id']
-        print('post_get_smth_onon', result[0])
-        return result, total, last_id
-    else:
-        print(response.text)
-        return [], [], 0
+# def post_get_smth(metod):
+#     link = host + metod
+#     response = requests.post(link, headers=headers)
+#     if response.ok:
+#         data = response.json()
+#         print('post_get_smth', data)  # (data['result']['items']), type(data['result']['items']))
+#         result = data['result']['items']
+#         total = data['result']['total']
+#         last_id = data['result']['last_id']
+#         print('post_get_smth_onon', result[0])
+#         return result, total, last_id
+#     else:
+#         print(response.text)
+#         return [], [], 0
 
 
-def get_product_info(product_id, offer_id):
-    metod = '/v2/product/info'
-    link = host + metod
-    data = {
-        "offer_id": offer_id,
-        "product_id": int(product_id),
-        "sku": 0
-    }
-    response = requests.post(link, headers=header, json=data)
-    answer = response.json()
-    result = answer['result']["fbs_sku"]
-    sleep(0.4)
-    # print('get_product_info_onon', len(result)) #{'product_id': 38010832, 'offer_id': 'OWLT190601', 'is_fbo_visible': True, 'is_fbs_visible': True, 'archived': False, 'is_discounted': False}
-    return result
+# def get_product_info(product_id, offer_id):
+#     metod = '/v2/product/info'
+#     link = host + metod
+#     data = {
+#         "offer_id": offer_id,
+#         "product_id": int(product_id),
+#         "sku": 0
+#     }
+#     response = requests.post(link, headers=header, json=data)
+#     answer = response.json()
+#     result = answer['result']["fbs_sku"]
+#     sleep(0.4)
+#     # print('get_product_info_onon', len(result)) #{'product_id': 38010832, 'offer_id': 'OWLT190601', 'is_fbo_visible': True, 'is_fbs_visible': True, 'archived': False, 'is_discounted': False}
+#     return result
 
 
 # def create_data_stocks():
