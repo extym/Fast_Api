@@ -671,7 +671,7 @@ async def get_avito_current_chat_v2(hook, check):
                 logging.info('TRY_REWRITE_DATA_TO_AMO_11_ {} {} {} {} '.
                              format(chat_id, user_id, title, target_link))
             except:
-                logging.info('FuckUp_TRY_REWRITE_DATA_TO_AMO_ {} {} {} {} '.
+                logging.error('FuckUp_TRY_REWRITE_DATA_TO_AMO_ {} {} {} {} '.
                              format(chat_id, user_id, title, target_link))
 
     elif not check[2]:
@@ -767,7 +767,7 @@ heck = {'id': 'd8e51513-9229-4497-94c6-69dc65ffedab', 'version': 'v3.0.0',
 # get_current_balance()
 # enable_avito_webhook(363810872)
 # enable_avito_webhook(375811020)
-# get_current_hook()
+get_current_hook()
 # disable_avito_webhook(10138154)
 # enable_avito_webhook('rota')
 # print(read_links())

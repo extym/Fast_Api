@@ -257,7 +257,13 @@ def make_orders_to_ps(delta_time:int=1):
                                                              external_order_id=order.get('id'))
 
                         if result:
-                            ps.send_current_basket_to_order()
+                            final_result = ps.send_current_basket_to_order()
+                            if final_result:
+                                data = ' '.join([i['id'] for i in final_result]).strip()
+                                print(5555555555, data)
+                                finish = ps.change_status_v2(data)
+                                print(7777777777, finish)
+
 
                     else:
                         continue

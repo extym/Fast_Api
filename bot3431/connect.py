@@ -124,7 +124,7 @@ UNIQUE (chat_id)
 """
 
 
-logging.basicConfig(filename=LOG_DIR + './webhook.log', level=logging.INFO,
+logging.basicConfig(filename=LOG_DIR + '/webhook.log', level=logging.INFO,
                     format="%(asctime)s %(levelname)s %(message)s")
 
 

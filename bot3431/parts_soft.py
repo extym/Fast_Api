@@ -53,6 +53,21 @@ async def change_status(ids: str):
         return False
 
 
+def change_status_v2(ids: str):
+    url = ps_link + '/order_items/change_status'
+    data = {
+        "order_item_ids": ids,
+        "status_id": 8
+    }
+    token_ps = HTTPBasicAuth(admin_ps_login, admin_ps_pass)
+    answer = requests.post(url=url, auth=token_ps, data=data)
+    print('answer_changed_status', answer.text)
+    if answer.ok:
+        return True
+    else:
+        return False
+
+
 def get_orders_v2(customer_id, marketplace_id):
     result, result_list = '', []
     page, error = 0, 0
@@ -187,7 +202,10 @@ def send_current_basket_to_order():
     answer = requests.post(url, headers=headers, data=data)
 
     print("FINAL_result {}".format(answer.text))
-
+    if answer.ok:
+        return answer.json().get('data')
+    else:
+        return None
 
 def make_basket(qnt=None, exter_order_id=None, propousal=None):
     url = "https://3431.ru/api/v1/baskets"
