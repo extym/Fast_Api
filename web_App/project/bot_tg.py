@@ -12,6 +12,8 @@ def send_get(text):
 
     if not response.ok:
         print(333, response.text)
+    else:
+        print('SEND smth ALL RIDE')
     sleep(2)
 
 # send_get(TEXT)

@@ -536,4 +536,4 @@ def send_product_price(key_recipient=None, recipient=None):
 
 # asyncio.run(create_data_stocks())
 # create_data_stocks_from_db(seller_id="1278621", is_stocks_null=False)
-create_data_price_for_send(seller_id="1278621", from_db=True)
+# create_data_price_for_send(seller_id="1278621", from_db=True)
