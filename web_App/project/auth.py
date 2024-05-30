@@ -3,7 +3,7 @@ import logging
 import os
 import time
 from html import unescape
-
+from .creds import LOCAL_MODE
 from flask import Blueprint, request, flash, render_template, redirect, url_for
 from flask_login import login_user, logout_user, login_required, current_user
 from psycopg2.errors import UniqueViolation
@@ -2001,7 +2001,8 @@ def upload_prices_settings():
                                                internal_import_role_2=internal_import_role_2,
                                                internal_import_markup_2=internal_import_markup_2)
                     except:
-                        flash("Настройки для указанного магазина не найдены. Введите требуемые настройки и сохраните их.",
+                        flash("Настройки для указанного магазина не найдены. "
+                              "Введите требуемые настройки и сохраните их.",
                               "alert")
     
                 elif result.get('internal_import_store_2') is not None:
@@ -2074,6 +2075,7 @@ def upload_prices_settings():
                            uid=uid, role=role,
                            rows=rows, rows_mp=set(rows_mp),
                            photo=photo,
+                           distributors=LOCAL_MODE,
                            user_name=user_name)
 
 
@@ -2104,6 +2106,7 @@ def distributor_settings():
                                        key_api_dist=key_api_dist,
                                        login_api_dist=login_api_dist,
                                        distributor=distributor,
+                                       distributors=LOCAL_MODE,
                                        photo=photo,
                                        user_name=user_name)
 
