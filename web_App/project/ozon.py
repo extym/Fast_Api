@@ -452,8 +452,9 @@ def send_stocks_oson_v3(key_recipient=None, donor_name=None, recipient=None):
     }
     metod = '/v2/products/stocks'
     link = host + metod
-    proxy = []
+    proxy, row,  last_error = [], [], ''
     count, error = 0, 0
+    global_count, global_error = 0, 0 
     for row in pre_data:
         data = {'stocks': row}
         # os.abort()
@@ -464,7 +465,7 @@ def send_stocks_oson_v3(key_recipient=None, donor_name=None, recipient=None):
             if result:
                 for row in result:
                     if len(row["errors"]) > 0:
-                        # print('ERROR from send_stocks_ozon', row)
+                        last_error = row["errors"][0]['message']
                         error += 1
                     # elif row['updated'] == False:
                     #     print('ERROR update from send_stocks_ozon', row)
@@ -472,9 +473,9 @@ def send_stocks_oson_v3(key_recipient=None, donor_name=None, recipient=None):
                         count += 1
                     #     print('SUCCES update from send_stocks_on', row)
                 proxy.append(answer)
-            oson_logger.info('ALL RIDE send_stocks_oson - answer {}, donor {},'
+            oson_logger.info('ALL RIDE send_stocks_oson - donor {},'
                              ' recipient {}, updated {}, errors update {}'
-                             .format(response.text, donor_name, recipient, count, error))
+                             .format( donor_name, recipient, count, error))
             sleep(0.6)
         else:
 
@@ -483,6 +484,13 @@ def send_stocks_oson_v3(key_recipient=None, donor_name=None, recipient=None):
                              .format(response.text, donor_name, recipient, len(key_recipient)))
             print('answer send_stocks_on_v3', response.text)
             sleep(0.6)
+
+        global_count += count
+        global_error += error
+
+    all =  (len(pre_data) - 1) * 1000 + len(row)
+    send_get("Отправлено остатки селлеру {}: удачно {}, неудачно {} из {} доступных. Финишная ошибка- {}"
+             .format(recipient, global_count, global_error, all, last_error))
 
 
 def send_product_price(key_recipient=None, recipient=None):
@@ -495,6 +503,7 @@ def send_product_price(key_recipient=None, recipient=None):
     }
     data = create_data_price_for_send(seller_id=recipient, from_db=True)
     count, errors = 0, 0
+    row = []
     for row in data:
         send_data = {"prices": row}
         resp = requests.post(url=metod, headers=headers, json=send_data)
@@ -517,7 +526,7 @@ def send_product_price(key_recipient=None, recipient=None):
                              .format(recipient, resp.text, len(data)))
 
     send_get("Отправлено цены селлеру {}: удачно {}, неудачно {} из {} доступных."
-             .format(recipient, count, errors, len(data)))
+             .format(recipient, count, errors, len(row)))
     return count, errors
 
 # get_product_info(38010832, "OWLT190601")
