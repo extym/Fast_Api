@@ -32,6 +32,37 @@ class ConsultUsers(db.Model, UserMixin):
     date_modifed = db.Column(db.String(250))
 
 
+class UploadPrice(db.Model):
+    __tablename__ = 'upload_price'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(250))
+    koef_price = db.Column(db.Integer())
+    distributors = db.Column(db.String(250))
+    link = db.Column(db.String(250))
+    is_null_stocks = db.Column(db.Boolean())
+    is_scheduler = db.Column(db.Boolean())
+    date_added = db.Column(db.String(250))
+    date_modifed = db.Column(db.String(250))
+    user_modifed = db.Column(db.Integer())
+
+
+class Distributor(db.Model):
+    __tablename__ = 'distributors'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(250))
+    koef_price = db.Column(db.Integer())
+    distributor = db.Column(db.String(250))
+    login_api_dist =  db.Column(db.String(250))
+    key_api_dist =  db.Column(db.String(250))
+    api_link = db.Column(db.String(250))
+    type_downloads = db.Column(db.String(250))
+    link_downloads = db.Column(db.String(500))
+    is_scheduler = db.Column(db.Boolean())
+    date_added = db.Column(db.String(250))
+    date_modifed = db.Column(db.String(250))
+    user_modifed = db.Column(db.Integer())
+
+
 class Product(db.Model):
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
