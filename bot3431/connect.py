@@ -158,6 +158,7 @@ def create_connection():
 
 def execute_query_v2(query, data):
     with create_connection() as connection:
+        connection.autocommit = True
         with connection.cursor() as cursor:
             try:
                 cursor.execute(query, data)
@@ -206,6 +207,22 @@ def execute_query_return_v3(query, data):
                 print(f"The ERROR from execute_query '{err}' occured ")
 
     return raw_data
+
+
+def execute_query_return_v4(query, data):
+    raw_data = []
+    with create_connection() as conn:
+        conn.autocommit = True
+        with conn.cursor() as cursor:
+            try:
+                cursor.execute(query, [data])
+                raw_data = cursor.fetchall()
+                # print("Query from execute_query executed successfully")
+            except OperationalError as err:
+                print(f"The ERROR from execute_query '{err}' occured ")
+
+    return raw_data
+
 
 async def executemany_query(query, data):
     connection = create_connection()
@@ -415,44 +432,61 @@ query_update_contact_id = ("UPDATE fresh_bids SET leads_id = %s, "
                            "contact_id = %s, date_modifed = NOW() "
                            "WHERE chat_id = %s ")
 
-query_check_is_message_exist = "SELECT msg_id, first_answer, rewrite_leads FROM fresh_bids WHERE chat_id=%s "
+query_check_is_message_exist = \
+    "SELECT msg_id, first_answer, rewrite_leads " \
+    "FROM fresh_bids WHERE chat_id=%s "
 
-query_get_bid_for_chat_id = "SELECT * FROM fresh_bids WHERE chat_id = %s"
+query_get_bid_for_chat_id = \
+    "SELECT * FROM fresh_bids WHERE chat_id = %s"
 
-query_get_bid_for_lead_id = "SELECT * FROM fresh_bids WHERE leads_id = %s"
+query_get_bid_for_lead_id = \
+    "SELECT * FROM fresh_bids WHERE leads_id = %s"
 
-query_get_all_shops = "SELECT * FROM stores WHERE mp_name= %s"
+query_get_all_shops = \
+    "SELECT * FROM stores WHERE mp_name= %s"
 
-query_is_exist_order = "SELECT * FROM fresh_orders WHERE order_id_mp = %s"
+query_is_exist_order = \
+    "SELECT * FROM fresh_orders WHERE order_id_mp = %s"
 
-query_write_order = "INSERT INTO  fresh_orders ( order_id_mp, mp_name, shipment_date, order_create_date, " \
-                    " date_added, status, substatus, payment_type, delivery, summ_order, client_id_ps )" \
-                    "VALUES (%s, %s, %s, %s, now(), %s, %s, %s, %s, %s, %s)"
+query_write_order = \
+    "INSERT INTO  fresh_orders ( order_id_mp, mp_name, " \
+    "shipment_date, order_create_date, " \
+    " date_added, status, substatus, payment_type, delivery, " \
+    "summ_order, client_id_ps )" \
+    "VALUES (%s, %s, %s, %s, now(), %s, %s, %s, %s, %s, %s)"
 
-query_write_items = " INSERT INTO order_items ( order_id_mp, mp_name, offer_id, " \
+query_write_items = \
+    " INSERT INTO order_items ( order_id_mp, mp_name, offer_id, " \
                     " id_1c, quantity, price ) " \
                     " VALUES ( %s, %s, %s, %s, %s, %s )"
-query_write_customer = " INSERT INTO customers ( order_id_mp, mp_name, order_create_date, " \
-                       " summ_order, phone, email, fias_regionId, fias_destinationId,  " \
-                       " geo_lat, geo_lon, regionKladrId, regionWithType, cityWithType) " \
-                       " VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s )"
 
+query_write_customer =\
+    " INSERT INTO customers ( order_id_mp, mp_name, order_create_date, " \
+   " summ_order, phone, email, fias_regionId, fias_destinationId,  " \
+   " geo_lat, geo_lon, regionKladrId, regionWithType, cityWithType) " \
+   " VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s )"
 
-update_order_and_items = " UPDATE fresh_orders SET status = %s " \
+update_order_and_items = \
+    " UPDATE fresh_orders SET status = %s " \
                          " WHERE order_id_mp = %s "
 
-query_add_settings_ym = (" INSERT INTO stores "
-                         "(client_id, key_store, campain_id, api_key_ps, upload_link) "
-                         "VALUES ( %s, %s, %s, %s, %s )")
+query_add_settings_ym = \
+    (" INSERT INTO stores "
+     "(client_id, key_store, campain_id, api_key_ps, upload_link) "
+     "VALUES ( %s, %s, %s, %s, %s )")
 
-query_add_settings_without_ym = (" INSERT INTO stores "
-                         "(client_id, key_store, api_key_ps, upload_link) "
-                         "VALUES ( %s, %s, %s, %s )")
+query_add_settings_without_ym = \
+    (" INSERT INTO stores "
+     "(client_id, key_store, campain_id, api_key_ps, upload_link) "
+     "VALUES ( %s, %s, %s, %s, %s )")
 
 proxy = ("u2i-TOYzRVLyb9Hw_l7u2aBTVg", '4391',
          "https://avito.ru/sankt-peterburg/zapchasti_i_aksessuary/trw_df4110_torm.disk_per.vent.280x24_4_otv_3364311913",
          'e737d71dcddc238d5a1db962f3fb6db9', 353207078, "TRW DF4110 Торм.диск пер.вент.280x24 4 отв",
          True, False, 0, 0)
+
+query_get_shop_client_id = \
+    (" SELECT client_id FROM stores WHERE campain_id = %s")
 
 
 def rewrite_bid_from_json(file):

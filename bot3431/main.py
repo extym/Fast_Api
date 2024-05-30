@@ -22,6 +22,7 @@ import logging
 from bot_tg import send_get
 from parts_soft import make_data_for_request_v2
 import connect as conn
+import uuid
 
 urllib3.disable_warnings()
 
@@ -308,6 +309,13 @@ async def check_is_exist_message_answer_v2(msg_id, chat_id):
     return compare, first_answer, rewrite_lead
 
 
+def reverse_time(time):
+    t = time.split('-')
+    t.reverse()
+    result = '-'.join(t)
+
+    return result
+
 # print(asyncio.run(check_is_exist_message_answer_v2('ad6c351403976b0f6175b81965221000', 'u2i-PalCq8X5aU0iwwKcwfUAqQ' )))
 
 def reformat_data_order(order, shop):
@@ -321,7 +329,7 @@ def reformat_data_order(order, shop):
             order["id"],
             order["our_id"],
             shop,   #order["shop"],
-            day_for_stm(day),
+            day,
             order["status"],
             order["our_status"],
             order["paymentType"],
@@ -329,13 +337,12 @@ def reformat_data_order(order, shop):
         )
 
     elif shop == 'Ozon':
-        time = order["shipment_date"].split('T')[0]
-
+        day = order["shipment_date"].split('T')[0]
         result = (
             order['id'],
             order["our_id"],
             shop,
-            day_for_stm(time), #reverse_time()
+            day,
             order["status"],
             order["our_status"],
             "PREPAID",
@@ -343,12 +350,12 @@ def reformat_data_order(order, shop):
         )
 
     elif shop == 'Sber':
-        time = order["shipments"][0]["shipping"]["shippingDate"].split('T')[0]
+        day = order["shipments"][0]["shipping"]["shippingDate"].split('T')[0]
         result = (
             order["shipments"][0]["shipmentId"],
             order['our_id'],
-            shop,  #order["shop"],
-            day_for_stm(time),  #reverse_time(time),
+            shop,
+            day,
             order["status"],
             order["our_status"],
             "PREPAID",  #order['data'].get("paymentType"),
@@ -437,6 +444,90 @@ def reformat_data_items(order, shop):
     return result
 
 
+def reformat_data_order_v2(order, mp, client_id_ps,
+                           dbs=True, customers=True):
+    result_items, result_customer = [], ()
+    result = None
+    if mp == 'Yandex':
+        try:
+            day = reverse_time(order["delivery"]["shipments"][0]["shipmentDate"])
+        except:
+            day = reverse_time(order['delivery']['dates']['fromDate'])
+        result = (
+            order["id"],
+            order["our_id"],
+            mp,   #order["shop"],
+            day,
+            order["status"],
+            order["our_status"],
+            order["paymentType"],
+            order["delivery"]["type"]
+        )
+
+    elif mp == 'Ozon':
+        day = order["shipment_date"].split('T')[0]
+        result = (
+            order['id'],
+            order["our_id"],
+            mp,
+            day,
+            order["status"],
+            order["our_status"],
+            "PREPAID",
+            order["delivery_method"]["warehouse_id"]
+        )
+
+    elif mp == 'Sber':
+        list_items = order["count_items"]
+        summ_order = 0
+        for item in list_items:
+            proxy = (
+                order["shipments"][0]["shipmentId"],
+                order["our_id"],
+                mp,
+                order["our_status"],
+                item["offerId"],
+                item["id_1c"],
+                item["quantity"],
+                item["price"]
+            )
+            result_items.append(proxy)
+            summ_order += item["price"]
+
+        day = order["shipments"][0]["shipping"]["shippingDate"].split('T')[0]
+        result = (
+            order["shipments"][0]["shipmentId"],
+            mp,
+            day,
+            order['shipmentDate'],
+            order["status"],
+            order["substatus"],
+            order["our_status"],
+            "PREPAID",  #order['data'].get("paymentType"),
+            order["shipments"][0]['fulfillmentMethod'],
+            summ_order,
+            client_id_ps
+        )
+
+        if customers and dbs:
+            result_customer = (
+                order["shipments"][0]["shipmentId"],
+                mp,
+                order['shipmentDate'],
+                summ_order,
+                order["shipments"][0]["customer"]['phone'],
+                order["shipments"][0]["customer"]['email'],
+                order["shipments"][0]["customer"]["address"]["fias"]['regionId'],
+                order["shipments"][0]["customer"]["address"]["fias"]['destinationId'],
+                order["shipments"][0]["customer"]["address"]["geo"]['lat'],
+                order["shipments"][0]["customer"]["address"]["geo"]['lon'],
+                order["shipments"][0]["customer"]["address"]['regionKladrId'],
+                order["shipments"][0]["customer"]["address"]['regionWithType'],
+                order["shipments"][0]["customer"]["address"]['cityWithType']
+            )
+
+    return result, result_items, result_customer
+
 
 app = Flask(__name__,
             template_folder='templates/')
@@ -472,8 +563,10 @@ def test():
     return 'OK phone'
 
 
-@app.route('/order/new', methods=['GET', 'POST'])
-def new_order_sber():
+@app.route('/external_orders/<uuid>/new', methods=['GET', 'POST'])
+async def new_order_sber(uuid):
+    print(33333, uuid)
+
     token = request.headers.get('Basic auth')
     if token == None or token != None:
         data_req = request.json
@@ -481,6 +574,9 @@ def new_order_sber():
         pre_proxy = order["shipments"][0]["items"]
         proxy = counter_items(pre_proxy)
 
+        client_id_ps = conn.execute_query_return_v4(
+            query_get_shop_client_id, uuid)
+        print(232323, type(client_id_ps), client_id_ps)
         # проверяем наличие for order
         # stock = check_is_accept_sb(proxy)
         # order["count_items"] = stock[1]
@@ -488,14 +584,17 @@ def new_order_sber():
         #     data = order_resp_sb(stock[0], True)
 
         data = order_resp_sb(True, True)
-        order['our_id'], order['status'], order['our_status'] \
-            = data[1], "NEW", "NEW"
-        ref_data = reformat_data_order(order, 'Sber')
-        execute_query(query_write_order, ref_data)
-        data_items = reformat_data_items(order, 'Sber')
-        executemany_query(query_write_items, data_items)
-        data_confirm = confirm_data_sb(order)
-        post_smth_sb('order/confirm', data_confirm)
+        order['status'],\
+            order['our_status'], order['count_items'] \
+            = "NEW", "NEW", proxy
+        # ref_data = reformat_data_order(order, 'Sber')
+        ref_data = reformat_data_order_v2(order, 'Sber',
+                                          client_id_ps=client_id_ps)
+        await execute_query(query_write_order, ref_data[0])
+        await executemany_query(query_write_items, ref_data[1])
+        await execute_query(query_write_customer, ref_data[2])
+        # data_confirm = confirm_data_sb(order)
+        # post_smth_sb('order/confirm', data_confirm)
 
         response = app.response_class(
             json.dumps(data[0]),
@@ -743,7 +842,7 @@ async def add_store():
         upload_link = data.get('upload_link')
         print(33333333, market, key_store, store_id, upload_link)
 
-        if (market == '235' or market == '2063' or market == '2063') \
+        if (market == '235' or market == '2063') \
                 and store_id != '' and key_store != '' and upload_link != '':
             result = conn.execute_query_v2(query_add_settings_ym,
                                            (market,
@@ -757,13 +856,16 @@ async def add_store():
                 flash(f"Ошибка сохранения {result[1]}")
 
         elif market != '' and key_store != '' and upload_link != '':
+            random_uuid = str(uuid.uuid4())
+            url = request.url
             result = conn.execute_query_v2(query_add_settings_without_ym,
                                            (market,
                                             key_store,
+                                            random_uuid,
                                             api_key_ps,
                                             upload_link))
             if result[0]:
-                flash('Настройки удачно сохранены')
+                flash(f'Настройки удачно сохранены. Ссылка на новых заказов {url}')
             else:
                 flash(f"Ошибка сохранения {result[1]}")
         else:
