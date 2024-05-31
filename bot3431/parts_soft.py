@@ -82,7 +82,7 @@ def get_orders_v2(customer_id, marketplace_id):
             url = ps_link + "/orders.json"
             token_ps = HTTPBasicAuth(admin_ps_login, admin_ps_pass)
             answer = requests.get(url, auth=token_ps, params=params)
-            print(123123123, answer.text)
+            # print(123123123, answer.text)
             if answer.ok:
                 data = answer.json()
                 result_list = [i for i in data.get('orders')
@@ -333,7 +333,7 @@ def create_resp_if_not_exist(list_items, link,
             print('SOME FUCKUP GET PROPOUSAL {}'.format(answer.text))
 
     if count_items == len(list_items):
-        print("Result result_make_basket successfully {}".format(count_items))
+        # print("Result result_make_basket successfully {}".format(count_items))
         global_result_make_basket = True
     else:
         print("Result result_make_basket UNsuccessfully {}".format(count_items))

@@ -70,6 +70,7 @@ user_id int,
 api_key_ps TEXT,
 upload_link TEXT,
 mp_name TEXT,
+model text,
 UNIQUE (client_id)
 )
 """
@@ -163,24 +164,27 @@ def execute_query_v2(query, data):
             try:
                 cursor.execute(query, data)
                 # print("Query from execute_query executed successfully")
-
+                return True
             except OperationalError as err:
                 print(f"The ERROR from execute_query '{err}' occured ")
-
+                return False
 
 async def execute_query(query, data):
     connection = create_connection()
     connection.autocommit = True
     cursor = connection.cursor()
-    try:
-        cursor.execute(query, data)
+    # try:
+    cursor.execute(query, [data])
         # print("Query from execute_query executed successfully")
 
-    except OperationalError as err:
-        print(f"The ERROR from execute_query '{err}' occured ")
+    # except OperationalError as err:
+    #     print(f"The ERROR from execute_query '{err}' occured ")
 
     cursor.close()
     connection.close()
+
+
+
 
 
 async def execute_query_v3(query, data):
@@ -209,14 +213,14 @@ def execute_query_return_v3(query, data):
     return raw_data
 
 
-def execute_query_return_v4(query, data):
-    raw_data = []
+def execute_query_return_one(query, data):
+    raw_data = None
     with create_connection() as conn:
         conn.autocommit = True
         with conn.cursor() as cursor:
             try:
                 cursor.execute(query, [data])
-                raw_data = cursor.fetchall()
+                raw_data = cursor.fetchone()
                 # print("Query from execute_query executed successfully")
             except OperationalError as err:
                 print(f"The ERROR from execute_query '{err}' occured ")
@@ -450,15 +454,15 @@ query_is_exist_order = \
 
 query_write_order = \
     "INSERT INTO  fresh_orders ( order_id_mp, mp_name, " \
-    "shipment_date, order_create_date, " \
-    " date_added, status, substatus, payment_type, delivery, " \
+    "shipment_date, order_create_date, date_added, status, " \
+    "substatus, our_status, payment_type, delivery, " \
     "summ_order, client_id_ps )" \
-    "VALUES (%s, %s, %s, %s, now(), %s, %s, %s, %s, %s, %s)"
+    "VALUES (%s, %s, %s, %s, now(), %s, %s, %s, %s, %s, %s, %s)"
 
 query_write_items = \
     " INSERT INTO order_items ( order_id_mp, mp_name, offer_id, " \
                     " id_1c, quantity, price ) " \
-                    " VALUES ( %s, %s, %s, %s, %s, %s )"
+                    " VALUES ( %s, %s, %s, %s,  %s, %s )"
 
 query_write_customer =\
     " INSERT INTO customers ( order_id_mp, mp_name, order_create_date, " \
@@ -486,8 +490,11 @@ proxy = ("u2i-TOYzRVLyb9Hw_l7u2aBTVg", '4391',
          True, False, 0, 0)
 
 query_get_shop_client_id = \
-    (" SELECT client_id FROM stores WHERE campain_id = %s")
+    (" SELECT  FROM stores WHERE campain_id = %s")
 
+
+query_get_shop_campain_id = \
+    (" SELECT model, client_id FROM stores WHERE campain_id = %s")
 
 def rewrite_bid_from_json(file):
     with open(file) as f:
@@ -534,6 +541,9 @@ def rewrite_bid_from_2_json(file, file2):
 # maintenans_query(create_fresh_orders)
 # maintenans_query(create_order_items)
 # maintenans_query(create_stores)
+
+# maintenans_query(create_customers)
+
 # execute_query_v2(query_write_bid, proxy)
 # print(get_bid("u2i-TOYzRVLyb9Hw_l7u2aBTVg"))
 # print(check_is_exist_in_db(query_check_is_message_exist, ("u2i-TOYzRVLyb9Hw_l7u2aBTVg",)))
@@ -542,3 +552,6 @@ def rewrite_bid_from_2_json(file, file2):
 
 # rewrite_bid_from_2_json('links.json', 'links.json.old')
 
+# asyncio.run(executemany_query(query_write_items, [('6111114952', 'Sber',  'BV001950-k', '', 1, '990'), ('6111114952',  'Sber',  'delivery', '', 1, '200')]))
+
+# asyncio.run(execute_query_v3(query_write_customer, ('61111152', 'Sber', '2022-11-12', '1190', '88888888888', 'test@test.com', '0c5b2444-70a0-4932-980c-b4dc0d3f02b5', '4cbce9f3-6fd7-4162-962d-41268b75aadc', '55.751812', '37.599292', '77', 'г Москва', 'г Москва')))

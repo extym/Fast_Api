@@ -1,4 +1,7 @@
 import sys
+
+from psycopg2 import IntegrityError
+
 from cred import *
 # from cred_update import creds
 from gevent import monkey
@@ -23,7 +26,14 @@ from bot_tg import send_get
 from parts_soft import make_data_for_request_v2
 import connect as conn
 import uuid
+from psycopg2.errors import UniqueViolation
+from psycopg2.extensions import register_adapter, AsIs
+import json
 
+def adapt_dict(dict_var):
+    return AsIs("'" + json.dumps(dict_var) + "'")
+
+register_adapter(dict, adapt_dict)
 urllib3.disable_warnings()
 
 # url = 'https://zakazjpexpressru.amocrm.ru'
@@ -445,7 +455,7 @@ def reformat_data_items(order, shop):
 
 
 def reformat_data_order_v2(order, mp, client_id_ps,
-                           dbs=True, customers=True):
+                           model=None, customers=True):
     result_items, result_customer = [], ()
     result = None
     if mp == 'Yandex':
@@ -483,38 +493,43 @@ def reformat_data_order_v2(order, mp, client_id_ps,
         for item in list_items:
             proxy = (
                 order["shipments"][0]["shipmentId"],
-                order["our_id"],
                 mp,
-                order["our_status"],
                 item["offerId"],
-                item["id_1c"],
+                '', # item["id_1c"],
                 item["quantity"],
-                item["price"]
+                str(item["price"])
             )
             result_items.append(proxy)
             summ_order += item["price"]
 
-        day = order["shipments"][0]["shipping"]["shippingDate"].split('T')[0]
+        if model == 'dbs':
+            day = order["shipments"][0]["handover"]["deliveryInterval"]["dateFrom"].split('T')[0]
+            order_create_day = order["shipments"][0]['shipmentDate'].split('T')[0]
+            delivery = order["shipments"][0]["handover"]['serviceScheme']
+        else:
+            day = order["shipments"][0]["shipping"]["shippingDate"].split('T')[0]
+            order_create_day = order['shipmentDate'].split('T')[0]
+            delivery = order["shipments"][0]['fulfillmentMethod']
         result = (
             order["shipments"][0]["shipmentId"],
             mp,
             day,
-            order['shipmentDate'],
+            order_create_day,
             order["status"],
-            order["substatus"],
+            "new",  # order["substatus"],
             order["our_status"],
             "PREPAID",  #order['data'].get("paymentType"),
-            order["shipments"][0]['fulfillmentMethod'],
-            summ_order,
+            delivery,
+            str(summ_order),
             client_id_ps
         )
 
-        if customers and dbs:
+        if customers and model == 'dbs':
             result_customer = (
                 order["shipments"][0]["shipmentId"],
                 mp,
-                order['shipmentDate'],
-                summ_order,
+                order_create_day,
+                str(summ_order),
                 order["shipments"][0]["customer"]['phone'],
                 order["shipments"][0]["customer"]['email'],
                 order["shipments"][0]["customer"]["address"]["fias"]['regionId'],
@@ -565,18 +580,23 @@ def test():
 
 @app.route('/external_orders/<uuid>/new', methods=['GET', 'POST'])
 async def new_order_sber(uuid):
-    print(33333, uuid)
+    # print(33333, uuid)
 
     token = request.headers.get('Basic auth')
+    print(33333, uuid)
     if token == None or token != None:
+        print(33311133, uuid)
         data_req = request.json
         order = data_req["data"]
         pre_proxy = order["shipments"][0]["items"]
         proxy = counter_items(pre_proxy)
 
-        client_id_ps = conn.execute_query_return_v4(
-            query_get_shop_client_id, uuid)
-        print(232323, type(client_id_ps), client_id_ps)
+        store_data = conn.execute_query_return_one(
+            query_get_shop_campain_id, uuid)
+        print(232323, type(store_data), store_data)
+        client_id_ps = store_data[1]
+        model = store_data[0]
+
         # проверяем наличие for order
         # stock = check_is_accept_sb(proxy)
         # order["count_items"] = stock[1]
@@ -584,15 +604,18 @@ async def new_order_sber(uuid):
         #     data = order_resp_sb(stock[0], True)
 
         data = order_resp_sb(True, True)
-        order['status'],\
+        order['status'],  \
             order['our_status'], order['count_items'] \
             = "NEW", "NEW", proxy
         # ref_data = reformat_data_order(order, 'Sber')
-        ref_data = reformat_data_order_v2(order, 'Sber',
+        ref_data = reformat_data_order_v2(order, 'Sber', model=model,
                                           client_id_ps=client_id_ps)
-        await execute_query(query_write_order, ref_data[0])
+        print(123, type(ref_data[0]),  ref_data[0])
+        print(123, type(ref_data[1]),  ref_data[1])
+        print(123, type(ref_data[2]),  ref_data[2])
+        await execute_query_v3(query_write_order, ref_data[0])
         await executemany_query(query_write_items, ref_data[1])
-        await execute_query(query_write_customer, ref_data[2])
+        await execute_query_v3(query_write_customer, ref_data[2])
         # data_confirm = confirm_data_sb(order)
         # post_smth_sb('order/confirm', data_confirm)
 
@@ -840,7 +863,7 @@ async def add_store():
         key_store = data.get('key_store')
         api_key_ps = data.get('api_key_ps')
         upload_link = data.get('upload_link')
-        print(33333333, market, key_store, store_id, upload_link)
+
 
         if (market == '235' or market == '2063') \
                 and store_id != '' and key_store != '' and upload_link != '':
@@ -858,16 +881,27 @@ async def add_store():
         elif market != '' and key_store != '' and upload_link != '':
             random_uuid = str(uuid.uuid4())
             url = request.url
-            result = conn.execute_query_v2(query_add_settings_without_ym,
-                                           (market,
-                                            key_store,
-                                            random_uuid,
-                                            api_key_ps,
-                                            upload_link))
-            if result[0]:
-                flash(f'Настройки удачно сохранены. Ссылка на новых заказов {url}')
-            else:
-                flash(f"Ошибка сохранения {result[1]}")
+            target_url_new = url.rsplit('/', 1)[0] + f'/external_orders/{random_uuid}/new'
+            target_url_cancel = url.rsplit('/', 1)[0] + f'/external_orders/{random_uuid}/cancel'
+            print(33333333, market, key_store, store_id, upload_link,
+                  random_uuid, target_url_new, target_url_cancel, url)
+            try:
+                conn.execute_query_v2(query_add_settings_without_ym,
+                                               (market,
+                                                key_store,
+                                                random_uuid,
+                                                api_key_ps,
+                                                upload_link))
+                flash(f'Настройки удачно сохранены. Ссылка для новых заказов {target_url_new}.'
+                      f' \n Ссылка для отмены заказов {target_url_cancel}.')
+            except IntegrityError as e:
+                if isinstance(e, UniqueViolation):
+                    flash(f"Ошибка сохранения {e}")
+
+            # if result:
+            #     flash(f'Настройки удачно сохранены. Ссылка для новых заказов {url}')
+            # else:
+            #     flash(f"Ошибка сохранения {result}")
         else:
             flash("Проверьте полноту введенных данных")
 

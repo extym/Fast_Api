@@ -131,7 +131,7 @@ def reformat_data_order(order, mp, client_id_ps):
                 item["offerId"],
                 id_1c,
                 item["count"],
-                str(item["price"] + item.get("subsidy")).split(".")[0]
+                str(item["price"] + item.get("subsidy")).split(".")[0]  # TODO is make it int ?
             )
             result_items.append(proxy)
 
