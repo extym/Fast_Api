@@ -36,14 +36,26 @@ class UploadPrice(db.Model):
     __tablename__ = 'upload_price'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(250))
-    koef_price = db.Column(db.Integer())
+    upload_prices_markup = db.Column(db.Integer())
+    upload_price_discount = db.Column(db.Integer())
     distributors = db.Column(db.String(250))
     link = db.Column(db.String(250))
-    is_null_stocks = db.Column(db.Boolean())
-    is_scheduler = db.Column(db.Boolean())
+    is_null_stocks = db.Column(db.String(250))
+    is_scheduler = db.Column(db.String(250))
     date_added = db.Column(db.String(250))
     date_modifed = db.Column(db.String(250))
     user_modifed = db.Column(db.Integer())
+    upload_prices_short_shop = db.Column(db.String(250))
+    upload_prices_legal_name = db.Column(db.String(250))
+    upload_prices_url = db.Column(db.String(250))
+    upload_price_category = db.Column(db.String(250))
+    upload_prices_store = db.Column(db.String(250))
+    upload_prices_mp = db.Column(db.String(250))
+    upload_option = db.Column(db.String(250))
+    user_id = db.Column(db.Integer())
+
+
+
 
 
 class Distributor(db.Model):

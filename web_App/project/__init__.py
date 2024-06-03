@@ -5,6 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import insert, create_engine, select, update, text
 from .creds import *
 
+
 # # Redis
 # from rq import Worker, Queue, Connection
 # from project.worker import conn
@@ -22,6 +23,7 @@ if LOCAL_MODE:
 else:
     interval = 120
 PHOTO_UPLOAD_FOLDER = 'project/templates/static/data/profile/'
+DATA_PATH = 'project/data/'
 engine = create_engine(f"postgresql+psycopg2://{db_user}:{db_pass}@{db_host}/{db_name}", pool_size=20, max_overflow=30)
 
 def create_app():

@@ -27,6 +27,7 @@ from .models import *
 from . import db
 from apscheduler.schedulers.background import BackgroundScheduler
 
+import project.sber as sber
 import project.ozon as oson
 
 import logging
@@ -70,7 +71,7 @@ def back_shops_tasks():
                       .format(len(key), seller_id, True))
 
                 logging.info('Send_stocks_oson_v2 - len_key {}, seller_id {}, is_stocks_null {}'
-                              .format(len(key), seller_id, True))
+                             .format(len(key), seller_id, True))
             if row.name_mp == 'wb':
                 wb.send_stocks_wb_v2(sourse='web',
                                      seller_id=seller_id,
@@ -79,7 +80,7 @@ def back_shops_tasks():
                       .format(len(key), seller_id, True))
 
                 logging.info('Send_stocks_wb_v2 - len_key {}, seller_id {}, is_stocks_null {}'
-                              .format(len(key), seller_id, True))
+                             .format(len(key), seller_id, True))
 
         if row.send_common_stocks:
             ii_raw = session.query(InternalImport) \
@@ -95,14 +96,14 @@ def back_shops_tasks():
                 print('Send_stocks_oson_v3 - donor_name {}, recipient_id {}, key_recipient {}'
                       .format(store_1, seller_id, key))
                 logging.info('Send_stocks_oson_v3 - donor {}, recipient {}'
-                              .format(store_1, seller_id))
+                             .format(store_1, seller_id))
             if row.name_mp == 'wb':
                 wb.send_stocks_wb_v3(donor=store_1,
                                      recipient=seller_id)
                 print('send_stocks_wb_v3 - donor {}, recipient {}'
                       .format(store_1, seller_id))
                 logging.info('send_stocks_wb_v3 - donor {}, recipient {}'
-                              .format(store_1, seller_id))
+                             .format(store_1, seller_id))
 
         if row.enable_orders_submit:
             if row.name_mp == 'ozon':
@@ -114,11 +115,11 @@ def back_shops_tasks():
             elif row.name_mp == 'wb':
                 wb.processing_orders_wb_v2(key=row.key_mp,
                                            shop_name=shop_name)
-                print('Processing_orders_wb_v2 - len_key {}, shop_name {}'\
+                print('Processing_orders_wb_v2 - len_key {}, shop_name {}' \
                       .format(len(key), shop_name))
 
                 logging.info('Processing_orders_wb_v2 - len_key {}, shop_name {}'
-                              .format(len(key), shop_name))
+                             .format(len(key), shop_name))
 
         if row.enable_sync_stocks:
             if row.name_mp == 'ozon':
@@ -129,7 +130,7 @@ def back_shops_tasks():
                       .format(seller_id, False))
 
                 logging.info('Send_stocks_oson_v2 - seller_id {} is_stocks_null {}'
-                              .format(seller_id, False))
+                             .format(seller_id, False))
             if row.name_mp == 'wb':
                 wb.send_stocks_wb_v2(seller_id=seller_id,
                                      is_stocks_null=False,
@@ -138,7 +139,7 @@ def back_shops_tasks():
                       .format(seller_id, False))
 
                 logging.info('Send_stocks_wb_v2 - seller_id {} is_stocks_null {}'
-                              .format(seller_id, False))
+                             .format(seller_id, False))
 
         if row.enable_sync_price:
             if row.name_mp == 'ozon':
@@ -147,15 +148,14 @@ def back_shops_tasks():
                 print('Send_product_price oson - len key {},  seller_id {}'
                       .format(len(key), row.seller_id))
                 logging.info('Send_product_price oson - key {}, recipient_id {}'
-                              .format(key, seller_id))
+                             .format(key, seller_id))
 
             if row.name_mp == 'wb':
                 wb.send_price_to_wb(seller_id=seller_id, sourse='web')
                 print('Send_stocks_wb_v2 - seller_id {} is_stocks_null {}'
                       .format(len(key), seller_id))
                 logging.info('Send_stocks_wb_v2 - seller_id {} is_stocks_null {}'
-                              .format(key, seller_id))
-
+                             .format(key, seller_id))
 
     # print(777, markets)
 
@@ -526,7 +526,6 @@ def import_settings():
     else:
         rows, rows_mp = [], []
         show = request.args.get('show')
-        # print(1111111111111, show, request.args.get('make'))
         # if show:
         #     uid = current_user.id
         #     role = current_user.roles
@@ -641,7 +640,7 @@ def import_settings_post():
             flash("Проверьте, пожалуйста, корректность вводимых данных", 'error')
             return redirect('/import_settings')
 
-    elif make == 'start_internal_import_product': 
+    elif make == 'start_internal_import_product':
         internal_import_mp_1 = data.get('internal_import_mp_1')
         internal_import_store_1 = data.get('internal_import_store_1')
         internal_import_role_1 = data.get('internal_import_role_1')
@@ -1717,46 +1716,8 @@ def upload_prices_table():
     else:
         if request.method == "POST":
             pass
-        
+
         rows, rows_mp = [], []
-        show = request.args.get('show')
-        # print(1111111111111, show, request.args.get('make'))
-        # if show:
-        #     uid = current_user.id
-        #     role = current_user.roles
-        #     need_id = current_user.company_id
-        #     user_name = current_user.name
-        #     photo = current_user.photo
-        #     if not photo or photo is None:
-        #         photo = 'prof-music-2.jpg'
-        #     internal_import_role_1 = request.args.get("internal_import_role_1")
-        #     internal_import_markup_1 = request.args.get("internal_import_markup_1")
-        #     internal_import_store_2 = request.args.get("internal_import_store_2")
-        #     internal_import_discount_2 = request.args.get("internal_import_discount_2")
-        #     internal_import_mp_1 = request.args.get("internal_import_mp_1")
-        #     internal_import_store_1 = request.args.get("internal_import_store_1")
-        #     internal_import_discount_1 = request.args.get("internal_import_discount_1")
-        #     internal_import_mp_2 = request.args.get("internal_import_mp_2")
-        #     internal_import_role_2 = request.args.get("internal_import_role_2")
-        #     internal_import_markup_2 = request.args.get("internal_import_markup_2")
-        #
-        #     return render_template('/import_settings.html',
-        #                            uid=uid, role=role,
-        #                            internal_import_role_1=internal_import_role_1,
-        #                            internal_import_markup_1=internal_import_markup_1,
-        #                            internal_import_store_2=internal_import_store_2,
-        #                            internal_import_discount_2=internal_import_discount_2,
-        #                            internal_import_mp_1=internal_import_mp_1,
-        #                            internal_import_store_1=internal_import_store_1,
-        #                            internal_import_discount_1=internal_import_discount_1,
-        #                            internal_import_mp_2=internal_import_mp_2,
-        #                            internal_import_role_2=internal_import_role_2,
-        #                            internal_import_markup_2=internal_import_markup_2,
-        #                            rows=rows, rows_mp=set(rows_mp),
-        #                            photo=photo,
-        #                            show=True,
-        #                            user_name=user_name)
-        # else:
         uid = current_user.id
         role = current_user.roles
         need_id = current_user.company_id
@@ -1783,102 +1744,96 @@ def upload_prices_table():
 @login_required
 def upload_prices_settings():
     if request.method == "POST":
-        pass
-
         uid = str(current_user.id)
         role = current_user.roles
         company_id = current_user.company_id
         data = request.form.to_dict()
         make = data.get('make')
-        print(111, data, current_user.name)
-        if make == 'start_import':
-            mp = data.get('import_mp_name')
-            shop_name = data.get('import_shop_names')
-            change_base_price = data.get('change_base_price')
-            if mp == 'ozon':
-                # job = q.enqueue_call(import_oson_data_prod(user_id=uid,
-                #                                            shop_name=shop_name,
-                #                                            company_id=company_id,
-                #                                            update_base_price=change_base_price))
-                print(777777777777, job.get_id)
-            elif mp == 'wb':
-                # job = q.enqueue_call(wb.import_product_from_wb(uid_edit_user=uid,
-                #                                                shop_name=shop_name,
-                #                                                company_id=company_id))
-                print(88888888888, job.get_id)
-    
-            return redirect('/upload_prices_settings')
-    
-        elif make == 'save_internal_import':
-            internal_import_mp_1 = data.get('internal_import_mp_1')
-            internal_import_store_1 = data.get('internal_import_store_1')
-            internal_import_role_1 = data.get('internal_import_role_1')
-    
-            if internal_import_mp_1 != 'Выбрать' and internal_import_store_1 != 'Выбрать' \
-                    and internal_import_role_1 == 'donor':
-                in_import = InternalImport(
-                    internal_import_mp_1=internal_import_mp_1,
-                    internal_import_store_1=internal_import_store_1,
-                    internal_import_role_1=internal_import_role_1,
-                    internal_import_markup_1=data.get('internal_import_markup_1'),
-                    internal_import_discount_1=data.get('internal_import_discount_1'),
-                    internal_import_mp_2=data.get('internal_import_mp_2'),
-                    internal_import_store_2=data.get('internal_import_store_2'),
-                    internal_import_role_2=data.get('internal_import_role_2'),
-                    internal_import_discount_2=data.get('internal_import_discount_2'),
-                    internal_import_markup_2=data.get('internal_import_markup_2'),
-                    company_id=current_user.company_id,
-                    user_id=current_user.name
+        print(111, *data.items(), sep='\n')
+        # for key in data.keys():
+        #     print(key, f"= data.get('{key}'),")
+        # print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+        # for key in data.keys():
+        #     print(key, f"={key}")
+
+        if make == 'save_upload_price':
+            upload_prices_mp = data.get('upload_prices_mp')
+            upload_prices_store = data.get('upload_prices_store')
+            upload_option = data.get('option')
+
+            if upload_prices_mp != 'Выбрать' and upload_prices_store != 'Выбрать' \
+                    and upload_option:
+                upload_price = UploadPrice(
+                    is_null_stocks=data.get('is_null_stocks', 'off'),
+                    is_scheduler=data.get('enabled_upload_price', 'off'),
+                    name=data.get('upload_price_name', 'default'),
+                    upload_option = data.get('option'),
+                    upload_prices_mp=data.get('upload_prices_mp'),
+                    upload_prices_markup=data.get('upload_prices_markup'),
+                    upload_prices_store=data.get('upload_prices_store'),
+                    upload_price_discount=data.get('upload_price_discount'),
+                    upload_prices_short_shop=data.get('upload_prices_short_shop'),
+                    upload_prices_legal_name=data.get('upload_prices_legal_name'),
+                    upload_prices_url=data.get('upload_prices_url'),
+                    upload_price_category=data.get('upload_price_category'),
+                    date_modifed=datetime.datetime.now(),
+                    user_id=current_user.id
                 )
-                db.session.add(in_import)
+
+                db.session.add(upload_price)
                 db.session.commit()
                 flash("Настройки удачно сохранены", 'success')
             else:
                 flash("Проверьте, пожалуйста, корректность вводимых данных", 'error')
                 return redirect('/upload_prices_settings')
-    
-        elif make == 'start_internal_import_product': 
-            internal_import_mp_1 = data.get('internal_import_mp_1')
-            internal_import_store_1 = data.get('internal_import_store_1')
-            internal_import_role_1 = data.get('internal_import_role_1')
-            internal_import_mp_2 = data.get('internal_import_mp_2')
-            internal_import_store_2 = data.get('internal_import_store_2')
-            internal_import_role_2 = data.get('internal_import_role_2')
-    
-            if internal_import_role_1 != internal_import_role_2 and \
-                    internal_import_store_1 != internal_import_store_2 and \
-                    internal_import_mp_1 != 'Выбрать ' and \
-                    internal_import_mp_2 != 'Выбрать ':
-                if internal_import_role_2 == 'donor' and internal_import_role_1 == 'recipient':
-                    donor = data.get('internal_import_store_2')
-                    recipient = data.get('internal_import_store_1')
-                    donor_mp = data.get('internal_import_mp_2')
-                    recipient_mp = data.get('internal_import_mp_1')
-                else:
-                    donor = data.get('internal_import_store_1')
-                    recipient = data.get('internal_import_store_2')
-                    donor_mp = data.get('internal_import_mp_1')
-                    recipient_mp = data.get('internal_import_mp_2')
-    
-                job = q.enqueue_call(make_internal_import_oson_product
-                                     (donor=donor,
-                                      recipient=recipient,
-                                      source='front',
-                                      donor_mp=donor_mp,
-                                      recipient_mp=recipient_mp))
+
+        elif make == 'make_product_feed':
+            upload_price_name = data.get('upload_price_name')
+            upload_prices_mp = data.get('upload_prices_mp')
+            is_null_stocks = data.get('is_null_stocks', False)
+            upload_option = data.get('option')
+            upload_prices_markup = data.get('upload_prices_markup')
+            upload_prices_store = data.get('upload_prices_store')
+            upload_price_discount = data.get('upload_price_discount')
+            upload_prices_short_shop = data.get('upload_prices_short_shop')
+            upload_prices_legal_name = data.get('upload_prices_legal_name')
+            upload_prices_url = data.get('upload_prices_url')
+            upload_price_category = data.get('upload_price_category')
+
+            if upload_prices_store != 'Выбрать' and \
+                    upload_prices_short_shop != '' and \
+                    upload_prices_legal_name != '' and \
+                    upload_prices_mp != 'Выбрать ':
+                if upload_prices_mp == 'sber' and upload_option == 'xml':
+                    job = q.enqueue_call(sber.create_sber_xml
+                                         (stocks_is_null=is_null_stocks,
+                                          site_url=upload_prices_url,
+                                          legal_name=upload_prices_legal_name,
+                                          short_shop_name=upload_prices_short_shop))
+                elif upload_prices_mp == 'yandex':
+                    job = q.enqueue_call(make_internal_import_oson_product
+                                         (donor=donor,
+                                          recipient=recipient,
+                                          source='front',
+                                          donor_mp=donor_mp,
+                                          recipient_mp=recipient_mp))
                 print(989898989, job.get_id)
-            # print(*data.items(), sep='\n')
-    
-        elif make == 'start_internal_import_price':
+            print(989898989, *data.items(), sep='\n')
+
+        elif make == 'make_price_feed':
             print('!!!!!!_start_internal_import_price_!!!!!')
-            internal_import_mp_1 = data.get('internal_import_mp_1')
-            internal_import_store_1 = data.get('internal_import_store_1')
-            internal_import_role_1 = data.get('internal_import_role_1')
-            internal_import_mp_2 = data.get('internal_import_mp_2')
-            internal_import_store_2 = data.get('internal_import_store_2')
-            internal_import_role_2 = data.get('internal_import_role_2')
-            internal_import_markup_2 = data.get('internal_import_markup_2')
-    
+            upload_price_name = data.get('upload_price_name')
+            is_null_stocks = data.get('is_null_stocks')
+            upload_prices_mp = data.get('upload_prices_mp')
+            upload_option = data.get('option')
+            upload_prices_markup = data.get('upload_prices_markup')
+            upload_prices_store = data.get('upload_prices_store')
+            upload_price_discount = data.get('upload_price_discount')
+            upload_prices_short_shop = data.get('upload_prices_short_shop')
+            upload_prices_legal_name = data.get('upload_prices_legal_name')
+            upload_prices_url = data.get('upload_prices_url')
+            upload_price_category = data.get('upload_price_category')
+
             if internal_import_role_1 != internal_import_role_2 and \
                     internal_import_store_1 != internal_import_store_2 and \
                     internal_import_mp_1 != 'Выбрать ' and \
@@ -1893,43 +1848,37 @@ def upload_prices_settings():
                     print(4545454545, job.get_id)
             else:
                 flash("Проверьте правильность ввода данных", 'error')
-    
-        elif make == 'check_settings':
+
+        elif make == 'check_settings_uploads':
             # print('!!!!!!check_settings!!!!!11')
-            if data.get('internal_import_mp_1') == 'Выбрать' \
-                    and data.get('internal_import_store_1') == 'Выбрать' \
-                    and data.get('internal_import_mp_2') == 'Выбрать' \
-                    and data.get('internal_import_store_2') == 'Выбрать':
+            if data.get('upload_prices_mp') == 'Выбрать' \
+                    and data.get('upload_prices_store') == 'Выбрать':
                 flash("Укажите хотя бы один магазин для которого нужен просмотр настроек", "alert")
             else:
                 result = {k: v for k, v in data.items() if (v != '0' and v != 'Выбрать')}
                 port_set, mprt_setts = {}, {}
-                if result.get('internal_import_store_1') is not None \
-                        and result.get("internal_import_store_2") is not None:
-                    import_set = db.session.scalars(select(InternalImport)
+                if result.get('upload_prices_store') is not None \
+                        and result.get("upload_prices_mp") is not None:
+                    upload_settings = db.session.scalars(select(UploadPrice)
                     .where(
-                        InternalImport.internal_import_store_1 == data.get('internal_import_store_1'))
+                        InternalImport.internal_import_store_1 == data.get('upload_prices_mp'))
                     .where(
-                        InternalImport.internal_import_store_2 == data.get('internal_import_store_2'))) \
+                        InternalImport.internal_import_store_2 == data.get('upload_prices_store'))) \
                         .first()
                     try:
-                        port_set = import_set.__dict__
-                        internal_import_role_1 = port_set.get("internal_import_role_1")
-                        internal_import_markup_1 = port_set.get("internal_import_markup_1")
-                        internal_import_store_2 = port_set.get("internal_import_store_2")
-                        internal_import_discount_2 = port_set.get("internal_import_discount_2")
-                        internal_import_mp_1 = port_set.get("internal_import_mp_1")
-                        internal_import_store_1 = port_set.get("internal_import_store_1")
-                        internal_import_discount_1 = port_set.get("internal_import_discount_1")
-                        internal_import_mp_2 = port_set.get("internal_import_mp_2")
-                        internal_import_role_2 = port_set.get("internal_import_role_2")
-                        internal_import_markup_2 = port_set.get("internal_import_markup_2")
-    
-                        # for row in port_set.items():
-                        #     # print(row + ' = ' + 'request.args.get("' + row + '")')
-                        #     # print(row + '=' + row + ',')
-                        #     print(row)
-    
+                        upl_price_setts = upload_settings.__dict__
+                        upload_option = upl_price_setts.get('option')
+                        is_null_stocks = upl_price_setts.get('is_null_stocks')
+                        upload_price_name = upl_price_setts.get('upload_price_name')
+                        upload_prices_mp = upl_price_setts.get('upload_prices_mp')
+                        upload_prices_markup = upl_price_setts.get('upload_prices_markup')
+                        upload_prices_store = upl_price_setts.get('upload_prices_store')
+                        upload_price_discount = upl_price_setts.get('upload_price_discount')
+                        upload_prices_short_shop = upl_price_setts.get('upload_prices_short_shop')
+                        upload_prices_legal_name = upl_price_setts.get('upload_prices_legal_name')
+                        upload_prices_url = upl_price_setts.get('upload_prices_url')
+                        upload_price_category = upl_price_setts.get('upload_price_category')
+
                         uid = current_user.id
                         role = current_user.roles
                         need_id = current_user.company_id
@@ -1937,46 +1886,45 @@ def upload_prices_settings():
                         photo = current_user.photo
                         if not photo or photo is None:
                             photo = 'prof-music-2.jpg'
-    
-                        return render_template('/import_settings.html',
+
+                        return render_template('/upload_price_settings.html',
                                                uid=uid, role=role,
                                                photo=photo,
                                                user_name=user_name,
                                                show=True,
-                                               internal_import_role_1=internal_import_role_1,
-                                               internal_import_markup_1=internal_import_markup_1,
-                                               internal_import_store_2=internal_import_store_2,
-                                               internal_import_discount_2=internal_import_discount_2,
-                                               internal_import_mp_1=internal_import_mp_1,
-                                               internal_import_store_1=internal_import_store_1,
-                                               internal_import_discount_1=internal_import_discount_1,
-                                               internal_import_mp_2=internal_import_mp_2,
-                                               internal_import_role_2=internal_import_role_2,
-                                               internal_import_markup_2=internal_import_markup_2)
+                                               upload_price_name=upload_price_name,
+                                               upload_prices_mp=upload_prices_mp,
+                                               upload_option=upload_option,
+                                               is_null_stocks=is_null_stocks,
+                                               upload_prices_markup=upload_prices_markup,
+                                               upload_prices_store=upload_prices_store,
+                                               upload_price_discount=upload_price_discount,
+                                               upload_prices_short_shop=upload_prices_short_shop,
+                                               upload_prices_legal_name=upload_prices_legal_name,
+                                               upload_prices_url=upload_prices_url,
+                                               upload_price_category=upload_price_category
+                                               )
                     except:
-                        flash("Настройки для указанных магазинов не найдены. Введите требуемые настройки и сохраните их.",
-                              "alert")
-    
-                elif result.get('internal_import_store_1') is not None:
-                    import_set = db.session.scalars(select(InternalImport)
+                        flash(
+                            "Настройки для указанных магазинов не найдены. Введите требуемые настройки и сохраните их.",
+                            "alert")
+
+                elif result.get('upload_prices_store') is not None:
+                    upload_settings = db.session.scalars(select(UploadPrice)
                     .where(
-                        InternalImport.internal_import_store_1 == data.get('internal_import_store_1'))
-                    .where(
-                        InternalImport.internal_import_role_1 == data.get('internal_import_role_1'))) \
+                        UploadPrice.upload_prices_store == data.get('upload_prices_store'))) \
                         .first()
                     try:
-                        port_set = import_set.__dict__
-                        internal_import_role_1 = port_set.get("internal_import_role_1")
-                        internal_import_markup_1 = port_set.get("internal_import_markup_1")
-                        internal_import_store_2 = port_set.get("internal_import_store_2")
-                        internal_import_discount_2 = port_set.get("internal_import_discount_2")
-                        internal_import_mp_1 = port_set.get("internal_import_mp_1")
-                        internal_import_store_1 = port_set.get("internal_import_store_1")
-                        internal_import_discount_1 = port_set.get("internal_import_discount_1")
-                        internal_import_mp_2 = port_set.get("internal_import_mp_2")
-                        internal_import_role_2 = port_set.get("internal_import_role_2")
-                        internal_import_markup_2 = port_set.get("internal_import_markup_2")
-    
+                        upl_price_setts = upload_settings.__dict__
+                        upload_prices_mp = upl_price_setts.get('upload_prices_mp')
+                        upload_prices_markup = upl_price_setts.get('upload_prices_markup')
+                        upload_prices_store = upl_price_setts.get('upload_prices_store')
+                        upload_price_discount = upl_price_setts.get('upload_price_discount')
+                        upload_prices_short_shop = upl_price_setts.get('upload_prices_short_shop')
+                        upload_prices_legal_name = upl_price_setts.get('upload_prices_legal_name')
+                        upload_prices_url = upl_price_setts.get('upload_prices_url')
+                        upload_price_category = upl_price_setts.get('upload_price_category')
+
                         uid = current_user.id
                         role = current_user.roles
                         need_id = current_user.company_id
@@ -1984,47 +1932,42 @@ def upload_prices_settings():
                         photo = current_user.photo
                         if not photo or photo is None:
                             photo = 'prof-music-2.jpg'
-    
-                        return render_template('/import_settings.html',
+
+                        return render_template('/upload_price_settings.html',
                                                uid=uid, role=role,
                                                photo=photo,
                                                user_name=user_name,
                                                show=True,
-                                               internal_import_role_1=internal_import_role_1,
-                                               internal_import_markup_1=internal_import_markup_1,
-                                               internal_import_store_2=internal_import_store_2,
-                                               internal_import_discount_2=internal_import_discount_2,
-                                               internal_import_mp_1=internal_import_mp_1,
-                                               internal_import_store_1=internal_import_store_1,
-                                               internal_import_discount_1=internal_import_discount_1,
-                                               internal_import_mp_2=internal_import_mp_2,
-                                               internal_import_role_2=internal_import_role_2,
-                                               internal_import_markup_2=internal_import_markup_2)
+                                               upload_prices_mp=upload_prices_mp,
+                                               upload_prices_markup=upload_prices_markup,
+                                               upload_prices_store=upload_prices_store,
+                                               upload_price_discount=upload_price_discount,
+                                               upload_prices_short_shop=upload_prices_short_shop,
+                                               upload_prices_legal_name=upload_prices_legal_name,
+                                               upload_prices_url=upload_prices_url,
+                                               upload_price_category=upload_price_category,
+                                               )
                     except:
                         flash("Настройки для указанного магазина не найдены. "
                               "Введите требуемые настройки и сохраните их.",
                               "alert")
-    
-                elif result.get('internal_import_store_2') is not None:
-                    import_settings = db.session.scalars(select(InternalImport)
+
+                elif result.get('upload_prices_mp') is not None:
+                    upload_settings = db.session.scalars(select(UploadPrice)
                     .where(
-                        InternalImport.internal_import_store_2 == data.get('internal_import_store_2'))
-                    .where(
-                        InternalImport.internal_import_role_2 == data.get('internal_import_role_2'))) \
+                        UploadPrice.upload_prices_mp == data.get('upload_prices_mp'))) \
                         .first()
                     try:
-                        mprt_setts = import_settings.__dict__
-                        internal_import_role_1 = mprt_setts.get("internal_import_role_1")
-                        internal_import_markup_1 = mprt_setts.get("internal_import_markup_1")
-                        internal_import_store_2 = mprt_setts.get("internal_import_store_2")
-                        internal_import_discount_2 = mprt_setts.get("internal_import_discount_2")
-                        internal_import_mp_1 = mprt_setts.get("internal_import_mp_1")
-                        internal_import_store_1 = mprt_setts.get("internal_import_store_1")
-                        internal_import_discount_1 = mprt_setts.get("internal_import_discount_1")
-                        internal_import_mp_2 = mprt_setts.get("internal_import_mp_2")
-                        internal_import_role_2 = mprt_setts.get("internal_import_role_2")
-                        internal_import_markup_2 = mprt_setts.get("internal_import_markup_2")
-    
+                        upl_price_setts = upload_settings.__dict__
+                        upload_prices_mp = upl_price_setts.get('upload_prices_mp')
+                        upload_prices_markup = upl_price_setts.get('upload_prices_markup')
+                        upload_prices_store = upl_price_setts.get('upload_prices_store')
+                        upload_price_discount = upl_price_setts.get('upload_price_discount')
+                        upload_prices_short_shop = upl_price_setts.get('upload_prices_short_shop')
+                        upload_prices_legal_name = upl_price_setts.get('upload_prices_legal_name')
+                        upload_prices_url = upl_price_setts.get('upload_prices_url')
+                        upload_price_category = upl_price_setts.get('upload_price_category')
+
                         uid = current_user.id
                         role = current_user.roles
                         need_id = current_user.company_id
@@ -2032,51 +1975,94 @@ def upload_prices_settings():
                         photo = current_user.photo
                         if not photo or photo is None:
                             photo = 'prof-music-2.jpg'
-    
-                        return render_template('/import_settings.html',
+
+                        return render_template('/upload_price_settings.html',
                                                uid=uid, role=role,
                                                photo=photo,
                                                user_name=user_name,
                                                show=True,
-                                               internal_import_role_1=internal_import_role_1,
-                                               internal_import_markup_1=internal_import_markup_1,
-                                               internal_import_store_2=internal_import_store_2,
-                                               internal_import_discount_2=internal_import_discount_2,
-                                               internal_import_mp_1=internal_import_mp_1,
-                                               internal_import_store_1=internal_import_store_1,
-                                               internal_import_discount_1=internal_import_discount_1,
-                                               internal_import_mp_2=internal_import_mp_2,
-                                               internal_import_role_2=internal_import_role_2,
-                                               internal_import_markup_2=internal_import_markup_2)
+                                               upload_prices_mp=upload_prices_mp,
+                                               upload_prices_markup=upload_prices_markup,
+                                               upload_prices_store=upload_prices_store,
+                                               upload_price_discount=upload_price_discount,
+                                               upload_prices_short_shop=upload_prices_short_shop,
+                                               upload_prices_legal_name=upload_prices_legal_name,
+                                               upload_prices_url=upload_prices_url,
+                                               upload_price_category=upload_price_category,
+                                               )
                     except:
-                        flash("Настройки для указанного магазина не найдены. Введите требуемые настройки и сохраните их.",
-                              "alert")
-    
+                        flash(
+                            "Настройки для указанного магазина не найдены. Введите требуемые настройки и сохраните их.",
+                            "alert")
+
         return redirect('/upload_prices_settings')
 
-    rows, rows_mp = [], []
     show = request.args.get('show')
-    uid = current_user.id
-    role = current_user.roles
-    need_id = current_user.company_id
-    user_name = current_user.name
-    photo = current_user.photo
-    if not photo or photo is None:
-        photo = 'prof-music-2.jpg'
-    need_data = db.session.execute(select(Marketplaces.shop_name,
-                                          Marketplaces.name_mp)
-                                   .where(Marketplaces.company_id == need_id))
+    #######################################################
+    # print(1111111111111, show, request.args.get('make'))
+    # for key in request.args.keys():
+    #     print(key, f"= request.args.get('{key}')")
+    #######################################################
+    rows, rows_mp = [], []
+    if show:
+        uid = current_user.id
+        role = current_user.roles
+        need_id = current_user.company_id
+        user_name = current_user.name
+        photo = current_user.photo
+        if not photo or photo is None:
+            photo = 'prof-music-2.jpg'
+        upload_price_name = request.args.get('upload_price_name')
+        is_null_stocks = request.args.get('is_null_stocks')
+        upload_prices_mp = request.args.get('upload_prices_mp')
+        upload_option = request.args.get('option')
+        upload_prices_markup = request.args.get('upload_prices_markup')
+        upload_prices_store = request.args.get('upload_prices_store')
+        upload_price_discount = request.args.get('upload_price_discount')
+        upload_prices_short_shop = request.args.get('upload_prices_short_shop')
+        upload_prices_legal_name = request.args.get('upload_prices_legal_name')
+        upload_prices_url = request.args.get('upload_prices_url')
+        upload_price_category = request.args.get('upload_price_category')
 
-    for row in need_data:
-        rows.append(row[0])
-        rows_mp.append(row[1])
+        return render_template('/upload_price_settings.html',
+                               uid=uid, role=role,
+                               upload_price_name=upload_price_name,
+                               upload_prices_mp=upload_prices_mp,
+                               upload_option=upload_option,
+                               is_null_stocks=is_null_stocks,
+                               upload_prices_markup=upload_prices_markup,
+                               upload_prices_store=upload_prices_store,
+                               upload_price_discount=upload_price_discount,
+                               upload_prices_short_shop=upload_prices_short_shop,
+                               upload_prices_legal_name=upload_prices_legal_name,
+                               upload_prices_url=upload_prices_url,
+                               upload_price_category=upload_price_category,
+                               rows=rows, rows_mp=set(rows_mp),
+                               photo=photo,
+                               show=True,
+                               user_name=user_name)
+    else:
+        uid = current_user.id
+        role = current_user.roles
+        need_id = current_user.company_id
+        user_name = current_user.name
+        photo = current_user.photo
+        if not photo or photo is None:
+            photo = 'prof-music-2.jpg'
+        need_data = db.session.execute(select(Marketplaces.shop_name,
+                                              Marketplaces.name_mp)
+                                       .where(Marketplaces.company_id == need_id))
 
-    return render_template('/upload_price_settings.html',
-                           uid=uid, role=role,
-                           rows=rows, rows_mp=set(rows_mp),
-                           photo=photo,
-                           distributors=LOCAL_MODE,
-                           user_name=user_name)
+        for row in need_data:
+            rows.append(row[0])
+            rows_mp.append(row[1])
+
+        return render_template('/upload_price_settings.html',
+                               uid=uid, role=role,
+                               rows=rows, rows_mp=set(rows_mp),
+                               photo=photo,
+                               distributors=LOCAL_MODE,
+                               user_name=user_name)
 
 
 @auth.route('/distributor-settings', methods=['GET', 'POST'])
@@ -2097,7 +2083,7 @@ def distributor_settings():
             if data.get('edit_name_dist') == 'Выбрать':
                 flash('Не выбран поставщик. Укажите поставщика.')
             if data.get('check_settings') is not None:
-                #return current settings that distributor
+                # return current settings that distributor
                 distributor = Distributor.query.filter_by(data.get('edit_name_dist')).first()
                 key_api_dist = distributor.key_api_dist
                 login_api_dist = distributor.login_api_dist
@@ -2109,7 +2095,6 @@ def distributor_settings():
                                        distributors=LOCAL_MODE,
                                        photo=photo,
                                        user_name=user_name)
-
 
             return redirect(url_for('auth.distributor_settings'))
 
