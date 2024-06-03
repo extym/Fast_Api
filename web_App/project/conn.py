@@ -164,6 +164,8 @@ roles TEXT,
 photo text,
 date_Added varchar,
 date_Modifed varchar,
+upload_prices_url text,
+upload_price_category varchar,
 UNIQUE (email)
 )
 """
@@ -172,17 +174,24 @@ create_upload_price = """
 CREATE TABLE IF NOT EXISTS upload_price (
 id SERIAL PRIMARY KEY,
 name varchar NOT NULL,
-koef_price varchar, 
-distributor TEXT NOT NULL,
-dist_login text,
-dist_pass text,
+upload_prices_markup int,
+upload_price_discount int, 
+upload_prices_mp text,
+distributors TEXT,
 link TEXT,
-is_null_stocks bool,
-is_scheduler bool,
+is_null_stocks text,
+is_scheduler text,
 date_Added varchar,
 date_Modifed varchar,
 user_modifed int,
-UNIQUE (distributor, link)
+upload_prices_short_shop text,
+upload_prices_legal_name text,
+upload_prices_store text,
+upload_option varchar,
+upload_prices_url text,
+upload_price_category text,
+user_id int,
+UNIQUE (id)
 )
 """
 
@@ -939,3 +948,5 @@ update_db = [
 # # maintenans_query(create_sales)
 # maintenans_query(create_attributes_product)
 # maintenans_query(create_internal_import)
+maintenans_query(create_upload_price)
+

@@ -1,82 +1,82 @@
-import datetime
 import json
+import sys
 from xml.dom import minidom
-from project import DATA_PATH
+import datetime
+from pictures import dowload_images
+from main import get_new_pages_v2
+from prepare_data_export import get_need_data, get_need_data_v2
+from connect import check_and_write_v4, check_write_json_v4, standart_product_v2
+# from copy_connect import check_write_json, check_and_write_v3, standart_product_v2
+from getcsv import standart_wheels_csv
+from get_json import standart_wheels_from_json
+from cred import DATA_IMG, DATA_PATH
+from categories import categories_wheels, cats_wheels_upper, special_wheels
+
+desk_carwel = 'Диски CARWEL- cовременный, динамично развивающийся бренд. Новейшее передовое оборудование и ' \
+              'современные технологии по производству литых колесных дисков отвечающие самым высоким стандартам ' \
+              'качества и надежности,является не единственным конкурентным преимуществом.'
+# categories = {'iFree': 628, 'Carwel': 1969, 'KHOMEN': 1968, 'КиК': 1782, 'Скад': 1926}
+need_cats = ['NEO', 'Wheels UP', 'iFree', 'CARWEL', 'КИК', 'Tech-Line', 'Carwel', 'RST', 'КиК', 'Venti', 'IFREE',
+             'VENTI', 'TECH-LINE', 'СКАД', 'KHOMEN']
 
 
-special_wheels = {}  #TODO make brand dict?
+# ll = [i.upper() for i in need_cats]
+# need_cats.extend(ll)
+# print(7777, set(need_cats))
 
-def create_sber_xml(stocks_is_null=False, without_db=False, addons=False,
-                    site_url='', legal_name='', short_shop_name='',
-                    category='Все товары'):
+
+def clean_standart_data():
+    data = {}
+    with open(DATA_PATH + 'standart_data.json', 'w') as f:
+        json.dump(data, f)
+
+    print('Clean standart data successfuly ')
+
+
+def create_ym_xml(stocks_is_null=False, without_db=False):
     root = minidom.Document()
 
-    date = datetime.datetime.now().replace(second=0, microsecond=0)
+    date = datetime.datetime.now(datetime.timezone.utc).isoformat()
     xml_root = root.createElement('yml_catalog')
     root.appendChild(xml_root)
-    xml_root.setAttribute('date', str(date)[:-3])
+    xml_root.setAttribute('date', date)
 
     productChild = root.createElement('shop')
 
     nameChild = root.createElement('name')
-    textName = root.createTextNode(short_shop_name)
+    textName = root.createTextNode('1000koles')
     nameChild.appendChild(textName)
 
     companyChild = root.createElement('company')
-    textCompany = root.createTextNode(legal_name)
+    textCompany = root.createTextNode('ИП Иванов К.А')
     companyChild.appendChild(textCompany)
 
     urlChild = root.createElement('url')
-    textUrl = root.createTextNode(site_url)
+    textUrl = root.createTextNode('https://www.1000koles.ru')
     urlChild.appendChild(textUrl)
+
+    platformChild = root.createElement('platform')
+    textPlatform = root.createTextNode('ShopCMS')
+    platformChild.appendChild(textPlatform)
+
+    versionChild = root.createElement('version')
+    textVersion = root.createTextNode('1.0')
+    versionChild.appendChild(textVersion)
 
     # currenciesChild = root.createElement('currencies')
 
-    deliveryChild = root.createElement('shipment-options')
+    deliveryChild = root.createElement('delivery-options')
 
     deliveryOptionChild = root.createElement('option')
-    # deliveryOptionChild.setAttribute('cost', '0')
-    deliveryOptionChild.setAttribute('days', '2')
+    deliveryOptionChild.setAttribute('cost', '0')
+    deliveryOptionChild.setAttribute('days', '3')
     deliveryOptionChild.setAttribute('order-before', '13')
     deliveryChild.appendChild(deliveryOptionChild)
 
     categoriesChild = root.createElement('categories')
 
-    # < categories >
-    # < category id = "1" > Все товары < / category >
-    # < category id = "2"  parentId = "1" > Авто < / category >
-    # < category id = "207" parentId = "2" > Шины и диски < / category >
-
-    categoryAllChild = root.createElement('category')
-    categoryAllChild.setAttribute('id', '1')
-    textCategory = root.createTextNode(category)
-    categoryAllChild.appendChild(textCategory)
-    categoriesChild.appendChild(categoryAllChild)
-
-    categoryAutoChild = root.createElement('category')
-    categoryAutoChild.setAttribute('id', '2')
-    categoryAutoChild.setAttribute('parentId', '1')
-    textCategory = root.createTextNode('Авто')
-    categoryAutoChild.appendChild(textCategory)
-    categoriesChild.appendChild(categoryAutoChild)
-
-    categoryTWChild = root.createElement('category')
-    categoryTWChild.setAttribute('id', '3')
-    categoryTWChild.setAttribute('parentId', '2')
-    textCategory = root.createTextNode('Шины и диски')
-    categoryTWChild.appendChild(textCategory)
-    categoriesChild.appendChild(categoryTWChild)
-
     categoryChild = root.createElement('category')
-    categoryChild.setAttribute('id', '4')
-    categoryChild.setAttribute('parentId', '3')
-    textCategory = root.createTextNode('Расходники')
-    categoryChild.appendChild(textCategory)
-    categoriesChild.appendChild(categoryChild)
-
-    categoryChild = root.createElement('category')
-    categoryChild.setAttribute('id', '5')
-    categoryChild.setAttribute('parentId', '3')
+    categoryChild.setAttribute('id', '1')
     textCategory = root.createTextNode('Литые диски')
     categoryChild.appendChild(textCategory)
     categoriesChild.appendChild(categoryChild)
@@ -86,7 +86,7 @@ def create_sber_xml(stocks_is_null=False, without_db=False, addons=False,
         categories_id = special_wheels[category_vendor]
         categoryChild = root.createElement('category')
         categoryChild.setAttribute('id', f'{categories_id}')
-        categoryChild.setAttribute('parentId', '5')
+        categoryChild.setAttribute('parentId', '1')
         textCategory = root.createTextNode(f'{category_vendor}')
         categoryChild.appendChild(textCategory)
         categoriesChild.appendChild(categoryChild)
@@ -94,9 +94,8 @@ def create_sber_xml(stocks_is_null=False, without_db=False, addons=False,
     offersChild = root.createElement('offers')
 
     def create_offer(name, vendor, product_code, category_id, description, url, count, price):
-        offer_id = vendor + product_code
         offerChild = root.createElement('offer')
-        offerChild.setAttribute('id', offer_id)
+        offerChild.setAttribute('id', product_code)
         # offerChild.setAttribute('id', f'162499{y}')
         offerChild.setAttribute('available', 'true')
         offersChild.appendChild(offerChild)
@@ -131,22 +130,32 @@ def create_sber_xml(stocks_is_null=False, without_db=False, addons=False,
         priceOfferChild.appendChild(textPriceOffer)
         offerChild.appendChild(priceOfferChild)
 
-        outletsChild = root.createElement('outlets')
-        oneOutletChild = root.createElement('outlet')
-        oneOutletChild.setAttribute('id', 'Склад мерчанта 1000koles.ru')
-        oneOutletChild.setAttribute('instock', f"{count}")
-        outletsChild.appendChild(oneOutletChild)
-        offerChild.appendChild(outletsChild)
-
         descriptionOfferChild = root.createElement('description')
-        textdescriptiontOffer = root.createTextNode(description)
-        descriptionOfferChild.appendChild(textdescriptiontOffer)
+        textdescriptionOffer = root.createTextNode(description)
+        descriptionOfferChild.appendChild(textdescriptionOffer)
         offerChild.appendChild(descriptionOfferChild)
 
+        countOfferChild = root.createElement('count')
+        textcountOffer = root.createTextNode(count)
+        countOfferChild.appendChild(textcountOffer)
+        offerChild.appendChild(countOfferChild)
+
         minQuantityOfferChild = root.createElement('min-quantity')
-        textMinQuantityOffer = root.createTextNode('4')
+        textMinQuantityOffer = root.createTextNode('2')
         minQuantityOfferChild.appendChild(textMinQuantityOffer)
         offerChild.appendChild(minQuantityOfferChild)
+
+        # <weight>3.1</weight>
+        weightOfferChild = root.createElement('weight')
+        textWeightOffer = root.createTextNode('7.6')
+        weightOfferChild.appendChild(textWeightOffer)
+        offerChild.appendChild(weightOfferChild)
+
+        # <dimensions>22.1/40.425/22.1</dimensions>
+        dimensionsOfferChild = root.createElement('dimensions')
+        textDimensionsOffer = root.createTextNode('65/65/27')
+        dimensionsOfferChild.appendChild(textDimensionsOffer)
+        offerChild.appendChild(dimensionsOfferChild)
 
     def create_need_data(without_db=False):
         json_data, csv_data = {}, {}
@@ -169,85 +178,77 @@ def create_sber_xml(stocks_is_null=False, without_db=False, addons=False,
                 json_data = standart_wheels_from_json(without_db=True)
             except:
                 pass
-
-
             data = standart_product_v2(get_new_pages_v2())
 
         pre_csv_data = {key: value for key, value in csv_data.items() if int(value[0][4]) >= 4}
         pre_json_data = {k: v for k, v in json_data.items() if int(v[0][4]) >= 4}
         need_data = dict()
         for ke, val in data.items():
-            pre_count_json = pre_json_data.get(ke)
-            if pre_count_json:
+            if pre_json_data.get(ke):
+                pre_count_json = pre_json_data.get(ke)
                 count_json = int(pre_count_json[0][4])
+                del pre_json_data[ke]
             else:
                 count_json = 0
-                # print(111, ke, type(val[0][4]), val[0][4])
-            pre_count_csv = pre_csv_data.get(ke)
-            if pre_count_csv:
+            if pre_csv_data.get(ke):
+                pre_count_csv = pre_csv_data.get(ke)
                 count_csv = int(pre_count_csv[0][4])
+                del pre_csv_data[ke]
             else:
                 count_csv = 0
-                # print(222, ke, type(val[0][4]), val[0][4])
+
             in_stok = int(val[0][4]) + count_json + count_csv
             new_data = val[0].copy()
             del new_data[4]
             new_data.insert(4, in_stok)
-            need_data.update({ke: (new_data, val[1], val[2], val[3], val[4])})
+
+            need_data.update({ke: (new_data, val[1], val[2], val[3])})
+
+        need_data.update(pre_csv_data)
+        need_data.update(pre_json_data)
         print('ALL_RIDE create_need_data ', len(need_data))
 
         return need_data
 
-    try:
-        need_data = create_need_data(without_db=without_db)
-        print('MAKE_NEED_data_successfuly ', len(need_data))
-    except:
-        with open(DATA_PATH + '/standart_data.json', 'r') as file:
-            need_data = json.load(file)
-
-    print('len_need_data_for_offers ', len(need_data))
+    # try:
+    need_data = create_need_data(without_db=without_db)
+    print('make_need_data_successfuly ', len(need_data))
     counter = 0
-
+    row = tuple()
     for row in need_data.values():
         try:
             if not stocks_is_null:
-                if row[0][7] in need_cats and int(row[0][3]) > 6000 and row[0][4] >= 4 and row[3]:
+                if row[0][7] in need_cats and int(row[0][3]) > 7000 and row[0][4] >= 4 and row[3]:
                     url = 'https://www.1000koles.ru/pictures/' + row[1][0]
-                    # price = int(row[0][3]) * 1.15
                     ## create_offer(name, vendor, product_code, category_id, description, url, count, price)
                     create_offer(row[0][1], row[0][7], row[0][6], str(row[0][0]), row[0][2], url, str(row[0][4]),
                                  str(row[0][3]))
                     counter += 1
             else:
-                if row[0][7] in need_cats and int(row[0][3]) > 6000 and row[3]:
+                if row[0][7] in need_cats and int(row[0][3]) > 7000 and row[0][4] >= 4 and row[3]:
                     url = 'https://www.1000koles.ru/pictures/' + row[1][0]
-                    # price = int(row[0][3]) * 1.15
-                    shop_price = int(row[4]) * 1.32
                     ## create_offer(name, vendor, product_code, category_id, description, url, count, price)
-                    create_offer(row[0][1], row[0][7], row[0][6], str(row[0][0]), row[0][2], url, "0", str(round(shop_price, 0)))
+                    create_offer(row[0][1], row[0][7], row[0][6], str(row[0][0]), row[0][2], url, "0",
+                                 str(row[0][3]))
                     counter += 1
-                    # print(555, row)
         except Exception as error:
-            print('some_fuck_up_need_sb_data {} {} {}'
-                  .format(error, row[0][4], row))
+            print('some_fuck_up_need_ym_data {} {} {} {}'.format
+                  (error, type(row[0][4]), row[0][4], row))
             continue
             # sys.exit()
-
-    if addons:
-        val_data = standart_addons_from_json(without_db=True, data=ventil_LS)
-        # val_data = add_data.values()
-
-        create_offer(val_data[0][1], val_data[0][7], val_data[0][6], str(val_data[0][0]), val_data[0][2],
-                     val_data[1][1], str(val_data[0][4]), "25.0")
-        counter += 1
+        # if row[0][-1] == 'colrad':
+        #     print(1111111111, row)
+        # else:
+        #     continue
+    # print(122222222222, row)
 
     print('len_offers ', datetime.datetime.now(), counter)
 
     productChild.appendChild(nameChild)
     productChild.appendChild(companyChild)
     productChild.appendChild(urlChild)
-    # productChild.appendChild(platformChild)
-    # productChild.appendChild(versionChild)
+    productChild.appendChild(platformChild)
+    productChild.appendChild(versionChild)
     productChild.appendChild(deliveryChild)
     # productChild.appendChild(currenciesChild)
     # currenciesChild.appendChild(currencyChild)
@@ -258,15 +259,20 @@ def create_sber_xml(stocks_is_null=False, without_db=False, addons=False,
 
     xml_str = root.toprettyxml(indent="\t", encoding="UTF-8")
 
-    with open(DATA_IMG + "sber.xml", "wb") as f:
+    # save_path_file = "/home/ivanovka/data/www/1000koles.ru/pictures/yandex.xml"
+
+    with open(DATA_IMG + "yandex.xml", "wb") as f:
         f.write(xml_str)
 
-    # clean_standart_data()
-    # dowload_images() #TODO uncomment for production
+    # with open(DATA_IMG + "sber.xml", "wb") as f:
+    #     f.write(xml_str)
 
-    print('len_offers_last ', datetime.datetime.now(), counter)
+    clean_standart_data()
+    dowload_images()
 
 
+# create_ym_xml(without_db=True, stocks_is_null=False)
+# create_ym_xml()
+# clean_standart_data()
 
-# create_sber_xml(stocks_is_null=True, without_db=True)
-# create_sber_xml()
+

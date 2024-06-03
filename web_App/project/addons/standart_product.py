@@ -1,115 +1,15 @@
-import json
-import string
-import sys
-import random
-from cred import DATA_PATH, magic_link_csv, magic_link_csv2
-import wget
-import csv
-import datetime
-from connect import check_write_json, check_write_json_v4
-from categories import *
-from urllib.request import urlretrieve
-import urllib3
-urllib3.disable_warnings()
-
-import ssl
-ssl._create_default_https_context = ssl._create_unverified_context
+import project.addons.shins as shins
 
 
-tn = datetime.datetime.now()
-ts = datetime.datetime.timestamp(tn) * 1000
-date = str(ts)[:13]
-type_data = ['wheels', 'tyres']
-url2 = magic_link_csv + date
-url = magic_link_csv2 + date
-
-# print(url, url2)
-# sys.exit()
-
-# try:
-#     result = wget.download(url, out=DATA_PATH + '/proxy_wheels.csv')
-#     result2 = wget.download(url2, out=DATA_PATH + '/proxy_tyres.csv')
-# except:
-#     print('Fuck_up download csv')
-
-name = ['sku', 'title', 'brand_sku', 'gtin', 'season', 'brand', 'model', 'diameter', 'width', 'profile', 'load_index',
-        'speed_index', 'pins', 'runflat', 'homologation', 'production_year', 'sale', 'price', 'price_retail',
-        'price_msrp', 'photo_url', 'amount_total', 'amount_local', 'amount shopId 7', 'amount shopId 12',
-        'amount shopId 13', 'amount shopId 14', 'amount shopId 17', 'amount shopId 20', 'amount shopId 21',
-        'amount shopId 22', 'amount shopId 23', 'amount shopId 25', 'amount shopId 33', 'amount shopId 36',
-        'amount shopId 667', 'amount shopId 714', 'amount shopId 718', 'amount shopId 3012']
-
-listt = ['1251539', 'Headway 225/40 R18 SNOW-UHP HW508 92H', '3PN02254018E000002', '06930213605119', 'W', 'Headway',
-         'SNOW-UHP HW508', 'R18', '225', '40', '92', 'H', 'N', 'N', '', '', 'N', '5389', '6420', '6420',
-         'https://www.shinservice.ru/catalog/headway/uhp-5081.jpg', '20', '19', '0', '0', '0', '4', '0', '2', '4', '4',
-         '4', '4', '0', '4', '4', '0', '8', '4', '4', '8', '0', '4', '0', '4', '4', '4', '4', '0', '4', '0', '4', '4',
-         '4', '4', '0', '4', '0', '0']
-
-
-# print('index', listt.index('5389'))
-
-
-def id_generator(size=8, chars=string.ascii_lowercase + string.digits):
-    return ''.join(random.choice(chars) for _ in range(size))
-
-
-
-def get_data_csv():
-    proxy = []
-    try:
-        path2, data = urlretrieve(url2)
-        with open(path2, 'r') as file:
-            reader = csv.reader(file, delimiter='\t')
-            for row in reader:
-                proxy.append(row)
-        print(' get_data_csv_tyres ', '-------- ', len(proxy))
-    except:
-        print('Fuck_up download tyres csv')
-
-    return proxy
-
-
-
-def get_data_wheels_csv():
-    proxy = []
-    try:
-        # result = wget.download(url, out=DATA_PATH + '/proxy_wheels.csv')
-        # with open(DATA_PATH + '/proxy_wheels (1).csv', 'r') as file:
-
-        path, data = urlretrieve(url)
-        with open(path, 'r') as file:
-            reader = csv.reader(file, delimiter='\t')
-            for row in reader:
-                proxy.append(row)
-        print('get_data_wheels_csv ', '-------- ', len(proxy))
-    except:
-        print('Fuck_up download wheels csv')
-
-    return proxy
-
-
-
-# get_data_wheels_csv()
-
-
-def count_price_tyres(string, size):
-    if string.isdigit():
-        if size[1:].isdigit() and int(size[1:]) <= 16:
-            price = int(string) * 1.12  # result float
-        elif size[1:].isdigit() and int(size[1:]) >= 17:
-            price = int(string) * 1.10
-        else:
-            price = int(string) * 1.10
-
-        price = round(price, 0)
-
-        return price
-
-
-def standart_tyres_csv():
+def standart_tyres_csv(distributor=None, type_data=None, without_db=False):
     proxy_data, proxy = [], []
     global_result = {}
-    data = get_data_csv()
+    if distributor == 'shins' and type_data == 'csv':
+        data = shins.get_data_csv()
+    elif distributor == 'kolrad':
+        pass
+    elif distributor == '4tochku':
+        pass
     for i in range(1, len(data)):
         try:
             if data[i][1] == 'title':
@@ -190,7 +90,7 @@ def standart_tyres_csv():
     return global_result
 
 
-def standart_wheels_csv(without_db=False):
+def standart_wheels_csv(distributor=None, without_db=False):
     data = get_data_wheels_csv()
     global_result = {}
     for i in range(1, len(data)):
@@ -268,14 +168,3 @@ def standart_wheels_csv(without_db=False):
 
     print('ALL_RIDE_get_wheels_csv ', len(global_result))
     return global_result
-
-
-# data = standart_tyres_csv()
-# mems = sys.getsizeof(data)
-# print('from_csv', mems / 1000, 'Kb')
-# check_write_json(data)
-
-# data = get_data_wheels_csv()
-# mems = sys.getsizeof(data)
-# print('from_csv_wheels', mems / 1000, 'Kb')
-# standart_wheels_csv()
