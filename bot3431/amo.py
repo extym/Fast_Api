@@ -1002,7 +1002,7 @@ async def get_phone(string):
 async def rewrite_leads_v2(chat_id, user_id):  # (leads_id, price, string):
     raw_data = await get_amo_unsorted_list_v3(user_id)
     # time.sleep(1)
-    logging.info('message from rewrite leads, we get some {} {} {} '.format(raw_data[0], chat_id, user_id))
+    # logging.info('message from rewrite leads, we get some {} {} {} '.format(raw_data[0], chat_id, user_id))
     if raw_data[0] == 401:
         # refresh_access_main_amo()
         refresh_access_main_amo_v2(user_id)
@@ -1025,8 +1025,8 @@ async def rewrite_leads_v2(chat_id, user_id):  # (leads_id, price, string):
             continue
     # data_link = await read_link_v2(chat_id)
     data_link = get_bid(chat_id)
-    logging.info('Some_get from rewrite lead, we get {}'
-                 .format(data_link))
+    # logging.info('Some_get from rewrite lead, we get {}'
+    #              .format(data_link))
     creds = await get_creds_v3(user_id)
     access_token = creds.get('access_token')
     try:

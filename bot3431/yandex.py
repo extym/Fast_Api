@@ -97,6 +97,7 @@ def get_vendor_code(number_sber, offer_id):
     print(count)
     return brand, vendor_code, price
 
+
 def get_id_1c(offer_id):
 
     return None
@@ -245,7 +246,6 @@ def make_orders_to_ps(delta_time:int=1):
                     # sys.exit()
                     if not check[0]:
                         data_order = reformat_data_order(order, 'Yandex', campain[1])
-                        # print(order, 'Yandex', campain[1])
                         write_order = execute_query_return_bool(query_write_order,
                                                                 data_order[0])
                         write_items = executemany_return_bool(query_write_items,
@@ -258,17 +258,15 @@ def make_orders_to_ps(delta_time:int=1):
 
                         if result:
                             final_result = ps.send_current_basket_to_order()
-                            if final_result:
-                                data = ' '.join([i['id'] for i in final_result]).strip()
+                            if final_result is not None:
+                                data = ' '.join([str(i['id']) for i in final_result]).strip()
                                 print(5555555555, data)
-                                finish = ps.change_status_v2(data)
+                                finish = ps.change_status_v2(data, status_id=2)
                                 print(7777777777, finish)
 
 
                     else:
                         continue
-
-            # sys.exit()
 
             if len(list_canceled_orders) > 0:
                 for canceled in list_canceled_orders:
@@ -278,8 +276,9 @@ def make_orders_to_ps(delta_time:int=1):
                     if check[1] != 'CANCELLED':
                         execute_query_return_bool(update_order_and_items,
                                                   ('CANCELLED', str(canceled.get('id'))))
-                        # ps.change_status()
-                        print('check_CANCELLED', check, str(canceled.get('id')))
+                        data = ' '.join([str(i['id']) for i in canceled.get['items'][0]]).strip()
+                        finish = ps.change_status_v2(data, status_id=10)
+                        print('check_CANCELLED', check, str(canceled.get('id')), finish)
 
                     else:
                         continue

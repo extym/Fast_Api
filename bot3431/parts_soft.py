@@ -53,11 +53,11 @@ async def change_status(ids: str):
         return False
 
 
-def change_status_v2(ids: str):
+def change_status_v2(ids: str, status_id=0):
     url = ps_link + '/order_items/change_status'
     data = {
         "order_item_ids": ids,
-        "status_id": 8
+        "status_id": status_id
     }
     token_ps = HTTPBasicAuth(admin_ps_login, admin_ps_pass)
     answer = requests.post(url=url, auth=token_ps, data=data)
@@ -283,7 +283,7 @@ def get_oem_from_xml(offer_id, link=None):
 
 def create_resp_if_not_exist(list_items, link,
                              external_order_id=None):
-    exter_order_id = external_order_id
+    # exter_order_id = external_order_id
     count_items = 0
     global_result_make_basket = False
     for item in list_items:
@@ -304,8 +304,7 @@ def create_resp_if_not_exist(list_items, link,
         metod = "/backend/price_items/api/v1/search/get_offers_by_oem_and_make_name"
         url = "http://3431.ru" + metod
         answer = requests.get(url, params=params)
-        # print(111111111111111111111, answer.text)
-        # print(2222222222222, answer.url)
+
         try:
             need_data = answer.json()["data"]
         except Exception as error:
@@ -323,7 +322,7 @@ def create_resp_if_not_exist(list_items, link,
 
             result_make_basket = make_basket(propousal=list_propousal[0],
                                              qnt=qnt,
-                                             exter_order_id=exter_order_id)
+                                             exter_order_id=external_order_id)
             if result_make_basket == 200:
                 count_items += 1
             else:
