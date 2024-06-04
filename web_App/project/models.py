@@ -118,6 +118,7 @@ class Product(db.Model):
     cart_id = db.Column(db.String(250))
     brand = db.Column(db.String(250))
     brand_id = db.Column(db.String(250))
+    vendor_code = db.Column(db.String(250))
 
     # attributes_product = db.Column(db.Integer())   #'attributes_product.id')
 

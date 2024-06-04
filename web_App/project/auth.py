@@ -29,6 +29,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 import project.sber as sber
 import project.ozon as oson
+import project.yandex as yan
 
 import logging
 
@@ -1789,6 +1790,7 @@ def upload_prices_settings():
 
         elif make == 'make_product_feed':
             upload_price_name = data.get('upload_price_name')
+            is_scheduler = data.get('enabled_upload_price', 'off')
             upload_prices_mp = data.get('upload_prices_mp')
             is_null_stocks = data.get('is_null_stocks', False)
             upload_option = data.get('option')
@@ -1809,22 +1811,28 @@ def upload_prices_settings():
                                          (stocks_is_null=is_null_stocks,
                                           site_url=upload_prices_url,
                                           legal_name=upload_prices_legal_name,
-                                          short_shop_name=upload_prices_short_shop))
-                elif upload_prices_mp == 'yandex':
-                    job = q.enqueue_call(make_internal_import_oson_product
-                                         (donor=donor,
-                                          recipient=recipient,
-                                          source='front',
-                                          donor_mp=donor_mp,
-                                          recipient_mp=recipient_mp))
+                                          short_shop_name=upload_prices_short_shop,
+                                          category=upload_price_category,
+                                          markup=upload_prices_markup,
+                                          discount=upload_price_discount))
+                elif upload_prices_mp == 'yandex' and upload_option == 'xml':
+                    job = q.enqueue_call(yan.create_ym_xml
+                                         (stocks_is_null=is_null_stocks,
+                                          site_url=upload_prices_url,
+                                          legal_name=upload_prices_legal_name,
+                                          short_shop_name=upload_prices_short_shop,
+                                          category=upload_price_category,
+                                          markup=upload_prices_markup,
+                                          discount=upload_price_discount))
                 print(989898989, job.get_id)
             print(989898989, *data.items(), sep='\n')
 
         elif make == 'make_price_feed':
             print('!!!!!!_start_internal_import_price_!!!!!')
             upload_price_name = data.get('upload_price_name')
-            is_null_stocks = data.get('is_null_stocks')
+            is_scheduler = data.get('enabled_upload_price', 'off')
             upload_prices_mp = data.get('upload_prices_mp')
+            is_null_stocks = data.get('is_null_stocks', False)
             upload_option = data.get('option')
             upload_prices_markup = data.get('upload_prices_markup')
             upload_prices_store = data.get('upload_prices_store')
@@ -1834,18 +1842,31 @@ def upload_prices_settings():
             upload_prices_url = data.get('upload_prices_url')
             upload_price_category = data.get('upload_price_category')
 
-            if internal_import_role_1 != internal_import_role_2 and \
-                    internal_import_store_1 != internal_import_store_2 and \
-                    internal_import_mp_1 != 'Выбрать ' and \
-                    internal_import_mp_2 != 'Выбрать ':
-                if internal_import_role_2 == 'recipient' and internal_import_role_1 == 'donor':
-                    job = q.enqueue_call(make_import_export_oson_price(
-                        donor=internal_import_role_1,
-                        recipient=internal_import_role_2,
-                        k=int(internal_import_markup_2),
-                        send_to_mp=False)
-                    )
-                    print(4545454545, job.get_id)
+            if upload_prices_store != 'Выбрать' and \
+                    upload_prices_short_shop != '' and \
+                    upload_prices_legal_name != '' and \
+                    upload_prices_mp != 'Выбрать ':
+                if upload_prices_mp == 'sber' and upload_option == 'xml':
+                    job = q.enqueue_call(sber.create_sber_xml
+                                         (stocks_is_null=is_null_stocks,
+                                          site_url=upload_prices_url,
+                                          legal_name=upload_prices_legal_name,
+                                          short_shop_name=upload_prices_short_shop,
+                                          category=upload_price_category,
+                                          markup=upload_prices_markup,
+                                          discount=upload_price_discount))
+                elif upload_prices_mp == 'yandex' and upload_option == 'xml':
+                    job = q.enqueue_call(yan.create_ym_xml
+                                         (stocks_is_null=is_null_stocks,
+                                          site_url=upload_prices_url,
+                                          legal_name=upload_prices_legal_name,
+                                          short_shop_name=upload_prices_short_shop,
+                                          category=upload_price_category,
+                                          markup=upload_prices_markup,
+                                          discount=upload_price_discount))
+                print(989898989, job.get_id)
+                print(989898989, *data.items(), sep='\n')
+
             else:
                 flash("Проверьте правильность ввода данных", 'error')
 
@@ -1856,7 +1877,6 @@ def upload_prices_settings():
                 flash("Укажите хотя бы один магазин для которого нужен просмотр настроек", "alert")
             else:
                 result = {k: v for k, v in data.items() if (v != '0' and v != 'Выбрать')}
-                port_set, mprt_setts = {}, {}
                 if result.get('upload_prices_store') is not None \
                         and result.get("upload_prices_mp") is not None:
                     upload_settings = db.session.scalars(select(UploadPrice)
@@ -1906,7 +1926,8 @@ def upload_prices_settings():
                                                )
                     except:
                         flash(
-                            "Настройки для указанных магазинов не найдены. Введите требуемые настройки и сохраните их.",
+                            "Настройки для указанных магазинов не найдены. "
+                            "Введите требуемые настройки и сохраните их.",
                             "alert")
 
                 elif result.get('upload_prices_store') is not None:
@@ -1914,16 +1935,10 @@ def upload_prices_settings():
                     .where(
                         UploadPrice.upload_prices_store == data.get('upload_prices_store'))) \
                         .first()
+
                     try:
-                        upl_price_setts = upload_settings.__dict__
-                        upload_prices_mp = upl_price_setts.get('upload_prices_mp')
-                        upload_prices_markup = upl_price_setts.get('upload_prices_markup')
-                        upload_prices_store = upl_price_setts.get('upload_prices_store')
-                        upload_price_discount = upl_price_setts.get('upload_price_discount')
-                        upload_prices_short_shop = upl_price_setts.get('upload_prices_short_shop')
-                        upload_prices_legal_name = upl_price_setts.get('upload_prices_legal_name')
-                        upload_prices_url = upl_price_setts.get('upload_prices_url')
-                        upload_price_category = upl_price_setts.get('upload_price_category')
+                        upload_data = upload_settings.__dict__
+                        print(232323, type(upload_data), upload_data)
 
                         uid = current_user.id
                         role = current_user.roles
@@ -1934,18 +1949,11 @@ def upload_prices_settings():
                             photo = 'prof-music-2.jpg'
 
                         return render_template('/upload_price_settings.html',
+                                               upload_data=upload_data,
                                                uid=uid, role=role,
                                                photo=photo,
                                                user_name=user_name,
-                                               show=True,
-                                               upload_prices_mp=upload_prices_mp,
-                                               upload_prices_markup=upload_prices_markup,
-                                               upload_prices_store=upload_prices_store,
-                                               upload_price_discount=upload_price_discount,
-                                               upload_prices_short_shop=upload_prices_short_shop,
-                                               upload_prices_legal_name=upload_prices_legal_name,
-                                               upload_prices_url=upload_prices_url,
-                                               upload_price_category=upload_price_category,
+                                               show=True
                                                )
                     except:
                         flash("Настройки для указанного магазина не найдены. "
@@ -1958,16 +1966,7 @@ def upload_prices_settings():
                         UploadPrice.upload_prices_mp == data.get('upload_prices_mp'))) \
                         .first()
                     try:
-                        upl_price_setts = upload_settings.__dict__
-                        upload_prices_mp = upl_price_setts.get('upload_prices_mp')
-                        upload_prices_markup = upl_price_setts.get('upload_prices_markup')
-                        upload_prices_store = upl_price_setts.get('upload_prices_store')
-                        upload_price_discount = upl_price_setts.get('upload_price_discount')
-                        upload_prices_short_shop = upl_price_setts.get('upload_prices_short_shop')
-                        upload_prices_legal_name = upl_price_setts.get('upload_prices_legal_name')
-                        upload_prices_url = upl_price_setts.get('upload_prices_url')
-                        upload_price_category = upl_price_setts.get('upload_price_category')
-
+                        upload_data = upload_settings.__dict__
                         uid = current_user.id
                         role = current_user.roles
                         need_id = current_user.company_id
@@ -1981,18 +1980,12 @@ def upload_prices_settings():
                                                photo=photo,
                                                user_name=user_name,
                                                show=True,
-                                               upload_prices_mp=upload_prices_mp,
-                                               upload_prices_markup=upload_prices_markup,
-                                               upload_prices_store=upload_prices_store,
-                                               upload_price_discount=upload_price_discount,
-                                               upload_prices_short_shop=upload_prices_short_shop,
-                                               upload_prices_legal_name=upload_prices_legal_name,
-                                               upload_prices_url=upload_prices_url,
-                                               upload_price_category=upload_price_category,
+                                               upload_data=upload_data
                                                )
                     except:
                         flash(
-                            "Настройки для указанного магазина не найдены. Введите требуемые настройки и сохраните их.",
+                            "Настройки для указанного магазина не найдены. "
+                            "Введите требуемые настройки и сохраните их.",
                             "alert")
 
         return redirect('/upload_prices_settings')

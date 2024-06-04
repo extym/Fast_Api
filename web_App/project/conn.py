@@ -244,15 +244,18 @@ description_product_add text,
 uid_edit_user INT,
 final_price float4,
 barcode TEXT, 
+vendor_code text,
 UNIQUE (articul_product, store_id)
 )
 """
 
 create_attributes_product = """
 CREATE TABLE IF NOT EXISTS  attributes_product (
-    id SERIAL PRIMARY KEY not null ,
-    prod_id INT,
-    articul_product varchar,
+    id SERIAL PRIMARY KEY,
+    articul_product varchar NOT NULL,
+    FOREIGN KEY (id)
+        REFERENCES products (id)
+        ON UPDATE CASCADE ON DELETE CASCADE,
     depth varchar,
     width varchar,
     height varchar,

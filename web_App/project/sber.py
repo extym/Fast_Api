@@ -8,7 +8,8 @@ special_wheels = {}  #TODO make brand dict?
 
 def create_sber_xml(stocks_is_null=False, without_db=False, addons=False,
                     site_url='', legal_name='', short_shop_name='',
-                    category='Все товары'):
+                    category='Все товары', markup='0',
+                    discount='0'):
     root = minidom.Document()
 
     date = datetime.datetime.now().replace(second=0, microsecond=0)
@@ -133,7 +134,7 @@ def create_sber_xml(stocks_is_null=False, without_db=False, addons=False,
 
         outletsChild = root.createElement('outlets')
         oneOutletChild = root.createElement('outlet')
-        oneOutletChild.setAttribute('id', 'Склад мерчанта 1000koles.ru')
+        oneOutletChild.setAttribute('id', wh_id)
         oneOutletChild.setAttribute('instock', f"{count}")
         outletsChild.appendChild(oneOutletChild)
         offerChild.appendChild(outletsChild)
@@ -213,16 +214,17 @@ def create_sber_xml(stocks_is_null=False, without_db=False, addons=False,
             if not stocks_is_null:
                 if row[0][7] in need_cats and int(row[0][3]) > 6000 and row[0][4] >= 4 and row[3]:
                     url = 'https://www.1000koles.ru/pictures/' + row[1][0]
-                    # price = int(row[0][3]) * 1.15
+                    # price = str(row[0][4])
+                    shop_price = int(row[4]) * (1 + int(markup) / 100)
                     ## create_offer(name, vendor, product_code, category_id, description, url, count, price)
-                    create_offer(row[0][1], row[0][7], row[0][6], str(row[0][0]), row[0][2], url, str(row[0][4]),
+                    create_offer(row[0][1], row[0][7], row[0][6], str(row[0][0]), row[0][2], url,  str(round(shop_price, 0)),
                                  str(row[0][3]))
                     counter += 1
             else:
                 if row[0][7] in need_cats and int(row[0][3]) > 6000 and row[3]:
                     url = 'https://www.1000koles.ru/pictures/' + row[1][0]
                     # price = int(row[0][3]) * 1.15
-                    shop_price = int(row[4]) * 1.32
+                    shop_price = int(row[4]) * (1 + int(markup) / 100)
                     ## create_offer(name, vendor, product_code, category_id, description, url, count, price)
                     create_offer(row[0][1], row[0][7], row[0][6], str(row[0][0]), row[0][2], url, "0", str(round(shop_price, 0)))
                     counter += 1

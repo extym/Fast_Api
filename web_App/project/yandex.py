@@ -33,7 +33,10 @@ def clean_standart_data():
     print('Clean standart data successfuly ')
 
 
-def create_ym_xml(stocks_is_null=False, without_db=False):
+def create_ym_xml(stocks_is_null=False, without_db=False, addons=False,
+                    site_url='', legal_name='', short_shop_name='',
+                    category='Все товары', markup='0',
+                    discount='0'):
     root = minidom.Document()
 
     date = datetime.datetime.now(datetime.timezone.utc).isoformat()
@@ -44,19 +47,19 @@ def create_ym_xml(stocks_is_null=False, without_db=False):
     productChild = root.createElement('shop')
 
     nameChild = root.createElement('name')
-    textName = root.createTextNode('1000koles')
+    textName = root.createTextNode(short_shop_name)
     nameChild.appendChild(textName)
 
     companyChild = root.createElement('company')
-    textCompany = root.createTextNode('ИП Иванов К.А')
+    textCompany = root.createTextNode(legal_name)
     companyChild.appendChild(textCompany)
 
     urlChild = root.createElement('url')
-    textUrl = root.createTextNode('https://www.1000koles.ru')
+    textUrl = root.createTextNode(site_url)
     urlChild.appendChild(textUrl)
 
     platformChild = root.createElement('platform')
-    textPlatform = root.createTextNode('ShopCMS')
+    textPlatform = root.createTextNode('i-bots')
     platformChild.appendChild(textPlatform)
 
     versionChild = root.createElement('version')
@@ -77,7 +80,7 @@ def create_ym_xml(stocks_is_null=False, without_db=False):
 
     categoryChild = root.createElement('category')
     categoryChild.setAttribute('id', '1')
-    textCategory = root.createTextNode('Литые диски')
+    textCategory = root.createTextNode(category)
     categoryChild.appendChild(textCategory)
     categoriesChild.appendChild(categoryChild)
 

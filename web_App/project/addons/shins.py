@@ -2,12 +2,12 @@ import json
 import string
 import sys
 import random
-from cred import DATA_PATH, magic_link_csv, magic_link_csv2
+# from cred import DATA_PATH, magic_link_csv, magic_link_csv2
 import wget
 import csv
 import datetime
-from connect import check_write_json, check_write_json_v4
-from categories import *
+# from connect import check_write_json, check_write_json_v4
+# from categories import *
 from urllib.request import urlretrieve
 import urllib3
 urllib3.disable_warnings()

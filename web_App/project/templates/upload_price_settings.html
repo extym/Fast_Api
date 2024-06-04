@@ -83,7 +83,7 @@
                                                     <span class="desc"> например "Tyres_wheels"</span>
                                                     <div class="controls">
                                                         {% if show %}
-                                                        <input type="text" value="{{ upload_price_name }}" class="form-control" name="upload_price_name" >
+                                                        <input type="text" value="{{ upload_data.get('name', 'default') }}" class="form-control" name="upload_price_name" >
                                                         {% else %}
                                                         <input type="text" value="" class="form-control" id="formfield25" name="upload_price_name" >
                                                         {% endif %}
@@ -103,7 +103,7 @@
                                                     </div>
                                                     <select class="custom-select" id="upload_prices_mp" name="upload_prices_mp">
                                                         {% if show %}
-                                                            <option selected>{{ upload_prices_mp }} </option>
+                                                            <option selected>{{ upload_data.get('upload_prices_mp') }} </option>
                                                                 <option value="Выбрать" >Выбрать</option>
                                                         {% else %}
                                                             <option selected>Выбрать</option>
@@ -124,16 +124,29 @@
 
     <!--                                            <h6>Checkbox Buttons</h6>-->
                                                 <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                                    {% if show %}
+                                                    {% if upload_data.get('is_scheduler') == 'on' %}
                                                     <label class="btn btn-secondary active">
-<!--                                                        <input type="checkbox" name="enabled_upload_price" checked="" autocomplete="off"> Включено-->
-                                                        <input type="checkbox" name="enabled_upload_price"  autocomplete="off"> Включено
+                                                        <input type="checkbox" name="enabled_upload_price" checked="" autocomplete="off"> Включено
                                                     </label>
+                                                    {% elif upload_data.get('is_scheduler') == 'off' %}
+                                                    <label class="btn btn-secondary active">
+                                                        <input type="checkbox" name="enabled_upload_price" checked="" autocomplete="off"> Включено
+                                                    </label>
+                                                    {% endif %}
+                                                    {% if upload_data.get('is_scheduler') == 'on' %}
+                                                    <label class="btn btn-secondary">
+                                                        <input type="checkbox" name="is_null_stocks" checked="" autocomplete="off"> Включить нулевые остатки
+                                                    </label>
+                                                    {% else %}
                                                     <label class="btn btn-secondary">
                                                         <input type="checkbox" name="is_null_stocks" autocomplete="off"> Включить нулевые остатки
                                                     </label>
+                                                    {% endif %}
     <!--                                                <label class="btn btn-secondary">-->
     <!--                                                    <input type="checkbox" autocomplete="off"> Check-->
     <!--                                                </label>-->
+                                                    {% endif %}
                                                 </div>
 
 
@@ -145,7 +158,7 @@
                                                 <span class="desc">% например "18"</span>
                                                 <div class="controls">
                                                     {% if show %}
-                                                    <input type="text" value="{{ upload_prices_markup }}" class="form-control" name="upload_prices_markup" >
+                                                    <input type="text" value="{{ upload_data.get('upload_prices_markup') }}" class="form-control" name="upload_prices_markup" >
                                                     {% else %}
                                                     <input type="text" value="0" class="form-control" id="formfield21" name="upload_prices_markup" >
                                                     {% endif %}
@@ -161,11 +174,11 @@
 
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
-                                                    <label class="input-group-text" for="edit_name_mp">Магазин</label>
+                                                    <label class="input-group-text" for="edit_shop_name">Магазин</label>
                                                 </div>
                                                     <select class="custom-select" id="edit_shop_name" name="upload_prices_store">
                                                         {% if show %}
-                                                        <option selected>{{ upload_prices_store }} </option>
+                                                        <option selected>{{ upload_data.get('upload_prices_store') }} </option>
                                                             <option value="Выбрать" >Выбрать</option>
                                                         {% else %}
                                                         <option selected>Выбрать</option>
@@ -185,6 +198,37 @@
                                                 <label class="form-label" for="option1">Выгружать в формате</label>
                                                     <span class="desc"></span>
                                                 <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                                    {% if show %}
+                                                    {% if upload_data.get('upload_option') == 'xml' %}
+                                                    <label class="btn btn-secondary">
+                                                        <input type="radio" name="option"  checked="" value="xml" id="option1" autocomplete="off" > XML
+                                                    </label>
+                                                    <label class="btn btn-secondary">
+                                                        <input type="radio" name="option" value="csv" id="option2" autocomplete="off"> CSV
+                                                    </label>
+                                                    <label class="btn btn-secondary active">
+                                                        <input type="radio" name="option" value="xlsx" id="option3" autocomplete="off"> XLS
+                                                    </label>
+                                                    {% elif upload_data.get('upload_option') == 'csv' %}
+                                                    <label class="btn btn-secondary">
+                                                        <input type="radio" name="option" value="xml" id="option1" autocomplete="off" > XML
+                                                    </label>
+                                                    <label class="btn btn-secondary">
+                                                        <input type="radio" name="option" checked="" value="csv" id="option2" autocomplete="off"> CSV
+                                                    </label>
+                                                    <label class="btn btn-secondary active">
+                                                        <input type="radio" name="option" value="xlsx" id="option3" autocomplete="off"> XLS
+                                                    </label>
+                                                    {% elif upload_data.get('upload_option') == 'xlsx' %}<label class="btn btn-secondary">
+                                                        <input type="radio" name="option" value="xml" id="option1" autocomplete="off" > XML
+                                                    </label>
+                                                    <label class="btn btn-secondary">
+                                                        <input type="radio" name="option" value="csv" id="option2" autocomplete="off"> CSV
+                                                    </label>
+                                                    <label class="btn btn-secondary active">
+                                                        <input type="radio" name="option" checked="" value="xlsx" id="option3" autocomplete="off"> XLS
+                                                    </label>
+                                                    {% else %}
                                                     <label class="btn btn-secondary">
                                                         <input type="radio" name="option" value="xml" id="option1" autocomplete="off" > XML
                                                     </label>
@@ -194,6 +238,8 @@
                                                     <label class="btn btn-secondary active">
                                                         <input type="radio" name="option" value="xlsx" id="option3" autocomplete="off"> XLS
                                                     </label>
+                                                    {% endif %}
+                                                    {% endif %}
                                                 </div>
 
     <!--                                            </div>-->
@@ -206,7 +252,7 @@
                                                 <span class="desc">% например "15"</span>
                                                 <div class="controls">
                                                     {% if show %}
-                                                    <input type="text" value="{{ upload_price_discount }}" class="form-control" name="upload_price_discount" >
+                                                    <input type="text" value="{{ upload_data.get('upload_price_discount') }}" class="form-control" name="upload_price_discount" >
                                                     {% else %}
                                                     <input type="text" value="0" class="form-control" id="formfield2" name="upload_price_discount" >
                                                     {% endif %}
@@ -268,7 +314,7 @@
                                                     <span class="desc"> например "Воздушный шар"</span>
                                                 <div class="controls">
                                                     {% if show %}
-                                                    <input type="text" value="{{ upload_prices_short_shop }}" class="form-control" name="upload_prices_short_shop" >
+                                                    <input type="text" value="{{ upload_data.get('upload_prices_short_shop') }}" class="form-control" name="upload_prices_short_shop" >
                                                     {% else %}
                                                     <input type="text" value="" class="form-control" id="formfield22" name="upload_prices_short_shop" >
                                                     {% endif %}
@@ -281,7 +327,7 @@
                                                     <span class="desc"> например "ООО Полет"</span>
                                                 <div class="controls">
                                                     {% if show %}
-                                                    <input type="text" value="{{ upload_prices_legal_name }}" class="form-control" name="upload_prices_legal_name" >
+                                                    <input type="text" value="{{ upload_data.get('upload_prices_legal_name') }}" class="form-control" name="upload_prices_legal_name" >
                                                     {% else %}
                                                     <input type="text" value="" class="form-control" id="formfield23" name="upload_prices_legal_name" >
                                                     {% endif %}
@@ -301,7 +347,7 @@
                                                 <span class="desc"> например "https://polet.ru"</span>
                                                 <div class="controls">
                                                     {% if show %}
-                                                        <input type="text" value="{{ upload_prices_url }}" class="form-control"  name="upload_prices_url" >
+                                                        <input type="text" value="{{ upload_data.get('upload_prices_url') }}" class="form-control"  name="upload_prices_url" >
                                                     {% else %}
                                                         <input type="text" value="0" class="form-control" id="formfield5" name="upload_prices_url" >
                                                     {% endif %}
@@ -314,7 +360,7 @@
                                                 <span class="desc"> например "Шины и диски"</span>
                                                 <div class="controls">
                                                     {% if show %}
-                                                    <input type="text" value="{{ upload_price_category }}" class="form-control" name="upload_price_category" >
+                                                    <input type="text" value="{{ upload_data.get('upload_price_category') }}" class="form-control" name="upload_price_category" >
                                                     {% else %}
                                                     <input type="text" value="0" class="form-control" id="formfield24" name="upload_price_category" >
                                                     {% endif %}
