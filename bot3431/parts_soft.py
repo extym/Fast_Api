@@ -340,6 +340,66 @@ def create_resp_if_not_exist(list_items, link,
     return global_result_make_basket
 
 
+def create_order_ps_if_not_exist(list_items, link, key=None,
+                             external_order_id=None):
+    # exter_order_id = external_order_id
+    count_items = 0
+    global_result_make_basket = False
+    for item in list_items:
+        list_propousal = []
+        # vendor_data = get_vendor_code_from_xlm(item.get('offer_id)'), link=link)
+        vendor_data = get_oem_from_xml(item.get('offerId'), link=link)
+        oem = vendor_data[1]
+        brand = vendor_data[0]
+        qnt = item.get("count")
+        print(3333, oem, brand, qnt)
+        # sys.exit()
+        params = {
+            "api_key": key,
+            "oem": oem,
+            "make_name": brand,
+            "without_cross": True
+        }
+        metod = "/backend/price_items/api/v1/search/get_offers_by_oem_and_make_name"
+        url = "http://3431.ru" + metod
+        answer = requests.get(url, params=params)
+
+        try:
+            need_data = answer.json()["data"]
+        except Exception as error:
+            print("ERROR get data from json {}, oem {}, brand {}, qnt {}"
+                  .format(answer.text, oem, brand, qnt))
+            need_data = []
+        if len(need_data) > 0:
+            propousal = {i['hash_key']: i['cost'] for i in need_data if
+                         (i["oem"] == oem and i['make_name'] == brand)}
+            list_propousal = choice_function(propousal, need_data, qnt)
+
+            # print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@',
+            #       *list_propousal[0].items(), sep='\n')
+            # print(len(propousal))
+
+            result_make_basket = make_basket(propousal=list_propousal[0],
+                                             qnt=qnt,
+                                             exter_order_id=external_order_id)
+            if result_make_basket == 200:
+                count_items += 1
+            else:
+                print("Make basket failed {} {}".format(result_make_basket, item))
+
+        else:
+            print('SOME FUCKUP GET PROPOUSAL {}'.format(answer.text))
+
+    if count_items == len(list_items):
+        # print("Result result_make_basket successfully {}".format(count_items))
+        global_result_make_basket = True
+    else:
+        print("Result result_make_basket UNsuccessfully {}".format(count_items))
+
+    return global_result_make_basket
+
+
+
 # send_current_basket_to_order()
 
 # create_resp_is_exist(brand="STELLOX", oem="42140459SX", qnt=2, external_id=451642783)

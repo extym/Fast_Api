@@ -23,15 +23,17 @@ from amo import *
 import urllib3
 import logging
 from bot_tg import send_get
-from parts_soft import make_data_for_request_v2
+import parts_soft as ps
 import connect as conn
 import uuid
 from psycopg2.errors import UniqueViolation
 from psycopg2.extensions import register_adapter, AsIs
 import json
 
+
 def adapt_dict(dict_var):
     return AsIs("'" + json.dumps(dict_var) + "'")
+
 
 register_adapter(dict, adapt_dict)
 urllib3.disable_warnings()
@@ -50,7 +52,6 @@ else:
 
 logging.basicConfig(filename=os.path.join(LOG_DIR + './webhook.log'), level=logging.INFO,
                     format="%(asctime)s %(levelname)s %(message)s")
-
 
 
 # refresh = creds.get('refresh')
@@ -230,19 +231,19 @@ def order_resp_sb(global_result, is_new):
     id_create = None
     if global_result:
         data = {
-                "data": {},
-                "meta": {},
-                "success": 1
-            }
+            "data": {},
+            "meta": {},
+            "success": 1
+        }
         if is_new:
             id_create = token_generator()
 
     else:
         data = {
-                "data": {},
-                "meta": {},
-                "success": 0
-            }
+            "data": {},
+            "meta": {},
+            "success": 0
+        }
 
     return data, id_create
 
@@ -259,8 +260,6 @@ def counter_items(items_list):
             lst.append(itemm)
 
     return lst
-
-
 
 
 def check_is_exist_message_answer(msg_id, chat_id):
@@ -328,6 +327,7 @@ def reverse_time(time):
 
     return result
 
+
 # print(asyncio.run(check_is_exist_message_answer_v2('ad6c351403976b0f6175b81965221000', 'u2i-PalCq8X5aU0iwwKcwfUAqQ' )))
 
 def reformat_data_order(order, shop):
@@ -340,7 +340,7 @@ def reformat_data_order(order, shop):
         result = (
             order["id"],
             order["our_id"],
-            shop,   #order["shop"],
+            shop,  # order["shop"],
             day,
             order["status"],
             order["our_status"],
@@ -370,7 +370,7 @@ def reformat_data_order(order, shop):
             day,
             order["status"],
             order["our_status"],
-            "PREPAID",  #order['data'].get("paymentType"),
+            "PREPAID",  # order['data'].get("paymentType"),
             order["shipments"][0]['fulfillmentMethod']
         )
 
@@ -419,21 +419,21 @@ def reformat_data_items(order, shop):
     elif shop == 'Ozon':
         result = []
         list_items = order['products']
-        items_ids = read_json_ids() #ids 1C
+        items_ids = read_json_ids()  # ids 1C
         for item in list_items:
             sku = str(item["sku"])
             vendor_code = item["offer_id"]
             id_1c = items_ids[vendor_code][0]
-            #price = product_info_price(items_skus[sku][0], vendor_code)
+            # price = product_info_price(items_skus[sku][0], vendor_code)
             proxy = (
                 order["id"],
                 order["our_id"],
                 shop,
                 order["our_status"],
                 vendor_code,
-                id_1c, #1c
+                id_1c,  # 1c
                 item["quantity"],
-                item["price"][:-2]  #price
+                item["price"][:-2]  # price
             )
             result.append(proxy)
 
@@ -468,7 +468,7 @@ def reformat_data_order_v2(order, mp, client_id_ps,
         result = (
             order["id"],
             order["our_id"],
-            mp,   #order["shop"],
+            mp,  # order["shop"],
             day,
             order["status"],
             order["our_status"],
@@ -497,7 +497,7 @@ def reformat_data_order_v2(order, mp, client_id_ps,
                 order["shipments"][0]["shipmentId"],
                 mp,
                 item["offerId"],
-                '', # item["id_1c"],
+                '',  # item["id_1c"],
                 item["quantity"],
                 str(item["price"])
             )
@@ -520,7 +520,7 @@ def reformat_data_order_v2(order, mp, client_id_ps,
             order["status"],
             "new",  # order["substatus"],
             order["our_status"],
-            "PREPAID",  #order['data'].get("paymentType"),
+            "PREPAID",  # order['data'].get("paymentType"),
             delivery,
             str(summ_order),
             client_id_ps
@@ -598,6 +598,7 @@ async def new_order_sber(uuid):
         print(232323, type(store_data), store_data)
         client_id_ps = store_data[1]
         model = store_data[0]
+        link = store_data[2]
 
         # проверяем наличие for order
         # stock = check_is_accept_sb(proxy)
@@ -606,26 +607,38 @@ async def new_order_sber(uuid):
         #     data = order_resp_sb(stock[0], True)
 
         data = order_resp_sb(True, True)
-        order['status'],  \
+        order['status'], \
             order['our_status'], order['count_items'] \
             = "NEW", "NEW", proxy
         # ref_data = reformat_data_order(order, 'Sber')
         ref_data = reformat_data_order_v2(order, 'Sber', model=model,
                                           client_id_ps=client_id_ps)
-        print(123, type(ref_data[0]),  ref_data[0])
-        print(123, type(ref_data[1]),  ref_data[1])
-        print(123, type(ref_data[2]),  ref_data[2])
+        print(123, type(ref_data[0]), ref_data[0])
+        print(123, type(ref_data[1]), ref_data[1])
+        print(123, type(ref_data[2]), ref_data[2])
         await execute_query_v3(query_write_order, ref_data[0])
         await executemany_query(query_write_items, ref_data[1])
         await execute_query_v3(query_write_customer, ref_data[2])
         # data_confirm = confirm_data_sb(order)
         # post_smth_sb('order/confirm', data_confirm)
 
-        response = app.response_class(
-            json.dumps(data[0]),
-            status=200,
-            content_type='application/json'
-        )
+        result = ps.create_order_ps_if_not_exist(order.get('items'), link,
+                                              key=store_data[3],
+                                              external_order_id=order.get('id'))
+
+        if result:
+            final_result = ps.send_current_basket_to_order()
+            if final_result is not None:
+                datas = ' '.join([str(i['id']) for i in final_result]).strip()
+                print(5555555555, datas)
+                finish = ps.change_status_v2(datas, status_id=2)
+                print(7777777777, finish)
+
+        response = app.response_class(-
+                                      json.dumps(data[0]),
+                                      status=200,
+                                      content_type='application/json'
+                                      )
 
         # else:
         #     data = order_resp_sb(False, True)
@@ -670,7 +683,6 @@ async def cancel_order_sber(uuid):
         )
 
     return response
-
 
 
 @app.route('/webhook', methods=['GET', 'POST'])
@@ -864,7 +876,7 @@ async def download():
                     return redirect(request.url)
                 # data = read_xlsx(file)
                 data = read_xlsx_v2(file, market)
-                await make_data_for_request_v2(data, market)
+                await ps.make_data_for_request_v2(data, market)
                 if data:
                     flash("File upload successfully")
                     return redirect(request.url)
@@ -916,12 +928,12 @@ async def add_store():
                   random_uuid, target_url_new, target_url_cancel, url)
             try:
                 conn.execute_query_v2(query_add_settings_without_ym,
-                                               (market,
-                                                key_store,
-                                                random_uuid,
-                                                api_key_ps,
-                                                upload_link,
-                                                model))
+                                      (market,
+                                       key_store,
+                                       random_uuid,
+                                       api_key_ps,
+                                       upload_link,
+                                       model))
                 flash(f'Настройки удачно сохранены. Ссылка для новых заказов {target_url_new}.'
                       f' \n Ссылка для отмены заказов {target_url_cancel}.')
             except IntegrityError as e:

@@ -512,7 +512,9 @@ query_get_shop_client_id = \
 
 
 query_get_shop_campain_id = \
-    (" SELECT model, client_id FROM stores WHERE campain_id = %s")
+    (" SELECT model, client_id, upload_link, api_key_ps "
+     " FROM stores "
+     " WHERE campain_id = %s ")
 
 def rewrite_bid_from_json(file):
     with open(file) as f:

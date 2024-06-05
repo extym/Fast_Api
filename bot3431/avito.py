@@ -628,11 +628,12 @@ async def get_avito_current_chat_v2(hook, check):
                  contact_id)
         logging.info('WROTE_DATA_FOR___22 {}'.format(proxy))
         await execute_query_v3(query_write_bid, proxy)
-        # await execute_query_v3(query_update_msg_id, (chat_id, msg_id))
         logging.info('WROTE_DATA_FOR___33 {}'.format(proxy))
+        await execute_query_v3(query_update_msg_id, (chat_id, msg_id))
+        logging.info('TRY_REWRITE_DATA_TO_AMO_1 {} {} {} {} '.
+                     format(chat_id, user_id, title, target_link))
         await rewrite_leads_v2(chat_id, user_id)
-        # logging.info('TRY_REWRITE_DATA_TO_AMO_1 {} {} {} {} '.
-        #              format(chat_id, user_id, title, target_link))
+
 
     ### Now in there no send
     elif not check[0]:  # if it's a message exist  or not
@@ -651,25 +652,25 @@ async def get_avito_current_chat_v2(hook, check):
             header_avito = {'Authorization': f'Bearer {avito_token}'}
             url = f'https://api.avito.ru/messenger/v2/accounts/{user_id}/chats/{chat_id}'
             answer = requests.get(url=url, headers=header_avito)
-            # logging.info("reTRY_GET_AVITO_CURRENT_CHAT4 {} {} {}"
-            #              .format(answer.status_code, chat_id, user_id))
+            logging.info("reTRY_GET_AVITO_CURRENT_CHAT4 {} {} {}"
+                         .format(answer.status_code, chat_id, user_id))
             raw_data = answer.json()
-            # logging.info("reTRY_GET_AVITO_CURRENT_CHAT5 {} {}"
-            #              .format(answer.status_code, user_id))
+            logging.info("reTRY_GET_AVITO_CURRENT_CHAT5 {} {}"
+                         .format(answer.status_code, user_id))
 
         # await re_write_link_v2(chat_id, msg_id)
         await execute_query_v3(query_update_msg_id, (chat_id, msg_id))
 
         author_id = hook.get('payload').get('value').get('author_id')
         await make_message_for_amo_v2(hook, raw_data, author_id, False)  # True)
-        # logging.info('SEND_DATA_FOR_MESSAGE_TO_AMO_3_ {} {} {}'
-        #              .format(chat_id, user_id, check))
+        logging.info('SEND_DATA_FOR_MESSAGE_TO_AMO_3_ {} {} {}'
+                     .format(chat_id, user_id, check))
 
         if not check[2]:
             try:
                 await rewrite_leads_v2(chat_id, user_id)
-                # logging.info('TRY_REWRITE_DATA_TO_AMO_11_ {} {} {} {} '.
-                #              format(chat_id, user_id, title, target_link))
+                logging.info('TRY_REWRITE_DATA_TO_AMO_11_ {} {} {} {} '.
+                             format(chat_id, user_id, title, target_link))
             except:
                 logging.error('FuckUp_TRY_REWRITE_DATA_TO_AMO_ {} {} {} {} '.
                              format(chat_id, user_id, title, target_link))
@@ -677,8 +678,8 @@ async def get_avito_current_chat_v2(hook, check):
     elif not check[2]:
         # try:
         await rewrite_leads_v2(chat_id, user_id)
-        # logging.info('TRY_REWRITE_DATA_TO_AMO_111_{} {} {} {} '.
-        #              format(chat_id, user_id, title, target_link))
+        logging.info('TRY_REWRITE_DATA_TO_AMO_111_{} {} {} {} '.
+                     format(chat_id, user_id, title, target_link))
 
     else:
         print("WE ALREADY HAVE THIS MESSAGE", chat_id)
