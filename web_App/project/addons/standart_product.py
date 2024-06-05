@@ -7,22 +7,13 @@ from project import engine
 from project.models import Product
 
 
-def standart_tyres_csv(type_data=None, shop_name=None):
+def standart_tyres(type_data=None, shop_name=None):
     proxy_data, proxy = [], []
     global_result = {}
-    # if distributor == 'shins' and type_data == 'csv':
-    #     data = shins.get_data_csv()
-    # elif distributor == 'kolrad' and type_data == 'xml':
-    #     data =
-    # elif distributor == '4tochku' and type_data == 'json':
-    #     data = tochki.get_data_from_json()
-    # else:
     with Session(engine) as session:
         data = session.scalars(select(Product)
                                .where(Product.shop_name == shop_name))\
             .all()
-    print("SOME dissonance () and type_data {}"
-          .format(type(data), data))
     for row in data:
         prod = row.__dict__
         for key in prod.keys():
@@ -78,6 +69,7 @@ def standart_tyres_csv(type_data=None, shop_name=None):
             elif vendor == '':
                 continue
             category_id = 7000
+
             if data[i][4] in ['S', 's', 'Летняя']:
                 type_tyres = 'Летняя'
             elif data[i][4] in ["W", 'Зимняя']:

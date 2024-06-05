@@ -2,9 +2,62 @@ import datetime
 import json
 from xml.dom import minidom
 from project import DATA_PATH
+import project.addons.shins as shins
+import project.addons.four_tochki as tochki
 
 
 special_wheels = {}  #TODO make brand dict?
+
+
+def create_need_data(without_db=False):
+    json_data, csv_data = {}, {}
+    if not without_db:
+        try:
+            csv_data = shins.standart_wheels_csv()
+        except:
+            print("We don't get csv")
+        try:
+            json_data = tochki.standart_wheels_from_json()
+        except:
+            print("We don't get json")
+        data = check_and_write_v4()
+    else:
+        try:
+            csv_data = shins.standart_wheels_csv(without_db=True)
+        except:
+            pass
+        try:
+            json_data = tochki.standart_wheels_from_json(without_db=True)
+        except:
+            pass
+
+        data = standart_product_v2(get_new_pages_v2())
+
+    pre_csv_data = {key: value for key, value in csv_data.items() if int(value[0][4]) >= 4}
+    pre_json_data = {k: v for k, v in json_data.items() if int(v[0][4]) >= 4}
+    need_data = dict()
+    for ke, val in data.items():
+        pre_count_json = pre_json_data.get(ke)
+        if pre_count_json:
+            count_json = int(pre_count_json[0][4])
+        else:
+            count_json = 0
+            # print(111, ke, type(val[0][4]), val[0][4])
+        pre_count_csv = pre_csv_data.get(ke)
+        if pre_count_csv:
+            count_csv = int(pre_count_csv[0][4])
+        else:
+            count_csv = 0
+            # print(222, ke, type(val[0][4]), val[0][4])
+        in_stok = int(val[0][4]) + count_json + count_csv
+        new_data = val[0].copy()
+        del new_data[4]
+        new_data.insert(4, in_stok)
+        need_data.update({ke: (new_data, val[1], val[2], val[3], val[4])})
+    print('ALL_RIDE create_need_data ', len(need_data))
+
+    return need_data
+
 
 def create_sber_xml(stocks_is_null=False, without_db=False, addons=False,
                     site_url='', legal_name='', short_shop_name='',
@@ -149,55 +202,55 @@ def create_sber_xml(stocks_is_null=False, without_db=False, addons=False,
         minQuantityOfferChild.appendChild(textMinQuantityOffer)
         offerChild.appendChild(minQuantityOfferChild)
 
-    def create_need_data(without_db=False):
-        json_data, csv_data = {}, {}
-        if not without_db:
-            try:
-                csv_data = standart_wheels_csv()
-            except:
-                print("We don't get csv")
-            try:
-                json_data = standart_wheels_from_json()
-            except:
-                print("We don't get json")
-            data = check_and_write_v4()
-        else:
-            try:
-                csv_data = standart_wheels_csv(without_db=True)
-            except:
-                pass
-            try:
-                json_data = standart_wheels_from_json(without_db=True)
-            except:
-                pass
-
-
-            data = standart_product_v2(get_new_pages_v2())
-
-        pre_csv_data = {key: value for key, value in csv_data.items() if int(value[0][4]) >= 4}
-        pre_json_data = {k: v for k, v in json_data.items() if int(v[0][4]) >= 4}
-        need_data = dict()
-        for ke, val in data.items():
-            pre_count_json = pre_json_data.get(ke)
-            if pre_count_json:
-                count_json = int(pre_count_json[0][4])
-            else:
-                count_json = 0
-                # print(111, ke, type(val[0][4]), val[0][4])
-            pre_count_csv = pre_csv_data.get(ke)
-            if pre_count_csv:
-                count_csv = int(pre_count_csv[0][4])
-            else:
-                count_csv = 0
-                # print(222, ke, type(val[0][4]), val[0][4])
-            in_stok = int(val[0][4]) + count_json + count_csv
-            new_data = val[0].copy()
-            del new_data[4]
-            new_data.insert(4, in_stok)
-            need_data.update({ke: (new_data, val[1], val[2], val[3], val[4])})
-        print('ALL_RIDE create_need_data ', len(need_data))
-
-        return need_data
+    # def create_need_data(without_db=False):
+    #     json_data, csv_data = {}, {}
+    #     if not without_db:
+    #         try:
+    #             csv_data = standart_wheels_csv()
+    #         except:
+    #             print("We don't get csv")
+    #         try:
+    #             json_data = standart_wheels_from_json()
+    #         except:
+    #             print("We don't get json")
+    #         data = check_and_write_v4()
+    #     else:
+    #         try:
+    #             csv_data = standart_wheels_csv(without_db=True)
+    #         except:
+    #             pass
+    #         try:
+    #             json_data = standart_wheels_from_json(without_db=True)
+    #         except:
+    #             pass
+    #
+    #
+    #         data = standart_product_v2(get_new_pages_v2())
+    #
+    #     pre_csv_data = {key: value for key, value in csv_data.items() if int(value[0][4]) >= 4}
+    #     pre_json_data = {k: v for k, v in json_data.items() if int(v[0][4]) >= 4}
+    #     need_data = dict()
+    #     for ke, val in data.items():
+    #         pre_count_json = pre_json_data.get(ke)
+    #         if pre_count_json:
+    #             count_json = int(pre_count_json[0][4])
+    #         else:
+    #             count_json = 0
+    #             # print(111, ke, type(val[0][4]), val[0][4])
+    #         pre_count_csv = pre_csv_data.get(ke)
+    #         if pre_count_csv:
+    #             count_csv = int(pre_count_csv[0][4])
+    #         else:
+    #             count_csv = 0
+    #             # print(222, ke, type(val[0][4]), val[0][4])
+    #         in_stok = int(val[0][4]) + count_json + count_csv
+    #         new_data = val[0].copy()
+    #         del new_data[4]
+    #         new_data.insert(4, in_stok)
+    #         need_data.update({ke: (new_data, val[1], val[2], val[3], val[4])})
+    #     print('ALL_RIDE create_need_data ', len(need_data))
+    #
+    #     return need_data
 
     try:
         need_data = create_need_data(without_db=without_db)

@@ -9,6 +9,7 @@ import datetime
 # from connect import check_write_json, check_write_json_v4
 # from categories import *
 from urllib.request import urlretrieve
+from project.conn import execute_query
 import urllib3
 urllib3.disable_warnings()
 
@@ -20,8 +21,8 @@ tn = datetime.datetime.now()
 ts = datetime.datetime.timestamp(tn) * 1000
 date = str(ts)[:13]
 type_data = ['wheels', 'tyres']
-url2 = magic_link_csv + date
-url = magic_link_csv2 + date
+url2 = vendor_link_tyres_csv + date
+url = vendor_link_whells_csv + date
 
 # print(url, url2)
 # sys.exit()

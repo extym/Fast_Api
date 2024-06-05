@@ -252,7 +252,7 @@ UNIQUE (articul_product, store_id)
 create_attributes_product = """
 CREATE TABLE IF NOT EXISTS  attributes_product (
     id SERIAL PRIMARY KEY,
-    articul_product varchar NOT NULL,
+    articul_product varchar,
     FOREIGN KEY (id)
         REFERENCES products (id)
         ON UPDATE CASCADE ON DELETE CASCADE,
@@ -262,33 +262,22 @@ CREATE TABLE IF NOT EXISTS  attributes_product (
     dimension_unit varchar,
     weight varchar,
     weight_unit varchar,
-    barcode varchar,
-    cart_id text,
-    brand text,
-    brand_id text,
-    category_id_oson varchar,
-    created_at varchar,
-    images varchar,
-    marketing_price varchar,
-    min_ozon_price varchar,
-    old_price varchar,
-    premium_price varchar,
-    price varchar,
-    recommended_price varchar,
-    min_price varchar,
-    stocks int,
+    name_category_id varchar,
+    category_mark varchar,
+    category_sign varchar,
+    mark_1 varchar,
+    mark_2 varchar,
+    mark_3 varchar,
+    mark_4 varchar,
+    mark_5 varchar,
     vat varchar,
     visible bool,
     commissions varchar,
     is_prepayment bool,
     is_prepayment_allowed bool,
-    images360 varchar,
-    color_image varchar,
-    primary_image varchar,
     is_kgt bool,
     discounted_stocks varchar,
     sku int,
-    description_category_id int,
     type_id int,
     volume_weight float4, 
     UNIQUE (id)
@@ -574,6 +563,19 @@ def create_connection():
         print(f'The ERROR "{error}" occurred')
 
     return connection
+
+
+def get_distibutor_link(distibutor):
+    query = " SELECT * " \
+            " FROM distributors" \
+            " WHERE distributor = %s "
+    with create_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(query, [distibutor])
+            raw_data = cursor.fetchall()
+            # print("Query from execute_query executed successfully")
+    return raw_data
+
 
 
 async def execute_query(query, data):
@@ -951,5 +953,6 @@ update_db = [
 # # maintenans_query(create_sales)
 # maintenans_query(create_attributes_product)
 # maintenans_query(create_internal_import)
-maintenans_query(create_upload_price)
+# maintenans_query(create_upload_price)
+maintenans_query(create_attributes_product)
 
