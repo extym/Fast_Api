@@ -2,15 +2,15 @@ import json
 import sys
 from xml.dom import minidom
 import datetime
-from pictures import dowload_images
-from main import get_new_pages_v2
-from prepare_data_export import get_need_data, get_need_data_v2
-from connect import check_and_write_v4, check_write_json_v4, standart_product_v2
+# from pictures import dowload_images
+# from main import get_new_pages_v2
+# from prepare_data_export import get_need_data, get_need_data_v2
+# from connect import check_and_write_v4, check_write_json_v4, standart_product_v2
 # from copy_connect import check_write_json, check_and_write_v3, standart_product_v2
-from getcsv import standart_wheels_csv
-from get_json import standart_wheels_from_json
-from cred import DATA_IMG, DATA_PATH
-from categories import categories_wheels, cats_wheels_upper, special_wheels
+# from getcsv import standart_wheels_csv
+# from get_json import standart_wheels_from_json
+# from cred import DATA_IMG, DATA_PATH
+# from categories import categories_wheels, cats_wheels_upper, special_wheels
 
 desk_carwel = 'Диски CARWEL- cовременный, динамично развивающийся бренд. Новейшее передовое оборудование и ' \
               'современные технологии по производству литых колесных дисков отвечающие самым высоким стандартам ' \
