@@ -131,9 +131,9 @@ UNIQUE (chat_id)
 )
 """
 
-
-logging.basicConfig(filename=LOG_DIR + '/webhook.log', level=logging.INFO,
-                    format="%(asctime)s %(levelname)s %(message)s")
+#
+# logging.basicConfig(filename= LOG_DIR + '/webhook.log', level=logging.INFO,
+#                     format="%(asctime)s %(levelname)s %(message)s")
 
 
 
@@ -205,6 +205,21 @@ def execute_query_return_v3(query, data):
         with conn.cursor() as cursor:
             try:
                 cursor.execute(query, [data])
+                raw_data = cursor.fetchall()
+                # print("Query from execute_query executed successfully")
+            except OperationalError as err:
+                print(f"The ERROR from execute_query '{err}' occured ")
+
+    return raw_data
+
+
+def execute_query_return_v4(query):
+    raw_data = []
+    with create_connection() as conn:
+        conn.autocommit = True
+        with conn.cursor() as cursor:
+            try:
+                cursor.execute(query)
                 raw_data = cursor.fetchall()
                 # print("Query from execute_query executed successfully")
             except OperationalError as err:
@@ -449,6 +464,9 @@ query_get_bid_for_lead_id = \
 query_get_all_shops = \
     "SELECT * FROM stores WHERE mp_name= %s"
 
+query_get_all_shops_v2 = \
+    "SELECT * FROM stores WHERE mp_name is not null"
+
 query_is_exist_order = \
     "SELECT * FROM fresh_orders WHERE order_id_mp = %s"
 
@@ -476,13 +494,13 @@ update_order_and_items = \
 
 query_add_settings_ym = \
     (" INSERT INTO stores "
-     "(client_id, key_store, campain_id, api_key_ps, upload_link) "
-     "VALUES ( %s, %s, %s, %s, %s )")
+     "(client_id, key_store, campain_id, api_key_ps, upload_link, model) "
+     "VALUES ( %s, %s, %s, %s, %s, %s )")
 
 query_add_settings_without_ym = \
     (" INSERT INTO stores "
-     "(client_id, key_store, campain_id, api_key_ps, upload_link) "
-     "VALUES ( %s, %s, %s, %s, %s )")
+     "(client_id, key_store, campain_id, api_key_ps, upload_link, model) "
+     "VALUES ( %s, %s, %s, %s, %s, %s )")
 
 proxy = ("u2i-TOYzRVLyb9Hw_l7u2aBTVg", '4391',
          "https://avito.ru/sankt-peterburg/zapchasti_i_aksessuary/trw_df4110_torm.disk_per.vent.280x24_4_otv_3364311913",
@@ -544,7 +562,7 @@ def rewrite_bid_from_2_json(file, file2):
 
 # maintenans_query(create_customers)
 
-# execute_query_v2(query_write_bid, proxy)
+# execute_query_v2(query_write_bid, ('u2i-iUFr7QWxboXAV0w021QM0Q', '1\xa0000 ₽', 'https://avito.ru/sankt-peterburg/zapchasti_i_aksessuary/radiator_konditsionera_ford_3925815202', '221851542faeb849389ec3e2c1d8c2f2', 363810872, 'Радиатор кондиционера Ford', True, False, 0, 0))
 # print(get_bid("u2i-TOYzRVLyb9Hw_l7u2aBTVg"))
 # print(check_is_exist_in_db(query_check_is_message_exist, ("u2i-TOYzRVLyb9Hw_l7u2aBTVg",)))
 # print(check_is_exist_message_in_db_v2('e737d71dcddc238d5a1db962f3fb6db9', "u2i-TOYzRVLyb9Hw_l7u2aBTVg"))
@@ -555,3 +573,7 @@ def rewrite_bid_from_2_json(file, file2):
 # asyncio.run(executemany_query(query_write_items, [('6111114952', 'Sber',  'BV001950-k', '', 1, '990'), ('6111114952',  'Sber',  'delivery', '', 1, '200')]))
 
 # asyncio.run(execute_query_v3(query_write_customer, ('61111152', 'Sber', '2022-11-12', '1190', '88888888888', 'test@test.com', '0c5b2444-70a0-4932-980c-b4dc0d3f02b5', '4cbce9f3-6fd7-4162-962d-41268b75aadc', '55.751812', '37.599292', '77', 'г Москва', 'г Москва')))
+
+# print(execute_query_return_v4(query_get_all_shops_v2))
+
+# print(get_bid(chat_id="u2i-uiUtB7Mj_nmi7aSjSt_Odg"))

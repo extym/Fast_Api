@@ -46,7 +46,7 @@ user_link = {
 }
 
 
-logging.basicConfig(filename=os.path.join(LOG_DIR + 'webhook.log'), level=logging.INFO,
+logging.basicConfig(filename=os.path.join(LOG_DIR + '/webhook.log'), level=logging.INFO,
                     format="%(asctime)s %(levelname)s %(message)s")
 
 
@@ -149,7 +149,7 @@ async def rewrite_contact_v2(chat_id=None, contact_id=0, user_id=0, amo_name='',
     if chat_id:
         # need_data = await read_link_v2(chat_id)
         need_data = get_bid(chat_id)
-        logging.info('CONTACT_ID {} {} {} {} '
+        logging.info('CONTACT_ID_м2 {} {} {} {} '
                  .format(chat_id, user_id, need_data, data))
     if need_data and contact_id == 0:
         contact_id = need_data[8]
@@ -841,7 +841,7 @@ async def get_amo_unsorted_list_v3(user_id):
         }
     }
     answer = requests.get(url, headers=headers, params=params)
-    logging.info('get_amo_unsorted_list_v3_ {} {} {}'.format(answer.status_code, user_id, url))
+    # logging.info('get_amo_unsorted_list_v3_ {} {} {}'.format(answer.status_code, user_id, url))
     if answer.status_code == 401:
         refresh_access_main_amo_v2(user_id)
         answer = requests.get(url, headers=headers, params=params)
@@ -876,7 +876,7 @@ def get_amo_events(avito_id=0, amo_name=None):
         'Authorization': 'Bearer ' + access_token
     }
     params = {
-        'page': 2,
+        'page': 1,
         'limit': 250,  # but we can 250
         'filter': {
             'category': [],
@@ -1002,7 +1002,7 @@ async def get_phone(string):
 async def rewrite_leads_v2(chat_id, user_id):  # (leads_id, price, string):
     raw_data = await get_amo_unsorted_list_v3(user_id)
     # time.sleep(1)
-    # logging.info('message from rewrite leads, we get some {} {} {} '.format(raw_data[0], chat_id, user_id))
+    logging.info('message from rewrite leads, we get some {} {} {} '.format(raw_data[0], chat_id, user_id))
     if raw_data[0] == 401:
         # refresh_access_main_amo()
         refresh_access_main_amo_v2(user_id)
@@ -1025,8 +1025,8 @@ async def rewrite_leads_v2(chat_id, user_id):  # (leads_id, price, string):
             continue
     # data_link = await read_link_v2(chat_id)
     data_link = get_bid(chat_id)
-    # logging.info('Some_get from rewrite lead, we get {}'
-    #              .format(data_link))
+    logging.info('Some_get from rewrite lead, we get {}'
+                 .format(data_link))
     creds = await get_creds_v3(user_id)
     access_token = creds.get('access_token')
     try:
@@ -1081,8 +1081,8 @@ async def rewrite_leads_v2(chat_id, user_id):  # (leads_id, price, string):
     }
     if leads_id:
         answer = requests.patch(url, json=data, headers=headers)
-        # logging.info('try_rewrite_lead_v2_{} {} {} {} {} {}'.
-        #              format(answer.status_code, user_id, chat_id, leads_id, data, url))
+        logging.info('try_rewrite_lead_v2_{} {} {} {} {} {}'.
+                     format(answer.status_code, user_id, chat_id, leads_id, data, url))
         if answer.ok:
             # await re_write_link_v3(chat_id, leads_id, contact_id)
             await execute_query_v3(query_update_contact_id,(chat_id,

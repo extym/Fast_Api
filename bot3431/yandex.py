@@ -98,72 +98,72 @@ def get_vendor_code(number_sber, offer_id):
     return brand, vendor_code, price
 
 
-def get_id_1c(offer_id):
+# def get_id_1c(offer_id):
+#
+#     return None
 
-    return None
 
-
-def reformat_data_order(order, mp, client_id_ps):
-    result, result_items = None, None
-    if mp == 'Yandex':
-        try:
-            day = order["delivery"]["shipments"][0]["shipmentDate"]
-        except:
-            day = order['delivery']['dates']['fromDate']
-        result = (
-            order["id"],
-            mp,
-            day,
-            order["status"],
-            order["substatus"],
-            order["paymentType"],
-            order["delivery"]["type"],
-            order["buyerTotalBeforeDiscount"],
-            client_id_ps
-        )
-
-        result_items = []
-        list_items = order['items']
-        for item in list_items:
-            id_1c = get_id_1c(order.get('offerId'))
-            proxy = (
-                str(order["id"]),
-                mp,
-                item["offerId"],
-                id_1c,
-                item["count"],
-                str(item["price"] + item.get("subsidy")).split(".")[0]  # TODO is make it int ?
-            )
-            result_items.append(proxy)
-
-    elif mp == 'Ozon':
-        time = order["shipment_date"].split('T')[0]
-
-        result = (
-            order['id'],
-            order["our_id"],
-            # shop,
-            # day_for_stm(time),  # reverse_time()
-            order["status"],
-            order["our_status"],
-            "PREPAID",
-            order["delivery_method"]["warehouse_id"]
-        )
-
-    elif mp == 'Sber':
-        time = order["shipments"][0]["shipping"]["shippingDate"].split('T')[0]
-        result = (
-            order["shipments"][0]["shipmentId"],
-            order['our_id'],
-            # shop,  # order["shop"],
-            # day_for_stm(time),  # reverse_time(time),
-            order["status"],
-            order["our_status"],
-            "PREPAID",  # order['data'].get("paymentType"),
-            order["shipments"][0]['fulfillmentMethod']
-        )
-
-    return result, result_items
+# def reformat_data_order(order, mp, client_id_ps):
+#     result, result_items = None, None
+#     if mp == 'Yandex':
+#         try:
+#             day = order["delivery"]["shipments"][0]["shipmentDate"]
+#         except:
+#             day = order['delivery']['dates']['fromDate']
+#         result = (
+#             order["id"],
+#             mp,
+#             day,
+#             order["status"],
+#             order["substatus"],
+#             order["paymentType"],
+#             order["delivery"]["type"],
+#             order["buyerTotalBeforeDiscount"],
+#             client_id_ps
+#         )
+#
+#         result_items = []
+#         list_items = order['items']
+#         for item in list_items:
+#             id_1c = get_id_1c(order.get('offerId'))
+#             proxy = (
+#                 str(order["id"]),
+#                 mp,
+#                 item["offerId"],
+#                 id_1c,
+#                 item["count"],
+#                 str(item["price"] + item.get("subsidy")).split(".")[0]  # TODO is make it int ?
+#             )
+#             result_items.append(proxy)
+#
+#     elif mp == 'Ozon':
+#         time = order["shipment_date"].split('T')[0]
+#
+#         result = (
+#             order['id'],
+#             order["our_id"],
+#             # shop,
+#             # day_for_stm(time),  # reverse_time()
+#             order["status"],
+#             order["our_status"],
+#             "PREPAID",
+#             order["delivery_method"]["warehouse_id"]
+#         )
+#
+#     elif mp == 'Sber':
+#         time = order["shipments"][0]["shipping"]["shippingDate"].split('T')[0]
+#         result = (
+#             order["shipments"][0]["shipmentId"],
+#             order['our_id'],
+#             # shop,  # order["shop"],
+#             # day_for_stm(time),  # reverse_time(time),
+#             order["status"],
+#             order["our_status"],
+#             "PREPAID",  # order['data'].get("paymentType"),
+#             order["shipments"][0]['fulfillmentMethod']
+#         )
+#
+#     return result, result_items
 
     # def reformat_data_items(order, shop):
     #     result = []
@@ -222,69 +222,69 @@ def reformat_data_order(order, mp, client_id_ps):
 #     print(count)
 
 
-def make_orders_to_ps(delta_time:int=1):
-    campain_list = execute_query_return_v3(query_get_all_shops, "Yandex")
-    if len(campain_list) > 0:
-        for campain in campain_list:
-            # orders_data = get_current_orders(campain[3])
-            # orders = orders_data['orders']
-            # orders = get_current_orders(campain[3])
-            orders = get_current_orders_ym_v2(campain[3], time_delta=delta_time)
-            list_fresh_orders = [i for i in orders if i['status'] == 'PROCESSING']
-            list_canceled_orders = [i for i in orders if (i['status'] == 'CANCELLED'
-                                                          and i['substatus'] != 'USER_NOT_PAID')]
-            # print(*list_fresh_orders, sep='\n')
-            # print('!' * 100)
-            # print(*list_canceled_orders, sep='\n')
-            # sys.exit()
-            if len(list_fresh_orders) > 0:
-                for order in list_fresh_orders:
-                    order_id = str(order.get('id'))
-                    print("$$$$$$$$4444", order_id)
-                    check = check_order_exist(query_is_exist_order, order_id)
-
-                    # sys.exit()
-                    if not check[0]:
-                        data_order = reformat_data_order(order, 'Yandex', campain[1])
-                        write_order = execute_query_return_bool(query_write_order,
-                                                                data_order[0])
-                        write_items = executemany_return_bool(query_write_items,
-                                                              data_order[1])
-                        print("Write order {},  write order items {}".
-                              format( write_order, write_items))
-                        # sys.exit()
-                        result = ps.create_resp_if_not_exist(order.get('items'), campain[8],
-                                                             external_order_id=order.get('id'))
-
-                        if result:
-                            final_result = ps.send_current_basket_to_order()
-                            if final_result is not None:
-                                data = ' '.join([str(i['id']) for i in final_result]).strip()
-                                print(5555555555, data)
-                                finish = ps.change_status_v2(data, status_id=2)
-                                print(7777777777, finish)
-
-
-                    else:
-                        continue
-
-            if len(list_canceled_orders) > 0:
-                for canceled in list_canceled_orders:
-
-                    check = check_order_exist(query_is_exist_order,
-                                              str(canceled.get('id')))
-                    if check[1] != 'CANCELLED':
-                        execute_query_return_bool(update_order_and_items,
-                                                  ('CANCELLED', str(canceled.get('id'))))
-                        data = ' '.join([str(i['id']) for i in canceled.get['items'][0]]).strip()
-                        finish = ps.change_status_v2(data, status_id=10)
-                        print('check_CANCELLED', check, str(canceled.get('id')), finish)
-
-                    else:
-                        continue
-
-                    # elif not check[2]:
-                    #     change_status(canceled)
+# def make_orders_to_ps(delta_time:int=1):
+#     campain_list = execute_query_return_v4(query_get_all_shops_v2, "Yandex")
+#     if len(campain_list) > 0:
+#         for campain in campain_list:
+#             # orders_data = get_current_orders(campain[3])
+#             # orders = orders_data['orders']
+#             # orders = get_current_orders(campain[3])
+#             orders = get_current_orders_ym_v2(campain[3], time_delta=delta_time)
+#             list_fresh_orders = [i for i in orders if i['status'] == 'PROCESSING']
+#             list_canceled_orders = [i for i in orders if (i['status'] == 'CANCELLED'
+#                                                           and i['substatus'] != 'USER_NOT_PAID')]
+#             # print(*list_fresh_orders, sep='\n')
+#             # print('!' * 100)
+#             # print(*list_canceled_orders, sep='\n')
+#             # sys.exit()
+#             if len(list_fresh_orders) > 0:
+#                 for order in list_fresh_orders:
+#                     order_id = str(order.get('id'))
+#                     print("$$$$$$$$4444", order_id)
+#                     check = check_order_exist(query_is_exist_order, order_id)
+#
+#                     # sys.exit()
+#                     if not check[0]:
+#                         data_order = reformat_data_order(order, 'Yandex', campain[1])
+#                         write_order = execute_query_return_bool(query_write_order,
+#                                                                 data_order[0])
+#                         write_items = executemany_return_bool(query_write_items,
+#                                                               data_order[1])
+#                         print("Write order {},  write order items {}".
+#                               format( write_order, write_items))
+#                         # sys.exit()
+#                         result = ps.create_resp_if_not_exist(order.get('items'), campain[8],
+#                                                              external_order_id=order.get('id'))
+#
+#                         if result:
+#                             final_result = ps.send_current_basket_to_order()
+#                             if final_result is not None:
+#                                 data = ' '.join([str(i['id']) for i in final_result]).strip()
+#                                 print(5555555555, data)
+#                                 finish = ps.change_status_v2(data, status_id=2)
+#                                 print(7777777777, finish)
+#
+#
+#                     else:
+#                         continue
+#
+#             if len(list_canceled_orders) > 0:
+#                 for canceled in list_canceled_orders:
+#
+#                     check = check_order_exist(query_is_exist_order,
+#                                               str(canceled.get('id')))
+#                     if check[1] != 'CANCELLED':
+#                         execute_query_return_bool(update_order_and_items,
+#                                                   ('CANCELLED', str(canceled.get('id'))))
+#                         data = ' '.join([str(i['id']) for i in canceled.get['items'][0]]).strip()
+#                         finish = ps.change_status_v2(data, status_id=10)
+#                         print('check_CANCELLED', check, str(canceled.get('id')), finish)
+#
+#                     else:
+#                         continue
+#
+#                     # elif not check[2]:
+#                     #     change_status(canceled)
 
 
 # print(datetime.datetime.strftime(datetime.datetime.now() - datetime.timedelta(days=3), "%d-%m-%Y"))

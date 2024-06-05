@@ -1,8 +1,8 @@
 import json
 import requests
 from datetime import datetime
-from read_json import read_json_sper
-from cred import token_sper
+# from read_json import read_json_sper
+# from cred import token_sper
 
 url = 'https://partner.sbermegamarket.ru/api/merchantIntegration/v1/offerService/'
 

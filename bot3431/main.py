@@ -42,16 +42,18 @@ ALLOWED = {'csv', 'xls', 'xlsx'}
 if LOCAL_MODE:
     UPLOAD_FOLDER = './'
     PATH_DIR = './'
-    LOG_DIR = './'
+    LOG_DIR = './logs'
 else:
     UPLOAD_FOLDER = '/var/www/html/load/'
     PATH_DIR = '/home/userbe/phone/'
-    LOG_DIR = 'home/userbe/phone/logs/'
+    LOG_DIR = ''
 
-logging.basicConfig(filename=os.path.join(LOG_DIR + 'webhook.log'), level=logging.INFO,
+logging.basicConfig(filename=os.path.join(LOG_DIR + './webhook.log'), level=logging.INFO,
                     format="%(asctime)s %(levelname)s %(message)s")
 
-refresh = creds.get('refresh')
+
+
+# refresh = creds.get('refresh')
 
 
 def check_allowed_filename(filename):
@@ -643,9 +645,32 @@ async def new_order_sber(uuid):
     return response
 
 
-@app.route('/order/cancel', methods=['GET', 'POST'])
-def cancel_order_sber():
-    pass
+@app.route('/order/<uuid>/cancel', methods=['GET', 'POST'])
+async def cancel_order_sber(uuid):
+    token = request.headers.get('Basic auth')
+    print(33333, uuid)
+    if token == None or token != None:
+        data_req = request.json
+        order = data_req["data"]
+        order_id = order["shipments"][0]['shipmentId']
+        # proxy = order["shipments"][0]["items"]
+        data = ("canceled", order_id, "Sber")
+        await execute_query(update_order_and_items, data)
+        re_data = order_resp_sb(True, False)
+
+        response = app.response_class(
+            json.dumps(re_data),
+            status=200,
+            content_type='application/json'
+        )
+
+    else:
+        response = app.response_class(
+            status=403
+        )
+
+    return response
+
 
 
 @app.route('/webhook', methods=['GET', 'POST'])
@@ -687,7 +712,7 @@ async def avito_webhook():
             else:
                 try:
                     await get_avito_current_chat_v2(hook, check)
-                    logging.info('get_avito_current_chat_v2 {} {} {}'
+                    logging.info('Get_avito_current_chat_v2 {} {} {}'
                                  .format(hook, check, chat_id))
                     return app.response_class(
                         status=200
@@ -863,7 +888,10 @@ async def add_store():
         key_store = data.get('key_store')
         api_key_ps = data.get('api_key_ps')
         upload_link = data.get('upload_link')
+        model = data.get('model')
 
+        if model == 'Выберите модель работы магазина':
+            flash('Выберите модель работы магазина')
 
         if (market == '235' or market == '2063') \
                 and store_id != '' and key_store != '' and upload_link != '':
@@ -872,7 +900,8 @@ async def add_store():
                                             key_store,
                                             store_id,
                                             api_key_ps,
-                                            upload_link))
+                                            upload_link,
+                                            model))
             if result[0]:
                 flash('Настройки удачно сохранены')
             else:
@@ -891,7 +920,8 @@ async def add_store():
                                                 key_store,
                                                 random_uuid,
                                                 api_key_ps,
-                                                upload_link))
+                                                upload_link,
+                                                model))
                 flash(f'Настройки удачно сохранены. Ссылка для новых заказов {target_url_new}.'
                       f' \n Ссылка для отмены заказов {target_url_cancel}.')
             except IntegrityError as e:

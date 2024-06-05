@@ -26,7 +26,7 @@ from bot_tg import send_get
 if LOCAL_MODE:
     UPLOAD_FOLDER = './'
     PATH_DIR = os.getcwd()
-    LOG_DIR = './'
+    LOG_DIR = './logs'
     CSV_PATH = './'
 else:
     UPLOAD_FOLDER = '/var/www/html/load/'
@@ -36,7 +36,7 @@ else:
     LOG_DIR = './logs/'
     CSV_PATH = '/var/www/html/csv/'
 
-logging.basicConfig(filename=os.path.join(LOG_DIR + 'webhook.log'), level=logging.INFO,
+logging.basicConfig(filename=os.path.join(LOG_DIR + '/webhook.log'), level=logging.INFO,
                     format="%(asctime)s %(levelname)s %(message)s")
 #
 # bot_answer = 'Добрый день.\n Благодарим за Ваше обращение в нашу компанию. ' \
@@ -560,8 +560,8 @@ async def get_avito_current_chat_v2(hook, check):
         ## try read current chat
         url = f'https://api.avito.ru/messenger/v2/accounts/{user_id}/chats/{chat_id}'
         answer = requests.get(url=url, headers=header_avito)
-        # logging.info("GET_AVITO_CURRENT_CHAT_1 {} {}"
-        #              .format(answer.status_code, chat_id))
+        logging.info("GET_AVITO_CURRENT_CHAT_1 {} {}"
+                     .format(answer.status_code, chat_id))
         try:
             raw_data = answer.json()
         except Exception as error:
@@ -627,7 +627,7 @@ async def get_avito_current_chat_v2(hook, check):
                  leads_id,
                  contact_id)
         logging.info('WROTE_DATA_FOR___22 {}'.format(proxy))
-        await execute_query(query_write_bid, proxy)
+        await execute_query_v3(query_write_bid, proxy)
         # await execute_query_v3(query_update_msg_id, (chat_id, msg_id))
         logging.info('WROTE_DATA_FOR___33 {}'.format(proxy))
         await rewrite_leads_v2(chat_id, user_id)
