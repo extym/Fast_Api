@@ -1,19 +1,18 @@
 import json
 import sys
 
-from connect import check_write_json_v4
+# from connect import check_write_json_v4
 import requests
 import random
 import string
-from cred import magic_link_json
+import project.conn as conn
 
 # #data = json.loads('http://super-good.ml/test_json.json')
-from categories import *
+# from categories import *
 
 
-def get_data_from_json():
-    ##WORK
-    r = requests.get(magic_link_json)
+def get_data_from_json(link_json):
+    r = requests.get(link_json)
     data = r.json()
 
     wheels = data['rims']
@@ -21,11 +20,6 @@ def get_data_from_json():
 
     return wheels, tires
 
-
-# print('wheels', len(wheels))
-# print('tires', len(tires))
-# print(wheels[0])
-# print(tires[-1])
 
 
 def count(row):  # dictionary
@@ -104,7 +98,8 @@ def id_generator(size=8, chars=string.ascii_lowercase + string.digits):
 
 
 def standart_wheels_from_json(without_db=False):
-    wheels = get_data_from_json()[0]
+    link_downloads = conn.get_distibutor_link('4tochki', 'json', 'wheels_tires')
+    wheels = get_data_from_json(link_downloads)[0]
     diction, proxy = {}, []
     for prod in wheels:
         try:
@@ -121,10 +116,11 @@ def standart_wheels_from_json(without_db=False):
             elif vendor == '':
                 break
             # check category wheels and tyres
-            category_id = categories_wheels.get(vendor, categories_wheels_upper.get(vendor.upper()))
-            if not category_id:
-                category_id = cats_wheels_upper.get(vendor.upper(), 4000)
-                print(444000, prod)
+            # category_id = categories_wheels.get(vendor, categories_wheels_upper.get(vendor.upper()))
+            # if not category_id:
+            #     category_id = cats_wheels_upper.get(vendor.upper(), 4000)
+            #     print(444000, prod)
+            category_id = prod.get("rim_type")
             price_data = get_price(prod)
             price = price_data[0]
             rule = price_data[1]
@@ -173,9 +169,7 @@ def standart_wheels_from_json(without_db=False):
 
     if not without_db:
         check_write_json_v4(diction)
-
-        tires = get_data_from_json()[1]
-        tttires = standart_tires_from_json(tires)  # return dict
+        tttires = standart_tires_from_json()  # return dict
         check_write_json_v4(tttires)
 
     print("ALL_RIDE_get_wheels_json {}".format(len(diction.keys())))
@@ -245,7 +239,9 @@ def standart_addons_from_json(without_db=True, data=None):
 # print(standart_addons_from_json(without_db=True, data=ventil_LS))
 
 
-def standart_tires_from_json(tyres):
+def standart_tires_from_json():
+    link_downloads = conn.get_distibutor_link('4tochki', 'json', 'wheels_tires')
+    tyres = get_data_from_json(link_downloads)[1]
     diction = {}
     for prod in tyres:
         in_stock = count(prod)
@@ -261,14 +257,16 @@ def standart_tires_from_json(tyres):
         elif vendor == '':
             continue  # break
         # check category wheels and tyres
-        category_id = 0
-        if not category_id and prod.get('season') == 'Летняя':
-            category_id = cats_summer_upper.get(vendor.upper(), 4000)
-        elif not category_id and prod.get('season') == 'Зимняя':
-            category_id = cats_winter_upper.get(vendor.upper(), 5000)
-        elif not category_id and prod.get('season') == 'Всесезонная':
-            category_id = cats_winter_upper.get(vendor.upper(), 6000)
+        # category_id = 0
+        # if not category_id and prod.get('season') == 'Летняя':
+        #     category_id = cats_summer_upper.get(vendor.upper(), 4000)
+        # elif not category_id and prod.get('season') == 'Зимняя':
+        #     category_id = cats_winter_upper.get(vendor.upper(), 5000)
+        # elif not category_id and prod.get('season') == 'Всесезонная':
+        #     category_id = cats_winter_upper.get(vendor.upper(), 6000)
         price = get_price_tires(prod)
+        category_id = prod.get('season')
+        tiretype = prod.get('tiretype')
         category = 12
         rule = False
         product_code = prod['cae']

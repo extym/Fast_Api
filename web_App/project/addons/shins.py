@@ -6,10 +6,10 @@ import random
 import wget
 import csv
 import datetime
-# from connect import check_write_json, check_write_json_v4
+
 # from categories import *
 from urllib.request import urlretrieve
-from project.conn import execute_query
+import project.conn as conn
 import urllib3
 urllib3.disable_warnings()
 
@@ -21,8 +21,8 @@ tn = datetime.datetime.now()
 ts = datetime.datetime.timestamp(tn) * 1000
 date = str(ts)[:13]
 type_data = ['wheels', 'tyres']
-url2 = vendor_link_tyres_csv + date
-url = vendor_link_whells_csv + date
+# url2 = vendor_link_tyres_csv + date
+# url = vendor_link_whells_csv + date
 
 # print(url, url2)
 # sys.exit()
@@ -55,10 +55,10 @@ def id_generator(size=8, chars=string.ascii_lowercase + string.digits):
 
 
 
-def get_data_csv():
+def get_data_csv(url):
     proxy = []
     try:
-        path2, data = urlretrieve(url2)
+        path2, data = urlretrieve(url)
         with open(path2, 'r') as file:
             reader = csv.reader(file, delimiter='\t')
             for row in reader:
@@ -71,7 +71,7 @@ def get_data_csv():
 
 
 
-def get_data_wheels_csv():
+def get_data_wheels_csv(url):
     proxy = []
     try:
         # result = wget.download(url, out=DATA_PATH + '/proxy_wheels.csv')
@@ -110,7 +110,9 @@ def count_price_tyres(string, size):
 def standart_tyres_csv():
     proxy_data, proxy = [], []
     global_result = {}
-    data = get_data_csv()
+    link_downloads_csv = conn.get_distibutor_link('shins', 'csv', 'tyres')
+    link = link_downloads_csv + date
+    data = get_data_csv(link)
     for i in range(1, len(data)):
         try:
             if data[i][1] == 'title':
@@ -192,7 +194,9 @@ def standart_tyres_csv():
 
 
 def standart_wheels_csv(without_db=False):
-    data = get_data_wheels_csv()
+    link_downloads_csv = conn.get_distibutor_link('shins', 'csv', 'wheels')
+    link = link_downloads_csv + date
+    data = get_data_wheels_csv(link)
     global_result = {}
     for i in range(1, len(data)):
         if data[i][1] == 'title':

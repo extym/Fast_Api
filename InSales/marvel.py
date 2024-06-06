@@ -142,7 +142,7 @@ def create_csv_for_category_from_marvel_v2():
                     proxy['category_id'] = category_id
                     proxy['id'] = prod_id
                     price = prod.get('WarePriceRUB')
-                    if price:
+                    if price and price != 0:
                         proxy['price'] = int(price.split(',')[0]) * 1.05
                     else:
                         continue

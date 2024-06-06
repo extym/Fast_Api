@@ -162,44 +162,49 @@ def create_csv_for_category_from_logic():  ##for import goods only (maybe)
 
             for prod in data:
                 proxy = dict()
-                ids.append(prod.get('product_id'))
-                proxy['id'] = prod.get('product_id')
-                proxy['published'] = site_category_path[category_id]
-                proxy['category_id'] = site_category_name  # category_id
-                proxy['quantity'] = prod.get('product_remain')
-                proxy['price'] = prod.get('product_price_dealer') * 1.05
-                proxy['brand'] = logic_brand_list.get(prod.get('brand_id'))
-                proxy['full_name'] = prod.get('product_full_name')
-                # proxy['id'] = prod.get('product_id')
-                pre_descr = prod.get('product_description')
-                if pre_descr:
-                    description = rewrite_description(prod.pop('product_description'))
-                    ########### extend fields. Is it need? #############
-
-                    # print('description_logic', description)
-                    proxy.update(description)
-                    rewrite_properties.update(description)  # TODO It's need if size fields is not constant
-                ####################################################
-                # else:
-                #     description = prod.get('product_full_name')
-                #     print('FUCK_UP_description', prod)
-                if prod.get('product_image_main'):
-                    proxy['image_main'] = add_link + prod.get('product_image_main')
+                quantity = prod.get('product_remain', 0)
+                if quantity == 0:
+                    continue
                 else:
-                    proxy['image_main'] = 'NOT_FOUND'
+                    ids.append(prod.get('product_id'))
+                    proxy['id'] = prod.get('product_id')
+                    proxy['published'] = site_category_path[category_id]
+                    proxy['category_id'] = site_category_name  # category_id
 
-                if prod.get('product_image_short'):
-                    proxy['image_short'] = add_link + prod.get('product_image_short')
-                else:
-                    proxy['image_short'] = 'NOT_FOUND'
+                    proxy['quantity'] = quantity
+                    proxy['price'] = prod.get('product_price_dealer') * 1.05
+                    proxy['brand'] = logic_brand_list.get(prod.get('brand_id'))
+                    proxy['full_name'] = prod.get('product_full_name')
+                    # proxy['id'] = prod.get('product_id')
+                    pre_descr = prod.get('product_description')
+                    if pre_descr:
+                        description = rewrite_description(prod.pop('product_description'))
+                        ########### extend fields. Is it need? #############
 
-                if prod.get('product_image_additional'):
-                    proxy['image_additional'] = add_link + prod.get('product_image_additional')
-                else:
-                    proxy['image_additional'] = 'NOT_FOUND'
+                        # print('description_logic', description)
+                        proxy.update(description)
+                        rewrite_properties.update(description)  # TODO It's need if size fields is not constant
+                    ####################################################
+                    # else:
+                    #     description = prod.get('product_full_name')
+                    #     print('FUCK_UP_description', prod)
+                    if prod.get('product_image_main'):
+                        proxy['image_main'] = add_link + prod.get('product_image_main')
+                    else:
+                        proxy['image_main'] = 'NOT_FOUND'
 
-                count += 1
-                result_list.append(proxy.copy())
+                    if prod.get('product_image_short'):
+                        proxy['image_short'] = add_link + prod.get('product_image_short')
+                    else:
+                        proxy['image_short'] = 'NOT_FOUND'
+
+                    if prod.get('product_image_additional'):
+                        proxy['image_additional'] = add_link + prod.get('product_image_additional')
+                    else:
+                        proxy['image_additional'] = 'NOT_FOUND'
+
+                    count += 1
+                    result_list.append(proxy.copy())
 
                 # print(f'prod_{key} ', len(prod.keys()), prod.keys())
             try:

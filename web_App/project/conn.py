@@ -195,6 +195,25 @@ UNIQUE (id)
 )
 """
 
+create_distributors = """
+CREATE TABLE IF NOT EXISTS distributors (
+id SERIAL PRIMARY KEY,
+name varchar NOT NULL,
+koef_price int,
+distributor TEXT,
+login_api_dist text,
+key_api_dist text,
+api_link text,
+type_downloads varchar,
+link_downloads text,
+is_scheduler bool,
+date_Added varchar,
+date_Modifed varchar,
+user_modifed int,
+UNIQUE (id)
+)
+"""
+
 create_consult_users = """
 CREATE TABLE IF NOT EXISTS consult_users (
 id SERIAL PRIMARY KEY,
@@ -565,13 +584,13 @@ def create_connection():
     return connection
 
 
-def get_distibutor_link(distibutor):
-    query = " SELECT * " \
+def get_distibutor_link(distibutor, type_downloads, name):
+    query = " SELECT link_downloads " \
             " FROM distributors" \
-            " WHERE distributor = %s "
+            " WHERE distributor = %s and type_downloads = %s and name = %s "
     with create_connection() as conn:
         with conn.cursor() as cursor:
-            cursor.execute(query, [distibutor])
+            cursor.execute(query, [distibutor, type_downloads, name])
             raw_data = cursor.fetchall()
             # print("Query from execute_query executed successfully")
     return raw_data
