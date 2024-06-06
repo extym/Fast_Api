@@ -613,29 +613,29 @@ async def new_order_sber(uuid):
         # ref_data = reformat_data_order(order, 'Sber')
         ref_data = reformat_data_order_v2(order, 'Sber', model=model,
                                           client_id_ps=client_id_ps)
-        print(123, type(ref_data[0]), ref_data[0])
-        print(123, type(ref_data[1]), ref_data[1])
-        print(123, type(ref_data[2]), ref_data[2])
-        await execute_query_v3(query_write_order, ref_data[0])
-        await executemany_query(query_write_items, ref_data[1])
-        await execute_query_v3(query_write_customer, ref_data[2])
-        # data_confirm = confirm_data_sb(order)
-        # post_smth_sb('order/confirm', data_confirm)
+        # print(12345678, type(ref_data[0]), ref_data[0])
+        # print(123, type(ref_data[1]), ref_data[1])
+        # print(123, type(ref_data[2]), ref_data[2])
+        not_exist = await execute_query_return_bool(query_write_order, ref_data[0])
+        if not_exist:
+            await executemany_query(query_write_items, ref_data[1])
+            await execute_query_v3(query_write_customer, ref_data[2])
+            # data_confirm = confirm_data_sb(order)
+            # post_smth_sb('order/confirm', data_confirm)
 
-        result = ps.create_order_ps_if_not_exist(order.get('items'), link,
-                                              key=store_data[3],
-                                              external_order_id=order.get('id'))
+            result = ps.create_order_ps_if_not_exist(order.get('items'), link,
+                                                     key=store_data[3],
+                                                     external_order_id=order.get('id'))
 
-        if result:
-            final_result = ps.send_current_basket_to_order()
-            if final_result is not None:
-                datas = ' '.join([str(i['id']) for i in final_result]).strip()
-                print(5555555555, datas)
-                finish = ps.change_status_v2(datas, status_id=2)
-                print(7777777777, finish)
+            if result:
+                final_result = ps.send_current_basket_to_order()
+                if final_result is not None:
+                    datas = ' '.join([str(i['id']) for i in final_result]).strip()
+                    print(55554444555555, datas)
+                    finish = ps.change_status_v2(datas, status_id=2)
+                    print(777755555777777, finish)
 
-        response = app.response_class(-
-                                      json.dumps(data[0]),
+        response = app.response_class(json.dumps(data[0]),
                                       status=200,
                                       content_type='application/json'
                                       )
@@ -658,7 +658,7 @@ async def new_order_sber(uuid):
     return response
 
 
-@app.route('/order/<uuid>/cancel', methods=['GET', 'POST'])
+@app.route('/external_orders/<uuid>/cancel', methods=['GET', 'POST'])
 async def cancel_order_sber(uuid):
     token = request.headers.get('Basic auth')
     print(33333, uuid)

@@ -13,6 +13,7 @@ import requests
 from requests import Session
 import xmltodict
 from urllib.request import urlopen
+from typing import List, Dict
 
 
 # from bot_tg import send_get
@@ -68,10 +69,27 @@ def change_status_v2(ids: str, status_id=0):
         return False
 
 
-def get_orders_v2(customer_id, marketplace_id):
+def get_orders_v2(customer_id: str,
+                  marketplace_id: str = None,
+                  filter_status: List = None):
+    """
+    We are requesting orders from parts-soft for get items ids
+    :param customer_id:
+    id customer in parts-soft
+    :param marketplace_id:
+    order id (shipment id) from marketplace
+    :param filter_status:
+    "id": 7, "name": "Пришло на центральный склад", "code": "prishlo"
+    "id": 21, "name": "Готово к выдаче", "code": "prishlo"
+    "id": 22, "name": "Резерв. Готов к выдаче", "code": "prishlo"
+    "id": 27, "name": "Подготовка к возврату по просрочке.", "code": "prishlo"
+    :return:
+    string items ids
+    """
     result, result_list = '', []
     page, error = 0, 0
-    if customer_id == '710' or customer_id == '715' or customer_id == '235':
+    if customer_id == '710' or customer_id == '715' \
+            or customer_id == '235':
         while marketplace_id != result:
             params = {
                 'search[customer_id_eq]': customer_id,
@@ -85,16 +103,22 @@ def get_orders_v2(customer_id, marketplace_id):
             # print(123123123, answer.text)
             if answer.ok:
                 data = answer.json()
-                result_list = [i for i in data.get('orders')
-                               if i.get('marketplace_id') == str(marketplace_id)]
+                if not filter_status:
+                    result_list = [i for i in data.get('orders')
+                                   if i.get('marketplace_id') == str(marketplace_id)]
+                else:
+                    # filter_status = [7, 21, 22, 27]
+                    result_list = [i for i in data.get('orders')
+                                   if (i.get('marketplace_id') == str(marketplace_id)
+                                       and i.get('status_id') in filter_status)]
 
                 if result_list:
                     result = marketplace_id
                 else:
                     page += 1
                     print('page ', page)
-                if page >= 5:
-                    bot_tg.send_get('So many pages {} for {} in {}'.format(page, marketplace_id, customer_id))
+                if page >= 3:
+                    bot_tg.send_get('Not found order {} in {}'.format(marketplace_id, customer_id))
                     break
             else:
                 error += 1
@@ -116,11 +140,18 @@ def get_orders_v2(customer_id, marketplace_id):
             url = ps_link + "/orders.json"
             token_ps = HTTPBasicAuth(admin_ps_login, admin_ps_pass)
             answer = requests.get(url, auth=token_ps, params=params)
-            # print(2222222, answer.url)
+
             if answer.ok:
                 data = answer.json()
-                result_list = [i for i in data.get('orders')
-                               if i.get('order_items')[0]['comment'] == marketplace_id ]
+                print(2222222, data)
+                if not filter_status:
+                    result_list = [i for i in data.get('orders')
+                                   if i.get('order_items')[0]['comment'] == marketplace_id]
+                else:
+                    # filter_status = [7, 21, 22, 27]
+                    result_list = [i for i in data.get('orders')
+                                   if (i.get('order_items')[0]['comment'] == marketplace_id
+                                       and i.get('status_id') in filter_status)]
 
                 if result_list:
                     result = marketplace_id
@@ -128,7 +159,7 @@ def get_orders_v2(customer_id, marketplace_id):
                     page += 1
                     print('page ', page)
                 if page >= 3:
-                    bot_tg.send_get('So many pages {} for {} in {}'.format(page, marketplace_id, customer_id))
+                    bot_tg.send_get('Not found order {} in {}'.format(marketplace_id, customer_id))
                     break
             else:
                 error += 1
@@ -136,7 +167,7 @@ def get_orders_v2(customer_id, marketplace_id):
                              .format(answer.status_code, answer.text))
                 bot_tg.send_get('Some trouble with access parts-soft - status {} text {}'
                                 .format(answer.status_code, answer.text))
-                if page >= 5:
+                if page >= 3:
                     break
 
     try:
@@ -152,7 +183,9 @@ async def make_data_for_request_v2(data_file, market):
     proxy = ''
     shipment_date = data_file[1]
     for number in data_file[0]:
-        item_ids = get_orders_v2(market, marketplace_id=str(number))
+        item_ids = get_orders_v2(market, 
+                                 marketplace_id=str(number),
+                                 filter_status = [7, 21, 22, 27])
         if item_ids:
             proxy += item_ids.strip() + ' '
             count += 1
@@ -206,6 +239,7 @@ def send_current_basket_to_order():
         return answer.json().get('data')
     else:
         return None
+
 
 def make_basket(qnt=None, exter_order_id=None, propousal=None):
     url = "https://3431.ru/api/v1/baskets"
@@ -341,7 +375,7 @@ def create_resp_if_not_exist(list_items, link,
 
 
 def create_order_ps_if_not_exist(list_items, link, key=None,
-                             external_order_id=None):
+                                 external_order_id=None):
     # exter_order_id = external_order_id
     count_items = 0
     global_result_make_basket = False
@@ -399,7 +433,6 @@ def create_order_ps_if_not_exist(list_items, link, key=None,
     return global_result_make_basket
 
 
-
 # send_current_basket_to_order()
 
 # create_resp_is_exist(brand="STELLOX", oem="42140459SX", qnt=2, external_id=451642783)
@@ -413,7 +446,7 @@ ym_orders = [459439792, 459438203, 459412869, 459372108, 459349047, 459339840, 4
 ym_orders_short = [459439792, 459438203, 459412869, 459372108, 459349047, 459339840, 459295293, 459282888, 459271641]
 
 # get_orders_v2(710, marketplace_id='9009797416999')
-# get_orders_v2("2063", marketplace_id="462477099")
+# get_orders_v2("2063", marketplace_id="462477099", filter_status=[7, 21, 22, 27])
 
 # get_smth('/regions.json')
 # get_smth("/orders.json")

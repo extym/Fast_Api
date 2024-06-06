@@ -35,7 +35,7 @@ def send_stocks_sb():
     headers = {'Content-type': 'application/json'
                }
     metod = 'stock/update'
-    url_address = url + metod  # + '?login=' + login_lm + '&password=' + pass_lm
+    url_address = url + metod
     answer = requests.post(url_address, headers=headers, json=data)
 
     print('send_stocks_sb', answer, answer.text)
