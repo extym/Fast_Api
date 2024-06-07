@@ -128,7 +128,7 @@ def standart_tyres(type_data=None, shop_name=None):
     return global_result
 
 
-standart_tyres_csv(shop_name='Low Price')
+# standart_tyres_csv(shop_name='Low Price')
 
 # def standart_wheels_csv(distributor=None, without_db=False):
 #     data = get_data_wheels_csv()
@@ -208,3 +208,7 @@ standart_tyres_csv(shop_name='Low Price')
 #
 #     print('ALL_RIDE_get_wheels_csv ', len(global_result))
 #     return global_result
+
+
+check_write_json_v4
+check_and_write_v4

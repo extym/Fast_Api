@@ -132,12 +132,20 @@ def standart_tyres_csv():
                 else:
                     description = data[i][1]
                 category_id = 7000
+                # if data[i][4] in ['S', 's', 'Летняя']:
+                #     category_id = cats_summer_upper.get(vendor.upper(), 4000)
+                # elif data[i][4] in ["W", 'Зимняя']:
+                #     category_id = cats_winter_upper.get(vendor.upper(), 5000)
+                # elif data[i][4] in ["allseason", 'Всесезонная']:
+                #     category_id = cats_allseason_upper.get(vendor.upper(), 6000)
+                # else:
+                #     print('1212_category_id', data[i][4])
                 if data[i][4] in ['S', 's', 'Летняя']:
-                    category_id = cats_summer_upper.get(vendor.upper(), 4000)
+                    category_id = 'Летняя'
                 elif data[i][4] in ["W", 'Зимняя']:
-                    category_id = cats_winter_upper.get(vendor.upper(), 5000)
+                    category_id = 'Зимняя'
                 elif data[i][4] in ["allseason", 'Всесезонная']:
-                    category_id = cats_allseason_upper.get(vendor.upper(), 6000)
+                    category_id = 'Всесезонная'
                 else:
                     print('1212_category_id', data[i][4])
                 category = 12
@@ -154,7 +162,7 @@ def standart_tyres_csv():
                     # name_picture = 'shins-' + id_generator() + '.png'
                     name_picture = 'shins-' + product_code + '.png'
                 image_tuple = (name_picture, image_url)
-                price = count_price(data[i][17], size)
+                price = count_price_tyres(data[i][17], size)
                 koeff = 1
                 meta_d = 'летняя и зимняя резина ' + name + ' в интернет-магазине шин и дисков 1000koles.ru'
                 meta_k = 'летняя и зимняя резина, колеса, цена, купить, в Москве, в интернет-магазине'
@@ -211,10 +219,8 @@ def standart_wheels_csv(without_db=False):
                 name = data[i][1]
                 vendor = data[i][3]
                 description = name
-                category_id = categories_wheels.get(vendor)
-                if category_id is None:
-                    category_id = cats_wheels_upper.get(vendor.upper(), 4000)
-                category = 5
+                category = data[i][5].split('/')[0].strip()
+                category_id = 5
                 # check category wheels and tyres
                 product_code = data[i][2]
                 diameter = data[i][7].split(' / ')[0]  # 16 'diameter'
@@ -250,9 +256,9 @@ def standart_wheels_csv(without_db=False):
                 }
                 global_result.update({vendor.strip() + product_code:
                     (
-                        [category_id, name, description, price, in_stock,
+                        [category, name, description, price, in_stock,
                          enabled, product_code, vendor, meta_d, meta_k,
-                         params, koeff, meta_h1, provider, category],
+                         params, koeff, meta_h1, provider, category_id],
                         image_tuple,
                         options,
                         rule,
