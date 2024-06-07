@@ -1,5 +1,13 @@
 from project import DATA_PATH
+
+import datetime
+import time
+import requests
 import json
+import urllib3
+
+# for production only
+requests.packages.urllib3.disable_warnings()
 
 
 
@@ -35,14 +43,6 @@ def rewrite_standart_data(listt):
     print('file_standart_data_rewrite', len(data_list))
 
 
-import datetime
-import time
-import requests
-import json
-
-
-# for production only
-requests.packages.urllib3.disable_warnings()
 
 def read_image_address():
     pages = None
