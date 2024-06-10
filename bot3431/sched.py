@@ -2,7 +2,7 @@ import schedule
 from avito import  get_avito_token_v2, get_current_balance
 from amo import refresh_access_main_amo
 from maintenance import read_gmotors_link, read_eurozapchastspb_link
-from yandex import make_orders_to_ps
+from common import make_orders_to_ps
 import time
 
 schedule.every(720).minutes.do(read_eurozapchastspb_link)
