@@ -80,22 +80,22 @@ def get_current_orders_ym_v2(campaign_id: int, time_delta: int=1):
     return result
 
 
-def get_vendor_code(number_sber, offer_id):
-    link = get_sber_link(number_sber)  #upload_price
-    brand, vendor_code, price = '', '', ''
-    data = pd.read_xml(link, xpath='//offer')
-    count = 0
-    for row in data:
-        if row[0] == offer_id:
-            print(len(row))
-            brand = row[6]
-            vendor_code = row[7]
-            price = row[8]
-        if len(row) != 14:
-            print(*row, sep='\n')
-            count += 1
-    print(count)
-    return brand, vendor_code, price
+# def get_vendor_code(number_sber, offer_id):
+#     link = get_sber_link(number_sber)  #upload_price
+#     brand, vendor_code, price = '', '', ''
+#     data = pd.read_xml(link, xpath='//offer')
+#     count = 0
+#     for row in data:
+#         if row[0] == offer_id:
+#             print(len(row))
+#             brand = row[6]
+#             vendor_code = row[7]
+#             price = row[8]
+#         if len(row) != 14:
+#             print(*row, sep='\n')
+#             count += 1
+#     print(count)
+#     return brand, vendor_code, price
 
 
 # def get_id_1c(offer_id):

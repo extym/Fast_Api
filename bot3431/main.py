@@ -256,7 +256,7 @@ def counter_items(items_list):
     for itemm in items_list:
         if itemm["offerId"] in pr.keys():
             value = pr.pop(itemm["offerId"])
-            itemm["quantity"] = value
+            itemm["count"] = value
             lst.append(itemm)
 
     return lst
@@ -582,20 +582,17 @@ def test():
 
 @app.route('/external_orders/<uuid>/new', methods=['GET', 'POST'])
 async def new_order_sber(uuid):
-    # print(33333, uuid)
-
     token = request.headers.get('Basic auth')
-    print(33333, uuid)
     if token == None or token != None:
-        print(33311133, uuid)
         data_req = request.json
         order = data_req["data"]
+        order_id = order.get("shipments")[0]["shipmentId"]
         pre_proxy = order["shipments"][0]["items"]
         proxy = counter_items(pre_proxy)
 
         store_data = conn.execute_query_return_one(
             query_get_shop_campain_id, uuid)
-        print(232323, type(store_data), store_data)
+        print(232323, proxy, store_data)
         client_id_ps = store_data[1]
         model = store_data[0]
         link = store_data[2]
@@ -610,28 +607,26 @@ async def new_order_sber(uuid):
         order['status'], \
             order['our_status'], order['count_items'] \
             = "NEW", "NEW", proxy
-        # ref_data = reformat_data_order(order, 'Sber')
         ref_data = reformat_data_order_v2(order, 'Sber', model=model,
                                           client_id_ps=client_id_ps)
         # print(12345678, type(ref_data[0]), ref_data[0])
         # print(123, type(ref_data[1]), ref_data[1])
         # print(123, type(ref_data[2]), ref_data[2])
-        not_exist = await execute_query_return_bool(query_write_order, ref_data[0])
+        not_exist = execute_query_return_bool(query_write_order, ref_data[0])
         if not_exist:
             await executemany_query(query_write_items, ref_data[1])
             await execute_query_v3(query_write_customer, ref_data[2])
             # data_confirm = confirm_data_sb(order)
             # post_smth_sb('order/confirm', data_confirm)
 
-            result = ps.create_order_ps_if_not_exist(order.get('items'), link,
+            result = ps.create_order_ps_if_not_exist(proxy, link,
                                                      key=store_data[3],
-                                                     external_order_id=order.get('id'))
+                                                     external_order_id=order_id)
 
             if result:
-                final_result = ps.send_current_basket_to_order()
+                final_result = ps.send_current_basket_to_order(key=store_data[3])
                 if final_result is not None:
                     datas = ' '.join([str(i['id']) for i in final_result]).strip()
-                    print(55554444555555, datas)
                     finish = ps.change_status_v2(datas, status_id=2)
                     print(777755555777777, finish)
 
@@ -924,8 +919,8 @@ async def add_store():
             url = request.url
             target_url_new = url.rsplit('/', 1)[0] + f'/external_orders/{random_uuid}/new'
             target_url_cancel = url.rsplit('/', 1)[0] + f'/external_orders/{random_uuid}/cancel'
-            print(33333333, market, key_store, store_id, upload_link,
-                  random_uuid, target_url_new, target_url_cancel, url)
+            # print(33333333, market, key_store, store_id, upload_link,
+            #       random_uuid, target_url_new, target_url_cancel, url)
             try:
                 conn.execute_query_v2(query_add_settings_without_ym,
                                       (market,

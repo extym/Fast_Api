@@ -244,11 +244,12 @@ def make_orders_to_ps(delta_time:int=1):
                         print("Write order {},  write order items {}".
                               format( write_order, write_items))
                         # sys.exit()
-                        result = ps.create_resp_if_not_exist(order.get('items'), campain[8],
+                        result = ps.create_resp_if_not_exist(order.get('items'),
+                                                             campain[8], key=campain[2],
                                                              external_order_id=order.get('id'))
 
                         if result:
-                            final_result = ps.send_current_basket_to_order()
+                            final_result = ps.send_current_basket_to_order(key=campain[2])
                             if final_result is not None:
                                 data = ' '.join([str(i['id']) for i in final_result]).strip()
                                 print(5555555555, data)

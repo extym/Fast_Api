@@ -32,7 +32,6 @@ else:
     UPLOAD_FOLDER = '/var/www/html/load/'
     PATH_DIR = os.getcwd()
     PATH_DIR = '/home/userbe/bot3431'
-
     LOG_DIR = './logs/'
     CSV_PATH = '/var/www/html/csv/'
 
@@ -629,7 +628,7 @@ async def get_avito_current_chat_v2(hook, check):
         logging.info('WROTE_DATA_FOR___22 {}'.format(proxy))
         await execute_query_v3(query_write_bid, proxy)
         logging.info('WROTE_DATA_FOR___33 {}'.format(proxy))
-        await execute_query_v3(query_update_msg_id, (chat_id, msg_id))
+        await execute_query_v3(query_update_msg_id, (msg_id, chat_id))
         logging.info('TRY_REWRITE_DATA_TO_AMO_1 {} {} {} {} '.
                      format(chat_id, user_id, title, target_link))
         await rewrite_leads_v2(chat_id, user_id)

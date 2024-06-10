@@ -7,7 +7,7 @@ from lxml import etree
 from requests.auth import HTTPBasicAuth
 
 import bot_tg
-from cred import admin_ps_login, admin_ps_pass, ps_link, ps_YM_II_api_key
+from cred import admin_ps_login, admin_ps_pass, ps_link
 from base64 import b64encode
 import requests
 from requests import Session
@@ -214,23 +214,23 @@ basket = '/api/v1/baskets/'
 add_basket = "/api/v1/baskets"
 
 
-def get_current_client_smth(metod):
+def get_current_client_smth(metod, key=None):
     url = "https://3431.ru" + metod
     # token_ps = HTTPBasicAuth(admin_ps_login, admin_ps_pass)
     params = {
-        "api_key": ps_YM_II_api_key
+        "api_key": key
     }
     answer = requests.get(url, params=params)
 
     print(answer.text)
 
 
-def send_current_basket_to_order():
+def send_current_basket_to_order(key: str = None):
     url = "https://3431.ru/api/v1/baskets/order"
     headers = {
-        "api_key": ps_YM_II_api_key}
+        "api_key": key}
     data = {
-        "api_key": ps_YM_II_api_key
+        "api_key": key
     }
     answer = requests.post(url, headers=headers, data=data)
 
@@ -241,12 +241,13 @@ def send_current_basket_to_order():
         return None
 
 
-def make_basket(qnt=None, exter_order_id=None, propousal=None):
+def make_basket(qnt=None, exter_order_id=None, key=None, propousal=None):
+    print(777777777, qnt, exter_order_id, key, propousal )
     url = "https://3431.ru/api/v1/baskets"
     headers = {
-        "api_key": ps_YM_II_api_key}
+        "api_key": key}
     data = {
-        "api_key": ps_YM_II_api_key,
+        "api_key": key,
         "oem": propousal.get('oem'),
         "make_name": propousal.get('make_name'),
         "detail_name": propousal.get('detail_name'),
@@ -264,7 +265,7 @@ def make_basket(qnt=None, exter_order_id=None, propousal=None):
 
 def choice_function(items, full_items, qnt):
     listing = sorted(items.values())[:5]
-    print(322222233, listing)
+    # print(322222233, listing)
     result = []
     for item in full_items:
         if item["cost"] in listing and item['qnt'] >= qnt:
@@ -315,7 +316,7 @@ def get_oem_from_xml(offer_id, link=None):
 # get_oem_from_xml("KORTEXKHB4267STD",
 #                          link = 'https://3431.ru/system/unload_prices/33/yandex_market.xml')
 
-def create_resp_if_not_exist(list_items, link,
+def create_resp_if_not_exist(list_items, link, key=None,
                              external_order_id=None):
     # exter_order_id = external_order_id
     count_items = 0
@@ -330,7 +331,7 @@ def create_resp_if_not_exist(list_items, link,
         print(3333, oem, brand, qnt)
         # sys.exit()
         params = {
-            "api_key": ps_YM_II_api_key,
+            "api_key": key,
             "oem": oem,
             "make_name": brand,
             "without_cross": True
@@ -382,47 +383,51 @@ def create_order_ps_if_not_exist(list_items, link, key=None,
     for item in list_items:
         list_propousal = []
         # vendor_data = get_vendor_code_from_xlm(item.get('offer_id)'), link=link)
-        vendor_data = get_oem_from_xml(item.get('offerId'), link=link)
-        oem = vendor_data[1]
-        brand = vendor_data[0]
-        qnt = item.get("count")
-        print(3333, oem, brand, qnt)
-        # sys.exit()
-        params = {
-            "api_key": key,
-            "oem": oem,
-            "make_name": brand,
-            "without_cross": True
-        }
-        metod = "/backend/price_items/api/v1/search/get_offers_by_oem_and_make_name"
-        url = "http://3431.ru" + metod
-        answer = requests.get(url, params=params)
+        if item.get('offerId') != 'delivery':
+            vendor_data = get_oem_from_xml(item.get('offerId'), link=link)
+            oem = vendor_data[1]
+            brand = vendor_data[0]
+            qnt = item.get("count")
+            print("oem---brand---qnt", oem, brand, qnt)
+            # sys.exit()
+            params = {
+                "api_key": key,
+                "oem": oem,
+                "make_name": brand,
+                "without_cross": True
+            }
+            metod = "/backend/price_items/api/v1/search/get_offers_by_oem_and_make_name"
+            url = "http://3431.ru" + metod
+            answer = requests.get(url, params=params)
 
-        try:
-            need_data = answer.json()["data"]
-        except Exception as error:
-            print("ERROR get data from json {}, oem {}, brand {}, qnt {}"
-                  .format(answer.text, oem, brand, qnt))
-            need_data = []
-        if len(need_data) > 0:
-            propousal = {i['hash_key']: i['cost'] for i in need_data if
-                         (i["oem"] == oem and i['make_name'] == brand)}
-            list_propousal = choice_function(propousal, need_data, qnt)
+            try:
+                need_data = answer.json()["data"]
+            except Exception as error:
+                print("ERROR get data from json {}, oem {}, brand {}, qnt {}"
+                      .format(answer.text, oem, brand, qnt))
+                need_data = []
+            if len(need_data) > 0:
+                propousal = {i['hash_key']: i['cost'] for i in need_data if
+                             (i["oem"] == oem and i['make_name'] == brand)}
+                list_propousal = choice_function(propousal, need_data, qnt)
 
-            # print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@',
-            #       *list_propousal[0].items(), sep='\n')
-            # print(len(propousal))
+                # print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@',
+                #       *list_propousal[0].items(), sep='\n')
+                # print(len(propousal))
 
-            result_make_basket = make_basket(propousal=list_propousal[0],
-                                             qnt=qnt,
-                                             exter_order_id=external_order_id)
-            if result_make_basket == 200:
-                count_items += 1
+                result_make_basket = make_basket(propousal=list_propousal[0],
+                                                 qnt=qnt, key=key,
+                                                 exter_order_id=external_order_id)
+                if result_make_basket == 200:
+                    count_items += 1
+                else:
+                    print("Make basket failed {} {}".format(result_make_basket, item))
+
             else:
-                print("Make basket failed {} {}".format(result_make_basket, item))
-
+                print('SOME FUCKUP GET PROPOUSAL {}'.format(answer.text))
         else:
-            print('SOME FUCKUP GET PROPOUSAL {}'.format(answer.text))
+            count_items += 1
+            continue  # TODO make order delivery
 
     if count_items == len(list_items):
         # print("Result result_make_basket successfully {}".format(count_items))

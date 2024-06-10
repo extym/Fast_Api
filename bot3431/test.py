@@ -3416,3 +3416,42 @@ ps_order_status_types = {
          "sms_discount_groups": [22, 30, 16, 10, 17, 11, 18, 19, 12, 20, 26, 14, 15, 29, 13, 7, 6],
          "email_discount_groups": [21, 27, 22, 30, 16, 10, 17, 11, 18, 19, 20, 29, 13, 7, 6],
          "disable_check_status": False}]}
+
+
+order_dbs_sber = {
+    "meta":{},
+    "data":{
+        "shipments":[
+            {
+                "shipmentId":"612",
+                "shipmentDate":"2024-06-12T18:13:30+03:00",
+                "handover":{
+                    "packingDate":"2022-11-13T14:00:00+03:00",
+                    "reserveExpirationDate":"2022-11-29T00:00:00+03:00",
+                    "outletId":"",
+                    "serviceScheme":"DELIVERY_BY_MERCHANT","depositedAmount":0,
+                    "deliveryInterval":{
+                        "dateFrom":"2022-11-15T09:00:00+03:00",
+                        "dateTo":"2022-11-29T21:00:00+03:00"
+                    },
+                    "deliveryId":692620459
+                },
+                "customer":{
+                    "customerFullName":"Тест Тестович",
+                    "phone":"88888888888","email":"test@test.com",
+                    "address":{
+                        "source":"г Москва, ул Тестовая, д 1, кв. 58",
+                        "postalCode":"119019",
+                        "fias":{
+                            "regionId":"0c5b2444-70a0-4932-980c-b4dc0d3f02b5",
+                            "destinationId":"4cbce9f3-6fd7-4162-962d-41268b75aadc"
+                        },"geo":{"lat":"55.751812","lon":"37.599292"},
+                        "access":{
+                            "detachedHouse":false,"entrance":"1","floor":1,
+                            "intercom":"1","cargoElevator":false,
+                            "comment":"Дверь справа","apartment":"58"},
+                        "regionKladrId":"77","house":"д 1","block":null,
+                        "flat":"58","regionWithType":"г Москва","cityWithType":"г Москва",
+                        "cityArea":"Центральный","streetWithType":"ул Арбат"}},
+                "flags":[],
+                "items":[{"itemIndex":"1","goodsId":"100000572021","offerId":"BV001950-k","itemName":"Материнская плата Gigabyte GA-H110M-H","price":990,"finalPrice":990,"discounts":[],"quantity":1,"taxRate":"NOT","reservationPerformed":true,"isDigitalMarkRequired":true},{"itemIndex":"2","goodsId":"100025325086","offerId":"delivery","itemName":"Доставка","price":200,"finalPrice":200,"discounts":[],"quantity":1,"taxRate":null,"reservationPerformed":true,"isDigitalMarkRequired":false}]}],"merchantId":1111}}

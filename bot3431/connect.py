@@ -398,7 +398,23 @@ def check_order_exist(query, data):
 
 
 
-async def execute_query_return_bool(query, data):
+def async_execute_query_return_bool(query, data):
+    with create_connection() as conn:
+        conn.autocommit = True
+        with conn.cursor() as cursor:
+            try:
+                cursor.execute(query, data)
+                return True
+                # print("Query from execute_query executed successfully")
+            except UniqueViolation  as err:
+                print(f"The ERROR UniqueViolation execute_query '{err}' occured ")
+                return False
+            # except OperationalError as err:
+            #     print(f"The ERROR from execute_query '{err}' occured ")
+            #     return False
+
+
+def execute_query_return_bool(query, data):
     with create_connection() as conn:
         conn.autocommit = True
         with conn.cursor() as cursor:
