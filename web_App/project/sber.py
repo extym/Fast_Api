@@ -2,67 +2,19 @@ import datetime
 import json
 from xml.dom import minidom
 from project import DATA_PATH
-import project.addons.shins as shins
-import project.addons.four_tochki as tochki
-
+# import project.addons.shins as shins
+# import project.addons.four_tochki as tochki
+# import project.addons.standart_product as standart
+# import project.addons.kolrad as kolrad
+import project.addons.common as common
 
 special_wheels = {}  #TODO make brand dict?
-
-
-def create_need_data(without_db=False):
-    json_data, csv_data = {}, {}
-    if not without_db:
-        try:
-            csv_data = shins.standart_wheels_csv()
-        except:
-            print("We don't get csv")
-        try:
-            json_data = tochki.standart_wheels_from_json()
-        except:
-            print("We don't get json")
-        data = check_and_write_v4()
-    else:
-        try:
-            csv_data = shins.standart_wheels_csv(without_db=True)
-        except:
-            pass
-        try:
-            json_data = tochki.standart_wheels_from_json(without_db=True)
-        except:
-            pass
-
-        data = standart_product_v2(get_new_pages_v2())
-
-    pre_csv_data = {key: value for key, value in csv_data.items() if int(value[0][4]) >= 4}
-    pre_json_data = {k: v for k, v in json_data.items() if int(v[0][4]) >= 4}
-    need_data = dict()
-    for ke, val in data.items():
-        pre_count_json = pre_json_data.get(ke)
-        if pre_count_json:
-            count_json = int(pre_count_json[0][4])
-        else:
-            count_json = 0
-            # print(111, ke, type(val[0][4]), val[0][4])
-        pre_count_csv = pre_csv_data.get(ke)
-        if pre_count_csv:
-            count_csv = int(pre_count_csv[0][4])
-        else:
-            count_csv = 0
-            # print(222, ke, type(val[0][4]), val[0][4])
-        in_stok = int(val[0][4]) + count_json + count_csv
-        new_data = val[0].copy()
-        del new_data[4]
-        new_data.insert(4, in_stok)
-        need_data.update({ke: (new_data, val[1], val[2], val[3], val[4])})
-    print('ALL_RIDE create_need_data ', len(need_data))
-
-    return need_data
 
 
 def create_sber_xml(stocks_is_null=False, without_db=False, addons=False,
                     site_url='', legal_name='', short_shop_name='',
                     category='Все товары', markup='0',
-                    discount='0'):
+                    discount='0', wh_id=None):
     root = minidom.Document()
 
     date = datetime.datetime.now().replace(second=0, microsecond=0)
@@ -202,58 +154,8 @@ def create_sber_xml(stocks_is_null=False, without_db=False, addons=False,
         minQuantityOfferChild.appendChild(textMinQuantityOffer)
         offerChild.appendChild(minQuantityOfferChild)
 
-    # def create_need_data(without_db=False):
-    #     json_data, csv_data = {}, {}
-    #     if not without_db:
-    #         try:
-    #             csv_data = standart_wheels_csv()
-    #         except:
-    #             print("We don't get csv")
-    #         try:
-    #             json_data = standart_wheels_from_json()
-    #         except:
-    #             print("We don't get json")
-    #         data = check_and_write_v4()
-    #     else:
-    #         try:
-    #             csv_data = standart_wheels_csv(without_db=True)
-    #         except:
-    #             pass
-    #         try:
-    #             json_data = standart_wheels_from_json(without_db=True)
-    #         except:
-    #             pass
-    #
-    #
-    #         data = standart_product_v2(get_new_pages_v2())
-    #
-    #     pre_csv_data = {key: value for key, value in csv_data.items() if int(value[0][4]) >= 4}
-    #     pre_json_data = {k: v for k, v in json_data.items() if int(v[0][4]) >= 4}
-    #     need_data = dict()
-    #     for ke, val in data.items():
-    #         pre_count_json = pre_json_data.get(ke)
-    #         if pre_count_json:
-    #             count_json = int(pre_count_json[0][4])
-    #         else:
-    #             count_json = 0
-    #             # print(111, ke, type(val[0][4]), val[0][4])
-    #         pre_count_csv = pre_csv_data.get(ke)
-    #         if pre_count_csv:
-    #             count_csv = int(pre_count_csv[0][4])
-    #         else:
-    #             count_csv = 0
-    #             # print(222, ke, type(val[0][4]), val[0][4])
-    #         in_stok = int(val[0][4]) + count_json + count_csv
-    #         new_data = val[0].copy()
-    #         del new_data[4]
-    #         new_data.insert(4, in_stok)
-    #         need_data.update({ke: (new_data, val[1], val[2], val[3], val[4])})
-    #     print('ALL_RIDE create_need_data ', len(need_data))
-    #
-    #     return need_data
-
     try:
-        need_data = create_need_data(without_db=without_db)
+        need_data = common.create_need_data(without_db=without_db)
         print('MAKE_NEED_data_successfuly ', len(need_data))
     except:
         with open(DATA_PATH + '/standart_data.json', 'r') as file:
@@ -265,7 +167,7 @@ def create_sber_xml(stocks_is_null=False, without_db=False, addons=False,
     for row in need_data.values():
         try:
             if not stocks_is_null:
-                if row[0][7] in need_cats and int(row[0][3]) > 6000 and row[0][4] >= 4 and row[3]:
+                if int(row[0][3]) > 6000 and row[0][4] >= 4 and row[3]:
                     url = 'https://www.1000koles.ru/pictures/' + row[1][0]
                     # price = str(row[0][4])
                     shop_price = int(row[4]) * (1 + int(markup) / 100)
@@ -274,7 +176,7 @@ def create_sber_xml(stocks_is_null=False, without_db=False, addons=False,
                                  str(row[0][3]))
                     counter += 1
             else:
-                if row[0][7] in need_cats and int(row[0][3]) > 6000 and row[3]:
+                if int(row[0][3]) > 6000 and row[3]:
                     url = 'https://www.1000koles.ru/pictures/' + row[1][0]
                     # price = int(row[0][3]) * 1.15
                     shop_price = int(row[4]) * (1 + int(markup) / 100)
@@ -288,13 +190,13 @@ def create_sber_xml(stocks_is_null=False, without_db=False, addons=False,
             continue
             # sys.exit()
 
-    if addons:
-        val_data = standart_addons_from_json(without_db=True, data=ventil_LS)
-        # val_data = add_data.values()
-
-        create_offer(val_data[0][1], val_data[0][7], val_data[0][6], str(val_data[0][0]), val_data[0][2],
-                     val_data[1][1], str(val_data[0][4]), "25.0")
-        counter += 1
+    # if addons:
+    #     val_data = standart.standart_addons_from_json(without_db=True, data=ventil_LS)
+    #     # val_data = add_data.values()
+    #
+    #     create_offer(val_data[0][1], val_data[0][7], val_data[0][6], str(val_data[0][0]), val_data[0][2],
+    #                  val_data[1][1], str(val_data[0][4]), "25.0")
+    #     counter += 1
 
     print('len_offers ', datetime.datetime.now(), counter)
 
@@ -313,7 +215,7 @@ def create_sber_xml(stocks_is_null=False, without_db=False, addons=False,
 
     xml_str = root.toprettyxml(indent="\t", encoding="UTF-8")
 
-    with open(DATA_IMG + "sber.xml", "wb") as f:
+    with open(DATA_PATH + "sber.xml", "wb") as f:
         f.write(xml_str)
 
     # clean_standart_data()

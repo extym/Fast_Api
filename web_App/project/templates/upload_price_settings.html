@@ -119,34 +119,39 @@
 
                                             <div class="form-group">
 
-                                                <label class="form-label" for="status_store">Включить выгрузку</label>
+                                                <label class="form-label" for="status_feed">Включить выгрузку</label>
                                                     <span class="desc"></span>
 
     <!--                                            <h6>Checkbox Buttons</h6>-->
                                                 <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                                    {% if show %}
-                                                    {% if upload_data.get('is_scheduler') == 'on' %}
+
+                                                    {% if show and upload_data.get('is_scheduler') == 'on' %}
                                                     <label class="btn btn-secondary active">
                                                         <input type="checkbox" name="enabled_upload_price" checked="" autocomplete="off"> Включено
                                                     </label>
-                                                    {% elif upload_data.get('is_scheduler') == 'off' %}
+                                                    {% elif show and upload_data.get('is_scheduler') == 'off' %}
                                                     <label class="btn btn-secondary active">
-                                                        <input type="checkbox" name="enabled_upload_price" checked="" autocomplete="off"> Включено
+                                                        <input type="checkbox" name="enabled_upload_price" autocomplete="off"> Включено
                                                     </label>
                                                     {% endif %}
-                                                    {% if upload_data.get('is_scheduler') == 'on' %}
+                                                    {% if show and upload_data.get('is_null_stocks') == 'on' %}
                                                     <label class="btn btn-secondary">
                                                         <input type="checkbox" name="is_null_stocks" checked="" autocomplete="off"> Включить нулевые остатки
                                                     </label>
-                                                    {% else %}
+                                                    {% elif show and upload_data.get('is_null_stocks') == 'off' %}
                                                     <label class="btn btn-secondary">
                                                         <input type="checkbox" name="is_null_stocks" autocomplete="off"> Включить нулевые остатки
                                                     </label>
+                                                    {% else %}
+                                                    <label class="btn btn-secondary active">
+                                                        <input type="checkbox" name="enabled_upload_price" autocomplete="off"> Включено
+                                                    </label>
+                                                    <label class="btn btn-secondary">
+                                                        <input type="checkbox" name="is_null_stocks" autocomplete="off"> Включить нулевые остатки
+                                                    </label>
+
                                                     {% endif %}
-    <!--                                                <label class="btn btn-secondary">-->
-    <!--                                                    <input type="checkbox" autocomplete="off"> Check-->
-    <!--                                                </label>-->
-                                                    {% endif %}
+
                                                 </div>
 
 
@@ -198,8 +203,8 @@
                                                 <label class="form-label" for="option1">Выгружать в формате</label>
                                                     <span class="desc"></span>
                                                 <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                                    {% if show %}
-                                                    {% if upload_data.get('upload_option') == 'xml' %}
+
+                                                    {% if show and upload_data.get('upload_option') == 'xml' %}
                                                     <label class="btn btn-secondary">
                                                         <input type="radio" name="option"  checked="" value="xml" id="option1" autocomplete="off" > XML
                                                     </label>
@@ -207,38 +212,38 @@
                                                         <input type="radio" name="option" value="csv" id="option2" autocomplete="off"> CSV
                                                     </label>
                                                     <label class="btn btn-secondary active">
-                                                        <input type="radio" name="option" value="xlsx" id="option3" autocomplete="off"> XLS
+                                                        <input type="radio" name="option" value="xlsx"  autocomplete="off"> XLS
                                                     </label>
-                                                    {% elif upload_data.get('upload_option') == 'csv' %}
+                                                    {% elif show and upload_data.get('upload_option') == 'csv' %}
                                                     <label class="btn btn-secondary">
-                                                        <input type="radio" name="option" value="xml" id="option1" autocomplete="off" > XML
+                                                        <input type="radio" name="option" value="xml"  autocomplete="off" > XML
                                                     </label>
                                                     <label class="btn btn-secondary">
-                                                        <input type="radio" name="option" checked="" value="csv" id="option2" autocomplete="off"> CSV
+                                                        <input type="radio" name="option" checked="" value="csv"  autocomplete="off"> CSV
                                                     </label>
                                                     <label class="btn btn-secondary active">
-                                                        <input type="radio" name="option" value="xlsx" id="option3" autocomplete="off"> XLS
+                                                        <input type="radio" name="option" value="xlsx"  autocomplete="off"> XLS
                                                     </label>
-                                                    {% elif upload_data.get('upload_option') == 'xlsx' %}<label class="btn btn-secondary">
-                                                        <input type="radio" name="option" value="xml" id="option1" autocomplete="off" > XML
+                                                    {% elif show and upload_data.get('upload_option') == 'xlsx' %}<label class="btn btn-secondary">
+                                                        <input type="radio" name="option" value="xml"  autocomplete="off" > XML
                                                     </label>
                                                     <label class="btn btn-secondary">
-                                                        <input type="radio" name="option" value="csv" id="option2" autocomplete="off"> CSV
+                                                        <input type="radio" name="option" value="csv"  autocomplete="off"> CSV
                                                     </label>
                                                     <label class="btn btn-secondary active">
                                                         <input type="radio" name="option" checked="" value="xlsx" id="option3" autocomplete="off"> XLS
                                                     </label>
                                                     {% else %}
                                                     <label class="btn btn-secondary">
-                                                        <input type="radio" name="option" value="xml" id="option1" autocomplete="off" > XML
+                                                        <input type="radio" name="option" value="xml"   autocomplete="off" > XML
                                                     </label>
                                                     <label class="btn btn-secondary">
-                                                        <input type="radio" name="option" value="csv" id="option2" autocomplete="off"> CSV
+                                                        <input type="radio" name="option" value="csv"  autocomplete="off"> CSV
                                                     </label>
                                                     <label class="btn btn-secondary active">
-                                                        <input type="radio" name="option" value="xlsx" id="option3" autocomplete="off"> XLS
+                                                        <input type="radio" name="option" value="xlsx" autocomplete="off"> XLS
                                                     </label>
-                                                    {% endif %}
+
                                                     {% endif %}
                                                 </div>
 

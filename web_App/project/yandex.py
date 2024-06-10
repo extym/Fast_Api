@@ -2,21 +2,16 @@ import json
 import sys
 from xml.dom import minidom
 import datetime
-# from pictures import dowload_images
-# from main import get_new_pages_v2
-# from prepare_data_export import get_need_data, get_need_data_v2
-# from connect import check_and_write_v4, check_write_json_v4, standart_product_v2
-# from copy_connect import check_write_json, check_and_write_v3, standart_product_v2
-# from getcsv import standart_wheels_csv
-# from get_json import standart_wheels_from_json
-# from cred import DATA_IMG, DATA_PATH
-# from categories import categories_wheels, cats_wheels_upper, special_wheels
+import project.addons.common as common
+from project import DATA_PATH
+
 
 desk_carwel = 'Диски CARWEL- cовременный, динамично развивающийся бренд. Новейшее передовое оборудование и ' \
               'современные технологии по производству литых колесных дисков отвечающие самым высоким стандартам ' \
               'качества и надежности,является не единственным конкурентным преимуществом.'
 # categories = {'iFree': 628, 'Carwel': 1969, 'KHOMEN': 1968, 'КиК': 1782, 'Скад': 1926}
-need_cats = ['NEO', 'Wheels UP', 'iFree', 'CARWEL', 'КИК', 'Tech-Line', 'Carwel', 'RST', 'КиК', 'Venti', 'IFREE',
+need_cats = ['NEO', 'Wheels UP', 'iFree', 'CARWEL', 'КИК', 'Tech-Line',
+             'Carwel', 'RST', 'КиК', 'Venti', 'IFREE',
              'VENTI', 'TECH-LINE', 'СКАД', 'KHOMEN']
 
 
@@ -160,61 +155,61 @@ def create_ym_xml(stocks_is_null=False, without_db=False, addons=False,
         dimensionsOfferChild.appendChild(textDimensionsOffer)
         offerChild.appendChild(dimensionsOfferChild)
 
-    def create_need_data(without_db=False):
-        json_data, csv_data = {}, {}
-        if not without_db:
-            try:
-                csv_data = standart_wheels_csv()
-            except:
-                print("We don't get csv")
-            try:
-                json_data = standart_wheels_from_json()
-            except:
-                print("We don't get json")
-            data = check_and_write_v4()
-        else:
-            try:
-                csv_data = standart_wheels_csv(without_db=True)
-            except:
-                pass
-            try:
-                json_data = standart_wheels_from_json(without_db=True)
-            except:
-                pass
-            data = standart_product_v2(get_new_pages_v2())
-
-        pre_csv_data = {key: value for key, value in csv_data.items() if int(value[0][4]) >= 4}
-        pre_json_data = {k: v for k, v in json_data.items() if int(v[0][4]) >= 4}
-        need_data = dict()
-        for ke, val in data.items():
-            if pre_json_data.get(ke):
-                pre_count_json = pre_json_data.get(ke)
-                count_json = int(pre_count_json[0][4])
-                del pre_json_data[ke]
-            else:
-                count_json = 0
-            if pre_csv_data.get(ke):
-                pre_count_csv = pre_csv_data.get(ke)
-                count_csv = int(pre_count_csv[0][4])
-                del pre_csv_data[ke]
-            else:
-                count_csv = 0
-
-            in_stok = int(val[0][4]) + count_json + count_csv
-            new_data = val[0].copy()
-            del new_data[4]
-            new_data.insert(4, in_stok)
-
-            need_data.update({ke: (new_data, val[1], val[2], val[3])})
-
-        need_data.update(pre_csv_data)
-        need_data.update(pre_json_data)
-        print('ALL_RIDE create_need_data ', len(need_data))
-
-        return need_data
+    # def create_need_data(without_db=False):
+    #     json_data, csv_data = {}, {}
+    #     if not without_db:
+    #         try:
+    #             csv_data = standart_wheels_csv()
+    #         except:
+    #             print("We don't get csv")
+    #         try:
+    #             json_data = standart_wheels_from_json()
+    #         except:
+    #             print("We don't get json")
+    #         data = check_and_write_v4()
+    #     else:
+    #         try:
+    #             csv_data = standart_wheels_csv(without_db=True)
+    #         except:
+    #             pass
+    #         try:
+    #             json_data = standart_wheels_from_json(without_db=True)
+    #         except:
+    #             pass
+    #         data = standart_product_v2(get_new_pages_v2())
+    #
+    #     pre_csv_data = {key: value for key, value in csv_data.items() if int(value[0][4]) >= 4}
+    #     pre_json_data = {k: v for k, v in json_data.items() if int(v[0][4]) >= 4}
+    #     need_data = dict()
+    #     for ke, val in data.items():
+    #         if pre_json_data.get(ke):
+    #             pre_count_json = pre_json_data.get(ke)
+    #             count_json = int(pre_count_json[0][4])
+    #             del pre_json_data[ke]
+    #         else:
+    #             count_json = 0
+    #         if pre_csv_data.get(ke):
+    #             pre_count_csv = pre_csv_data.get(ke)
+    #             count_csv = int(pre_count_csv[0][4])
+    #             del pre_csv_data[ke]
+    #         else:
+    #             count_csv = 0
+    #
+    #         in_stok = int(val[0][4]) + count_json + count_csv
+    #         new_data = val[0].copy()
+    #         del new_data[4]
+    #         new_data.insert(4, in_stok)
+    #
+    #         need_data.update({ke: (new_data, val[1], val[2], val[3])})
+    #
+    #     need_data.update(pre_csv_data)
+    #     need_data.update(pre_json_data)
+    #     print('ALL_RIDE create_need_data ', len(need_data))
+    #
+    #     return need_data
 
     # try:
-    need_data = create_need_data(without_db=without_db)
+    need_data = common.create_need_data(without_db=without_db)
     print('make_need_data_successfuly ', len(need_data))
     counter = 0
     row = tuple()
@@ -264,14 +259,14 @@ def create_ym_xml(stocks_is_null=False, without_db=False, addons=False,
 
     # save_path_file = "/home/ivanovka/data/www/1000koles.ru/pictures/yandex.xml"
 
-    with open(DATA_IMG + "yandex.xml", "wb") as f:
+    with open(DATA_PATH + "yandex.xml", "wb") as f:
         f.write(xml_str)
 
     # with open(DATA_IMG + "sber.xml", "wb") as f:
     #     f.write(xml_str)
 
     clean_standart_data()
-    dowload_images()
+    common.dowload_images()
 
 
 # create_ym_xml(without_db=True, stocks_is_null=False)

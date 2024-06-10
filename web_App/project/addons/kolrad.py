@@ -4,8 +4,11 @@ import requests
 import json
 import xmltodict
 from project import DATA_PATH
+import project.conn as conn
 
-def get_new_pages_v2():
+
+def get_kolrad_xml():
+    link = conn.get_distibutor_link('kolrad', 'xml', 'tyres_wheels')
     resp = requests.get(link)
     data = xmltodict.parse(resp.text)
     data_product = data['data']['product']
@@ -38,9 +41,9 @@ def check_and_write_v4(standart_data):
                 product_id = make_query_get_id_v2(add_product, data_product[0])
                 ij_data.append({product_id: data_product[1]})
                 picture_id = make_query_get_id_v2(add_pictures,
-                                               [product_id, data_product[1][0]])
+                                                  [product_id, data_product[1][0]])
                 proxy_data = [picture_id, product_id]
-                make_query_v2(add_product_picture,  proxy_data)
+                make_query_v2(add_product_picture, proxy_data)
                 data_options = params_optwheels(data_product[2], product_id)
                 # for option in data_options:
                 #     make_query_v2(add_options, option)
@@ -67,7 +70,7 @@ def check_and_write_v4(standart_data):
                     product_id = make_query_get_id_v2(add_product, data_product[0])
                     ij_data.append({product_id: data_product[1]})
                     picture_id = make_query_get_id_v2(add_pictures,
-                                                   [product_id, data_product[1][0]])
+                                                      [product_id, data_product[1][0]])
                     proxy_data = [picture_id, product_id]
                     make_query_v2(add_product_picture, proxy_data)
 
@@ -115,7 +118,7 @@ def check_and_write_v4(standart_data):
 
 
 def standart_product_v2(without_db=False):
-    list_wheels_json = get_new_pages_v2()
+    list_wheels_json = get_kolrad_xml()
     global_result = {}
     proxy = []
     for dictionary in list_wheels_json:
@@ -133,7 +136,7 @@ def standart_product_v2(without_db=False):
             if not description:
                 description = name
             vendor = dictionary.get('vendor').replace('"', '')
-            category_id = categories_wheels\
+            category_id = categories_wheels \
                 .get(vendor, cats_wheels_upper.get(vendor.upper(), 7000))
             price_opt = int(dictionary.get('price').strip('"').replace('\xa0', '').split('.')[0])
             price = float(dictionary.get('RoznicaPrice').strip('"').replace('\xa0', '').split('.')[0])
@@ -185,12 +188,9 @@ def standart_product_v2(without_db=False):
             # print("FUCKUP_standart_product_v2", dictionary)
             continue
 
-
     rewrite_standart_data(global_result)
-    
+
     if not without_db:
         check_and_write_v4(global_result)
 
     return global_result
-
-

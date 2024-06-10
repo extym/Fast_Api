@@ -510,7 +510,7 @@
                                             <a href="javascript:;"> <span class="title">Настройки экспорта</span>  <span class="arrow "></span> </a>
                                             <ul class="sub-menu">
                                                 <a class="" href="{{ url_for('auth.upload_prices_settings')}}"  >Настройки</a>
-                                                <a class="" href="{{ url_for('auth.upload_prices_settings')}}"  >Выгрузки</a>
+                                                <a class="" href="{{ url_for('auth.upload_prices_table')}}"  >Выгрузки</a>
                                                 </ul>
                                         </li>
                                         {% endif %}
@@ -555,13 +555,13 @@
                             </a>
                             <ul class="sub-menu" >
                                 <li>
-                                    <a class="" href="{{ url_for('auth.products_page') }}"  target = '_blank' >Все Товары</a>
+                                    <a class="" href="{{ url_for('auth.products_page') }}"   >Все Товары</a>
                                 </li>
                                 <li>
-                                    <a class="" href="{{ url_for('auth.add_product') }}"  target = '_blank' >Добавить товар</a>
+                                    <a class="" href="{{ url_for('auth.add_product') }}" >Добавить товар</a>
                                 </li>
                                 <li>
-                                    <a class="" href="{{ url_for('auth.edit_product') }}"  target = '_blank' >Редактировать товар</a>
+                                    <a class="" href="{{ url_for('auth.edit_product') }}" >Редактировать товар</a>
                                 </li>
 <!--                                <li>-->
 <!--                                    <a class="" href="widgets.html" >Widgets</a>-->
@@ -607,10 +607,10 @@
                             <ul class="sub-menu" >
 
                                 <li>
-                                    <a class="" href="{{ url_for('auth.upload_prices_table')}}" >Все</a>
+                                    <a class="" href="{{ url_for('auth.distributors-table')}}" >Все</a>
                                 </li>
                                 <li>
-                                    <a class="" href="{{ url_for('auth.distributor_settings')}}" >Настройки</a>
+                                    <a class="" href="{{ url_for('auth.distributor-settings')}}" >Настройки</a>
                                 </li>
 <!--                                <li>-->
 <!--                                    <a class="" href="tables-responsive.html" >Активность пользователя</a>-->

@@ -1,0 +1,132 @@
+{% extends "base-layout.html" %}
+
+{% block content  %}
+ <!-- START CONTENT -->
+    <section id="main-content" class=" ">
+        <section class="wrapper main-wrapper" style=''>
+<!--            <div class='col-xl-12 col-lg-12 col-md-12 col-12'>-->
+<!--            </div>-->
+
+            <div class="clearfix"></div>
+
+            <div class="col-xl-12">
+                <section class="box ">
+                    <header class="panel_header">
+                        <h2 class="title float-left">Сводная таблица магазинов</h2>
+                        <div class="actions panel_actions float-right">
+                            <i class="box_toggle fa fa-chevron-down"></i>
+                            <i class="box_setting fa fa-cog" data-toggle="modal" href="#section-settings"></i>
+                            <i class="box_close fa fa-times"></i>
+                        </div>
+                    </header>
+                    <div class="content-body">    <div class="row">
+                            <div class="col-lg-12 col-md-12 col-12">
+                                <form action="{{ url_for('auth.shops') }}" method="post" >
+                                <div class="table-responsive" data-pattern="priority-columns">
+                                    <table cellspacing="0" id="tech-companies-1" class="table table-small-font table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Магазин </th>
+<!--                                                <th data-priority="1">Артикул</th>-->
+                                                <th data-priority="1" >Маркет</th>
+                                                <th data-priority="3">Seller_id</th>
+                                                <th data-priority="3" title="При включении этой настройки на маркетплейсы будут передаваться остатки для этого магазина" >Отправлять остатки</th>
+                                                <th data-priority="6"title="При включении этой настройки на маркетплейсы будут передаваться цены для этого магазина" >Отправлять цены</th>
+                                                <th data-priority="5"title="При включении этой настройки на маркетплейсы будут передаваться сводные (с учетом продаж на всех МП) остатки товаров для этого магазина" >Сводные остатки</th>
+                                                <th data-priority="6"title="При установке этой настройки на маркетплейсы будут передаваться нулевое количество для всех товаров этого магазина" >Обнулить остатки</th>
+                                                <th data-priority="6">Обновлено</th>
+                                                <th data-priority="6"title="Если у Вас маркетплейс ВБ или ЛМ, то можно включить получение заказов с маркета." >Забирать заказы</th>
+<!--                                                <th data-priority="5">Группа</th>-->
+<!--                                                <th data-priority="5">Подгруппа</th>-->
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        {{ rows }}
+                                        </tbody>
+                                    </table>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-purple btn-outline-secondary" type="submit">Сохранить</button>
+                                    </div>
+
+                                </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+        </section>
+    </section>
+
+
+
+        <!-- OTHER SCRIPTS INCLUDED ON THIS PAGE - START --> 
+        <script src="../../static/assets/plugins/responsive-tables/js/rwd-table.min.js" type="text/javascript"></script><!-- OTHER SCRIPTS INCLUDED ON THIS PAGE - END -->
+
+
+        <!-- CORE TEMPLATE JS - START -->
+        <script src="../../static/assets/js/scripts.js" type="text/javascript"></script>
+        <!-- END CORE TEMPLATE JS - END -->
+
+        <!-- Sidebar Graph - START -->
+        <script src="../../static/assets/plugins/sparkline-chart/jquery.sparkline.min.js" type="text/javascript"></script>
+        <script src="../../static/assets/js/chart-sparkline.js" type="text/javascript"></script>
+        <!-- Sidebar Graph - END -->
+
+        <!-- CUSTOM -->
+        <script src="../../static/assets/js/jquery-3.4.1.min.js" type="text/javascript"></script>
+
+        <!-- OTHER SCRIPTS INCLUDED ON THIS PAGE - START -->
+        <link href="../../static/assets/plugins/jquery-ui/smoothness/jquery-ui.min.css" rel="stylesheet" type="text/css" media="screen"/>
+        <link href="../../static/assets/plugins/datepicker/css/datepicker.css" rel="stylesheet" type="text/css" media="screen"/>
+        <link href="assets/plugins/daterangepicker/css/daterangepicker-bs3.css" rel="stylesheet" type="text/css" media="screen"/>
+        <link href="assets/plugins/timepicker/css/bootstrap-timepicker.css" rel="stylesheet" type="text/css" media="screen"/>
+        <link href="assets/plugins/datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet" type="text/css" media="screen"/>
+        <link href="assets/plugins/colorpicker/css/bootstrap-colorpicker.min.css" rel="stylesheet" type="text/css" media="screen"/>
+        <link href="../../static/assets/plugins/ios-switch/css/switch.css" rel="stylesheet" type="text/css" media="screen"/>
+        <link href="assets/plugins/tagsinput/css/bootstrap-tagsinput.css" rel="stylesheet" type="text/css" media="screen"/>
+        <link href="assets/plugins/select2/select2.css" rel="stylesheet" type="text/css" media="screen"/>
+        <link href="assets/plugins/typeahead/css/typeahead.css" rel="stylesheet" type="text/css" media="screen"/>
+        <link href="assets/plugins/multi-select/css/multi-select.css" rel="stylesheet" type="text/css" media="screen"/>
+    <!-- OTHER SCRIPTS INCLUDED ON THIS PAGE - END -->
+
+
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+        <!-- General section box modal start -->
+{#        <div class="modal" id="section-settings" tabindex="-1" role="dialog" aria-labelledby="ultraModal-Label" aria-hidden="true">#}
+{#            <div class="modal-dialog animated bounceInDown">#}
+{#                <div class="modal-content">#}
+{#                    <div class="modal-header">#}
+{#                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>#}
+{#                        <h4 class="modal-title">Section Settings</h4>#}
+{#                    </div>#}
+{#                    <div class="modal-body">#}
+{##}
+{#                        Body goes here...#}
+{##}
+{#                    </div>#}
+{#                    <div class="modal-footer">#}
+{#                        <button data-dismiss="modal" class="btn btn-default" type="button">Close</button>#}
+{#                        <button class="btn btn-primary" type="button">Save changes</button>#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#        <!-- modal end -->#}
+{#    </body>#}
+{#</html>#}
+
+
+
