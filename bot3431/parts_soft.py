@@ -174,7 +174,7 @@ def get_orders_v2(customer_id: str,
         datas = ' '.join([str(i.get('id')) for i in result_list[0].get('order_items')])
     except:
         datas = ''
-    print('datas', datas)
+    # print('datas', datas)
     return datas
 
 

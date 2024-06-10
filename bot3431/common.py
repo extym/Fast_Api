@@ -214,7 +214,7 @@ def reformat_data_order_v2(order, mp, client_id_ps,
 
 
 def make_orders_to_ps(delta_time:int=1):
-    campain_list = conn.execute_query_return_v4(conn.query_get_all_shops, "Yandex")
+    campain_list = conn.execute_query_return_v3(conn.query_get_all_shops, "Yandex")
     if len(campain_list) > 0:
         for campain in campain_list:
             # orders_data = get_current_orders(campain[3])
