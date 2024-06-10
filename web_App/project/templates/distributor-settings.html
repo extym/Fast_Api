@@ -151,12 +151,18 @@
                                                 <option value="Выбрать" >Выбрать</option>
                                             {% else %}
                                             <option selected>Выбрать</option>
+                                            <optgroup label="Электроника">
                                                 <option value="merlion">Мерлион</option>
                                                 <option value="marvel">Марвел</option>
                                                 <option value="ocs">OSC</option>
                                                 <option value="netlab">Нетлаб</option>
                                                 <option value="logic">3Лоджик</option>
-                                                <option value="treolan">Треолан</option>
+                                            </optgroup>
+                                            <optgroup label="Шины и диски">
+                                                <option value="4">4 Точки</option>
+                                                <option value="shins">Шинсервис</option>
+                                                <option value="colrad">Колрад</option>
+                                            </optgroup>
                                             {% endif %}
                                             </select>
                                     </div>
@@ -221,7 +227,7 @@
             <div class="col-xl-12">
                 <section class="box ">
                     <header class="panel_header">
-                        <h2 class="title float-left">Настройки магазинов </h2>
+                        <h2 class="title float-left">Настройки обновления данных из прайса поставщика </h2>
                         <div class="actions panel_actions float-right">
                             <i class="box_toggle fa fa-chevron-down"></i>
                             <i class="box_setting fa fa-cog" data-toggle="modal" href="#section-settings"></i>
@@ -235,59 +241,134 @@
                                 <div class="row margin-0">
                                     <div class="col-lg-6 col-md-6 col-6">
 
+<!--                                        <div class="input-group mb-3">-->
+<!--                                        <div class="input-group-prepend">-->
+<!--                                            <label class="input-group-text" for="name_mp">Маркетплейс</label>-->
+<!--                                        </div>-->
+<!--                                        <select class="custom-select" id="name_mp" name="name_mp">-->
+<!--                                                <option selected></option>-->
+<!--                                                <option value="yandex">ЯндексМаркет</option>-->
+<!--                                                <option value="sber">СберМегаМаркет</option>-->
+<!--                                                <option value="ozon">Озон</option>-->
+<!--                                                <option value="wb">Вайлдбериз</option>-->
+<!--                                                <option value="leroy">ЛеруаМерлен</option>-->
+<!--                                            </select>-->
+<!--                                    </div>-->
+
                                         <div class="input-group mb-3">
                                         <div class="input-group-prepend">
-                                            <label class="input-group-text" for="name_mp">Маркетплейс</label>
+                                            <label class="input-group-text" for="settings_name_dist">Поставщик</label>
                                         </div>
-                                        <select class="custom-select" id="name_mp" name="name_mp">
-                                                <option selected></option>
-                                                <option value="yandex">ЯндексМаркет</option>
-                                                <option value="sber">СберМегаМаркет</option>
-                                                <option value="ozon">Озон</option>
-                                                <option value="wb">Вайлдбериз</option>
-                                                <option value="leroy">ЛеруаМерлен</option>
+                                        <select class="custom-select" id="settings_name_dist" name="settings_name_dist">
+                                            {% if show %}
+                                                <option selected value="{{ mp }}" >{{ mp }}</option>
+                                                <option value="Выбрать" >Выбрать</option>
+                                            {% else %}
+                                            <option selected>Выбрать</option>
+                                            <optgroup label="Электроника">
+                                                <option value="merlion">Мерлион</option>
+                                                <option value="marvel">Марвел</option>
+                                                <option value="ocs">OSC</option>
+                                                <option value="netlab">Нетлаб</option>
+                                                <option value="logic">3Лоджик</option>
+                                            </optgroup>
+                                            <optgroup label="Шины и диски">
+                                                <option value="4">4 Точки</option>
+                                                <option value="shins">Шинсервис</option>
+                                                <option value="colrad">Колрад</option>
+                                            </optgroup>
+                                            {% endif %}
                                             </select>
-                                    </div>
+                                        </div>
 
                                         <div class="form-group">
-                                            <label class="form-label" for="formfield1">Общая наценка на маркетплейс</label>
-                                            <span class="desc">% например "16"</span>
+                                            <label class="form-label" for="formfield1">Ссылка на прайс поставщика</label>
+                                            <span class="desc">например "https://b2b.4tochki.ru/export_data/M28420.json"</span>
                                             <div class="controls">
-                                                <input type="text" class="form-control" id="formfield1" name="mp_markup" >
+                                                <input type="text" class="form-control" id="formfield1" name="" >
                                             </div>
                                         </div>
 
                                         <div class="form-group">
-                                            <label class="form-label" for="formfield24">Общая скидка на маркетплейс</label>
-                                            <span class="desc">% например "13"</span>
+
+                                                <h6> </h6>
+
+                                                <label class="form-label" for="option1">Выгружать в формате</label>
+                                                    <span class="desc"></span>
+                                                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+
+                                                    {% if show and upload_data.get('upload_option') == 'xml' %}
+                                                    <label class="btn btn-secondary">
+                                                        <input type="radio" name="option"  checked="" value="xml" id="option1" autocomplete="off" > XML
+                                                    </label>
+                                                    <label class="btn btn-secondary">
+                                                        <input type="radio" name="option" value="csv" id="option2" autocomplete="off"> CSV
+                                                    </label>
+                                                    <label class="btn btn-secondary active">
+                                                        <input type="radio" name="option" value="xlsx"  autocomplete="off"> XLS
+                                                    </label>
+                                                    {% elif show and upload_data.get('upload_option') == 'csv' %}
+                                                    <label class="btn btn-secondary">
+                                                        <input type="radio" name="option" value="xml"  autocomplete="off" > XML
+                                                    </label>
+                                                    <label class="btn btn-secondary">
+                                                        <input type="radio" name="option" checked="" value="csv"  autocomplete="off"> CSV
+                                                    </label>
+                                                    <label class="btn btn-secondary active">
+                                                        <input type="radio" name="option" value="xlsx"  autocomplete="off"> XLS
+                                                    </label>
+                                                    {% elif show and upload_data.get('upload_option') == 'xlsx' %}<label class="btn btn-secondary">
+                                                        <input type="radio" name="option" value="xml"  autocomplete="off" > XML
+                                                    </label>
+                                                    <label class="btn btn-secondary">
+                                                        <input type="radio" name="option" value="csv"  autocomplete="off"> CSV
+                                                    </label>
+                                                    <label class="btn btn-secondary active">
+                                                        <input type="radio" name="option" checked="" value="xlsx" id="option3" autocomplete="off"> XLS
+                                                    </label>
+                                                    {% else %}
+                                                    <label class="btn btn-secondary">
+                                                        <input type="radio" name="option" value="xml"   autocomplete="off" > XML
+                                                    </label>
+                                                    <label class="btn btn-secondary">
+                                                        <input type="radio" name="option" value="csv"  autocomplete="off"> CSV
+                                                    </label>
+                                                    <label class="btn btn-secondary active">
+                                                        <input type="radio" name="option" value="xlsx" autocomplete="off"> XLS
+                                                    </label>
+
+                                                    {% endif %}
+                                                </div>
+
+    <!--                                            </div>-->
+
+                                            </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label" for="formfield24">Логин прайса поставщика </label>
+                                            <span class="desc">(если есть)</span>
                                             <div class="controls">
-                                                <input type="text" class="form-control" id="formfield24" name="mp_discount" >
+                                                <input type="text" class="form-control" id="formfield24" name="login_dist_price" >
                                             </div>
                                         </div>
 
-                                        <div class="form-group">
-                                            <label class="form-label" for="formfield21">Общая наценка для "Цена до скидки"</label>
-                                            <span class="desc">% например "16"</span>
-                                            <div class="controls">
-                                                <input type="text" class="form-control" id="formfield21" name="price_before" >
-                                            </div>
-                                        </div>
 
-                                        <div class="form-group">
-                                            <label class="form-label" for="formfield3">Добавить артикул на маркетплейс</label>
-                                            <span class="desc">можно несколько через запятую</span>
-                                            <div class="controls">
-                                                <input type="text" class="form-control" id="formfield3" name="add_articul_mp" >
-                                            </div>
-                                        </div>
 
-                                        <div class="form-group">
-                                            <label class="form-label" for="formfield4">Исключить артикул из маркетплейса</label>
-                                            <span class="desc">можно несколько через запятую</span>
-                                            <div class="controls">
-                                                <input type="text" class="form-control" id="formfield4" name="extract_articul_mp" >
-                                            </div>
-                                        </div>
+<!--                                        <div class="form-group">-->
+<!--                                            <label class="form-label" for="formfield3">Добавить артикул на маркетплейс</label>-->
+<!--                                            <span class="desc">можно несколько через запятую</span>-->
+<!--                                            <div class="controls">-->
+<!--                                                <input type="text" class="form-control" id="formfield3" name="add_articul_mp" >-->
+<!--                                            </div>-->
+<!--                                        </div>-->
+
+<!--                                        <div class="form-group">-->
+<!--                                            <label class="form-label" for="formfield4">Исключить артикул из маркетплейса</label>-->
+<!--                                            <span class="desc">можно несколько через запятую</span>-->
+<!--                                            <div class="controls">-->
+<!--                                                <input type="text" class="form-control" id="formfield4" name="extract_articul_mp" >-->
+<!--                                            </div>-->
+<!--                                        </div>-->
 
 
                                     </div>
@@ -307,44 +388,105 @@
                                         </div>
 
                                         <div class="form-group">
-                                            <label class="form-label" for="formfield5">Дополнительная наценка на магазин</label>
-                                            <span class="desc">% например "33"</span>
+                                            <label class="form-label" for="formfield5">Установить наценку на этот прайс</label>
+                                            <span class="desc">% например "12"</span>
                                             <div class="controls">
-                                                <input type="text" class="form-control" id="formfield5" name="store_markup" >
+                                                <input type="text" class="form-control" id="formfield5" name="dist_price_markup" >
                                             </div>
                                         </div>
 
                                         <div class="form-group">
-                                            <label class="form-label" for="formfield6">Дополнительная скидка на магазин</label>
-                                            <span class="desc">% например "23"</span>
+
+                                                <h6> </h6>
+
+                                                <label class="form-label" for="option1">Выгружать в формате</label>
+                                                    <span class="desc"></span>
+                                                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+
+                                                    {% if show and upload_data.get('upload_option') == 'xml' %}
+                                                    <label class="btn btn-secondary">
+                                                        <input type="radio" name="option"  checked="" value="xml" id="option1" autocomplete="off" > XML
+                                                    </label>
+                                                    <label class="btn btn-secondary">
+                                                        <input type="radio" name="option" value="csv" id="option2" autocomplete="off"> CSV
+                                                    </label>
+                                                    <label class="btn btn-secondary active">
+                                                        <input type="radio" name="option" value="xlsx"  autocomplete="off"> XLS
+                                                    </label>
+                                                    {% elif show and upload_data.get('upload_option') == 'csv' %}
+                                                    <label class="btn btn-secondary">
+                                                        <input type="radio" name="option" value="xml"  autocomplete="off" > XML
+                                                    </label>
+                                                    <label class="btn btn-secondary">
+                                                        <input type="radio" name="option" checked="" value="csv"  autocomplete="off"> CSV
+                                                    </label>
+                                                    <label class="btn btn-secondary active">
+                                                        <input type="radio" name="option" value="xlsx"  autocomplete="off"> XLS
+                                                    </label>
+                                                    {% elif show and upload_data.get('upload_option') == 'xlsx' %}<label class="btn btn-secondary">
+                                                        <input type="radio" name="option" value="xml"  autocomplete="off" > XML
+                                                    </label>
+                                                    <label class="btn btn-secondary">
+                                                        <input type="radio" name="option" value="csv"  autocomplete="off"> CSV
+                                                    </label>
+                                                    <label class="btn btn-secondary active">
+                                                        <input type="radio" name="option" checked="" value="xlsx" id="option3" autocomplete="off"> XLS
+                                                    </label>
+                                                    {% else %}
+                                                    <label class="btn btn-secondary">
+                                                        <input type="radio" name="option" value="xml"   autocomplete="off" > XML
+                                                    </label>
+                                                    <label class="btn btn-secondary">
+                                                        <input type="radio" name="option" value="csv"  autocomplete="off"> CSV
+                                                    </label>
+                                                    <label class="btn btn-secondary active">
+                                                        <input type="radio" name="option" value="xlsx" autocomplete="off"> XLS
+                                                    </label>
+
+                                                    {% endif %}
+                                                </div>
+
+                                            </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label" for="formfield21">Пароль прайса поставщика </label>
+                                            <span class="desc">(если есть)</span>
                                             <div class="controls">
-                                                <input type="text" class="form-control" id="formfield6" name="store_discount" >
+                                                <input type="text" class="form-control" id="formfield21" name="price_before" >
                                             </div>
                                         </div>
 
-                                        <div class="form-group">
-                                            <label class="form-label" for="formfield22">Дополнительная наценка для "Цена до скидки"</label>
-                                            <span class="desc">% например "16"</span>
-                                            <div class="controls">
-                                                <input type="text" class="form-control" id="formfield22" name="shop_add_price_before" >
-                                            </div>
-                                        </div>
+<!--                                        <div class="form-group">-->
+<!--                                            <label class="form-label" for="formfield6">Дополнительная скидка на магазин</label>-->
+<!--                                            <span class="desc">% например "23"</span>-->
+<!--                                            <div class="controls">-->
+<!--                                                <input type="text" class="form-control" id="formfield6" name="store_discount" >-->
+<!--                                            </div>-->
+<!--                                        </div>-->
 
-                                        <div class="form-group">
-                                            <label class="form-label" for="formfield7">Добавить артикул в магазин</label>
-                                            <span class="desc">можно несколько через запятую</span>
-                                            <div class="controls">
-                                                <input type="text" class="form-control" id="formfield7" name="formfield7" >
-                                            </div>
-                                        </div>
+<!--                                        <div class="form-group">-->
+<!--                                            <label class="form-label" for="formfield22">Дополнительная наценка для "Цена до скидки"</label>-->
+<!--                                            <span class="desc">% например "16"</span>-->
+<!--                                            <div class="controls">-->
+<!--                                                <input type="text" class="form-control" id="formfield22" name="shop_add_price_before" >-->
+<!--                                            </div>-->
+<!--                                        </div>-->
 
-                                        <div class="form-group">
-                                            <label class="form-label" for="formfield11">Исключить артикул из магазина</label>
-                                            <span class="desc">можно несколько через запятую</span>
-                                            <div class="controls">
-                                                <input type="text" class="form-control" id="formfield11" name="extract_articul_shop" >
-                                            </div>
-                                        </div>
+<!--                                        <div class="form-group">-->
+<!--                                            <label class="form-label" for="formfield7">Добавить артикул в магазин</label>-->
+<!--                                            <span class="desc">можно несколько через запятую</span>-->
+<!--                                            <div class="controls">-->
+<!--                                                <input type="text" class="form-control" id="formfield7" name="formfield7" >-->
+<!--                                            </div>-->
+<!--                                        </div>-->
+
+<!--                                        <div class="form-group">-->
+<!--                                            <label class="form-label" for="formfield11">Исключить артикул из магазина</label>-->
+<!--                                            <span class="desc">можно несколько через запятую</span>-->
+<!--                                            <div class="controls">-->
+<!--                                                <input type="text" class="form-control" id="formfield11" name="extract_articul_shop" >-->
+<!--                                            </div>-->
+<!--                                        </div>-->
 
                                     </div>
                                 </div>

@@ -2,7 +2,6 @@ import json
 import string
 import sys
 import random
-# from cred import DATA_PATH, magic_link_csv, magic_link_csv2
 import wget
 import csv
 import datetime
@@ -74,9 +73,6 @@ def get_data_csv(url):
 def get_data_wheels_csv(url):
     proxy = []
     try:
-        # result = wget.download(url, out=DATA_PATH + '/proxy_wheels.csv')
-        # with open(DATA_PATH + '/proxy_wheels (1).csv', 'r') as file:
-
         path, data = urlretrieve(url)
         with open(path, 'r') as file:
             reader = csv.reader(file, delimiter='\t')

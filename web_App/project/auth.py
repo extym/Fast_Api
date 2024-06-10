@@ -1710,38 +1710,130 @@ def upload_file():
 
 @auth.route('/upload_prices_table', methods=['GET', 'POST'])
 @login_required
-# @roles_required('owner')
 def upload_prices_table():
     if not current_user.is_authenticated:
         return redirect(url_for('main.index_main'))
     else:
         if request.method == "POST":
-            pass
+            data = request.form.to_dict()
+            proxy_settings = {}
+            if len(data.keys()) > 0:
+                for key, value in data.items():
+                    need_job = key.rsplit('_', maxsplit=1)[0]
+                    proxy_settings[value] = proxy_settings.get(value, []) + [need_job]
 
-        rows, rows_mp = [], []
-        uid = current_user.id
-        role = current_user.roles
-        need_id = current_user.company_id
-        user_name = current_user.name
-        photo = current_user.photo
-        if not photo or photo is None:
-            photo = 'prof-music-2.jpg'
-        need_data = db.session.execute(select(Marketplaces.shop_name,
-                                              Marketplaces.name_mp)
-                                       .where(Marketplaces.company_id == need_id))
+            markets = Marketplaces.query \
+                .filter_by(company_id=current_user.company_id).all()
+            for row in markets:
+                current_work = {'check_send_null': False,
+                                'send_common_stocks': False,
+                                'enable_orders_submit': False,
+                                'enable_sync_price': False,
+                                'enable_sync_stocks': False}
+                if row.shop_name in proxy_settings.keys():
+                    current = {i: True for i in proxy_settings[row.shop_name]}
+                    current_work.update(current)
+                    db.session.execute(update(Marketplaces)
+                                       .where(Marketplaces.seller_id == row.seller_id)
+                                       .values(current_work))
+                else:
+                    db.session.execute(update(Marketplaces)
+                                       .where(Marketplaces.seller_id == row.seller_id)
+                                       .values(current_work))
+                db.session.commit()
 
-        for row in need_data:
-            rows.append(row[0])
-            rows_mp.append(row[1])
+            if len(data.keys()) > 0:
+                try:
+                    scheduler.remove_job('shops_back')
+                except:
+                    print('Job_update_error')
+                finally:
+                    current_job = scheduler.add_job(back_shops_tasks, id='shops_back',
+                                                    trigger='interval', minutes=60)
+                    if scheduler.state == 0:
+                        scheduler.start()
 
-        return render_template('/upload_price_settings.html',
-                               uid=uid, role=role,
-                               rows=rows, rows_mp=set(rows_mp),
-                               photo=photo,
-                               user_name=user_name)
+                    print(100000000, current_job)
+                    # print(111000, len(data.keys()))
+            else:
+                try:
+                    scheduler.remove_job('shops_back')
+                except:
+                    print('Job_remove_error')
+
+            return redirect(url_for('auth.upload_prices_table'))
+
+        else:
+            # print(22222, request.args.to_dict())
+            uid = current_user.id
+            role = current_user.roles
+            user_name = current_user.name
+            photo = current_user.photo
+            if not photo or photo is None:
+                photo = 'prof-music-2.jpg'
+            rows = ''
+
+            raw_list_shops = db.session.query(Marketplaces) \
+                .filter_by(company_id=current_user.company_id) \
+                .order_by(Marketplaces.seller_id.asc()) \
+                .all()
+            # raw_list_products = db.session.query(Product)
+            # .paginate(page=30, per_page=30, error_out=False).items
+            for row in raw_list_shops:
+                seller_id = row.seller_id
+                if row.date_modifed:
+                    date_modifed = row.date_modifed
+                else:
+                    date_modifed = "Нет"
+                if row.check_send_null:
+                    check_send_null = "checked"
+                else:
+                    check_send_null = "unchecked"
+
+                if row.send_common_stocks:
+                    send_common_stocks = "checked"
+                else:
+                    send_common_stocks = "unchecked"
+
+                if row.enable_sync_stocks:
+                    enable_sync_stocks = "checked"
+                else:
+                    enable_sync_stocks = "unchecked"
+
+                if row.enable_sync_price:
+                    enable_sync_price = "checked"
+                else:
+                    enable_sync_price = "unchecked"
+
+                if row.enable_orders_submit:
+                    enable_orders_submit = "checked"
+                else:
+                    enable_orders_submit = "unchecked"
+
+                rows += '<tr>' \
+                        f'<td >{row.shop_name} </td>' \
+                        f'<td >{row.name_mp}</td>' \
+                        f'<td >{row.seller_id}</td>' \
+                        f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="enable_sync_stocks_{seller_id}' \
+                        f'" {enable_sync_stocks} class="iswitch iswitch iswitch-primary"></div></td>' \
+                        f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="enable_sync_price_{seller_id}' \
+                        f'" {enable_sync_price} class="iswitch iswitch iswitch-primary"></div></td>' \
+                        f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="send_common_stocks_{seller_id}' \
+                        f'" {send_common_stocks} class="iswitch iswitch iswitch-purple"></div></td>' \
+                        f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="check_send_null_{seller_id}' \
+                        f'" {check_send_null} class="iswitch iswitch iswitch-warning"></div></td>' \
+                        f'<td >{str(date_modifed).rsplit(":")[0]}</td>' \
+                        f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="enable_orders_submit_{seller_id}' \
+                        f'" {enable_orders_submit} class="iswitch iswitch iswitch-purple"></div></td>' \
+                        f'</tr>'
+
+            return unescape(render_template('tables-shops.html',
+                                            rows=rows, role=role,
+                                            photo=photo,
+                                            user_name=user_name))
 
 
-@auth.route('/upload_prices_settings', methods=['GET', 'POST'])
+@auth.route('/upload-prices-settings', methods=['GET', 'POST'])
 @login_required
 def upload_prices_settings():
     if request.method == "POST":
@@ -2095,7 +2187,133 @@ def distributor_settings():
                                role=role,
                                rows=rows, rows_mp=set(rows_mp),
                                photo=photo,
-                               user_name=user_name)
+                               user_name=user_name,
+                               distributors=LOCAL_MODE)
+    
+    
+@auth.route('/distributors-table', methods=['GET', 'POST'])
+@login_required
+def distributors_table():
+    if not current_user.is_authenticated:
+        return redirect(url_for('main.index_main'))
+    else:
+        if request.method == "POST":
+            data = request.form.to_dict()
+            proxy_settings = {}
+            if len(data.keys()) > 0:
+                for key, value in data.items():
+                    need_job = key.rsplit('_', maxsplit=1)[0]
+                    proxy_settings[value] = proxy_settings.get(value, []) + [need_job]
+
+            markets = Marketplaces.query \
+                .filter_by(company_id=current_user.company_id).all()
+            for row in markets:
+                current_work = {'check_send_null': False,
+                                'send_common_stocks': False,
+                                'enable_orders_submit': False,
+                                'enable_sync_price': False,
+                                'enable_sync_stocks': False}
+                if row.shop_name in proxy_settings.keys():
+                    current = {i: True for i in proxy_settings[row.shop_name]}
+                    current_work.update(current)
+                    db.session.execute(update(Marketplaces)
+                                       .where(Marketplaces.seller_id == row.seller_id)
+                                       .values(current_work))
+                else:
+                    db.session.execute(update(Marketplaces)
+                                       .where(Marketplaces.seller_id == row.seller_id)
+                                       .values(current_work))
+                db.session.commit()
+
+            if len(data.keys()) > 0:
+                try:
+                    scheduler.remove_job('shops_back')
+                except:
+                    print('Job_update_error')
+                finally:
+                    current_job = scheduler.add_job(back_shops_tasks, id='shops_back',
+                                                    trigger='interval', minutes=60)
+                    if scheduler.state == 0:
+                        scheduler.start()
+
+                    print(100000000, current_job)
+                    # print(111000, len(data.keys()))
+            else:
+                try:
+                    scheduler.remove_job('shops_back')
+                except:
+                    print('Job_remove_error')
+
+            return redirect(url_for('auth.distributors-table'))
+
+        else:
+            # print(22222, request.args.to_dict())
+            uid = current_user.id
+            role = current_user.roles
+            user_name = current_user.name
+            photo = current_user.photo
+            if not photo or photo is None:
+                photo = 'prof-music-2.jpg'
+            rows = ''
+
+            raw_list_shops = db.session.query(Marketplaces) \
+                .filter_by(company_id=current_user.company_id) \
+                .order_by(Marketplaces.seller_id.asc()) \
+                .all()
+            # raw_list_products = db.session.query(Product)
+            # .paginate(page=30, per_page=30, error_out=False).items
+            for row in raw_list_shops:
+                seller_id = row.seller_id
+                if row.date_modifed:
+                    date_modifed = row.date_modifed
+                else:
+                    date_modifed = "Нет"
+                if row.check_send_null:
+                    check_send_null = "checked"
+                else:
+                    check_send_null = "unchecked"
+
+                if row.send_common_stocks:
+                    send_common_stocks = "checked"
+                else:
+                    send_common_stocks = "unchecked"
+
+                if row.enable_sync_stocks:
+                    enable_sync_stocks = "checked"
+                else:
+                    enable_sync_stocks = "unchecked"
+
+                if row.enable_sync_price:
+                    enable_sync_price = "checked"
+                else:
+                    enable_sync_price = "unchecked"
+
+                if row.enable_orders_submit:
+                    enable_orders_submit = "checked"
+                else:
+                    enable_orders_submit = "unchecked"
+
+                rows += '<tr>' \
+                        f'<td >{row.shop_name} </td>' \
+                        f'<td >{row.name_mp}</td>' \
+                        f'<td >{row.seller_id}</td>' \
+                        f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="enable_sync_stocks_{seller_id}' \
+                        f'" {enable_sync_stocks} class="iswitch iswitch iswitch-primary"></div></td>' \
+                        f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="enable_sync_price_{seller_id}' \
+                        f'" {enable_sync_price} class="iswitch iswitch iswitch-primary"></div></td>' \
+                        f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="send_common_stocks_{seller_id}' \
+                        f'" {send_common_stocks} class="iswitch iswitch iswitch-purple"></div></td>' \
+                        f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="check_send_null_{seller_id}' \
+                        f'" {check_send_null} class="iswitch iswitch iswitch-warning"></div></td>' \
+                        f'<td >{str(date_modifed).rsplit(":")[0]}</td>' \
+                        f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="enable_orders_submit_{seller_id}' \
+                        f'" {enable_orders_submit} class="iswitch iswitch iswitch-purple"></div></td>' \
+                        f'</tr>'
+
+            return unescape(render_template('distributors-table.html',
+                                            rows=rows, role=role,
+                                            photo=photo,
+                                            user_name=user_name))
 
 
 @auth.app_errorhandler(404)

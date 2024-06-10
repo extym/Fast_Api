@@ -214,6 +214,25 @@ UNIQUE (id)
 )
 """
 
+create_distributor_price = """
+CREATE TABLE IF NOT EXISTS distributor_price (
+id SERIAL PRIMARY KEY,
+name varchar NOT NULL,
+dist_price_markup int,
+distributor TEXT,
+login_dist_price text,
+key_dist_price text,
+price_link text,
+type_downloads varchar,
+link_downloads text,
+is_scheduler bool,
+date_Added varchar,
+date_Modifed varchar,
+user_modifed int,
+UNIQUE (id)
+)
+"""
+
 create_consult_users = """
 CREATE TABLE IF NOT EXISTS consult_users (
 id SERIAL PRIMARY KEY,
