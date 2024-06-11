@@ -100,17 +100,10 @@ def get_orders_v2(customer_id: str,
             url = ps_link + "/orders.json"
             token_ps = HTTPBasicAuth(admin_ps_login, admin_ps_pass)
             answer = requests.get(url, auth=token_ps, params=params)
-            # print(123123123, answer.text)
             if answer.ok:
                 data = answer.json()
-                if not filter_status:
-                    result_list = [i for i in data.get('orders')
-                                   if i.get('marketplace_id') == str(marketplace_id)]
-                else:
-                    # filter_status = [7, 21, 22, 27]
-                    result_list = [i for i in data.get('orders')
-                                   if (i.get('marketplace_id') == str(marketplace_id)
-                                       and i.get('status_id') in filter_status)]
+                result_list = [i for i in data.get('orders')
+                               if i.get('marketplace_id') == str(marketplace_id)]
 
                 if result_list:
                     result = marketplace_id
@@ -143,15 +136,17 @@ def get_orders_v2(customer_id: str,
 
             if answer.ok:
                 data = answer.json()
-                print(2222222, data)
+                # print(2222222, data)
                 if not filter_status:
                     result_list = [i for i in data.get('orders')
                                    if i.get('order_items')[0]['comment'] == marketplace_id]
+                    print('not filter_status_2 {}'.format(result_list))
                 else:
                     # filter_status = [7, 21, 22, 27]
                     result_list = [i for i in data.get('orders')
                                    if (i.get('order_items')[0]['comment'] == marketplace_id
                                        and i.get('status_id') in filter_status)]
+                    print('With filter_status_2 {}'.format(result_list))
 
                 if result_list:
                     result = marketplace_id
@@ -170,10 +165,22 @@ def get_orders_v2(customer_id: str,
                 if page >= 3:
                     break
 
+    proxy = 0
+    datas = ''
     try:
-        datas = ' '.join([str(i.get('id')) for i in result_list[0].get('order_items')])
-    except:
-        datas = ''
+        proxy = result_list[0].get('id')
+        if not filter_status:
+            datas = ' '.join([str(i.get('id')) for i in result_list[0].get('order_items')])
+        else:
+            datas = ' '.join([str(i.get('id')) for i in result_list[0].get('order_items')
+                              if i.get('status_id') in filter_status])
+
+            # pro_data = result_list[0].get('order_items')
+            # for i in range(pro_data):
+            #     datas = ' '.join([str(pro_data[i].get('id')) if pro_data[i].get('status_id') in filter_status])
+    except Exception as error:
+        print(222222222222222222, proxy)
+        print('datas_error', error)
     # print('datas', datas)
     return datas
 
@@ -242,7 +249,7 @@ def send_current_basket_to_order(key: str = None):
 
 
 def make_basket(qnt=None, exter_order_id=None, key=None, propousal=None):
-    print(777777777, qnt, exter_order_id, key, propousal )
+    # print(777777777, qnt, exter_order_id, key, propousal )
     url = "https://3431.ru/api/v1/baskets"
     headers = {
         "api_key": key}
@@ -356,7 +363,7 @@ def create_resp_if_not_exist(list_items, link, key=None,
             # print(len(propousal))
 
             result_make_basket = make_basket(propousal=list_propousal[0],
-                                             qnt=qnt,
+                                             qnt=qnt, key=key,
                                              exter_order_id=external_order_id)
             if result_make_basket == 200:
                 count_items += 1
@@ -403,7 +410,7 @@ def create_order_ps_if_not_exist(list_items, link, key=None,
             try:
                 need_data = answer.json()["data"]
             except Exception as error:
-                print("ERROR get data from json {}, oem {}, brand {}, qnt {}"
+                print("ERROR get data from partsoft {}, oem {}, brand {}, qnt {}"
                       .format(answer.text, oem, brand, qnt))
                 need_data = []
             if len(need_data) > 0:
