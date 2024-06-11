@@ -226,9 +226,9 @@ def make_orders_to_ps(delta_time:int=1):
             list_fresh_orders = [i for i in orders if i['status'] == 'PROCESSING']
             list_canceled_orders = [i for i in orders if (i['status'] == 'CANCELLED'
                                                           and i['substatus'] != 'USER_NOT_PAID')]
-            print(*list_fresh_orders, sep='\n')
-            print('!' * 100)
-            print(*list_canceled_orders, sep='\n')
+            # print(*list_fresh_orders, sep='\n')
+            # print('!' * 100)
+            # print(*list_canceled_orders, sep='\n')
             # sys.exit()
             if len(list_fresh_orders) > 0:
                 for order in list_fresh_orders:
@@ -238,13 +238,13 @@ def make_orders_to_ps(delta_time:int=1):
 
                     # sys.exit()
                     if not check[0]:
-                        data_order = reformat_data_order(order, 'Yandex', campain[1])
-                        write_order = conn.execute_query_return_bool(conn.query_write_order,
-                                                                data_order[0])
-                        write_items = conn.executemany_return_bool(conn.query_write_items,
-                                                              data_order[1])
-                        print("Write order {},  write order items {}".
-                              format( write_order, write_items))
+                        # data_order = reformat_data_order(order, 'Yandex', campain[1])
+                        # write_order = conn.execute_query_return_bool(conn.query_write_order,
+                        #                                         data_order[0])
+                        # write_items = conn.executemany_return_bool(conn.query_write_items,
+                        #                                       data_order[1])
+                        # print("Write order {},  write order items {}".
+                        #       format( write_order, write_items))
                         # sys.exit()
                         result = ps.create_resp_if_not_exist(order.get('items'),
                                                              campain[8], key=campain[7],
@@ -253,10 +253,16 @@ def make_orders_to_ps(delta_time:int=1):
                         if result:
                             final_result = ps.send_current_basket_to_order(key=campain[7])
                             if final_result is not None:
+                                data_order = reformat_data_order(order, 'Yandex', campain[1])
+                                write_order = conn.execute_query_return_bool(conn.query_write_order,
+                                                                             data_order[0])
+                                write_items = conn.executemany_return_bool(conn.query_write_items,
+                                                                           data_order[1])
+                                print("Write order {},  write order items {}".
+                                      format(write_order, write_items))
                                 data = ' '.join([str(i['id']) for i in final_result]).strip()
-                                # print(5555555555, data)
                                 finish = ps.change_status_v2(data, status_id=2)
-                                # print(7777777777, finish)
+                                print('finish_change_status_order', finish)
 
 
                     else:
@@ -270,7 +276,7 @@ def make_orders_to_ps(delta_time:int=1):
                     if check[1] != 'CANCELLED':
                         conn.execute_query_return_bool(conn.update_order_and_items,
                                                   ('CANCELLED', str(canceled.get('id'))))
-                        data = ' '.join([str(i['id']) for i in canceled.get('items')[0]]).strip()
+                        data = ' '.join([str(i['id']) for i in canceled.get('items')]).strip()
                         finish = ps.change_status_v2(data, status_id=10)
                         print('check_CANCELLED', check, str(canceled.get('id')), finish)
 
