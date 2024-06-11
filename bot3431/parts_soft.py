@@ -109,7 +109,7 @@ def get_orders_v2(customer_id: str,
                     result = marketplace_id
                 else:
                     page += 1
-                    print('page ', page)
+                    # print('page ', page)
                 if page >= 3:
                     bot_tg.send_get('Not found order {} in {}'.format(marketplace_id, customer_id))
                     break

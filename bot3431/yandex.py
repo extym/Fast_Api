@@ -72,7 +72,7 @@ def get_current_orders_ym_v2(campaign_id: int, time_delta: int=1):
             else:
                 requesting = False
         else:
-            print('Error_get_data {}'.format(answer.text))
+            print('Error_get_data_v2 {}'.format(answer.text))
 
     # result.extend(data['orders'])
 

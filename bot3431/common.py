@@ -220,7 +220,7 @@ def make_orders_to_ps(delta_time:int=1):
             # orders_data = get_current_orders(campain[3])
             # orders = orders_data['orders']
             # orders = get_current_orders(campain[3])
-            orders = yan.get_current_orders_ym_v2(campain[7], time_delta=delta_time)
+            orders = yan.get_current_orders_ym_v2(campain[3], time_delta=delta_time)
             list_fresh_orders = [i for i in orders if i['status'] == 'PROCESSING']
             list_canceled_orders = [i for i in orders if (i['status'] == 'CANCELLED'
                                                           and i['substatus'] != 'USER_NOT_PAID')]
@@ -277,3 +277,6 @@ def make_orders_to_ps(delta_time:int=1):
 
                     # elif not check[2]:
                     #     change_status(canceled)
+
+
+make_orders_to_ps(delta_time=2)
