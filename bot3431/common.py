@@ -41,8 +41,10 @@ def reformat_data_order(order, mp, client_id_ps):
             order["id"],
             mp,
             day,
+            order['creationDate'],
             order["status"],
             order["substatus"],
+            'new', # our_status
             order["paymentType"],
             order["delivery"]["type"],
             order["buyerTotalBeforeDiscount"],
@@ -224,9 +226,9 @@ def make_orders_to_ps(delta_time:int=1):
             list_fresh_orders = [i for i in orders if i['status'] == 'PROCESSING']
             list_canceled_orders = [i for i in orders if (i['status'] == 'CANCELLED'
                                                           and i['substatus'] != 'USER_NOT_PAID')]
-            # print(*list_fresh_orders, sep='\n')
-            # print('!' * 100)
-            # print(*list_canceled_orders, sep='\n')
+            print(*list_fresh_orders, sep='\n')
+            print('!' * 100)
+            print(*list_canceled_orders, sep='\n')
             # sys.exit()
             if len(list_fresh_orders) > 0:
                 for order in list_fresh_orders:
