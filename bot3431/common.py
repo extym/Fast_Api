@@ -220,7 +220,7 @@ def make_orders_to_ps(delta_time:int=1):
             # orders_data = get_current_orders(campain[3])
             # orders = orders_data['orders']
             # orders = get_current_orders(campain[3])
-            orders = yan.get_current_orders_ym_v2(campain[3], time_delta=delta_time)
+            orders = yan.get_current_orders_ym_v2(campain[7], time_delta=delta_time)
             list_fresh_orders = [i for i in orders if i['status'] == 'PROCESSING']
             list_canceled_orders = [i for i in orders if (i['status'] == 'CANCELLED'
                                                           and i['substatus'] != 'USER_NOT_PAID')]
@@ -245,11 +245,11 @@ def make_orders_to_ps(delta_time:int=1):
                               format( write_order, write_items))
                         # sys.exit()
                         result = ps.create_resp_if_not_exist(order.get('items'),
-                                                             campain[8], key=campain[2],
+                                                             campain[8], key=campain[7],
                                                              external_order_id=order.get('id'))
 
                         if result:
-                            final_result = ps.send_current_basket_to_order(key=campain[2])
+                            final_result = ps.send_current_basket_to_order(key=campain[7])
                             if final_result is not None:
                                 data = ' '.join([str(i['id']) for i in final_result]).strip()
                                 print(5555555555, data)
