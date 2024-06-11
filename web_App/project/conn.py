@@ -992,5 +992,6 @@ update_db = [
 # maintenans_query(create_attributes_product)
 # maintenans_query(create_internal_import)
 # maintenans_query(create_upload_price)
-maintenans_query(create_attributes_product)
+# maintenans_query(create_attributes_product)
+# maintenans_query(create_distributor_price)
 

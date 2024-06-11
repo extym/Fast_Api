@@ -161,6 +161,10 @@ def back_shops_tasks():
     # print(777, markets)
 
 
+def back_distibutors_tasks():
+    pass
+
+
 def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -2163,6 +2167,7 @@ def distributor_settings():
         user_name = current_user.name
         if request.method == 'POST':
             data = request.form.to_dict()
+            print(*data.items(), sep='\n')
             print(55555, data)
 
             if data.get('edit_name_dist') == 'Выбрать':
@@ -2180,6 +2185,23 @@ def distributor_settings():
                                        distributors=LOCAL_MODE,
                                        photo=photo,
                                        user_name=user_name)
+
+            if data.get('dist_sett_price') == 'save':
+                if data.get('settings_name_dist') == '':
+                    flash('Выберите поставщика')
+                distributor = Distributor(
+                    name=data.get('name'),
+                    distibutor=data.get('settings_name_dist'),
+                    login_dist_price=data.get('login_dist_price'),
+                    dist_price_markup=data.get('dist_price_markup'),
+                    key_dist_price=data.get('key_dist_price'),
+                    price_link=data.get('price_link'),
+                    is_scheduler=data.get('is_scheduler'),
+                    type_downloads=data.get('type_downloads'),
+                    user_modifed=current_user.id
+                )
+                db.session.add(distributor)
+                db.session.commit()
 
             return redirect(url_for('auth.distributor_settings'))
 
@@ -2199,6 +2221,7 @@ def distributors_table():
     else:
         if request.method == "POST":
             data = request.form.to_dict()
+            print(77777, data)
             proxy_settings = {}
             if len(data.keys()) > 0:
                 for key, value in data.items():
@@ -2227,12 +2250,12 @@ def distributors_table():
 
             if len(data.keys()) > 0:
                 try:
-                    scheduler.remove_job('shops_back')
+                    scheduler.remove_job('distibutors')
                 except:
                     print('Job_update_error')
                 finally:
-                    current_job = scheduler.add_job(back_shops_tasks, id='shops_back',
-                                                    trigger='interval', minutes=60)
+                    current_job = scheduler.add_job(back_distibutors_tasks, id='distibutors',
+                                                    trigger='interval', minutes=600)
                     if scheduler.state == 0:
                         scheduler.start()
 
@@ -2240,11 +2263,11 @@ def distributors_table():
                     # print(111000, len(data.keys()))
             else:
                 try:
-                    scheduler.remove_job('shops_back')
+                    scheduler.remove_job('distibutors')
                 except:
                     print('Job_remove_error')
 
-            return redirect(url_for('auth.distributors-table'))
+            return redirect(url_for('auth.distributors_table'))
 
         else:
             # print(22222, request.args.to_dict())
@@ -2256,18 +2279,17 @@ def distributors_table():
                 photo = 'prof-music-2.jpg'
             rows = ''
 
-            raw_list_shops = db.session.query(Marketplaces) \
-                .filter_by(company_id=current_user.company_id) \
-                .order_by(Marketplaces.seller_id.asc()) \
+            raw_list_shops = db.session.query(Distributor) \
+                .order_by(Distributor.id.asc()) \
                 .all()
             # raw_list_products = db.session.query(Product)
             # .paginate(page=30, per_page=30, error_out=False).items
             for row in raw_list_shops:
                 seller_id = row.seller_id
-                if row.date_modifed:
-                    date_modifed = row.date_modifed
-                else:
-                    date_modifed = "Нет"
+                # if row.date_modifed:
+                #     date_modifed = row.date_modifed
+                # else:
+                #     date_modifed = "Нет"
                 if row.check_send_null:
                     check_send_null = "checked"
                 else:
@@ -2287,11 +2309,11 @@ def distributors_table():
                     enable_sync_price = "checked"
                 else:
                     enable_sync_price = "unchecked"
-
-                if row.enable_orders_submit:
-                    enable_orders_submit = "checked"
-                else:
-                    enable_orders_submit = "unchecked"
+                #
+                # if row.enable_orders_submit:
+                #     enable_orders_submit = "checked"
+                # else:
+                #     enable_orders_submit = "unchecked"
 
                 rows += '<tr>' \
                         f'<td >{row.shop_name} </td>' \
@@ -2305,15 +2327,13 @@ def distributors_table():
                         f'" {send_common_stocks} class="iswitch iswitch iswitch-purple"></div></td>' \
                         f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="check_send_null_{seller_id}' \
                         f'" {check_send_null} class="iswitch iswitch iswitch-warning"></div></td>' \
-                        f'<td >{str(date_modifed).rsplit(":")[0]}</td>' \
-                        f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="enable_orders_submit_{seller_id}' \
-                        f'" {enable_orders_submit} class="iswitch iswitch iswitch-purple"></div></td>' \
                         f'</tr>'
 
             return unescape(render_template('distributors-table.html',
                                             rows=rows, role=role,
                                             photo=photo,
-                                            user_name=user_name))
+                                            user_name=user_name,
+                                            distributors=LOCAL_MODE))
 
 
 @auth.app_errorhandler(404)

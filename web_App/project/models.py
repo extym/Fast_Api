@@ -55,17 +55,14 @@ class UploadPrice(db.Model):
     user_id = db.Column(db.Integer())
 
 
-
-
-
 class Distributor(db.Model):
     __tablename__ = 'distributors'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(250))
     koef_price = db.Column(db.Integer())
     distributor = db.Column(db.String(250))
-    login_api_dist =  db.Column(db.String(250))
-    key_api_dist =  db.Column(db.String(250))
+    login_api_dist = db.Column(db.String(250))
+    key_api_dist = db.Column(db.String(250))
     api_link = db.Column(db.String(250))
     type_downloads = db.Column(db.String(250))
     link_downloads = db.Column(db.String(500))
@@ -81,8 +78,8 @@ class DistributorPrice(db.Model):
     name = db.Column(db.String(250))
     dist_price_markup = db.Column(db.Integer())
     distributor = db.Column(db.String(250))
-    login_dist_price =  db.Column(db.String(250))
-    key_dist_price =  db.Column(db.String(250))
+    login_dist_price = db.Column(db.String(250))
+    key_dist_price = db.Column(db.String(250))
     price_link = db.Column(db.String(250))
     type_downloads = db.Column(db.String(250))
     link_downloads = db.Column(db.String(500))
@@ -90,7 +87,6 @@ class DistributorPrice(db.Model):
     date_added = db.Column(db.String(250))
     date_modifed = db.Column(db.String(250))
     user_modifed = db.Column(db.Integer())
-
 
 
 class Product(db.Model):

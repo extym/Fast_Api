@@ -12,7 +12,7 @@
             <div class="col-xl-12">
                 <section class="box ">
                     <header class="panel_header">
-                        <h2 class="title float-left">Сводная таблица магазинов</h2>
+                        <h2 class="title float-left">Сводная таблица прайсов поставщиков</h2>
                         <div class="actions panel_actions float-right">
                             <i class="box_toggle fa fa-chevron-down"></i>
                             <i class="box_setting fa fa-cog" data-toggle="modal" href="#section-settings"></i>
@@ -21,21 +21,20 @@
                     </header>
                     <div class="content-body">    <div class="row">
                             <div class="col-lg-12 col-md-12 col-12">
-                                <form action="{{ url_for('auth.shops') }}" method="post" >
+                                <form action="{{ url_for('auth.distributors_table') }}" method="post" >
                                 <div class="table-responsive" data-pattern="priority-columns">
                                     <table cellspacing="0" id="tech-companies-1" class="table table-small-font table-bordered table-striped">
                                         <thead>
                                             <tr>
-                                                <th>Магазин </th>
+                                                <th>Название </th>
 <!--                                                <th data-priority="1">Артикул</th>-->
-                                                <th data-priority="1" >Маркет</th>
-                                                <th data-priority="3">Seller_id</th>
-                                                <th data-priority="3" title="При включении этой настройки на маркетплейсы будут передаваться остатки для этого магазина" >Отправлять остатки</th>
-                                                <th data-priority="6"title="При включении этой настройки на маркетплейсы будут передаваться цены для этого магазина" >Отправлять цены</th>
-                                                <th data-priority="5"title="При включении этой настройки на маркетплейсы будут передаваться сводные (с учетом продаж на всех МП) остатки товаров для этого магазина" >Сводные остатки</th>
-                                                <th data-priority="6"title="При установке этой настройки на маркетплейсы будут передаваться нулевое количество для всех товаров этого магазина" >Обнулить остатки</th>
-                                                <th data-priority="6">Обновлено</th>
-                                                <th data-priority="6"title="Если у Вас маркетплейс ВБ или ЛМ, то можно включить получение заказов с маркета." >Забирать заказы</th>
+                                                <th data-priority="1" >Поставщик</th>
+                                                <th data-priority="3">Тип прайса</th>
+                                                <th data-priority="3"  >Отправлять остатки</th>
+                                                <th data-priority="6"title="При включении этой настройки будут регулярно запрашиваться цены и остатки по прайсу этого поставщика" >Обновлять прайс</th>
+<!--                                                <th data-priority="5"title="При включении этой настройки на маркетплейсы будут передаваться сводные (с учетом продаж на всех МП) остатки товаров для этого магазина" >Сводные остатки</th>-->
+                                                <th data-priority="6"title="При включении этой настройки будут обновлятся цены и остатки по прайсу этого поставщика в базе данных" >Обновлять в БД</th>
+                                                <th data-priority="6"title="Если у Вашего поставщика реализована возможность размещения заказов, то можно включить эту опцию." >Размещать заказы</th>
 <!--                                                <th data-priority="5">Группа</th>-->
 <!--                                                <th data-priority="5">Подгруппа</th>-->
                                             </tr>
