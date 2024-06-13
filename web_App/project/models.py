@@ -67,6 +67,8 @@ class Distributor(db.Model):
     type_downloads = db.Column(db.String(250))
     link_downloads = db.Column(db.String(500))
     is_scheduler = db.Column(db.Boolean())
+    enable_orders_submit = db.Column(db.Boolean())
+    enable_sync_bd = db.Column(db.Boolean())
     date_added = db.Column(db.String(250))
     date_modifed = db.Column(db.String(250))
     user_modifed = db.Column(db.Integer())
@@ -75,7 +77,7 @@ class Distributor(db.Model):
 class DistributorPrice(db.Model):
     __tablename__ = 'distributor_price'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(250))
+    price_name = db.Column(db.String(250))
     dist_price_markup = db.Column(db.Integer())
     distributor = db.Column(db.String(250))
     login_dist_price = db.Column(db.String(250))
@@ -84,6 +86,7 @@ class DistributorPrice(db.Model):
     type_downloads = db.Column(db.String(250))
     link_downloads = db.Column(db.String(500))
     is_scheduler = db.Column(db.Boolean())
+    enable_sync_bd = db.Column(db.Boolean())
     date_added = db.Column(db.String(250))
     date_modifed = db.Column(db.String(250))
     user_modifed = db.Column(db.Integer())

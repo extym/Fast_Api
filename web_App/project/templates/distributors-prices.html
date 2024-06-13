@@ -12,7 +12,7 @@
             <div class="col-xl-12">
                 <section class="box ">
                     <header class="panel_header">
-                        <h2 class="title float-left">Сводная таблица поставщиков - API</h2>
+                        <h2 class="title float-left">Таблица прайсов поставщиков</h2>
                         <div class="actions panel_actions float-right">
                             <i class="box_toggle fa fa-chevron-down"></i>
                             <i class="box_setting fa fa-cog" data-toggle="modal" href="#section-settings"></i>
@@ -21,21 +21,21 @@
                     </header>
                     <div class="content-body">    <div class="row">
                             <div class="col-lg-12 col-md-12 col-12">
-                                <form action="{{ url_for('auth.distributors_table') }}" method="post" >
+                                <form action="{{ url_for('auth.distributors_prices') }}" method="post" >
                                 <div class="table-responsive" data-pattern="priority-columns">
                                     <table cellspacing="0" id="tech-companies-1" class="table table-small-font table-bordered table-striped">
                                         <thead>
                                             <tr>
                                                 <th>ID </th>
 <!--                                                <th data-priority="1">Артикул</th>-->
-                                                <th data-priority="1" >Поставщик</th>
-                                                <th data-priority="3">Ссылка на прайс</th>
+                                                <th data-priority="1" >Название</th>
+                                                <th data-priority="3">Поставщик</th>
 <!--                                                <th data-priority="3"  >Отправлять остатки</th>-->
                                                 <th data-priority="6"title="При включении этой настройки будут регулярно запрашиваться цены и остатки по прайсу этого поставщика" >Обновлять прайс</th>
 <!--                                                <th data-priority="5"title="При включении этой настройки на маркетплейсы будут передаваться сводные (с учетом продаж на всех МП) остатки товаров для этого магазина" >Сводные остатки</th>-->
                                                 <th data-priority="6"title="При включении этой настройки будут обновлятся цены и остатки по прайсу этого поставщика в базе данных" >Обновлять в БД</th>
-                                                <th data-priority="6"title="Если у Вашего поставщика реализована возможность размещения заказов, то можно включить эту опцию." >Размещать заказы</th>
-<!--                                                <th data-priority="5">Группа</th>-->
+<!--                                                <th data-priority="6"title="Если у Вашего поставщика реализована возможность размещения заказов, то можно включить эту опцию." >Размещать заказы</th>-->
+                                                <th data-priority="5">Тип данных</th>
 <!--                                                <th data-priority="5">Подгруппа</th>-->
                                             </tr>
                                         </thead>

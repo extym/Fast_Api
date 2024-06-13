@@ -55,17 +55,17 @@
                                         <div class="input-group-prepend">
                                             <label class="input-group-text" for="input_name_mp">Поставщик</label>
                                         </div>
-                                        <select class="custom-select" id="input_name_mp" name="insert_new_shop">
+                                        <select class="custom-select" id="input_name_mp" name="add_distributor">
                                             <option selected>Выбрать</option>
                                             <optgroup label="Электроника">
                                                 <option value="merlion">Мерлион</option>
                                                 <option value="marvel">Марвел</option>
                                                 <option value="ocs">OSC</option>
                                                 <option value="netlab">Нетлаб</option>
-                                                <option value="logic">3Лоджик</option>
+                                                <option value="3logic">3Лоджик</option>
                                             </optgroup>
                                             <optgroup label="Шины и диски">
-                                                <option value="4">4 Точки</option>
+                                                <option value="4tochki">4 Точки</option>
                                                 <option value="shins">Шинсервис</option>
                                                 <option value="colrad">Колрад</option>
                                             </optgroup>
@@ -76,7 +76,7 @@
                                         <label class="form-label" for="formfield16">Ссылка на API</label>
                                         <span class="desc">Например 'http://services.netlab.ru/rest/'</span>
                                         <div class="controls">
-                                            <input type="text" value="" class="form-control" id="formfield16" name="api_link" autocomplete="off">
+                                            <input type="text" value="" class="form-control" id="formfield16" name="add_api_link" autocomplete="off">
                                         </div>
                                     </div>
 
@@ -84,7 +84,7 @@
                                         <label class="form-label" for="formfield26">Логин API у поставщика</label>
                                         <span class="desc"> например 1234567</span>
                                         <div class="controls">
-                                            <input autocomplete="new-password" id="formfield26" type="text" class="form-control"  name="login_api_dist"  >
+                                            <input autocomplete="new-password" id="formfield26" type="text" class="form-control"  name="add_login_api_dist"  >
                                         </div>
                                     </div>
 
@@ -92,7 +92,7 @@
                                         <label class="form-label" for="formfield34">Ключ API</label>
                                         <span class="desc">например a5f64e91-ac50-4a9e-a3c5-38a412f4a44c</span>
                                         <div class="controls">
-                                            <input type="password" value="" class="form-control" id="formfield34" name="key_api_dist" autocomplete="off" >
+                                            <input type="password" value="" class="form-control" id="formfield34" name="add_key_api_dist" autocomplete="off" >
                                         </div>
                                     </div>
 
@@ -109,7 +109,7 @@
                                     {% endif %}
 
                                     <div class="float-right">
-                                        <button type="submit" class="btn btn-primary" >Сохранить</button>
+                                        <button type="submit" name="distributor" value="save" class="btn btn-primary" >Сохранить</button>
                                         <button class="btn" type="reset">Очистить</button>
                                     </div>
                                 </form>
@@ -146,8 +146,8 @@
                                             <label class="input-group-text" for="edit_name_dist">Поставщик</label>
                                         </div>
                                         <select class="custom-select" id="edit_name_dist" name="edit_name_dist">
-                                            {% if show %}
-                                                <option selected value="{{ mp }}" >{{ mp }}</option>
+                                            {% if show_dist %}
+                                                <option selected value="{{ distributor }}" >{{ distributor }}</option>
                                                 <option value="Выбрать" >Выбрать</option>
                                             {% else %}
                                             <option selected>Выбрать</option>
@@ -156,7 +156,7 @@
                                                 <option value="marvel">Марвел</option>
                                                 <option value="ocs">OSC</option>
                                                 <option value="netlab">Нетлаб</option>
-                                                <option value="logic">3Лоджик</option>
+                                                <option value="3logic">3Лоджик</option>
                                             </optgroup>
                                             <optgroup label="Шины и диски">
                                                 <option value="4">4 Точки</option>
@@ -171,7 +171,7 @@
                                         <label class="form-label" for="formfield15">Ссылка на API</label>
                                         <span class="desc">Например 'http://services.netlab.ru/rest/'</span>
                                         <div class="controls">
-                                            {% if show %}
+                                            {% if show_dist %}
                                             <input type="text" value="{{ api_link }}" class="form-control"  name="api_link" autocomplete="off">
                                             {% else %}
                                             <input type="text" value="" class="form-control" id="formfield15" name="api_link" autocomplete="off">
@@ -184,7 +184,7 @@
                                         <label class="form-label" for="formfield25">Логин API у поставщика</label>
                                         <span class="desc"> например 1234567</span>
                                         <div class="controls">
-                                            {% if show %}
+                                            {% if show_dist %}
                                             <input autocomplete="off" value="{{ login_api_dist }}" type="text" class="form-control"  name="login_api_dist"  >
                                             {% else %}
                                             <input autocomplete="new-password" id="formfield25" type="text" class="form-control"  name="login_api_dist"  >
@@ -197,7 +197,7 @@
                                         <label class="form-label" for="formfield33">Ключ API</label>
                                         <span class="desc">например a5f64e91-ac50-4a9e-a3c5-38a412f4a44c</span>
                                         <div class="controls">
-                                            {% if show_wb %}
+                                            {% if show_dist %}
                                             <input type="password" value="{{ key_api_dist }}" class="form-control"  name="key_api_dist" autocomplete="off" >
                                             {% else %}
                                             <input type="password" value="" class="form-control" id="formfield33" name="key_api_dist" autocomplete="off" >
@@ -240,13 +240,13 @@
 
                                 <div class="col-lg-12 col-md-12 col-12">
                                     <div class="form-group">
-                                        <label class="form-label" title="" for="formfield24">Название прайса</label>
+                                        <label class="form-label" title="" for="formfield27">Название прайса</label>
                                         <span class="desc"> например "Tyres_wheels"</span>
                                         <div class="controls">
                                             {% if show %}
-                                            <input type="text" value="{{ upload_data.get('name', 'default') }}" class="form-control" name="name" >
+                                            <input type="text" value="{{ dist_price_data.get('price_name') }}" class="form-control" name="dist_price_name" >
                                             {% else %}
-                                            <input type="text" value="" class="form-control" id="formfield25" name="upload_price_name" >
+                                            <input type="text" value="" class="form-control" id="formfield27" name="dist_price_name" >
                                             {% endif %}
 
                                         </div>
@@ -262,7 +262,7 @@
                                         </div>
                                         <select class="custom-select" id="settings_name_dist" name="settings_name_dist">
                                             {% if show %}
-                                                <option selected value="{{ distributor }}" >{{ distributor }}</option>
+                                                <option selected value="{{ dist_price_data.get('distributor') }}" >{{ dist_price_data.get('distributor') }}</option>
                                                 <option value="Выбрать" >Выбрать</option>
                                             {% else %}
                                             <option selected>Выбрать</option>
@@ -271,10 +271,10 @@
                                                 <option value="marvel">Марвел</option>
                                                 <option value="ocs">OSC</option>
                                                 <option value="netlab">Нетлаб</option>
-                                                <option value="logic">3Лоджик</option>
+                                                <option value="3logic">3Лоджик</option>
                                             </optgroup>
                                             <optgroup label="Шины и диски">
-                                                <option value="4">4 Точки</option>
+                                                <option value="4tochki">4 Точки</option>
                                                 <option value="shins">Шинсервис</option>
                                                 <option value="colrad">Колрад</option>
                                             </optgroup>
@@ -294,7 +294,11 @@
                                             <label class="form-label" for="formfield1">Ссылка на прайс поставщика</label>
                                             <span class="desc">https://b2b.4tochki.ru/export_data/M28420.json</span>
                                             <div class="controls">
+                                                {% if show %}
+                                                <input type="text" value="{{ dist_price_data.get('price_link') }}" class="form-control" id="formfield1" name="price_link" >
+                                                {% else %}
                                                 <input type="text" class="form-control" id="formfield1" name="price_link" >
+                                                {% endif %}
                                             </div>
                                         </div>
 
@@ -306,11 +310,11 @@
     <!--                                            <h6>Checkbox Buttons</h6>-->
                                                 <div class="btn-group btn-group-toggle" data-toggle="buttons">
 
-                                                    {% if show and upload_data.get('is_scheduler') == 'on' %}
+                                                    {% if show and dist_price_data.get('is_scheduler') == 'on' %}
                                                     <label class="btn btn-secondary active">
                                                         <input type="checkbox" name="enabled_upload_price" checked="" autocomplete="off"> Включено
                                                     </label>
-                                                    {% elif show and upload_data.get('is_scheduler') == 'off' %}
+                                                    {% elif show and dist_price_data.get('is_scheduler') == 'off' %}
                                                     <label class="btn btn-secondary active">
                                                         <input type="checkbox" name="enabled_upload_price" autocomplete="off"> Включено
                                                     </label>
@@ -370,7 +374,7 @@
                                             <label class="form-label" for="formfield5">Установить наценку на этот прайс</label>
                                             <span class="desc">% например "12"</span>
                                             <div class="controls">
-                                                <input type="text" class="form-control" id="formfield5" name="dist_price_markup" >
+                                                <input type="text" value="0" class="form-control" id="formfield5" name="dist_price_markup" >
                                             </div>
                                         </div>
 
@@ -382,7 +386,7 @@
                                                     <span class="desc"></span>
                                                 <div class="btn-group btn-group-toggle" data-toggle="buttons">
 
-                                                    {% if show and upload_data.get('type_downloads') == 'xml' %}
+                                                    {% if show and dist_price_data.get('type_downloads') == 'xml' %}
                                                     <label class="btn btn-secondary">
                                                         <input type="radio" name="type_downloads"  checked="" value="xml" id="option1" autocomplete="off" > XML
                                                     </label>
@@ -395,7 +399,7 @@
                                                     <label class="btn btn-secondary active">
                                                         <input type="radio" name="type_downloads"  value="json" id="option3" autocomplete="off"> JSON
                                                     </label>
-                                                    {% elif show and upload_data.get('type_downloads') == 'csv' %}
+                                                    {% elif show and dist_price_data.get('type_downloads') == 'csv' %}
                                                     <label class="btn btn-secondary">
                                                         <input type="radio" name="type_downloads" value="xml"  autocomplete="off" > XML
                                                     </label>
@@ -408,7 +412,7 @@
                                                     <label class="btn btn-secondary active">
                                                         <input type="radio" name="type_downloads"  value="json" id="option3" autocomplete="off"> JSON
                                                     </label>
-                                                    {% elif show and upload_data.get('type_downloads') == 'xlsx' %}<label class="btn btn-secondary">
+                                                    {% elif show and dist_price_data.get('type_downloads') == 'xlsx' %}<label class="btn btn-secondary">
                                                         <input type="radio" name="type_downloads" value="xml"  autocomplete="off" > XML
                                                     </label>
                                                     <label class="btn btn-secondary">
@@ -417,7 +421,7 @@
                                                     <label class="btn btn-secondary active">
                                                         <input type="radio" name="type_downloads" checked="" value="xlsx" id="option3" autocomplete="off"> XLS
                                                     </label>
-                                                    {% elif show and upload_data.get('type_downloads') == 'json' %}<label class="btn btn-secondary">
+                                                    {% elif show and dist_price_data.get('type_downloads') == 'json' %}<label class="btn btn-secondary">
                                                         <input type="radio" name="type_downloads" value="xml"  autocomplete="off" > XML
                                                     </label>
                                                     <label class="btn btn-secondary">

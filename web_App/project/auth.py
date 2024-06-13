@@ -165,6 +165,10 @@ def back_distibutors_tasks():
     pass
 
 
+def back_upload_prices():
+    pass
+
+
 def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -1317,7 +1321,7 @@ def shops():
                 try:
                     scheduler.remove_job('shops_back')
                 except:
-                    print('Job_remove_error')
+                    print('Job_shops_back_remove_error')
 
             return redirect(url_for('auth.shops'))
 
@@ -1748,12 +1752,14 @@ def upload_prices_table():
 
             if len(data.keys()) > 0:
                 try:
-                    scheduler.remove_job('shops_back')
+                    scheduler.remove_job('upload_prices')
                 except:
-                    print('Job_update_error')
+                    print('Job_upload_prices_update_error')
                 finally:
-                    current_job = scheduler.add_job(back_shops_tasks, id='shops_back',
-                                                    trigger='interval', minutes=60)
+                    current_job = scheduler.add_job(back_upload_prices,
+                                                    id='upload_prices',
+                                                    trigger='interval',
+                                                    minutes=60)
                     if scheduler.state == 0:
                         scheduler.start()
 
@@ -1761,9 +1767,9 @@ def upload_prices_table():
                     # print(111000, len(data.keys()))
             else:
                 try:
-                    scheduler.remove_job('shops_back')
+                    scheduler.remove_job('upload_prices')
                 except:
-                    print('Job_remove_error')
+                    print('Job_upload_prices_remove_error')
 
             return redirect(url_for('auth.upload_prices_table'))
 
@@ -1781,8 +1787,7 @@ def upload_prices_table():
                 .filter_by(company_id=current_user.company_id) \
                 .order_by(Marketplaces.seller_id.asc()) \
                 .all()
-            # raw_list_products = db.session.query(Product)
-            # .paginate(page=30, per_page=30, error_out=False).items
+
             for row in raw_list_shops:
                 seller_id = row.seller_id
                 if row.date_modifed:
@@ -1882,7 +1887,7 @@ def upload_prices_settings():
                 flash("Настройки удачно сохранены", 'success')
             else:
                 flash("Проверьте, пожалуйста, корректность вводимых данных", 'error')
-                return redirect('/upload_prices_settings')
+                return redirect('/upload-prices-settings')
 
         elif make == 'make_product_feed':
             upload_price_name = data.get('upload_price_name')
@@ -2084,7 +2089,7 @@ def upload_prices_settings():
                             "Введите требуемые настройки и сохраните их.",
                             "alert")
 
-        return redirect('/upload_prices_settings')
+        return redirect('/upload-prices-settings')
 
     show = request.args.get('show')
     #######################################################
@@ -2170,28 +2175,49 @@ def distributor_settings():
             print(*data.items(), sep='\n')
             print(55555, data)
 
-            if data.get('edit_name_dist') == 'Выбрать':
-                flash('Не выбран поставщик. Укажите поставщика.')
             if data.get('check_settings') is not None:
+                if data.get('edit_name_dist') == 'Выбрать':
+                    flash('Не выбран поставщик. Укажите поставщика.')
                 # return current settings that distributor
-                distributor = Distributor.query.filter_by(data.get('edit_name_dist')).first()
+                distributor = Distributor.query\
+                    .filter_by(distributor=data.get('edit_name_dist')).first()
+                print(3333333, distributor)
+                dist_name = distributor.distributor
                 key_api_dist = distributor.key_api_dist
                 login_api_dist = distributor.login_api_dist
+                api_link = distributor.api_link
                 return render_template('distributor-settings.html',
                                        role=role, rows=rows,
                                        key_api_dist=key_api_dist,
                                        login_api_dist=login_api_dist,
-                                       distributor=distributor,
+                                       distributor=dist_name,
+                                       api_link=api_link,
+                                       show_dist=True,
                                        distributors=LOCAL_MODE,
                                        photo=photo,
                                        user_name=user_name)
 
-            if data.get('dist_sett_price') == 'save':
+            elif data.get('distributor') == 'save':
+                if data.get('add_distributor') == 'Выбрать':
+                    flash('Выберите поставщика')
+                disributor = Distributor(
+                    distributor=data.get('add_distributor'),
+                    login_api_dist=data.get('add_login_api_dist'),
+                    key_api_dist=data.get('add_key_api_dist'),
+                    api_link=data.get('add_api_link')
+                )
+                db.session.add(disributor)
+                db.session.commit()
+                flash('Настройки поставщика удачно сохранены')
+
+            elif data.get('distributor_price') == 'save':
                 if data.get('settings_name_dist') == '':
                     flash('Выберите поставщика')
-                distributor = Distributor(
-                    name=data.get('name'),
-                    distibutor=data.get('settings_name_dist'),
+                if data.get('dist_price_name') == '':
+                    flash('Укажите название прайса')
+                dist_price = DistributorPrice(
+                    price_name=data.get('dist_price_name'),
+                    distributor=data.get('settings_name_dist'),
                     login_dist_price=data.get('login_dist_price'),
                     dist_price_markup=data.get('dist_price_markup'),
                     key_dist_price=data.get('key_dist_price'),
@@ -2200,8 +2226,29 @@ def distributor_settings():
                     type_downloads=data.get('type_downloads'),
                     user_modifed=current_user.id
                 )
-                db.session.add(distributor)
+                db.session.add(dist_price)
                 db.session.commit()
+
+                flash('Настройки прайса поставщика удачно сохранены')
+                # return redirect(url_for('auth.distributor_settings'))
+
+            elif data.get('check_dist_price') == 'check':
+                if data.get('settings_name_dist') == 'Выбрать':
+                    flash('Не выбран поставщик. Укажите поставщика.')
+                # return current settings that distributor_price
+                dist_price = DistributorPrice.query\
+                    .filter_by(distributor=data.get('settings_name_dist')).first()
+                print(333555553333, dist_price)
+                dist_price_data = dist_price.__dict__
+                # key_api_dist = dist_price.key_api_dist
+                # login_api_dist = dist_price.login_api_dist
+                return render_template('distributor-settings.html',
+                                       role=role, rows=rows,
+                                       dist_price_data=dist_price_data,
+                                       distributors=LOCAL_MODE,
+                                       show=True,
+                                       photo=photo,
+                                       user_name=user_name)
 
             return redirect(url_for('auth.distributor_settings'))
 
@@ -2221,30 +2268,28 @@ def distributors_table():
     else:
         if request.method == "POST":
             data = request.form.to_dict()
-            print(77777, data)
+            # print(77777, data)
             proxy_settings = {}
             if len(data.keys()) > 0:
                 for key, value in data.items():
                     need_job = key.rsplit('_', maxsplit=1)[0]
                     proxy_settings[value] = proxy_settings.get(value, []) + [need_job]
+                # print(3242344314, proxy_settings)
 
-            markets = Marketplaces.query \
-                .filter_by(company_id=current_user.company_id).all()
-            for row in markets:
-                current_work = {'check_send_null': False,
-                                'send_common_stocks': False,
+            disributors_data = Distributor.query.all()
+            for row in disributors_data:
+                current_work = {'is_scheduler': False,
                                 'enable_orders_submit': False,
-                                'enable_sync_price': False,
-                                'enable_sync_stocks': False}
-                if row.shop_name in proxy_settings.keys():
-                    current = {i: True for i in proxy_settings[row.shop_name]}
+                                'enable_sync_bd': False}
+                if row.distributor in proxy_settings.keys():
+                    current = {i: True for i in proxy_settings[row.distributor]}
                     current_work.update(current)
-                    db.session.execute(update(Marketplaces)
-                                       .where(Marketplaces.seller_id == row.seller_id)
+                    db.session.execute(update(Distributor)
+                                       .where(Distributor.id == row.id)
                                        .values(current_work))
                 else:
-                    db.session.execute(update(Marketplaces)
-                                       .where(Marketplaces.seller_id == row.seller_id)
+                    db.session.execute(update(Distributor)
+                                       .where(Distributor.id == row.id)
                                        .values(current_work))
                 db.session.commit()
 
@@ -2252,10 +2297,12 @@ def distributors_table():
                 try:
                     scheduler.remove_job('distibutors')
                 except:
-                    print('Job_update_error')
+                    print('Job_distibutors_update_error')
                 finally:
-                    current_job = scheduler.add_job(back_distibutors_tasks, id='distibutors',
-                                                    trigger='interval', minutes=600)
+                    current_job = scheduler.add_job(back_distibutors_tasks,
+                                                    id='distibutors',
+                                                    trigger='interval',
+                                                    minutes=600)
                     if scheduler.state == 0:
                         scheduler.start()
 
@@ -2265,7 +2312,7 @@ def distributors_table():
                 try:
                     scheduler.remove_job('distibutors')
                 except:
-                    print('Job_remove_error')
+                    print('Job_distibutors_remove_error')
 
             return redirect(url_for('auth.distributors_table'))
 
@@ -2285,51 +2332,149 @@ def distributors_table():
             # raw_list_products = db.session.query(Product)
             # .paginate(page=30, per_page=30, error_out=False).items
             for row in raw_list_shops:
-                seller_id = row.seller_id
+                id = row.id
                 # if row.date_modifed:
                 #     date_modifed = row.date_modifed
                 # else:
                 #     date_modifed = "Нет"
-                if row.check_send_null:
-                    check_send_null = "checked"
-                else:
-                    check_send_null = "unchecked"
-
-                if row.send_common_stocks:
-                    send_common_stocks = "checked"
-                else:
-                    send_common_stocks = "unchecked"
-
-                if row.enable_sync_stocks:
-                    enable_sync_stocks = "checked"
-                else:
-                    enable_sync_stocks = "unchecked"
-
-                if row.enable_sync_price:
-                    enable_sync_price = "checked"
-                else:
-                    enable_sync_price = "unchecked"
-                #
-                # if row.enable_orders_submit:
-                #     enable_orders_submit = "checked"
+                # if row.check_send_null:
+                #     check_send_null = "checked"
                 # else:
-                #     enable_orders_submit = "unchecked"
+                #     check_send_null = "unchecked"
+                #
+                # if row.send_common_stocks:
+                #     send_common_stocks = "checked"
+                # else:
+                #     send_common_stocks = "unchecked"
+
+                if row.is_scheduler:
+                    is_scheduler = "checked"
+                else:
+                    is_scheduler = "unchecked"
+
+                if row.enable_sync_bd:
+                    enable_sync_bd = "checked"
+                else:
+                    enable_sync_bd = "unchecked"
+
+                if row.enable_orders_submit:
+                    enable_orders_submit = "checked"
+                else:
+                    enable_orders_submit = "unchecked"
 
                 rows += '<tr>' \
-                        f'<td >{row.shop_name} </td>' \
-                        f'<td >{row.name_mp}</td>' \
-                        f'<td >{row.seller_id}</td>' \
-                        f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="enable_sync_stocks_{seller_id}' \
-                        f'" {enable_sync_stocks} class="iswitch iswitch iswitch-primary"></div></td>' \
-                        f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="enable_sync_price_{seller_id}' \
-                        f'" {enable_sync_price} class="iswitch iswitch iswitch-primary"></div></td>' \
-                        f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="send_common_stocks_{seller_id}' \
-                        f'" {send_common_stocks} class="iswitch iswitch iswitch-purple"></div></td>' \
-                        f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="check_send_null_{seller_id}' \
-                        f'" {check_send_null} class="iswitch iswitch iswitch-warning"></div></td>' \
+                        f'<td >{row.id} </td>' \
+                        f'<td >{row.distributor}</td>' \
+                        f'<td >{row.api_link}</td>' \
+                        f'<td ><div class="form-block"><input type="checkbox" value="{row.distributor}" name="is_scheduler_{id}' \
+                        f'" {is_scheduler} class="iswitch iswitch iswitch-purple"></div></td>' \
+                        f'<td ><div class="form-block"><input type="checkbox" value="{row.distributor}" name="enable_sync_bd_{id}' \
+                        f'" {enable_sync_bd} class="iswitch iswitch iswitch-warning"></div></td>'\
+                        f'<td ><div class="form-block"><input type="checkbox" value="{row.distributor}" name="enable_orders_submit_{id}' \
+                        f'" {enable_orders_submit} class="iswitch iswitch iswitch-warning"></div></td>' \
                         f'</tr>'
 
             return unescape(render_template('distributors-table.html',
+                                            rows=rows, role=role,
+                                            photo=photo,
+                                            user_name=user_name,
+                                            distributors=LOCAL_MODE))
+
+
+@auth.route('/distributors-prices', methods=['GET', 'POST'])
+@login_required
+def distributors_prices():
+    if not current_user.is_authenticated:
+        return redirect(url_for('main.index_main'))
+    else:
+        if request.method == "POST":
+            data = request.form.to_dict()
+            # print(77777, data)
+            proxy_settings = {}
+            if len(data.keys()) > 0:
+                for key, value in data.items():
+                    need_job = key.rsplit('_', maxsplit=1)[0]
+                    proxy_settings[value] = proxy_settings.get(value, []) + [need_job]
+                # print(3242344314, proxy_settings)
+
+            disr_prices_data = DistributorPrice.query.all()
+            for row in disr_prices_data:
+                current_work = {'is_scheduler': False,
+                                'enable_sync_bd': False}
+                if row.distributor in proxy_settings.keys():
+                    current = {i: True for i in proxy_settings[row.distributor]}
+                    current_work.update(current)
+                    db.session.execute(update(DistributorPrice)
+                                       .where(DistributorPrice.id == row.id)
+                                       .values(current_work))
+                else:
+                    db.session.execute(update(DistributorPrice)
+                                       .where(DistributorPrice.id == row.id)
+                                       .values(current_work))
+                db.session.commit()
+
+            if len(data.keys()) > 0:
+                try:
+                    scheduler.remove_job('distibutors_prices')
+                except:
+                    print('Job_update_error')
+                finally:
+                    current_job = scheduler.add_job(back_distibutors_tasks,
+                                                    id='distibutors_prices',
+                                                    trigger='interval',
+                                                    minutes=600)
+                    if scheduler.state == 0:
+                        scheduler.start()
+
+                    print(100000000, current_job)
+                    # print(111000, len(data.keys()))
+            else:
+                try:
+                    scheduler.remove_job('distibutors')
+                except:
+                    print('Job_remove_error')
+
+            return redirect(url_for('auth.distributors_prices'))
+
+        else:
+            uid = current_user.id
+            role = current_user.roles
+            user_name = current_user.name
+            photo = current_user.photo
+            if not photo or photo is None:
+                photo = 'prof-music-2.jpg'
+            rows = ''
+
+            raw_list_prices = db.session.query(DistributorPrice) \
+                .order_by(DistributorPrice.id.asc()) \
+                .all()
+
+            for row in raw_list_prices:
+                id = row.id
+
+                if row.is_scheduler:
+                    is_scheduler = "checked"
+                else:
+                    is_scheduler = "unchecked"
+
+                if row.enable_sync_bd:
+                    enable_sync_bd = "checked"
+                else:
+                    enable_sync_bd = "unchecked"
+
+
+                rows += '<tr>' \
+                        f'<td >{row.id} </td>' \
+                        f'<td >{row.price_name}</td>' \
+                        f'<td >{row.distributor}</td>' \
+                        f'<td ><div class="form-block"><input type="checkbox" value="{row.distributor}" name="is_scheduler_{id}' \
+                        f'" {is_scheduler} class="iswitch iswitch iswitch-purple"></div></td>' \
+                        f'<td ><div class="form-block"><input type="checkbox" value="{row.distributor}" name="enable_sync_bd_{id}' \
+                        f'" {enable_sync_bd} class="iswitch iswitch iswitch-warning"></div></td>' \
+                        f'<td >{row.type_downloads}</td>' \
+                        f'</tr>'
+
+            return unescape(render_template('distributors-prices.html',
                                             rows=rows, role=role,
                                             photo=photo,
                                             user_name=user_name,

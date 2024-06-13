@@ -817,12 +817,10 @@ def import_product_from_wb(shop_name=None, company_id=None,
             with Session(engine) as session:
                 session.begin()
                 smth = insert(Product).values(product)
-                # print(77777, smth)
                 try:
                     session.execute(smth)
                     time.sleep(0.1)
                     count += 1
-                    # print(555555555555)
                 except sqlalchemy.exc.IntegrityError as error:
                     session.rollback()
                     session.begin()
@@ -832,7 +830,6 @@ def import_product_from_wb(shop_name=None, company_id=None,
                         .values(product)
                     session.execute(update_prod)
                     count_error += 1
-                    # print(22222222222222, count_error)
                 finally:
                     session.commit()
 

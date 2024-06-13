@@ -597,7 +597,6 @@ def import_oson_data_prod(user_id=None, shop_name=None, company_id=None, update_
                         session.execute(smth)
                         time.sleep(0.1)
                         count += 1
-                        # print(555555555555)
                     except sqlalchemy.exc.IntegrityError as error:
                         session.rollback()
                         session.begin()
