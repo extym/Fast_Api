@@ -36,7 +36,8 @@ def get_smth(metod):
     token_ps = HTTPBasicAuth(admin_ps_login, admin_ps_pass)
     answer = requests.get(url, auth=token_ps)
 
-    print(3111133, answer.text)
+    # print(3111133, answer.text)
+    return answer.json()
 
 
 async def change_status(ids: str):
@@ -101,11 +102,12 @@ def get_orders_v2(customer_id: str,
             token_ps = HTTPBasicAuth(admin_ps_login, admin_ps_pass)
             answer = requests.get(url, auth=token_ps, params=params)
             if answer.ok:
+                print(333, answer.text)
                 data = answer.json()
                 result_list = [i for i in data.get('orders')
-                               if i.get('marketplace_id') == str(marketplace_id)]
-
-                if result_list:
+                               if i.get('marketplace_id') == marketplace_id]
+                print(555, result_list[0])
+                if len(result_list) > 0:
                     result = marketplace_id
                 else:
                     page += 1
@@ -136,18 +138,7 @@ def get_orders_v2(customer_id: str,
 
             if answer.ok:
                 data = answer.json()
-                # print(2222222, data)
-                if not filter_status:
-                    result_list = [i for i in data.get('orders')
-                                   if i.get('order_items')[0]['comment'] == marketplace_id]
-                    print('not filter_status_2 {}'.format(result_list))
-                else:
-                    # filter_status = [7, 21, 22, 27]
-                    result_list = [i for i in data.get('orders')
-                                   if (i.get('order_items')[0]['comment'] == marketplace_id
-                                       and i.get('status_id') in filter_status)]
-                    print('With filter_status_2 {}'.format(result_list))
-
+                result_list = data.get('orders')
                 if result_list:
                     result = marketplace_id
                 else:
@@ -168,20 +159,26 @@ def get_orders_v2(customer_id: str,
     proxy = 0
     datas = ''
     try:
-        proxy = result_list[0].get('id')
+        line = get_smth("/order_status_types.json").get("order_status_types")
+        proxy = result_list[0].get('order_id')
         if not filter_status:
             datas = ' '.join([str(i.get('id')) for i in result_list[0].get('order_items')])
         else:
-            datas = ' '.join([str(i.get('id')) for i in result_list[0].get('order_items')
-                              if i.get('status_id') in filter_status])
+            for item in result_list[0].get('order_items'):
+                if item.get('status_id')  in filter_status:
+                    # datas = ' '.join(str(item.get('id')))
+                    datas += ' ' + str(item.get('id')).strip()
+                elif item.get('status_id') == 8:
+                    bot_tg.send_get("Заказ {} уже выдан.".format(proxy))
+                else:
+                    status = [i.get('name') for i in line if i.get('id') == item.get("status_id")]
+                    bot_tg.send_get("Заказ {} в статусе {} (id {}), для выдачи заказ должен быть в группе Пришло."
+                                    .format(proxy, status[0], item.get("status_id")))
 
-            # pro_data = result_list[0].get('order_items')
-            # for i in range(pro_data):
-            #     datas = ' '.join([str(pro_data[i].get('id')) if pro_data[i].get('status_id') in filter_status])
     except Exception as error:
         print(222222222222222222, proxy)
         print('datas_error', error)
-    # print('datas', datas)
+    print('datas', datas)
     return datas
 
 
