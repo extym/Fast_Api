@@ -121,13 +121,13 @@ def get_orders_v2(customer_id: str,
                                 .format(answer.status_code, answer.text))
                 if page >= 5:
                     break
-    elif customer_id == '2063':
+    elif customer_id == '2063' or customer_id == '2504':
         while marketplace_id != result:
             params = {
                 'search[customer_id_eq]': customer_id,
                 # 'search[order_items_attributes][0][comment_eq]': marketplace_id,
                 'search[order_items_comment_eq]': marketplace_id,
-                'per_page': 30,
+                'per_page': 20,
                 'page': page
             }
             url = ps_link + "/orders.json"
@@ -337,41 +337,45 @@ def create_resp_if_not_exist(list_items, link, key=None,
         qnt = item.get("count")
         print(3333, oem, brand, qnt)
         # sys.exit()
-        params = {
-            "api_key": key,
-            "oem": oem,
-            "make_name": brand,
-            "without_cross": True
-        }
-        metod = "/backend/price_items/api/v1/search/get_offers_by_oem_and_make_name"
-        url = "http://3431.ru" + metod
-        answer = requests.get(url, params=params)
+        if oem:
+            params = {
+                "api_key": key,
+                "oem": oem,
+                "make_name": brand,
+                "without_cross": True
+            }
+            metod = "/backend/price_items/api/v1/search/get_offers_by_oem_and_make_name"
+            url = "http://3431.ru" + metod
+            answer = requests.get(url, params=params)
 
-        try:
-            need_data = answer.json()["data"]
-        except Exception as error:
-            print("ERROR get data from json {}, oem {}, brand {}, qnt {}"
-                  .format(answer.text, oem, brand, qnt))
-            need_data = []
-        if len(need_data) > 0:
-            propousal = {i['hash_key']: i['cost'] for i in need_data if
-                         (i["oem"] == oem and i['make_name'] == brand)}
-            list_propousal = choice_function(propousal, need_data, qnt)
+            try:
+                need_data = answer.json()["data"]
+            except Exception as error:
+                print("ERROR get data from json {}, oem {}, brand {}, qnt {}"
+                      .format(answer.text, oem, brand, qnt))
+                need_data = []
+            if len(need_data) > 0:
+                propousal = {i['hash_key']: i['cost'] for i in need_data if
+                             (i["oem"] == oem and i['make_name'] == brand)}
+                list_propousal = choice_function(propousal, need_data, qnt)
 
-            # print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@',
-            #       *list_propousal[0].items(), sep='\n')
-            # print(len(propousal))
+                # print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@',
+                #       *list_propousal[0].items(), sep='\n')
+                # print(len(propousal))
 
-            result_make_basket = make_basket(propousal=list_propousal[0],
-                                             qnt=qnt, key=key,
-                                             exter_order_id=external_order_id)
-            if result_make_basket == 200:
-                count_items += 1
+                result_make_basket = make_basket(propousal=list_propousal[0],
+                                                 qnt=qnt, key=key,
+                                                 exter_order_id=external_order_id)
+                if result_make_basket == 200:
+                    count_items += 1
+                else:
+                    print("Make basket failed {} {}".format(result_make_basket, item))
+
             else:
-                print("Make basket failed {} {}".format(result_make_basket, item))
-
+                print('SOME FUCKUP GET PROPOUSAL {}'.format(answer.text))
         else:
-            print('SOME FUCKUP GET PROPOUSAL {}'.format(answer.text))
+            bot_tg.send_get('.Проблема обработки заказа {}. Not found oem for offer_id {}'
+                            .format(item.get('offerId'), external_order_id))
 
     if count_items == len(list_items):
         # print("Result result_make_basket successfully {}".format(count_items))
@@ -397,41 +401,45 @@ def create_order_ps_if_not_exist(list_items, link, key=None,
             qnt = item.get("count")
             print("oem---brand---qnt", oem, brand, qnt)
             # sys.exit()
-            params = {
-                "api_key": key,
-                "oem": oem,
-                "make_name": brand,
-                "without_cross": True
-            }
-            metod = "/backend/price_items/api/v1/search/get_offers_by_oem_and_make_name"
-            url = "http://3431.ru" + metod
-            answer = requests.get(url, params=params)
-
-            try:
-                need_data = answer.json()["data"]
-            except Exception as error:
-                print("ERROR get data from partsoft {}, oem {}, brand {}, qnt {}"
-                      .format(answer.text, oem, brand, qnt))
-                need_data = []
-            if len(need_data) > 0:
-                propousal = {i['hash_key']: i['cost'] for i in need_data if
-                             (i["oem"] == oem and i['make_name'] == brand)}
-                list_propousal = choice_function(propousal, need_data, qnt)
-
-                # print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@',
-                #       *list_propousal[0].items(), sep='\n')
-                # print(len(propousal))
-
-                result_make_basket = make_basket(propousal=list_propousal[0],
-                                                 qnt=qnt, key=key,
-                                                 exter_order_id=external_order_id)
-                if result_make_basket == 200:
-                    count_items += 1
-                else:
-                    print("Make basket failed {} {}".format(result_make_basket, item))
-
+            if not oem:
+                bot_tg.send_get('.Проблема обработки заказа {}. Not found oem for offer_id {}'
+                                .format(item.get('offerId'), external_order_id))
             else:
-                print('SOME FUCKUP GET PROPOUSAL {}'.format(answer.text))
+                params = {
+                    "api_key": key,
+                    "oem": oem,
+                    "make_name": brand,
+                    "without_cross": True
+                }
+                metod = "/backend/price_items/api/v1/search/get_offers_by_oem_and_make_name"
+                url = "http://3431.ru" + metod
+                answer = requests.get(url, params=params)
+
+                try:
+                    need_data = answer.json()["data"]
+                except Exception as error:
+                    print("ERROR get data from partsoft {}, oem {}, brand {}, qnt {}"
+                          .format(answer.text, oem, brand, qnt))
+                    need_data = []
+                if len(need_data) > 0:
+                    propousal = {i['hash_key']: i['cost'] for i in need_data if
+                                 (i["oem"] == oem and i['make_name'] == brand)}
+                    list_propousal = choice_function(propousal, need_data, qnt)
+
+                    # print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@',
+                    #       *list_propousal[0].items(), sep='\n')
+                    # print(len(propousal))
+
+                    result_make_basket = make_basket(propousal=list_propousal[0],
+                                                     qnt=qnt, key=key,
+                                                     exter_order_id=external_order_id)
+                    if result_make_basket == 200:
+                        count_items += 1
+                    else:
+                        print("Make basket failed {} {}".format(result_make_basket, item))
+
+                else:
+                    print('SOME FUCKUP GET PROPOUSAL {}'.format(answer.text))
         else:
             count_items += 1
             continue  # TODO make order delivery

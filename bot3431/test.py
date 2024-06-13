@@ -3447,11 +3447,11 @@ order_dbs_sber = {
                             "destinationId":"4cbce9f3-6fd7-4162-962d-41268b75aadc"
                         },"geo":{"lat":"55.751812","lon":"37.599292"},
                         "access":{
-                            "detachedHouse":false,"entrance":"1","floor":1,
-                            "intercom":"1","cargoElevator":false,
+                            "detachedHouse":False,"entrance":"1","floor":1,
+                            "intercom":"1","cargoElevator":False,
                             "comment":"Дверь справа","apartment":"58"},
-                        "regionKladrId":"77","house":"д 1","block":null,
+                        "regionKladrId":"77","house":"д 1","block":None,
                         "flat":"58","regionWithType":"г Москва","cityWithType":"г Москва",
                         "cityArea":"Центральный","streetWithType":"ул Арбат"}},
                 "flags":[],
-                "items":[{"itemIndex":"1","goodsId":"100000572021","offerId":"BV001950-k","itemName":"Материнская плата Gigabyte GA-H110M-H","price":990,"finalPrice":990,"discounts":[],"quantity":1,"taxRate":"NOT","reservationPerformed":true,"isDigitalMarkRequired":true},{"itemIndex":"2","goodsId":"100025325086","offerId":"delivery","itemName":"Доставка","price":200,"finalPrice":200,"discounts":[],"quantity":1,"taxRate":null,"reservationPerformed":true,"isDigitalMarkRequired":false}]}],"merchantId":1111}}
+                "items":[{"itemIndex":"1","goodsId":"100000572021","offerId":"BV001950-k","itemName":"Материнская плата Gigabyte GA-H110M-H","price":990,"finalPrice":990,"discounts":[],"quantity":1,"taxRate":"NOT","reservationPerformed":True,"isDigitalMarkRequired":True},{"itemIndex":"2","goodsId":"100025325086","offerId":"delivery","itemName":"Доставка","price":200,"finalPrice":200,"discounts":[],"quantity":1,"taxRate":None,"reservationPerformed":True,"isDigitalMarkRequired":False}]}],"merchantId":1111}}
