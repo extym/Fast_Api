@@ -330,13 +330,13 @@ def create_resp_if_not_exist(list_items, link, key=None,
     count_items = 0
     global_result_make_basket = False
     for item in list_items:
-        list_propousal = []
         # vendor_data = get_vendor_code_from_xlm(item.get('offer_id)'), link=link)
+        offer_id = item.get('offerId')
         vendor_data = get_oem_from_xml(item.get('offerId'), link=link)
         oem = vendor_data[1]
         brand = vendor_data[0]
         qnt = item.get("count")
-        print(3333, oem, brand, qnt)
+        print(3333, offer_id, oem, brand, qnt)
         # sys.exit()
         if oem:
             params = {
