@@ -113,7 +113,9 @@ def get_orders_v2(customer_id: str,
                     page += 1
                     # print('page ', page)
                 if page >= 3:
-                    bot_tg.send_get('Not found order {} in {}'.format(marketplace_id, customer_id))
+                    bot_tg.send_get('Не найдено отправление {} для {}. '
+                                    'Требуется ручная обработка для изменения статуса на Выдано'
+                                    .format(marketplace_id, customer_id))
                     break
             else:
                 error += 1
@@ -145,7 +147,9 @@ def get_orders_v2(customer_id: str,
                     page += 1
                     print('page ', page)
                 if page >= 3:
-                    bot_tg.send_get('Not found order {} in {}'.format(marketplace_id, customer_id))
+                    bot_tg.send_get('Не найдено отправление {} для {}. '
+                                    'Требуется ручная обработка для изменения статуса на Выдано'
+                                    .format(marketplace_id, customer_id))
                     break
             else:
                 error += 1
@@ -201,13 +205,13 @@ async def make_data_for_request_v2(data_file, market):
         if result:
             logging.info("All_ride_Rewrite {} statuses for all {} from market {} at {}"
                          .format(count, len(data_file[0]), market, shipment_date))
-            bot_tg.send_get("All_ride_Rewrite {} statuses for all {} from market {} at {}"
+            bot_tg.send_get("Удачно выдано {} закказов из общего количества {} для {} на {}"
                             .format(count, len(data_file[0]), market, shipment_date))
         else:
             bot_tg.send_get("Error_Rewrite {} statuses for all {} from market {} at {}"
                             .format(count, len(data_file[0]), market, shipment_date))
     else:
-        bot_tg.send_get("Not found orders to_Rewrite  from market {} at {}"
+        bot_tg.send_get("Не найдено заказов для {} на {}."
                         .format(market, shipment_date))
 
     print('All_order_items', proxy)
