@@ -305,26 +305,62 @@ def get_oem_from_xml(offer_id, link=None):
 
     return brand, oem
 
+def get_oem_from_xml_v2(offer_id, link=None):
+    brand, oem = '', ''
+    print("OFFER ID", offer_id)
+    with urlopen(link) as xml:
+        doc = xmltodict.parse(xml)
+        for row in doc['yml_catalog']['shop']['offers']['offer']:
+            if row["@id"] == offer_id:
+                print('$' * 50)
+                brand = row['vendor']
+                oem = row['vendorCode']
+                price = row['price']
+                print(44444444444, brand, oem, price)
+                break
 
-# def get_vendor_code_from_xlm(offer_id, link=None):
-#     # link = 'https://3431.ru/system/unload_prices/33/yandex_market.xml'
-#     # link = 'https://3431.ru/system/unload_prices/21/sbermegamarket.xml'
-#     # link = 'https://3431.ru/system/unload_prices/17/yandex_market1.xml'
-#     vendor, vendor_code = '', ''
-#     data = pd.read_xml(link, xpath=f'//offer')
-#     count = 0
-#     for row in data.values:
-#         if row[0] == offer_id:
-#             vendor = row[12]
-#             vendor_code = row[13]
-#             break
+        if not oem and brand:
+            result = False
+            while result:
+                count = 1
+                offer_id = offer_id[:-count]
+                print(offer_id)
+                for row in doc['yml_catalog']['shop']['offers']['offer']:
+                    if offer_id[: - count] == row["@id"][: - count]:
+
+                        print(type(row), *row.items(), sep='\n')
+                        brand = row['vendor']
+                        oem = row['vendorCode'][:-count] + offer_id[- count:]
+                        print(44444444444, brand, oem, offer_id)
+
+                        break
+                    else:
+                        count += 1
+
+                    if count >= 5:
+                        result = True
+
+    return brand, oem
+
+def get_vendor_code_from_xlm(offer_id, link=None):
+    link = 'https://3431.ru/system/unload_prices/33/yandex_market.xml'
+    # link = 'https://3431.ru/system/unload_prices/21/sbermegamarket.xml'
+    # link = 'https://3431.ru/system/unload_prices/17/yandex_market1.xml'
+    vendor, vendor_code = '', ''
+    data = pd.read_xml(link, xpath=f'//offer')
+    count = 0
+    for row in data.values:
+        if row[0] == offer_id:
+            vendor = row[12]
+            vendor_code = row[13]
+            break
+
+    return vendor, vendor_code
+
+
 #
-#     return vendor, vendor_code
-
-
-#
-# get_oem_from_xml("KORTEXKHB4267STD",
-#                          link = 'https://3431.ru/system/unload_prices/33/yandex_market.xml')
+print(get_oem_from_xml_v2("LUZARLRAC2601",
+                         link = 'https://3431.ru/system/unload_prices/33/yandex_market.xml'))
 
 def create_resp_if_not_exist(list_items, link, key=None,
                              external_order_id=None):
@@ -377,7 +413,7 @@ def create_resp_if_not_exist(list_items, link, key=None,
             else:
                 print('SOME FUCKUP GET PROPOUSAL {}'.format(answer.text))
         else:
-            bot_tg.send_get('.Проблема обработки заказа {}. Not found oem for offer_id {}'
+            bot_tg.send_get('Проблема обработки заказа {}. Not found oem for offer_id {}'
                             .format(item.get('offerId'), external_order_id))
 
     if count_items == len(list_items):
