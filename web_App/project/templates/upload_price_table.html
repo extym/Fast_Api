@@ -12,7 +12,7 @@
             <div class="col-xl-12">
                 <section class="box ">
                     <header class="panel_header">
-                        <h2 class="title float-left">Сводная таблица магазинов</h2>
+                        <h2 class="title float-left">Сводная таблица выгрузок (фидов)</h2>
                         <div class="actions panel_actions float-right">
                             <i class="box_toggle fa fa-chevron-down"></i>
                             <i class="box_setting fa fa-cog" data-toggle="modal" href="#section-settings"></i>
@@ -21,21 +21,22 @@
                     </header>
                     <div class="content-body">    <div class="row">
                             <div class="col-lg-12 col-md-12 col-12">
-                                <form action="{{ url_for('auth.shops') }}" method="post" >
+                                <form action="{{ url_for('auth.upload_prices_table') }}" method="post" >
                                 <div class="table-responsive" data-pattern="priority-columns">
                                     <table cellspacing="0" id="tech-companies-1" class="table table-small-font table-bordered table-striped">
                                         <thead>
                                             <tr>
-                                                <th>Магазин </th>
-<!--                                                <th data-priority="1">Артикул</th>-->
-                                                <th data-priority="1" >Маркет</th>
-                                                <th data-priority="3">Seller_id</th>
-                                                <th data-priority="3" title="При включении этой настройки на маркетплейсы будут передаваться остатки для этого магазина" >Отправлять остатки</th>
-                                                <th data-priority="6"title="При включении этой настройки на маркетплейсы будут передаваться цены для этого магазина" >Отправлять цены</th>
-                                                <th data-priority="5"title="При включении этой настройки на маркетплейсы будут передаваться сводные (с учетом продаж на всех МП) остатки товаров для этого магазина" >Сводные остатки</th>
-                                                <th data-priority="6"title="При установке этой настройки на маркетплейсы будут передаваться нулевое количество для всех товаров этого магазина" >Обнулить остатки</th>
-                                                <th data-priority="6">Обновлено</th>
-                                                <th data-priority="6"title="Если у Вас маркетплейс ВБ или ЛМ, то можно включить получение заказов с маркета." >Забирать заказы</th>
+                                                <th>ID </th>
+                                                <th data-priority="1" >Название</th>
+<!--                                                <th data-priority="3">Поставщики</th>-->
+
+                                                <th data-priority="3">Наценка на фид</th>
+                                                <th data-priority="3">Скидка "старой цены"</th>
+                                                <th data-priority="3">Ссылка на фид</th>
+                                                <th data-priority="6" title="При включении этой настройки на маркетплейсы будут передаваться остатки для этого магазина" >Включить</th>
+                                                <th data-priority="6"title="При установке этой настройки на маркетплейсы будут передаваться нулевое количество для всех товаров этого магазина" >Нулевые остатки</th>
+                                                <th data-priority="3">Формат</th>
+<!--                                                <th data-priority="6"title="Если у Вас маркетплейс ВБ или ЛМ, то можно включить получение заказов с маркета." >Забирать заказы</th>-->
 <!--                                                <th data-priority="5">Группа</th>-->
 <!--                                                <th data-priority="5">Подгруппа</th>-->
                                             </tr>

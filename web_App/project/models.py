@@ -53,6 +53,7 @@ class UploadPrice(db.Model):
     upload_prices_mp = db.Column(db.String(250))
     upload_option = db.Column(db.String(250))
     user_id = db.Column(db.Integer())
+    warehouses = db.Column(db.String(250))
 
 
 class Distributor(db.Model):
@@ -69,6 +70,7 @@ class Distributor(db.Model):
     is_scheduler = db.Column(db.Boolean())
     enable_orders_submit = db.Column(db.Boolean())
     enable_sync_bd = db.Column(db.Boolean())
+    send_tg_notice = db.Column(db.Boolean())
     date_added = db.Column(db.String(250))
     date_modifed = db.Column(db.String(250))
     user_modifed = db.Column(db.Integer())
@@ -87,6 +89,7 @@ class DistributorPrice(db.Model):
     link_downloads = db.Column(db.String(500))
     is_scheduler = db.Column(db.Boolean())
     enable_sync_bd = db.Column(db.Boolean())
+    send_tg_notice = db.Column(db.Boolean())
     date_added = db.Column(db.String(250))
     date_modifed = db.Column(db.String(250))
     user_modifed = db.Column(db.Integer())

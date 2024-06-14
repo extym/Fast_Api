@@ -79,7 +79,6 @@ def write(smth):
             file.write(str(how_time) + '-' + smth)
 
 
-
 def get_image(name, url):
     try:
         response = requests.get(url, verify=False)

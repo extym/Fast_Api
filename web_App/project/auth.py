@@ -30,6 +30,9 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import project.sber as sber
 import project.ozon as oson
 import project.yandex as yan
+import project.addons.kolrad as kolrad
+import project.addons.shins as shins
+import project.addons.four_tochki as tochki
 
 import logging
 
@@ -162,11 +165,51 @@ def back_shops_tasks():
 
 
 def back_distibutors_tasks():
-    pass
+    with Session(engine) as session:
+        distibutors_job = session.query(Distributor) \
+            .filter(or_(Distributor.is_scheduler == True,
+                        Distributor.enable_orders_submit == True)) \
+            .all()
+        for row in distibutors_job:
+            enabled = row.is_scheduler
+            if enabled:
+                if row.distributor == '3logic':
+                    pass
+
+
+def back_dist_prices_tasks():
+    with Session(engine) as session:
+        distr_prices = session.query(DistributorPrice) \
+            .filter(or_(DistributorPrice.is_scheduler == True)) \
+            .all()
+        for row in distr_prices:
+            if row.distributor == 'shins' and row.type_downloads == 'csv':
+                shins.get_data_csv(url=row.price_link)
 
 
 def back_upload_prices():
-    pass
+    with Session(engine) as session:
+        upload_prices = session.query(UploadPrice) \
+            .filter(or_(UploadPrice.is_scheduler == True,
+                        UploadPrice.is_null_stocks == True)) \
+            .all()
+
+        for row in upload_prices:
+            if row.upload_price_mp == 'sber' and row.type_downloads == 'xml':
+                sber.create_sber_xml(stocks_is_null=row.is_null_stocks,
+                                     without_db=row.enable_sync_bd,
+                                     legal_name=row.upload_price_legal_name,
+                                     short_shop_name=row.upload_prices_short_shop,
+                                     markup=row.upload_prices_markup,
+                                     discount=row.upload_price_discount,
+                                     wh_id=row.warehouses_id)
+            if row.upload_price_mp == 'yandex' and row.type_downloads == 'xml':
+                yan.create_ym_xml(stocks_is_null=row.is_null_stocks,
+                                  without_db=row.enable_sync_bd,
+                                  legal_name=row.upload_price_legal_name,
+                                  short_shop_name=row.upload_prices_short_shop,
+                                  markup=row.upload_prices_markup,
+                                  discount=row.upload_price_discount)
 
 
 def allowed_file(filename):
@@ -332,7 +375,7 @@ def add_mp_post():
     role = current_user.roles
     company_id = current_user.company_id
     date_add = datetime.datetime.now()
-    print(113333333111, data)
+
     if 'insert_new_shop' in data:
         mp = data.get('insert_new_shop')
         shop_name = data.get('name')
@@ -442,6 +485,7 @@ def add_mp_post():
         pass
         # job = q.enqueue_call(test_time)
         # print(job.get_id)
+
     if 'edit_shop' in data:
         print(33333333333333333333333, data)
         if 'edit_shop' == 'Выбрать' and 'edit_shop_settings' == 'Выбрать':
@@ -454,8 +498,6 @@ def add_mp_post():
             d_b = Db()
             d_b.update_mp(shop_name, mp, key_mp)
         print(*data.keys(), sep='\n')
-    # if
-    #     pass
 
     return redirect('/add_mp')
 
@@ -467,7 +509,6 @@ def edit_mp_post():
     uid = current_user.id
     role = current_user.roles
     company_id = current_user.company_id
-    print(11111111111, data)
     if 'edit_name_mp' in data:
         mp = data.get('edit_name_mp')
         shop_name = data.get('edit_shop_names')
@@ -483,7 +524,6 @@ def edit_mp_post():
             return redirect('/add_mp')
 
         if shop_name != 'Выбрать' and mp != 'Выбрать' and key_mp:
-            # print(1111, mp, shop_name, key_mp)
             mp = data.get('edit_shop')
             shop_name = data.get('edit_shop_name')
             shop_id = data.get('id_mp')
@@ -602,7 +642,6 @@ def import_settings_post():
     company_id = current_user.company_id
     data = request.form.to_dict()
     make = data.get('make')
-    print(111, data, current_user.name)
     if make == 'start_import':
         mp = data.get('import_mp_name')
         shop_name = data.get('import_shop_names')
@@ -1228,7 +1267,6 @@ def products_page(page=1):
         user_name = current_user.name
         photo = current_user.photo
         shop = request.args.get('select_shop_name')
-        # print(11111, shop)
         if not photo or photo is None:
             photo = 'prof-music-2.jpg'
         rows = ''
@@ -1316,7 +1354,6 @@ def shops():
                         scheduler.start()
 
                     print(100000000, current_job)
-                    # print(111000, len(data.keys()))
             else:
                 try:
                     scheduler.remove_job('shops_back')
@@ -1724,29 +1761,29 @@ def upload_prices_table():
     else:
         if request.method == "POST":
             data = request.form.to_dict()
+            print(34343434, data)
+
             proxy_settings = {}
             if len(data.keys()) > 0:
                 for key, value in data.items():
                     need_job = key.rsplit('_', maxsplit=1)[0]
-                    proxy_settings[value] = proxy_settings.get(value, []) + [need_job]
+                    proxy_settings[int(value)] = proxy_settings.get(value, []) + [need_job]
+            print(232323, proxy_settings)
+            uploads = UploadPrice.query.all()
+            for row in uploads:
+                current_work = {'is_null_stocks': False,
+                                'is_scheduler': False}
 
-            markets = Marketplaces.query \
-                .filter_by(company_id=current_user.company_id).all()
-            for row in markets:
-                current_work = {'check_send_null': False,
-                                'send_common_stocks': False,
-                                'enable_orders_submit': False,
-                                'enable_sync_price': False,
-                                'enable_sync_stocks': False}
-                if row.shop_name in proxy_settings.keys():
-                    current = {i: True for i in proxy_settings[row.shop_name]}
+                if row.id in proxy_settings.keys():
+                    current = {i: True for i in proxy_settings[row.id]}
+                    print(345345, current)
                     current_work.update(current)
-                    db.session.execute(update(Marketplaces)
-                                       .where(Marketplaces.seller_id == row.seller_id)
+                    db.session.execute(update(UploadPrice)
+                                       .where(UploadPrice.id == row.id)
                                        .values(current_work))
                 else:
-                    db.session.execute(update(Marketplaces)
-                                       .where(Marketplaces.seller_id == row.seller_id)
+                    db.session.execute(update(UploadPrice)
+                                       .where(UploadPrice.id == row.id)
                                        .values(current_work))
                 db.session.commit()
 
@@ -1764,7 +1801,6 @@ def upload_prices_table():
                         scheduler.start()
 
                     print(100000000, current_job)
-                    # print(111000, len(data.keys()))
             else:
                 try:
                     scheduler.remove_job('upload_prices')
@@ -1783,63 +1819,42 @@ def upload_prices_table():
                 photo = 'prof-music-2.jpg'
             rows = ''
 
-            raw_list_shops = db.session.query(Marketplaces) \
-                .filter_by(company_id=current_user.company_id) \
-                .order_by(Marketplaces.seller_id.asc()) \
+            raw_list_uploads = db.session.query(UploadPrice) \
+                .order_by(UploadPrice.id.asc()) \
                 .all()
 
-            for row in raw_list_shops:
-                seller_id = row.seller_id
-                if row.date_modifed:
-                    date_modifed = row.date_modifed
-                else:
-                    date_modifed = "Нет"
-                if row.check_send_null:
-                    check_send_null = "checked"
-                else:
-                    check_send_null = "unchecked"
+            print(raw_list_uploads)
 
-                if row.send_common_stocks:
-                    send_common_stocks = "checked"
+            for row in raw_list_uploads:
+                id = row.id
+                if row.is_null_stocks:
+                    is_null_stocks = "checked"
                 else:
-                    send_common_stocks = "unchecked"
+                    is_null_stocks = "unchecked"
 
-                if row.enable_sync_stocks:
-                    enable_sync_stocks = "checked"
+                if row.is_scheduler:
+                    is_scheduler = "checked"
                 else:
-                    enable_sync_stocks = "unchecked"
-
-                if row.enable_sync_price:
-                    enable_sync_price = "checked"
-                else:
-                    enable_sync_price = "unchecked"
-
-                if row.enable_orders_submit:
-                    enable_orders_submit = "checked"
-                else:
-                    enable_orders_submit = "unchecked"
+                    is_scheduler = "unchecked"
 
                 rows += '<tr>' \
-                        f'<td >{row.shop_name} </td>' \
-                        f'<td >{row.name_mp}</td>' \
-                        f'<td >{row.seller_id}</td>' \
-                        f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="enable_sync_stocks_{seller_id}' \
-                        f'" {enable_sync_stocks} class="iswitch iswitch iswitch-primary"></div></td>' \
-                        f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="enable_sync_price_{seller_id}' \
-                        f'" {enable_sync_price} class="iswitch iswitch iswitch-primary"></div></td>' \
-                        f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="send_common_stocks_{seller_id}' \
-                        f'" {send_common_stocks} class="iswitch iswitch iswitch-purple"></div></td>' \
-                        f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="check_send_null_{seller_id}' \
-                        f'" {check_send_null} class="iswitch iswitch iswitch-warning"></div></td>' \
-                        f'<td >{str(date_modifed).rsplit(":")[0]}</td>' \
-                        f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="enable_orders_submit_{seller_id}' \
-                        f'" {enable_orders_submit} class="iswitch iswitch iswitch-purple"></div></td>' \
+                        f'<td >{row.id} </td>' \
+                        f'<td >{row.name}</td>' \
+                        f'<td >{row.upload_prices_markup}</td>' \
+                        f'<td >{row.upload_price_discount}</td>' \
+                        f'<td >{row.upload_prices_url}</td>' \
+                        f'<td ><div class="form-block"><input type="checkbox" value="{row.id}" name="is_scheduler_{id}' \
+                        f'" {is_scheduler} class="iswitch iswitch iswitch-purple"></div></td>' \
+                        f'<td ><div class="form-block"><input type="checkbox" value="{row.id}" name="is_null_stocks_{id}' \
+                        f'" {is_null_stocks} class="iswitch iswitch iswitch-warning"></div></td>' \
+                        f'<td >{row.upload_option}</td>' \
                         f'</tr>'
 
-            return unescape(render_template('tables-shops.html',
+            return unescape(render_template('upload_price_table.html',
                                             rows=rows, role=role,
                                             photo=photo,
-                                            user_name=user_name))
+                                            user_name=user_name,
+                                            distributors=LOCAL_MODE))
 
 
 @auth.route('/upload-prices-settings', methods=['GET', 'POST'])
@@ -1851,7 +1866,7 @@ def upload_prices_settings():
         company_id = current_user.company_id
         data = request.form.to_dict()
         make = data.get('make')
-        print(111, *data.items(), sep='\n')
+        # print(111, *data.items(), sep='\n')
         # for key in data.keys():
         #     print(key, f"= data.get('{key}'),")
         # print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
@@ -1863,13 +1878,12 @@ def upload_prices_settings():
             upload_prices_store = data.get('upload_prices_store')
             upload_option = data.get('option')
 
-            if upload_prices_mp != 'Выбрать' and upload_prices_store != 'Выбрать' \
-                    and upload_option:
+            if upload_prices_mp != 'Выбрать' and upload_option:
                 upload_price = UploadPrice(
                     is_null_stocks=data.get('is_null_stocks', 'off'),
                     is_scheduler=data.get('enabled_upload_price', 'off'),
                     name=data.get('upload_price_name', 'default'),
-                    upload_option = data.get('option'),
+                    upload_option=data.get('option'),
                     upload_prices_mp=data.get('upload_prices_mp'),
                     upload_prices_markup=data.get('upload_prices_markup'),
                     upload_prices_store=data.get('upload_prices_store'),
@@ -2179,7 +2193,7 @@ def distributor_settings():
                 if data.get('edit_name_dist') == 'Выбрать':
                     flash('Не выбран поставщик. Укажите поставщика.')
                 # return current settings that distributor
-                distributor = Distributor.query\
+                distributor = Distributor.query \
                     .filter_by(distributor=data.get('edit_name_dist')).first()
                 print(3333333, distributor)
                 dist_name = distributor.distributor
@@ -2236,7 +2250,7 @@ def distributor_settings():
                 if data.get('settings_name_dist') == 'Выбрать':
                     flash('Не выбран поставщик. Укажите поставщика.')
                 # return current settings that distributor_price
-                dist_price = DistributorPrice.query\
+                dist_price = DistributorPrice.query \
                     .filter_by(distributor=data.get('settings_name_dist')).first()
                 print(333555553333, dist_price)
                 dist_price_data = dist_price.__dict__
@@ -2258,8 +2272,8 @@ def distributor_settings():
                                photo=photo,
                                user_name=user_name,
                                distributors=LOCAL_MODE)
-    
-    
+
+
 @auth.route('/distributors-table', methods=['GET', 'POST'])
 @login_required
 def distributors_table():
@@ -2280,7 +2294,8 @@ def distributors_table():
             for row in disributors_data:
                 current_work = {'is_scheduler': False,
                                 'enable_orders_submit': False,
-                                'enable_sync_bd': False}
+                                'enable_sync_bd': False,
+                                'send_tg_notice': False}
                 if row.distributor in proxy_settings.keys():
                     current = {i: True for i in proxy_settings[row.distributor]}
                     current_work.update(current)
@@ -2307,7 +2322,6 @@ def distributors_table():
                         scheduler.start()
 
                     print(100000000, current_job)
-                    # print(111000, len(data.keys()))
             else:
                 try:
                     scheduler.remove_job('distibutors')
@@ -2362,6 +2376,11 @@ def distributors_table():
                 else:
                     enable_orders_submit = "unchecked"
 
+                if row.send_tg_notice:
+                    send_tg_notice = "checked"
+                else:
+                    send_tg_notice = "unchecked"
+
                 rows += '<tr>' \
                         f'<td >{row.id} </td>' \
                         f'<td >{row.distributor}</td>' \
@@ -2369,9 +2388,11 @@ def distributors_table():
                         f'<td ><div class="form-block"><input type="checkbox" value="{row.distributor}" name="is_scheduler_{id}' \
                         f'" {is_scheduler} class="iswitch iswitch iswitch-purple"></div></td>' \
                         f'<td ><div class="form-block"><input type="checkbox" value="{row.distributor}" name="enable_sync_bd_{id}' \
-                        f'" {enable_sync_bd} class="iswitch iswitch iswitch-warning"></div></td>'\
+                        f'" {enable_sync_bd} class="iswitch iswitch iswitch-warning"></div></td>' \
                         f'<td ><div class="form-block"><input type="checkbox" value="{row.distributor}" name="enable_orders_submit_{id}' \
                         f'" {enable_orders_submit} class="iswitch iswitch iswitch-warning"></div></td>' \
+                        f'<td ><div class="form-block"><input type="checkbox" value="{row.distributor}" name="send_tg_notice_{id}' \
+                        f'" {send_tg_notice} class="iswitch iswitch iswitch-primary"></div></td>' \
                         f'</tr>'
 
             return unescape(render_template('distributors-table.html',
@@ -2400,7 +2421,8 @@ def distributors_prices():
             disr_prices_data = DistributorPrice.query.all()
             for row in disr_prices_data:
                 current_work = {'is_scheduler': False,
-                                'enable_sync_bd': False}
+                                'enable_sync_bd': False,
+                                'send_tg_notice': False}
                 if row.distributor in proxy_settings.keys():
                     current = {i: True for i in proxy_settings[row.distributor]}
                     current_work.update(current)
@@ -2419,7 +2441,7 @@ def distributors_prices():
                 except:
                     print('Job_update_error')
                 finally:
-                    current_job = scheduler.add_job(back_distibutors_tasks,
+                    current_job = scheduler.add_job(back_dist_prices_tasks,
                                                     id='distibutors_prices',
                                                     trigger='interval',
                                                     minutes=600)
@@ -2427,7 +2449,6 @@ def distributors_prices():
                         scheduler.start()
 
                     print(100000000, current_job)
-                    # print(111000, len(data.keys()))
             else:
                 try:
                     scheduler.remove_job('distibutors')
@@ -2462,6 +2483,10 @@ def distributors_prices():
                 else:
                     enable_sync_bd = "unchecked"
 
+                if row.send_tg_notice:
+                    send_tg_notice = "checked"
+                else:
+                    send_tg_notice = "unchecked"
 
                 rows += '<tr>' \
                         f'<td >{row.id} </td>' \
@@ -2472,6 +2497,8 @@ def distributors_prices():
                         f'<td ><div class="form-block"><input type="checkbox" value="{row.distributor}" name="enable_sync_bd_{id}' \
                         f'" {enable_sync_bd} class="iswitch iswitch iswitch-warning"></div></td>' \
                         f'<td >{row.type_downloads}</td>' \
+                        f'<td ><div class="form-block"><input type="checkbox" value="{row.distributor}" name="send_tg_notice_{id}' \
+                        f'" {send_tg_notice} class="iswitch iswitch iswitch-primary"></div></td>' \
                         f'</tr>'
 
             return unescape(render_template('distributors-prices.html',
