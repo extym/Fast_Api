@@ -62,10 +62,14 @@ def get_client_logic():
 
 
 def get_category_list():  # getCategoryList
-    category_list = get_client_logic().service.getCategoryList()
-    data_list = zeep.helpers.serialize_object(category_list)
+    data_list = []
+    try:
+        category_list = get_client_logic().service.getCategoryList()
+        data_list = zeep.helpers.serialize_object(category_list)
     # print('getCategoryList', len(data_list), data_list, sep='\n')
-    print('getCategoryList', len(data_list))
+    except Exception as error:
+        print(" Мы получили от 2LOGIC {}".format(error))
+        print('getCategoryList', len(data_list))
     return data_list
 
 
