@@ -102,11 +102,11 @@ def get_orders_v2(customer_id: str,
             token_ps = HTTPBasicAuth(admin_ps_login, admin_ps_pass)
             answer = requests.get(url, auth=token_ps, params=params)
             if answer.ok:
-                print(333, answer.text)
+                # print(333, answer.text)
                 data = answer.json()
                 result_list = [i for i in data.get('orders')
                                if i.get('marketplace_id') == marketplace_id]
-                print(555, result_list[0])
+                # print(555, result_list[0])
                 if len(result_list) > 0:
                     result = marketplace_id
                 else:
@@ -125,6 +125,7 @@ def get_orders_v2(customer_id: str,
                                 .format(answer.status_code, answer.text))
                 if page >= 5:
                     break
+
     elif customer_id == '2063' or customer_id == '2504':
         while marketplace_id != result:
             params = {
@@ -176,8 +177,9 @@ def get_orders_v2(customer_id: str,
                     bot_tg.send_get("Заказ {} уже выдан.".format(proxy))
                 else:
                     status = [i.get('name') for i in line if i.get('id') == item.get("status_id")]
-                    bot_tg.send_get("Заказ {} в статусе {} (id {}), для выдачи заказ должен быть в группе Пришло."
-                                    .format(proxy, status[0], item.get("status_id")))
+                    bot_tg.send_get("Заказ {} в статусе {} для {}. "
+                                    "Выдача заказа возможна только из группы Пришло."
+                                    .format(proxy, status[0], customer_id))
 
     except Exception as error:
         print(222222222222222222, proxy)
@@ -205,7 +207,7 @@ async def make_data_for_request_v2(data_file, market):
         if result:
             logging.info("All_ride_Rewrite {} statuses for all {} from market {} at {}"
                          .format(count, len(data_file[0]), market, shipment_date))
-            bot_tg.send_get("Удачно выдано {} закказов из общего количества {} для {} на {}"
+            bot_tg.send_get("Удачно выдано {} заказов из общего количества {} для {} на {}"
                             .format(count, len(data_file[0]), market, shipment_date))
         else:
             bot_tg.send_get("Error_Rewrite {} statuses for all {} from market {} at {}"
