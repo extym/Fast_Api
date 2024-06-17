@@ -316,31 +316,26 @@ def get_oem_from_xml_v2(offer_id, link=None):
                 brand = row['vendor']
                 oem = row['vendorCode']
                 price = row['price']
-                print(44444444444, brand, oem, price)
+                # print(44444444444, brand, oem, price)
                 break
 
-        if not oem and brand:
+        if not oem and not brand:
             result = False
-            while result:
-                count = 1
-                offer_id = offer_id[:-count]
-                print(offer_id)
-                for row in doc['yml_catalog']['shop']['offers']['offer']:
-                    if offer_id[: - count] == row["@id"][: - count]:
+            while not result:
+                for i in range(1, 6):
+                    offer = offer_id[: - 1]
+                    print("OFFER_ID", offer_id, offer)
+                    for row in doc['yml_catalog']['shop']['offers']['offer']:
+                        id_prod = row["@id"][: - 1]
+                        if offer == id_prod:
+                            brand = row['vendor']
+                            oem = row['vendorCode'][: -i] + offer_id[-i:]
+                            break
 
-                        print(type(row), *row.items(), sep='\n')
-                        brand = row['vendor']
-                        oem = row['vendorCode'][:-count] + offer_id[- count:]
-                        print(44444444444, brand, oem, offer_id)
-
-                        break
-                    else:
-                        count += 1
-
-                    if count >= 5:
-                        result = True
+                result = True
 
     return brand, oem
+
 
 def get_vendor_code_from_xlm(offer_id, link=None):
     link = 'https://3431.ru/system/unload_prices/33/yandex_market.xml'
@@ -359,8 +354,9 @@ def get_vendor_code_from_xlm(offer_id, link=None):
 
 
 #
-print(get_oem_from_xml_v2("LUZARLRAC2601",
+print(get_oem_from_xml_v2("CHERY204000455AA",
                          link = 'https://3431.ru/system/unload_prices/33/yandex_market.xml'))
+
 
 def create_resp_if_not_exist(list_items, link, key=None,
                              external_order_id=None):
@@ -413,7 +409,9 @@ def create_resp_if_not_exist(list_items, link, key=None,
             else:
                 print('SOME FUCKUP GET PROPOUSAL {}'.format(answer.text))
         else:
-            bot_tg.send_get('Проблема обработки заказа {}. Not found oem for offer_id {}'
+            bot_tg.send_get('Проблема обработки заказа {}. '
+                            'Требуется ручная обработка.'
+                            ' Not found oem for offer_id {} y'
                             .format(external_order_id, item.get('offerId')))
 
     if count_items == len(list_items):
@@ -441,7 +439,9 @@ def create_order_ps_if_not_exist(list_items, link, key=None,
             print("oem---brand---qnt", oem, brand, qnt)
             # sys.exit()
             if not oem:
-                bot_tg.send_get('Проблема обработки заказа {}. Not found oem for offer_id {}'
+                bot_tg.send_get('Проблема обработки заказа {}. '
+                            'Требуется ручная обработка.'
+                            ' Not found oem for offer_id {} s'
                             .format(external_order_id, item.get('offerId')))
             else:
                 params = {
