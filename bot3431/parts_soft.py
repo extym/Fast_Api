@@ -375,8 +375,8 @@ def create_resp_if_not_exist(list_items, link, key=None,
             else:
                 print('SOME FUCKUP GET PROPOUSAL {}'.format(answer.text))
         else:
-            bot_tg.send_get('.Проблема обработки заказа {}. Not found oem for offer_id {}'
-                            .format(item.get('offerId'), external_order_id))
+            bot_tg.send_get('Проблема обработки заказа {}. Not found oem for offer_id {}'
+                            .format(external_order_id, item.get('offerId')))
 
     if count_items == len(list_items):
         # print("Result result_make_basket successfully {}".format(count_items))
@@ -403,8 +403,8 @@ def create_order_ps_if_not_exist(list_items, link, key=None,
             print("oem---brand---qnt", oem, brand, qnt)
             # sys.exit()
             if not oem:
-                bot_tg.send_get('.Проблема обработки заказа {}. Not found oem for offer_id {}'
-                                .format(item.get('offerId'), external_order_id))
+                bot_tg.send_get('Проблема обработки заказа {}. Not found oem for offer_id {}'
+                            .format(external_order_id, item.get('offerId')))
             else:
                 params = {
                     "api_key": key,
