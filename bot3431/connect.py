@@ -517,10 +517,10 @@ query_add_settings_ym = \
      "(client_id, key_store, campain_id, api_key_ps, upload_link, model) "
      "VALUES ( %s, %s, %s, %s, %s, %s )")
 
-query_add_settings_without_ym = \
+query_add_settings_sber = \
     (" INSERT INTO stores "
-     "(client_id, key_store, campain_id, api_key_ps, upload_link, model) "
-     "VALUES ( %s, %s, %s, %s, %s, %s )")
+     "(client_id, key_store, campain_id, api_key_ps, upload_link, model, user_id) "
+     "VALUES ( %s, %s, %s, %s, %s, %s, %s )")
 
 proxy = ("u2i-TOYzRVLyb9Hw_l7u2aBTVg", '4391',
          "https://avito.ru/sankt-peterburg/zapchasti_i_aksessuary/trw_df4110_torm.disk_per.vent.280x24_4_otv_3364311913",

@@ -922,13 +922,14 @@ async def add_store():
             # print(33333333, market, key_store, store_id, upload_link,
             #       random_uuid, target_url_new, target_url_cancel, url)
             try:
-                conn.execute_query_v2(query_add_settings_without_ym,
+                conn.execute_query_v2(query_add_settings_sber,
                                       (market,
                                        key_store,
                                        random_uuid,
                                        api_key_ps,
                                        upload_link,
-                                       model))
+                                       model,
+                                       store_id))
                 flash(f'Настройки удачно сохранены. Ссылка для новых заказов {target_url_new}.'
                       f' \n Ссылка для отмены заказов {target_url_cancel}.')
             except IntegrityError as e:
