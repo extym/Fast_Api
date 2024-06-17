@@ -1150,7 +1150,7 @@ def edit_product_post():
 
         except IntegrityError as e:
             if isinstance(e.orig, UniqueViolation):
-                print('!!!!!!!!!!!!!!!!!!!!!!!!!!', data)
+                # print('!!!!!!!!!!!!!!!!!!!!!!!!!!', data)
                 db.session.rollback()
                 articul_product = data.get('articul_product')
                 product = Product.query.filter_by(articul_product=articul_product).update(data)
@@ -1866,19 +1866,21 @@ def upload_prices_settings():
         company_id = current_user.company_id
         data = request.form.to_dict()
         make = data.get('make')
-        # print(111, *data.items(), sep='\n')
-        # for key in data.keys():
-        #     print(key, f"= data.get('{key}'),")
+        print(111, *data.items(), sep='\n')
+        for key in data.keys():
+            print(key, f"= data.get('{key}'),")
         # print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
         # for key in data.keys():
         #     print(key, f"={key}")
 
         if make == 'save_upload_price':
             upload_prices_mp = data.get('upload_prices_mp')
-            upload_prices_store = data.get('upload_prices_store')
+            upload_prices_id = data.get('upload_prices_id')
             upload_option = data.get('option')
 
-            if upload_prices_mp != 'Выбрать' and upload_option:
+            if upload_prices_mp != 'Выбрать' \
+                    and upload_option \
+                    and upload_prices_id == '0':
                 upload_price = UploadPrice(
                     is_null_stocks=data.get('is_null_stocks', 'off'),
                     is_scheduler=data.get('enabled_upload_price', 'off'),
@@ -1899,6 +1901,28 @@ def upload_prices_settings():
                 db.session.add(upload_price)
                 db.session.commit()
                 flash("Настройки удачно сохранены", 'success')
+            elif upload_prices_mp != 'Выбрать' \
+                    and upload_option \
+                    and upload_prices_id != '0':
+                upload_price = UploadPrice(
+                    is_null_stocks=data.get('is_null_stocks', 'off'),
+                    is_scheduler=data.get('enabled_upload_price', 'off'),
+                    name=data.get('upload_price_name', 'default'),
+                    upload_option=data.get('option'),
+                    upload_prices_mp=data.get('upload_prices_mp'),
+                    upload_prices_markup=data.get('upload_prices_markup'),
+                    upload_prices_store=data.get('upload_prices_store'),
+                    upload_price_discount=data.get('upload_price_discount'),
+                    upload_prices_short_shop=data.get('upload_prices_short_shop'),
+                    upload_prices_legal_name=data.get('upload_prices_legal_name'),
+                    upload_prices_url=data.get('upload_prices_url'),
+                    upload_price_category=data.get('upload_price_category'),
+                    date_modifed=datetime.datetime.now(),
+                    user_id=current_user.id
+                )
+
+                db.session.(upload_price)
+                db.session.commit()
             else:
                 flash("Проверьте, пожалуйста, корректность вводимых данных", 'error')
                 return redirect('/upload-prices-settings')
@@ -1917,6 +1941,11 @@ def upload_prices_settings():
             upload_prices_url = data.get('upload_prices_url')
             upload_price_category = data.get('upload_price_category')
 
+            if upload_prices_short_shop == '':
+                flash("Укажите на вкладке Профиль - Краткое название магазина")
+            if upload_prices_legal_name == '':
+                flash("Укажите на вкладке Профиль - Краткое название организации")
+
             if upload_prices_store != 'Выбрать' and \
                     upload_prices_short_shop != '' and \
                     upload_prices_legal_name != '' and \
@@ -1930,6 +1959,7 @@ def upload_prices_settings():
                                           category=upload_price_category,
                                           markup=upload_prices_markup,
                                           discount=upload_price_discount))
+                    print(97777789, job.get_id)
                 elif upload_prices_mp == 'yandex' and upload_option == 'xml':
                     job = q.enqueue_call(yan.create_ym_xml
                                          (stocks_is_null=is_null_stocks,
@@ -1939,7 +1969,8 @@ def upload_prices_settings():
                                           category=upload_price_category,
                                           markup=upload_prices_markup,
                                           discount=upload_price_discount))
-                print(989898989, job.get_id)
+                    print(97777789, job.get_id)
+
             print(989898989, *data.items(), sep='\n')
 
         elif make == 'make_price_feed':
@@ -2053,7 +2084,7 @@ def upload_prices_settings():
 
                     try:
                         upload_data = upload_settings.__dict__
-                        print(232323, type(upload_data), upload_data)
+                        # print(232323, type(upload_data), upload_data)
 
                         uid = current_user.id
                         role = current_user.roles
@@ -2249,20 +2280,21 @@ def distributor_settings():
             elif data.get('check_dist_price') == 'check':
                 if data.get('settings_name_dist') == 'Выбрать':
                     flash('Не выбран поставщик. Укажите поставщика.')
-                # return current settings that distributor_price
-                dist_price = DistributorPrice.query \
-                    .filter_by(distributor=data.get('settings_name_dist')).first()
-                print(333555553333, dist_price)
-                dist_price_data = dist_price.__dict__
-                # key_api_dist = dist_price.key_api_dist
-                # login_api_dist = dist_price.login_api_dist
-                return render_template('distributor-settings.html',
-                                       role=role, rows=rows,
-                                       dist_price_data=dist_price_data,
-                                       distributors=LOCAL_MODE,
-                                       show=True,
-                                       photo=photo,
-                                       user_name=user_name)
+                else:
+                    # return current settings that distributor_price
+                    dist_price = DistributorPrice.query \
+                        .filter_by(distributor=data.get('settings_name_dist')).first()
+                    # print(333555553333, dist_price)
+                    dist_price_data = dist_price.__dict__
+                    # key_api_dist = dist_price.key_api_dist
+                    # login_api_dist = dist_price.login_api_dist
+                    return render_template('distributor-settings.html',
+                                           role=role, rows=rows,
+                                           dist_price_data=dist_price_data,
+                                           distributors=LOCAL_MODE,
+                                           show=True,
+                                           photo=photo,
+                                           user_name=user_name)
 
             return redirect(url_for('auth.distributor_settings'))
 
@@ -2488,10 +2520,15 @@ def distributors_prices():
                 else:
                     send_tg_notice = "unchecked"
 
+                shop_name = row.shop_name
+                if shop_name == 'all':
+                    shop_name = 'Все магазины'
+
                 rows += '<tr>' \
                         f'<td >{row.id} </td>' \
                         f'<td >{row.price_name}</td>' \
                         f'<td >{row.distributor}</td>' \
+                        f'<td >{shop_name}</td>' \
                         f'<td ><div class="form-block"><input type="checkbox" value="{row.distributor}" name="is_scheduler_{id}' \
                         f'" {is_scheduler} class="iswitch iswitch iswitch-purple"></div></td>' \
                         f'<td ><div class="form-block"><input type="checkbox" value="{row.distributor}" name="enable_sync_bd_{id}' \

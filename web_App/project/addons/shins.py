@@ -10,11 +10,12 @@ import datetime
 from urllib.request import urlretrieve
 import project.conn as conn
 import urllib3
+
 urllib3.disable_warnings()
 
 import ssl
-ssl._create_default_https_context = ssl._create_unverified_context
 
+ssl._create_default_https_context = ssl._create_unverified_context
 
 tn = datetime.datetime.now()
 ts = datetime.datetime.timestamp(tn) * 1000
@@ -53,7 +54,6 @@ def id_generator(size=8, chars=string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
 
-
 def get_data_csv(url):
     proxy = []
     try:
@@ -69,7 +69,6 @@ def get_data_csv(url):
     return proxy
 
 
-
 def get_data_wheels_csv(url):
     proxy = []
     try:
@@ -83,7 +82,6 @@ def get_data_wheels_csv(url):
         print('Fuck_up download wheels csv')
 
     return proxy
-
 
 
 # get_data_wheels_csv()
@@ -103,10 +101,17 @@ def count_price_tyres(string, size):
         return price
 
 
-def standart_tyres_csv():
+def standart_tyres_csv(name_price=None, shop_name='all'):
     proxy_data, proxy = [], []
     global_result = {}
-    link_downloads_csv = conn.get_distibutor_link('shins', 'csv', 'tyres')
+    provider = 'shins'
+    price_type = 'csv'
+    # TODO make provider&price
+    get_distibutor_data = conn.get_distibutor_link(provider,
+                                                  price_type,
+                                                  name_price)
+    link_downloads_csv = get_distibutor_data[0]
+    price_murkup = get_distibutor_data[1]
     link = link_downloads_csv + date
     data = get_data_csv(link)
     for i in range(1, len(data)):
@@ -120,7 +125,7 @@ def standart_tyres_csv():
                 else:
                     enabled = 0
                 name = data[i][1]
-                vendor = data[i][5]
+                vendor = data[i][5].replace('-', '')
                 if vendor == 'Carwel':
                     description = name
                 elif vendor == '':
@@ -158,36 +163,39 @@ def standart_tyres_csv():
                     # name_picture = 'shins-' + id_generator() + '.png'
                     name_picture = 'shins-' + product_code + '.png'
                 image_tuple = (name_picture, image_url)
-                price = count_price_tyres(data[i][17], size)
-                koeff = 1
-                meta_d = 'летняя и зимняя резина ' + name + ' в интернет-магазине шин и дисков 1000koles.ru'
-                meta_k = 'летняя и зимняя резина, колеса, цена, купить, в Москве, в интернет-магазине'
-                meta_h1 = ' '
+                opt_price = data[i][17]
+                id_1c = ''
+                # price = count_price_tyres(data[i][17], size)
+                # koeff = 1
+                # meta_d = 'летняя и зимняя резина ' + name + ' в интернет-магазине шин и дисков 1000koles.ru'
+                # meta_k = 'летняя и зимняя резина, колеса, цена, купить, в Москве, в интернет-магазине'
+                # meta_h1 = ' '
+                articul_product = vendor.strip() + '_' + product_code
                 provider = 'shins'
-                params = 1
+                id_1c = ''
                 options = {
+                    'category_id': category_id,
+                    'distributor': provider,
+                    'distibutor_price': name_price,
                     'diameter': size,
                     'width': width,
                     'profile': height
                 }
 
-                global_result.update({vendor.strip() + product_code:
+                global_result.update({articul_product:
                     (
-                        [category_id, name, description, price,
-                         in_stock, enabled, product_code, vendor, meta_d, meta_k,
-                         params, koeff, meta_h1, provider, category],
+                        (category, name, description,
+                         opt_price, in_stock,
+                         product_code, vendor, category_id,
+                         articul_product, id_1c, image_url,
+                         price_murkup, shop_name),
                         image_tuple,
-                        options,
-                        rule
+                        options
                     )})
-                # result = ([category_id, name, description, price, in_stock, enabled, product_code, vendor, meta_d, meta_k,
-                #  params, koeff, meta_h1, category], image_tuple, options)
-                # proxy_data.append(result)
 
         except KeyError as error:
             print("Something went wrong KeyError from getcsv: {}".format(error))
-            # write(str(data))
-            print(str(data[i]))
+            print(5555, str(data[i]))
             continue
 
     mem = sys.getsizeof(proxy_data)
@@ -275,7 +283,6 @@ def standart_wheels_csv(without_db=False):
 
     print('ALL_RIDE_get_wheels_csv ', len(global_result))
     return global_result
-
 
 # data = standart_tyres_csv()
 # mems = sys.getsizeof(data)

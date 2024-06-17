@@ -93,6 +93,7 @@ class DistributorPrice(db.Model):
     date_added = db.Column(db.String(250))
     date_modifed = db.Column(db.String(250))
     user_modifed = db.Column(db.Integer())
+    shop_name = db.Column(db.String(250))
 
 
 class Product(db.Model):

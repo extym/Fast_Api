@@ -338,7 +338,11 @@
                                             <label class="form-label" for="formfield24">Логин прайса поставщика </label>
                                             <span class="desc">(если есть)</span>
                                             <div class="controls">
+                                                {% if show %}
+                                                <input type="text" value="{{ dist_price_data.get('login_dist_price') }}" class="form-control" id="formfield24" name="login_dist_price" >
+                                                {% else %}
                                                 <input type="text" class="form-control" id="formfield24" name="login_dist_price" >
+                                                {% endif %}
                                             </div>
                                         </div>
 
@@ -361,11 +365,18 @@
                                         <div class="input-group-prepend">
                                             <label class="input-group-text" for="input_shop_name">Магазин</label>
                                         </div>
-                                        <select class="custom-select" id="input_shop_name" name="shop_name">
-                                        <option selected>Выбрать </option>
-                                            {% for row in rows %}
-                                            <option value="{{ row }}" >{{ row }}</option>
-                                            {% endfor %}
+                                        <select class="custom-select" id="input_shop_name" name="upload_prices_store">
+                                            {% if show %}
+                                            <option selected>{{ dist_price_data.get('upload_prices_store') }} </option>
+                                                <option value="Выбрать" >Выбрать</option>
+                                                <option value="all" >Все магазины</option>
+                                            {% else %}
+                                            <option selected>Выбрать</option>
+                                            <option value="all" >Все магазины</option>
+                                                {% for row in rows %}
+                                                <option value="{{ row }}" >{{ row }}</option>
+                                                {% endfor %}
+                                            {% endif %}
 
                                         </select>
                                         </div>
@@ -458,7 +469,11 @@
                                             <label class="form-label" for="formfield21">Пароль прайса поставщика </label>
                                             <span class="desc">(если есть)</span>
                                             <div class="controls">
-                                                <input type="text" class="form-control" id="formfield21" name="key_dist_price" >
+                                                {% if show %}
+                                                <input type="password" value="{{ dist_price_data.get('key_dist_price')}}" class="form-control" id="formfield21" name="key_dist_price" >
+                                                {% else %}
+                                                <input type="password" class="form-control" id="formfield21" name="key_dist_price" >
+                                                {% endif %}
                                             </div>
                                         </div>
 

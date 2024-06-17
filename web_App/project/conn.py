@@ -553,6 +553,21 @@ query_rm_full_order = (" SELECT * from fresh_orders, order_items "
 query_read_items = (" SELECT * from order_items "
                     " WHERE id_ip = %s and shop_name = %s ")
 
+query_add_product = (" INSERT INTO products "
+                     "(type_id, name_product, description_product,"
+                     " price_product_base, quantity,  "
+                     " date_added, date_modifed, vendor_code, brand,   "
+                     " articul_product, id_1c, photo, shop_k_product, shop_name ) "
+                     " VALUES (%s, %s, %s, %s, %s, now(), now(), %s, %s, %s, %s, %s, %s, %s, %s)")
+
+query_add_tyres_options = (" INSERT INTO attributes_product "
+                           " ()"
+                           " VALUES ()")
+
+query_add_wheels_options = (" INSERT INTO attributes_product "
+                           " ()"
+                           " VALUES ()")
+
 read_new_order = (" SELECT * from fresh_orders "
                   " WHERE our_status = 'NEW' ")
 
@@ -608,9 +623,9 @@ def create_connection():
     return connection
 
 
-def get_distibutor_link(distibutor, type_downloads, name):
-    query = " SELECT link_downloads " \
-            " FROM distributors" \
+def get_distibutor_data(distibutor, type_downloads, name):
+    query = " SELECT link_downloads, dist_price_markup " \
+            " FROM distributor_price" \
             " WHERE distributor = %s and type_downloads = %s and name = %s "
     with create_connection() as conn:
         with conn.cursor() as cursor:
@@ -784,7 +799,25 @@ def check_is_exist(query, data):
     return result
 
 
-# check_order( query_read_order, ("MP2713064-001", 'Leroy'))
+def check_is_exist_in_db(query, data):
+    result = (False, 0, 0, 0)
+    with create_connection() as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(query, data)
+            for (id, quantity, price_product_base, final_rice) in cursor:
+                if id:
+                    result = (True, quantity, price_product_base, final_rice)
+
+    return result
+
+
+def make_query_get_id(query, data):
+    with create_connection() as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(query, data)
+            lastrowid = cursor.lastroid
+
+            return lastrowid
 
 
 def get_one_order():

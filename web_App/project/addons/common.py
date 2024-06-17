@@ -17,6 +17,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from project import engine
 from project.models import Product
+import project.conn as conn
 
 
 # for production only
@@ -320,7 +321,8 @@ def check_and_write_v4(standart_data):
         provider = data_product[0].pop(-1)
         quantity = data_product[0][4]
         if category in [1, 4, 5, 7]:  ###wheels only
-            is_exist = check_is_exist(data_product[0][6], data_product[0][0])
+            is_exist = check_is_exist(data_product[0][6],
+                                      data_product[0][0])
             if not is_exist[0] and quantity >= 4:
                 product_id = make_query_get_id_v2(add_product, data_product[0])
                 ij_data.append({product_id: data_product[1]})
@@ -481,6 +483,80 @@ def check_write_json_v4(data_from_json):
     print('from_check_and_write_v4_errors_json', count)
 
 
+def check_and_write(standart_data, min_quan=1, shop_name=None):
+    standart_copy = standart_data.copy()
+    image_data, proxy = [], []
+    count = 0
+    for key, data_product in standart_data.items():
+        category = data_product[0].pop(-1)  # [-1]
+        provider = data_product[0].pop(-1)
+        quantity = data_product[0][4]
+        if category in [1, 4, 5, 7]:  ###wheels only
+            # check is exist in db and compare quantity & base price & final_price
+            is_exist = conn.check_is_exist_in_db(data_product[0][6],
+                                      data_product[0][0],
+                                      shop_name=shop_name)
+            if not is_exist[0] and quantity >= min_quan:
+                id_product = conn.make_query_get_id(add_product, data_product[0])
+                # prepare for downlod images
+                image_data.append({id_product: data_product[1]})
+                # picture_id = make_query_get_id_v2(add_pictures,
+                #                                [product_id, data_product[1][0]])
+                # proxy_data = [picture_id, product_id]
+                # make_query_v2(add_product_picture,  proxy_data)
+                data_options = params_optwheels(data_product[2], id_product)
+                make_query_many_v2(add_options, data_options)
 
-# clean()
-# dowload_images()
+            elif is_exist[0]:
+                category_id = data_product[0][0]
+                product_code = data_product[0][6]
+                price_for_site = data_product[0][3]
+                if quantity >= min_quan and [is_exist[1], is_exist[2]] != [quantity, data_product[0][3]]:
+                    enabled = 1
+                    new_data = [price_for_site, quantity, enabled, category_id, product_code]
+                    make_query_v2(update, new_data)
+                elif quantity < min_quan and is_exist[1] != quantity:
+                    enabled = 0
+                    new_data = [price_for_site, quantity, enabled, category_id, product_code]
+                    make_query_v2(update, new_data)
+                    del standart_copy[key]
+
+        elif category == 12:
+            try:
+                is_exist = check_is_exist(data_product[0][6], data_product[0][0])
+                if not is_exist[0] and quantity >= min_quan:
+                    product_id = make_query_get_id_v2(add_product, data_product[0])
+                    image_data.append({product_id: data_product[1]})
+                    picture_id = make_query_get_id_v2(add_pictures,
+                                                   [product_id, data_product[1][0]])
+                    proxy_data = [picture_id, product_id]
+                    make_query_v2(add_product_picture, proxy_data)
+                    data_options_tyres = params_optyres(data_product[2], product_id)
+                    make_query_many_v2(add_options, data_options_tyres)
+                elif is_exist[0]:
+                    category_id = data_product[0][0]  # because we get data from csv and has category_id
+                    product_code = data_product[0][6]
+                    price_for_site = data_product[0][3]
+                    if quantity >= min_quan and [is_exist[1], is_exist[2]] != [quantity, data_product[0][3]]:
+                        enabled = 1
+                        new_data = [price_for_site, quantity, enabled, category_id, product_code]
+                        make_query_v2(update, new_data)
+                    elif quantity < min_quan and is_exist[1] != quantity:
+                        enabled = 0
+                        new_data = [price_for_site, quantity, enabled, category_id, product_code]
+                        make_query_v2(update, new_data)
+
+            except KeyError as e:
+                print("S_thing went wrong KeyError tyres---: {}".format(e))
+                continue
+
+        else:
+            print('pass', category)
+            continue
+
+    rewrite_pictures_data(image_data)
+    print('For_write_pictures_data', len(image_data))
+    print('from_check_and_write_4_errors', count)
+    # dowload_images()
+
+    return standart_copy

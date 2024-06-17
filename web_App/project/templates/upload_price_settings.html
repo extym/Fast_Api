@@ -111,7 +111,7 @@
                                                         <option value="sber">СберМегаМаркет</option>
                                                         <option value="ozon">Озон</option>
                                                         <option value="wb">Вайлдбериз</option>
-                                                        <option value="leroy">ЛеруаМерлен</option>
+<!--                                                        <option value="leroy">ЛеруаМерлен</option>-->
                                                     {% endif %}
                                                     </select>
                                             </div>
@@ -185,8 +185,10 @@
                                                         {% if show %}
                                                         <option selected>{{ upload_data.get('upload_prices_store') }} </option>
                                                             <option value="Выбрать" >Выбрать</option>
+                                                            <option value="all" >Все магазины</option>
                                                         {% else %}
                                                         <option selected>Выбрать</option>
+                                                        <option value="all" >Все магазины</option>
                                                             {% for row in rows %}
                                                             <option value="{{ row }}" >{{ row }}</option>
                                                             {% endfor %}
@@ -345,6 +347,17 @@
 
                                         </div>
                                         <div class="col-lg-6 col-md-6 col-6">
+
+
+                                            <div class="controls" type="hide">
+                                                {% if show %}
+                                                    <input type="text" value="{{ upload_data.get('id') }}" class="form-control"  name="upload_prices_id" >
+                                                {% else %}
+                                                    <input type="text" value="0" name="upload_prices_id" >
+                                                {% endif %}
+
+                                            </div>
+
 
 
                                             <div class="form-group">
