@@ -322,11 +322,11 @@ def get_oem_from_xml_v2(offer_id, link=None):
         if not oem and not brand:
             result = False
             while not result:
-                for i in range(1, 6):
-                    offer = offer_id[: - 1]
+                for i in range(1, 7):
+                    offer = offer_id[: - 6]
                     print("OFFER_ID", offer_id, offer)
                     for row in doc['yml_catalog']['shop']['offers']['offer']:
-                        id_prod = row["@id"][: - 1]
+                        id_prod = row["@id"][: - i]
                         if offer == id_prod:
                             brand = row['vendor']
                             oem = row['vendorCode'][: -i] + offer_id[-i:]
@@ -354,8 +354,8 @@ def get_vendor_code_from_xlm(offer_id, link=None):
 
 
 #
-print(get_oem_from_xml_v2("CHERY204000455AA",
-                         link = 'https://3431.ru/system/unload_prices/33/yandex_market.xml'))
+# print(get_oem_from_xml_v2("CHERY204000455AA",
+#                          link = 'https://3431.ru/system/unload_prices/33/yandex_market.xml'))
 
 
 def create_resp_if_not_exist(list_items, link, key=None,
@@ -366,7 +366,7 @@ def create_resp_if_not_exist(list_items, link, key=None,
     for item in list_items:
         # vendor_data = get_vendor_code_from_xlm(item.get('offer_id)'), link=link)
         offer_id = item.get('offerId')
-        vendor_data = get_oem_from_xml(item.get('offerId'), link=link)
+        vendor_data = get_oem_from_xml_v2(item.get('offerId'), link=link)
         oem = vendor_data[1]
         brand = vendor_data[0]
         qnt = item.get("count")
@@ -432,7 +432,7 @@ def create_order_ps_if_not_exist(list_items, link, key=None,
         list_propousal = []
         # vendor_data = get_vendor_code_from_xlm(item.get('offer_id)'), link=link)
         if item.get('offerId') != 'delivery':
-            vendor_data = get_oem_from_xml(item.get('offerId'), link=link)
+            vendor_data = get_oem_from_xml_v2(item.get('offerId'), link=link)
             oem = vendor_data[1]
             brand = vendor_data[0]
             qnt = item.get("count")
