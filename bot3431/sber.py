@@ -75,3 +75,26 @@ def post_smth_sb(metod, data):
     print('post_smth_sb', response,
           response.text,
           target_url, metod)
+
+
+def get_current_shipments(shipments):
+    url = 'https://api.megamarket.tech/api/market/v1/orderService/order/get'
+    token = ""
+    headers = {'Content-type': 'application/json'}
+    data = {
+      "meta": {},
+      "data": {
+        "token": token,
+        "shipments": [
+          shipments
+        ]
+      }
+    }
+    answer =  requests.post(url=url, data=json.dumps(data), headers=headers)
+    if answer.ok:
+        data = answer.json()
+        print(34343, data)
+    else:
+        print(answer.text)
+
+get_current_shipments("9650941632826")

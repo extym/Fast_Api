@@ -663,7 +663,8 @@ async def cancel_order_sber(uuid):
         order = data_req["data"]
         order_id = order["shipments"][0]['shipmentId']
         # proxy = order["shipments"][0]["items"]
-        data = ("canceled", order_id)
+        time = datetime.datetime.now()
+        data = ("canceled", time, order_id)
         await execute_query_v3(update_order_and_items, data)
         re_data = order_resp_sb(True, False)
 

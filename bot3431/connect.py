@@ -510,7 +510,7 @@ query_write_customer =\
    " VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s )"
 
 update_order_and_items = \
-    " UPDATE fresh_orders SET status = %s " \
+    " UPDATE fresh_orders SET status = %s date_modifed = %s " \
                          " WHERE order_id_mp = %s  "
 
 query_add_settings_ym = \
