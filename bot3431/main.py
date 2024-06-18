@@ -510,7 +510,7 @@ def reformat_data_order_v2(order, mp, client_id_ps,
             delivery = order["shipments"][0]["handover"]['serviceScheme']
         else:
             day = order["shipments"][0]["shipping"]["shippingDate"].split('T')[0]
-            order_create_day = order['shipmentDate'].split('T')[0]
+            order_create_day = order["shipments"][0]['shipmentDate'].split('T')[0]
             delivery = order["shipments"][0]['fulfillmentMethod']
         result = (
             order["shipments"][0]["shipmentId"],
@@ -615,7 +615,8 @@ async def new_order_sber(uuid):
         not_exist = execute_query_return_bool(query_write_order, ref_data[0])
         if not_exist:
             await executemany_query(query_write_items, ref_data[1])
-            await execute_query_v3(query_write_customer, ref_data[2])
+            if len(ref_data[2]) > 0:
+                await execute_query_v3(query_write_customer, ref_data[2])
             # data_confirm = confirm_data_sb(order)
             # post_smth_sb('order/confirm', data_confirm)
 
@@ -662,8 +663,8 @@ async def cancel_order_sber(uuid):
         order = data_req["data"]
         order_id = order["shipments"][0]['shipmentId']
         # proxy = order["shipments"][0]["items"]
-        data = ("canceled", order_id, "Sber")
-        await execute_query(update_order_and_items, data)
+        data = ("canceled", order_id)
+        await execute_query_v3(update_order_and_items, data)
         re_data = order_resp_sb(True, False)
 
         response = app.response_class(
@@ -908,7 +909,8 @@ async def add_store():
                                             store_id,
                                             api_key_ps,
                                             upload_link,
-                                            model))
+                                            model,
+                                            "Yandex"))
             if result[0]:
                 flash('Настройки удачно сохранены')
             else:
@@ -929,7 +931,8 @@ async def add_store():
                                        api_key_ps,
                                        upload_link,
                                        model,
-                                       store_id))
+                                       store_id,
+                                       'Sber'))
                 flash(f'Настройки удачно сохранены. Ссылка для новых заказов {target_url_new}.'
                       f' \n Ссылка для отмены заказов {target_url_cancel}.')
             except IntegrityError as e:

@@ -360,7 +360,7 @@ def get_vendor_code_from_xlm(offer_id, link=None):
 
 def create_resp_if_not_exist(list_items, link, key=None,
                              external_order_id=None):
-    # exter_order_id = external_order_id
+    offer_id = ''
     count_items = 0
     global_result_make_basket = False
     for item in list_items:
@@ -419,6 +419,10 @@ def create_resp_if_not_exist(list_items, link, key=None,
         global_result_make_basket = True
     else:
         print("Result result_make_basket UNsuccessfully {}".format(count_items))
+        bot_tg.send_get('Проблема обработки заказа {}. '
+                        'Требуется ручная обработка.'
+                        ' Not found oem for all offer_id {} y'
+                        .format(external_order_id, offer_id))
 
     return global_result_make_basket
 

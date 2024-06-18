@@ -193,6 +193,7 @@ async def execute_query_v3(query, data):
         conn.autocommit = True
         with conn.cursor() as cursor:
             try:
+                print("Query from execute_query {} {}".format(len(data), data))
                 cursor.execute(query, data)
                 # print("Query from execute_query executed successfully")
             except OperationalError as err:
@@ -510,17 +511,17 @@ query_write_customer =\
 
 update_order_and_items = \
     " UPDATE fresh_orders SET status = %s " \
-                         " WHERE order_id_mp = %s "
+                         " WHERE order_id_mp = %s  "
 
 query_add_settings_ym = \
     (" INSERT INTO stores "
-     "(client_id, key_store, campain_id, api_key_ps, upload_link, model) "
-     "VALUES ( %s, %s, %s, %s, %s, %s )")
+     "(client_id, key_store, campain_id, api_key_ps, upload_link, model, mp_name) "
+     "VALUES ( %s, %s, %s, %s, %s, %s, %s )")
 
 query_add_settings_sber = \
     (" INSERT INTO stores "
-     "(client_id, key_store, campain_id, api_key_ps, upload_link, model, user_id) "
-     "VALUES ( %s, %s, %s, %s, %s, %s, %s )")
+     "(client_id, key_store, campain_id, api_key_ps, upload_link, model, user_id, mp_name) "
+     "VALUES ( %s, %s, %s, %s, %s, %s, %s, %s )")
 
 proxy = ("u2i-TOYzRVLyb9Hw_l7u2aBTVg", '4391',
          "https://avito.ru/sankt-peterburg/zapchasti_i_aksessuary/trw_df4110_torm.disk_per.vent.280x24_4_otv_3364311913",
