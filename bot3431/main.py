@@ -596,6 +596,7 @@ async def new_order_sber(uuid):
         client_id_ps = store_data[1]
         model = store_data[0]
         link = store_data[2]
+        autoreorder = store_data[4]
 
         # проверяем наличие for order
         # stock = check_is_accept_sb(proxy)
@@ -626,7 +627,7 @@ async def new_order_sber(uuid):
 
             if result:
                 final_result = ps.send_current_basket_to_order(key=store_data[3])
-                if final_result is not None:
+                if final_result is not None and autoreorder:
                     datas = ' '.join([str(i['id']) for i in final_result]).strip()
                     finish = ps.change_status_v2(datas, status_id=2)
                     print(777755555777777, finish)
@@ -898,6 +899,8 @@ async def add_store():
         api_key_ps = data.get('api_key_ps')
         upload_link = data.get('upload_link')
         model = data.get('model')
+        autoreorder = data.get('autoreorder')
+
 
         if model == 'Выберите модель работы магазина':
             flash('Выберите модель работы магазина')
@@ -911,7 +914,8 @@ async def add_store():
                                             api_key_ps,
                                             upload_link,
                                             model,
-                                            "Yandex"))
+                                            "Yandex",
+                                            autoreorder))
             if result[0]:
                 flash('Настройки удачно сохранены')
             else:
@@ -933,7 +937,8 @@ async def add_store():
                                        upload_link,
                                        model,
                                        store_id,
-                                       'Sber'))
+                                       'Sber',
+                                       autoreorder))
                 flash(f'Настройки удачно сохранены. Ссылка для новых заказов {target_url_new}.'
                       f' \n Ссылка для отмены заказов {target_url_cancel}.')
             except IntegrityError as e:

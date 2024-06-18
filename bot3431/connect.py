@@ -72,6 +72,7 @@ api_key_ps TEXT,
 upload_link TEXT,
 mp_name TEXT,
 model text,
+autoreorder boolean,
 UNIQUE (client_id)
 )
 """
@@ -510,18 +511,18 @@ query_write_customer =\
    " VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s )"
 
 update_order_and_items = \
-    " UPDATE fresh_orders SET status = %s date_modifed = %s " \
+    " UPDATE fresh_orders SET status = %s, date_modifed = %s " \
                          " WHERE order_id_mp = %s  "
 
 query_add_settings_ym = \
     (" INSERT INTO stores "
-     "(client_id, key_store, campain_id, api_key_ps, upload_link, model, mp_name) "
-     "VALUES ( %s, %s, %s, %s, %s, %s, %s )")
+     "(client_id, key_store, campain_id, api_key_ps, upload_link, model, mp_name, autoreorder) "
+     "VALUES ( %s, %s, %s, %s, %s, %s, %s, %s )")
 
 query_add_settings_sber = \
     (" INSERT INTO stores "
-     "(client_id, key_store, campain_id, api_key_ps, upload_link, model, user_id, mp_name) "
-     "VALUES ( %s, %s, %s, %s, %s, %s, %s, %s )")
+     "(client_id, key_store, campain_id, api_key_ps, upload_link, model, user_id, mp_name, autoreorder) "
+     "VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s )")
 
 proxy = ("u2i-TOYzRVLyb9Hw_l7u2aBTVg", '4391',
          "https://avito.ru/sankt-peterburg/zapchasti_i_aksessuary/trw_df4110_torm.disk_per.vent.280x24_4_otv_3364311913",

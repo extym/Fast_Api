@@ -284,6 +284,29 @@ def choice_function(items, full_items, qnt):
     return result
 
 
+def choice_function_v2(items, full_items, qnt, 
+                       filter_price=False, 
+                       name_price='Магазин Культуры 63'):
+    result = []
+    if not filter_price:
+        listing = sorted(items.values())[:5]
+        for item in full_items:
+            if item["cost"] in listing and item['qnt'] >= qnt:
+                result.append(item)
+
+    elif filter_price and name_price:
+        for item in full_items:
+            if item["price_name"] == name_price and item['qnt'] >= qnt:
+                result.append(item)
+            else:
+                listing = sorted(items.values())[:5]
+                for item in full_items:
+                    if item["cost"] in listing and item['qnt'] >= qnt:
+                        result.append(item)
+
+    return result
+
+
 # from lxml import etree
 # root = etree.fromstring("https://3431.ru/system/unload_prices/33/yandex_market.xml")
 # print(root)
@@ -394,9 +417,11 @@ def create_resp_if_not_exist(list_items, link, key=None,
                              (i["oem"] == oem and i['make_name'] == brand)}
                 list_propousal = choice_function(propousal, need_data, qnt)
 
-                # print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@',
-                #       *list_propousal[0].items(), sep='\n')
-                # print(len(propousal))
+                # print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
+                # for row in list_propousal:
+                #     print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
+                #     print(*row.items(), sep='\n')
+                #     print(len(row))
 
                 result_make_basket = make_basket(propousal=list_propousal[0],
                                                  qnt=qnt, key=key,
@@ -428,7 +453,8 @@ def create_resp_if_not_exist(list_items, link, key=None,
 
 
 def create_order_ps_if_not_exist(list_items, link, key=None,
-                                 external_order_id=None):
+                                 external_order_id=None,
+                                 autoreorder=False):
     # exter_order_id = external_order_id
     count_items = 0
     global_result_make_basket = False
@@ -472,7 +498,7 @@ def create_order_ps_if_not_exist(list_items, link, key=None,
                     # print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@',
                     #       *list_propousal[0].items(), sep='\n')
                     # print(len(propousal))
-
+                    # sys.exit()
                     result_make_basket = make_basket(propousal=list_propousal[0],
                                                      qnt=qnt, key=key,
                                                      exter_order_id=external_order_id)
