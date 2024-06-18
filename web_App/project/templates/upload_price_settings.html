@@ -125,23 +125,30 @@
     <!--                                            <h6>Checkbox Buttons</h6>-->
                                                 <div class="btn-group btn-group-toggle" data-toggle="buttons">
 
-                                                    {% if show and upload_data.get('is_scheduler') == 'on' %}
+                                                    {% if show and upload_data.get('is_scheduler') and upload_data.get('is_null_stocks') %}
                                                     <label class="btn btn-secondary active">
                                                         <input type="checkbox" name="enabled_upload_price" checked="" autocomplete="off"> Включено
                                                     </label>
-                                                    {% elif show and upload_data.get('is_scheduler') == 'off' %}
                                                     <label class="btn btn-secondary active">
-                                                        <input type="checkbox" name="enabled_upload_price" autocomplete="off"> Включено
-                                                    </label>
-                                                    {% endif %}
-                                                    {% if show and upload_data.get('is_null_stocks') == 'on' %}
-                                                    <label class="btn btn-secondary">
                                                         <input type="checkbox" name="is_null_stocks" checked="" autocomplete="off"> Включить нулевые остатки
                                                     </label>
-                                                    {% elif show and upload_data.get('is_null_stocks') == 'off' %}
+
+                                                    {% elif show and upload_data.get('is_scheduler') and not upload_data.get('is_null_stocks') %}
+                                                    <label class="btn btn-secondary active">
+                                                        <input type="checkbox" name="enabled_upload_price" checked="" autocomplete="off"> Включено
+                                                    </label>
                                                     <label class="btn btn-secondary">
                                                         <input type="checkbox" name="is_null_stocks" autocomplete="off"> Включить нулевые остатки
                                                     </label>
+                                                    {% elif show and  not upload_data.get('is_scheduler') and upload_data.get('is_null_stocks') %}
+                                                    <label class="btn btn-secondary">
+                                                        <input type="checkbox" name="enabled_upload_price"  autocomplete="off"> Включено
+                                                    </label>
+                                                    <label class="btn btn-secondary active">
+                                                        <input type="checkbox" name="is_null_stocks" checked="" autocomplete="off"> Включить нулевые остатки
+                                                    </label>
+
+
                                                     {% else %}
                                                     <label class="btn btn-secondary active">
                                                         <input type="checkbox" name="enabled_upload_price" autocomplete="off"> Включено
@@ -207,26 +214,27 @@
                                                 <div class="btn-group btn-group-toggle" data-toggle="buttons">
 
                                                     {% if show and upload_data.get('upload_option') == 'xml' %}
-                                                    <label class="btn btn-secondary">
+                                                    <label class="btn btn-secondary active">
                                                         <input type="radio" name="option"  checked="" value="xml" id="option1" autocomplete="off" > XML
                                                     </label>
                                                     <label class="btn btn-secondary">
                                                         <input type="radio" name="option" value="csv" id="option2" autocomplete="off"> CSV
                                                     </label>
-                                                    <label class="btn btn-secondary active">
+                                                    <label class="btn btn-secondary">
                                                         <input type="radio" name="option" value="xlsx"  autocomplete="off"> XLS
                                                     </label>
                                                     {% elif show and upload_data.get('upload_option') == 'csv' %}
                                                     <label class="btn btn-secondary">
                                                         <input type="radio" name="option" value="xml"  autocomplete="off" > XML
                                                     </label>
-                                                    <label class="btn btn-secondary">
+                                                    <label class="btn btn-secondary active">
                                                         <input type="radio" name="option" checked="" value="csv"  autocomplete="off"> CSV
                                                     </label>
-                                                    <label class="btn btn-secondary active">
+                                                    <label class="btn btn-secondary ">
                                                         <input type="radio" name="option" value="xlsx"  autocomplete="off"> XLS
                                                     </label>
-                                                    {% elif show and upload_data.get('upload_option') == 'xlsx' %}<label class="btn btn-secondary">
+                                                    {% elif show and upload_data.get('upload_option') == 'xlsx' %}
+                                                    <label class="btn btn-secondary">
                                                         <input type="radio" name="option" value="xml"  autocomplete="off" > XML
                                                     </label>
                                                     <label class="btn btn-secondary">
@@ -349,15 +357,6 @@
                                         <div class="col-lg-6 col-md-6 col-6">
 
 
-                                            <div class="controls" type="hide">
-                                                {% if show %}
-                                                    <input type="text" value="{{ upload_data.get('id') }}" class="form-control"  name="upload_prices_id" >
-                                                {% else %}
-                                                    <input type="text" value="0" name="upload_prices_id" >
-                                                {% endif %}
-
-                                            </div>
-
 
 
                                             <div class="form-group">
@@ -420,6 +419,16 @@
                                             </p>
                                         </div>
                                     </div> </div>
+
+                                    <div type="hidden">
+                                                {% if show %}
+                                                    <input type="hidden" value="{{ upload_data.get('id', '0') }}" class="form-control"  name="upload_prices_id" >
+                                                {% else %}
+                                                    <input type="hidden" value="0" name="upload_prices_id" >
+                                                {% endif %}
+
+                                    </div>
+
                             </form>
 
                                                     <div class="tab-pane fade" id="messages-1">

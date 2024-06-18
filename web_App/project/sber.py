@@ -1,5 +1,6 @@
 import datetime
 import json
+import os
 from xml.dom import minidom
 from project import DATA_PATH
 # import project.addons.shins as shins
@@ -14,7 +15,7 @@ special_wheels = {}  #TODO make brand dict?
 def create_sber_xml(stocks_is_null=False, without_db=False, addons=False,
                     site_url='', legal_name='', short_shop_name='',
                     category='Все товары', markup='0',
-                    discount='0', wh_id=None):
+                    discount='0', wh_id=None, shop_name=None):
     root = minidom.Document()
 
     date = datetime.datetime.now().replace(second=0, microsecond=0)
@@ -87,15 +88,16 @@ def create_sber_xml(stocks_is_null=False, without_db=False, addons=False,
     categoryChild.appendChild(textCategory)
     categoriesChild.appendChild(categoryChild)
 
-    for key in special_wheels.keys():
-        category_vendor = key
-        categories_id = special_wheels[category_vendor]
-        categoryChild = root.createElement('category')
-        categoryChild.setAttribute('id', f'{categories_id}')
-        categoryChild.setAttribute('parentId', '5')
-        textCategory = root.createTextNode(f'{category_vendor}')
-        categoryChild.appendChild(textCategory)
-        categoriesChild.appendChild(categoryChild)
+    if len(special_wheels.keys()) > 0:
+        for key in special_wheels.keys():
+            category_vendor = key
+            categories_id = special_wheels[category_vendor]
+            categoryChild = root.createElement('category')
+            categoryChild.setAttribute('id', f'{categories_id}')
+            categoryChild.setAttribute('parentId', '5')
+            textCategory = root.createTextNode(f'{category_vendor}')
+            categoryChild.appendChild(textCategory)
+            categoriesChild.appendChild(categoryChild)
 
     offersChild = root.createElement('offers')
 
@@ -155,10 +157,12 @@ def create_sber_xml(stocks_is_null=False, without_db=False, addons=False,
         offerChild.appendChild(minQuantityOfferChild)
 
     try:
-        need_data = common.create_need_data(without_db=without_db)
+        need_data = common.create_need_data(without_db=without_db,
+                                            shop_name=shop_name)
         print('MAKE_NEED_data_successfuly ', len(need_data))
     except:
-        with open(DATA_PATH + '/standart_data.json', 'r') as file:
+        print(2222222222222222, os.getcwd())
+        with open(os.getcwd() + DATA_PATH + 'standart_data.json', 'r') as file:
             need_data = json.load(file)
 
     print('len_need_data_for_offers ', len(need_data))
@@ -215,7 +219,7 @@ def create_sber_xml(stocks_is_null=False, without_db=False, addons=False,
 
     xml_str = root.toprettyxml(indent="\t", encoding="UTF-8")
 
-    with open(DATA_PATH + "sber.xml", "wb") as f:
+    with open(os.getcwd() + DATA_PATH + "sber.xml", "wb") as f:
         f.write(xml_str)
 
     # clean_standart_data()
@@ -223,6 +227,7 @@ def create_sber_xml(stocks_is_null=False, without_db=False, addons=False,
 
     print('len_offers_last ', datetime.datetime.now(), counter)
 
+    return "success {}".format(counter)
 
 
 # create_sber_xml(stocks_is_null=True, without_db=True)

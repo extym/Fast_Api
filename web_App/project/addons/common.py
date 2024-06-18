@@ -1,3 +1,5 @@
+import os
+
 from project import DATA_PATH
 
 import datetime
@@ -59,12 +61,8 @@ def rewrite_standart_data(listt):
 
 def read_image_address():
     pages = None
-    try:
-        for line in open('/usr/local/bin/fuck_debian/tyres_wheels/dict_images.json', 'r'):
-            pages = json.loads(line)
-    except:
-        for line in open('dict_images.json', 'r'):
-            pages = json.loads(line)
+    for line in open(os.getcwd() + DATA_PATH + 'dict_images.json', 'r'):
+        pages = json.loads(line)
 
     return pages
 
@@ -91,7 +89,7 @@ def get_image(name, url):
         print('some_fuck_up_get_image', name, url)
 
 
-def dowload_images():
+def dowload_images(sleep=False):
     pages = read_image_address()
     print('from_pictures', len(pages))
     count = len(pages)
@@ -108,9 +106,10 @@ def dowload_images():
                 time.sleep(1)
             else:
                 continue
-    for _ in range(30):
-        print('We are sleep & wait clean')
-        time.sleep(1)
+    if sleep:
+        for _ in range(30):
+            print('We are sleep & wait clean')
+            time.sleep(1)
     clean()
 
 
@@ -159,7 +158,7 @@ def create_need_data(without_db=False, shop_name=None):
             print("We don't ger kolrad data")
     # if we don't get data from distributors, we make feed from database
     if len(json_data) == 0 and len(csv_data) == 0 and len(data) == 0:
-        data = standart.standart_product()
+        data = standart_product()
         #sys.exit   # more variants
 
     pre_csv_data = {key: value for key, value in csv_data.items() if int(value[0][4]) >= 4}

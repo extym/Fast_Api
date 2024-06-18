@@ -1321,7 +1321,7 @@ def shops():
                 for key, value in data.items():
                     need_job = key.rsplit('_', maxsplit=1)[0]
                     proxy_settings[value] = proxy_settings.get(value, []) + [need_job]
-
+            # print(232323, proxy_settings)
             markets = Marketplaces.query \
                 .filter_by(company_id=current_user.company_id).all()
             for row in markets:
@@ -1767,15 +1767,15 @@ def upload_prices_table():
             if len(data.keys()) > 0:
                 for key, value in data.items():
                     need_job = key.rsplit('_', maxsplit=1)[0]
-                    proxy_settings[int(value)] = proxy_settings.get(value, []) + [need_job]
+                    proxy_settings[value] = proxy_settings.get(value, []) + [need_job]
             print(232323, proxy_settings)
             uploads = UploadPrice.query.all()
             for row in uploads:
                 current_work = {'is_null_stocks': False,
                                 'is_scheduler': False}
-
-                if row.id in proxy_settings.keys():
-                    current = {i: True for i in proxy_settings[row.id]}
+                curr_id = str(row.id)
+                if curr_id in proxy_settings.keys():
+                    current = {i: True for i in proxy_settings[curr_id]}
                     print(345345, current)
                     current_work.update(current)
                     db.session.execute(update(UploadPrice)
@@ -1866,9 +1866,9 @@ def upload_prices_settings():
         company_id = current_user.company_id
         data = request.form.to_dict()
         make = data.get('make')
-        print(111, *data.items(), sep='\n')
-        for key in data.keys():
-            print(key, f"= data.get('{key}'),")
+        print(11122, *data.items(), sep='\n')
+        # for key in data.keys():
+        #     print(key, f"= data.get('{key}'),")
         # print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
         # for key in data.keys():
         #     print(key, f"={key}")
@@ -1905,6 +1905,7 @@ def upload_prices_settings():
                     and upload_option \
                     and upload_prices_id != '0':
                 upload_price = UploadPrice(
+                    id=upload_prices_id,
                     is_null_stocks=data.get('is_null_stocks', 'off'),
                     is_scheduler=data.get('enabled_upload_price', 'off'),
                     name=data.get('upload_price_name', 'default'),
@@ -1918,10 +1919,10 @@ def upload_prices_settings():
                     upload_prices_url=data.get('upload_prices_url'),
                     upload_price_category=data.get('upload_price_category'),
                     date_modifed=datetime.datetime.now(),
-                    user_id=current_user.id
+                    user_modifed=current_user.id
                 )
 
-                db.session.(upload_price)
+                db.session.merge(upload_price)
                 db.session.commit()
             else:
                 flash("Проверьте, пожалуйста, корректность вводимых данных", 'error')
@@ -1958,7 +1959,8 @@ def upload_prices_settings():
                                           short_shop_name=upload_prices_short_shop,
                                           category=upload_price_category,
                                           markup=upload_prices_markup,
-                                          discount=upload_price_discount))
+                                          discount=upload_price_discount,
+                                          shop_name=upload_prices_store))
                     print(97777789, job.get_id)
                 elif upload_prices_mp == 'yandex' and upload_option == 'xml':
                     job = q.enqueue_call(yan.create_ym_xml
@@ -2017,7 +2019,7 @@ def upload_prices_settings():
                 flash("Проверьте правильность ввода данных", 'error')
 
         elif make == 'check_settings_uploads':
-            # print('!!!!!!check_settings!!!!!11')
+            print('!!!!!!check_settings!!!!!11')
             if data.get('upload_prices_mp') == 'Выбрать' \
                     and data.get('upload_prices_store') == 'Выбрать':
                 flash("Укажите хотя бы один магазин для которого нужен просмотр настроек", "alert")
@@ -2027,24 +2029,12 @@ def upload_prices_settings():
                         and result.get("upload_prices_mp") is not None:
                     upload_settings = db.session.scalars(select(UploadPrice)
                     .where(
-                        InternalImport.internal_import_store_1 == data.get('upload_prices_mp'))
+                        UploadPrice.upload_prices_mp == data.get('upload_prices_mp'))
                     .where(
-                        InternalImport.internal_import_store_2 == data.get('upload_prices_store'))) \
+                        UploadPrice.upload_prices_store == data.get('upload_prices_store'))) \
                         .first()
                     try:
                         upl_price_setts = upload_settings.__dict__
-                        upload_option = upl_price_setts.get('option')
-                        is_null_stocks = upl_price_setts.get('is_null_stocks')
-                        upload_price_name = upl_price_setts.get('upload_price_name')
-                        upload_prices_mp = upl_price_setts.get('upload_prices_mp')
-                        upload_prices_markup = upl_price_setts.get('upload_prices_markup')
-                        upload_prices_store = upl_price_setts.get('upload_prices_store')
-                        upload_price_discount = upl_price_setts.get('upload_price_discount')
-                        upload_prices_short_shop = upl_price_setts.get('upload_prices_short_shop')
-                        upload_prices_legal_name = upl_price_setts.get('upload_prices_legal_name')
-                        upload_prices_url = upl_price_setts.get('upload_prices_url')
-                        upload_price_category = upl_price_setts.get('upload_price_category')
-
                         uid = current_user.id
                         role = current_user.roles
                         need_id = current_user.company_id
@@ -2058,18 +2048,7 @@ def upload_prices_settings():
                                                photo=photo,
                                                user_name=user_name,
                                                show=True,
-                                               upload_price_name=upload_price_name,
-                                               upload_prices_mp=upload_prices_mp,
-                                               upload_option=upload_option,
-                                               is_null_stocks=is_null_stocks,
-                                               upload_prices_markup=upload_prices_markup,
-                                               upload_prices_store=upload_prices_store,
-                                               upload_price_discount=upload_price_discount,
-                                               upload_prices_short_shop=upload_prices_short_shop,
-                                               upload_prices_legal_name=upload_prices_legal_name,
-                                               upload_prices_url=upload_prices_url,
-                                               upload_price_category=upload_price_category
-                                               )
+                                               upload_data=upl_price_setts)
                     except:
                         flash(
                             "Настройки для указанных магазинов не найдены. "
@@ -2143,65 +2122,65 @@ def upload_prices_settings():
     #     print(key, f"= request.args.get('{key}')")
     #######################################################
     rows, rows_mp = [], []
-    if show:
-        uid = current_user.id
-        role = current_user.roles
-        need_id = current_user.company_id
-        user_name = current_user.name
-        photo = current_user.photo
-        if not photo or photo is None:
-            photo = 'prof-music-2.jpg'
-        upload_price_name = request.args.get('upload_price_name')
-        is_null_stocks = request.args.get('is_null_stocks')
-        upload_prices_mp = request.args.get('upload_prices_mp')
-        upload_option = request.args.get('option')
-        upload_prices_markup = request.args.get('upload_prices_markup')
-        upload_prices_store = request.args.get('upload_prices_store')
-        upload_price_discount = request.args.get('upload_price_discount')
-        upload_prices_short_shop = request.args.get('upload_prices_short_shop')
-        upload_prices_legal_name = request.args.get('upload_prices_legal_name')
-        upload_prices_url = request.args.get('upload_prices_url')
-        upload_price_category = request.args.get('upload_price_category')
+    # if show:
+    #     uid = current_user.id
+    #     role = current_user.roles
+    #     need_id = current_user.company_id
+    #     user_name = current_user.name
+    #     photo = current_user.photo
+    #     if not photo or photo is None:
+    #         photo = 'prof-music-2.jpg'
+    #     upload_price_name = request.args.get('upload_price_name')
+    #     is_null_stocks = request.args.get('is_null_stocks')
+    #     upload_prices_mp = request.args.get('upload_prices_mp')
+    #     upload_option = request.args.get('option')
+    #     upload_prices_markup = request.args.get('upload_prices_markup')
+    #     upload_prices_store = request.args.get('upload_prices_store')
+    #     upload_price_discount = request.args.get('upload_price_discount')
+    #     upload_prices_short_shop = request.args.get('upload_prices_short_shop')
+    #     upload_prices_legal_name = request.args.get('upload_prices_legal_name')
+    #     upload_prices_url = request.args.get('upload_prices_url')
+    #     upload_price_category = request.args.get('upload_price_category')
+    #
+    #     return render_template('/upload_price_settings.html',
+    #                            uid=uid, role=role,
+    #                            upload_price_name=upload_price_name,
+    #                            upload_prices_mp=upload_prices_mp,
+    #                            upload_option=upload_option,
+    #                            is_null_stocks=is_null_stocks,
+    #                            upload_prices_markup=upload_prices_markup,
+    #                            upload_prices_store=upload_prices_store,
+    #                            upload_price_discount=upload_price_discount,
+    #                            upload_prices_short_shop=upload_prices_short_shop,
+    #                            upload_prices_legal_name=upload_prices_legal_name,
+    #                            upload_prices_url=upload_prices_url,
+    #                            upload_price_category=upload_price_category,
+    #                            rows=rows, rows_mp=set(rows_mp),
+    #                            photo=photo,
+    #                            show=True,
+    #                            user_name=user_name)
+    # else:
+    uid = current_user.id
+    role = current_user.roles
+    need_id = current_user.company_id
+    user_name = current_user.name
+    photo = current_user.photo
+    if not photo or photo is None:
+        photo = 'prof-music-2.jpg'
+    need_data = db.session.execute(select(Marketplaces.shop_name,
+                                          Marketplaces.name_mp)
+                                   .where(Marketplaces.company_id == need_id))
 
-        return render_template('/upload_price_settings.html',
-                               uid=uid, role=role,
-                               upload_price_name=upload_price_name,
-                               upload_prices_mp=upload_prices_mp,
-                               upload_option=upload_option,
-                               is_null_stocks=is_null_stocks,
-                               upload_prices_markup=upload_prices_markup,
-                               upload_prices_store=upload_prices_store,
-                               upload_price_discount=upload_price_discount,
-                               upload_prices_short_shop=upload_prices_short_shop,
-                               upload_prices_legal_name=upload_prices_legal_name,
-                               upload_prices_url=upload_prices_url,
-                               upload_price_category=upload_price_category,
-                               rows=rows, rows_mp=set(rows_mp),
-                               photo=photo,
-                               show=True,
-                               user_name=user_name)
-    else:
-        uid = current_user.id
-        role = current_user.roles
-        need_id = current_user.company_id
-        user_name = current_user.name
-        photo = current_user.photo
-        if not photo or photo is None:
-            photo = 'prof-music-2.jpg'
-        need_data = db.session.execute(select(Marketplaces.shop_name,
-                                              Marketplaces.name_mp)
-                                       .where(Marketplaces.company_id == need_id))
+    for row in need_data:
+        rows.append(row[0])
+        rows_mp.append(row[1])
 
-        for row in need_data:
-            rows.append(row[0])
-            rows_mp.append(row[1])
-
-        return render_template('/upload_price_settings.html',
-                               uid=uid, role=role,
-                               rows=rows, rows_mp=set(rows_mp),
-                               photo=photo,
-                               distributors=LOCAL_MODE,
-                               user_name=user_name)
+    return render_template('/upload_price_settings.html',
+                           uid=uid, role=role,
+                           rows=rows, rows_mp=set(rows_mp),
+                           photo=photo,
+                           distributors=LOCAL_MODE,
+                           user_name=user_name)
 
 
 @auth.route('/distributor-settings', methods=['GET', 'POST'])
@@ -2217,7 +2196,7 @@ def distributor_settings():
         user_name = current_user.name
         if request.method == 'POST':
             data = request.form.to_dict()
-            print(*data.items(), sep='\n')
+            # print(*data.items(), sep='\n')
             print(55555, data)
 
             if data.get('check_settings') is not None:
@@ -2226,7 +2205,9 @@ def distributor_settings():
                 # return current settings that distributor
                 distributor = Distributor.query \
                     .filter_by(distributor=data.get('edit_name_dist')).first()
-                print(3333333, distributor)
+                # dist_data = distributor.__dict__
+                # print(3333333, dist_data)
+
                 dist_name = distributor.distributor
                 key_api_dist = distributor.key_api_dist
                 login_api_dist = distributor.login_api_dist
@@ -2255,27 +2236,93 @@ def distributor_settings():
                 db.session.commit()
                 flash('Настройки поставщика удачно сохранены')
 
-            elif data.get('distributor_price') == 'save':
+            elif data.get('distributor_price') == 'save' :
+                print(88888, data)
                 if data.get('settings_name_dist') == '':
                     flash('Выберите поставщика')
                 if data.get('dist_price_name') == '':
                     flash('Укажите название прайса')
-                dist_price = DistributorPrice(
-                    price_name=data.get('dist_price_name'),
-                    distributor=data.get('settings_name_dist'),
-                    login_dist_price=data.get('login_dist_price'),
-                    dist_price_markup=data.get('dist_price_markup'),
-                    key_dist_price=data.get('key_dist_price'),
-                    price_link=data.get('price_link'),
-                    is_scheduler=data.get('is_scheduler'),
-                    type_downloads=data.get('type_downloads'),
-                    user_modifed=current_user.id
-                )
-                db.session.add(dist_price)
-                db.session.commit()
+                upload_prices_id = data.get('upload_prices_id')
+                if upload_prices_id == '0':
+                    dist_price = DistributorPrice(
+                        price_name=data.get('dist_price_name'),
+                        distributor=data.get('settings_name_dist'),
+                        login_dist_price=data.get('login_dist_price'),
+                        dist_price_markup=data.get('dist_price_markup'),
+                        key_dist_price=data.get('key_dist_price'),
+                        price_link=data.get('price_link'),
+                        is_scheduler=data.get('is_scheduler'),
+                        type_downloads=data.get('type_downloads'),
+                        user_modifed=current_user.id
+                    )
+                    db.session.add(dist_price)
+                    db.session.commit()
+    
+                    flash('Настройки прайса поставщика удачно сохранены')
+                else:
+                    keypass = data.get('key_dist_price')
+                    loginpass = data.get('login_dist_price')
+                    if loginpass == '0' and keypass != '0':
+                        dist_price = DistributorPrice(
+                            id=upload_prices_id,
+                            price_name=data.get('dist_price_name'),
+                            distributor=data.get('settings_name_dist'),
+                            key_dist_price=data.get('key_dist_price'),
+                            dist_price_markup=data.get('dist_price_markup'),
+                            price_link=data.get('price_link'),
+                            is_scheduler=data.get('is_scheduler'),
+                            type_downloads=data.get('type_downloads'),
+                            user_modifed=current_user.id
+                        )
+                        db.session.merge(dist_price)
+                        db.session.commit()
 
-                flash('Настройки прайса поставщика удачно сохранены')
-                # return redirect(url_for('auth.distributor_settings'))
+                    elif keypass == '0' and loginpass != '0':
+                        dist_price = DistributorPrice(
+                            id=upload_prices_id,
+                            price_name=data.get('dist_price_name'),
+                            distributor=data.get('settings_name_dist'),
+                            login_dist_price=data.get('login_dist_price'),
+                            dist_price_markup=data.get('dist_price_markup'),
+                            price_link=data.get('price_link'),
+                            is_scheduler=data.get('is_scheduler'),
+                            type_downloads=data.get('type_downloads'),
+                            user_modifed=current_user.id
+                        )
+                        db.session.merge(dist_price)
+                        db.session.commit()
+
+                    elif keypass == '0' and loginpass == '':
+                        dist_price = DistributorPrice(
+                            id=upload_prices_id,
+                            price_name=data.get('dist_price_name'),
+                            distributor=data.get('settings_name_dist'),
+                            dist_price_markup=data.get('dist_price_markup'),
+                            price_link=data.get('price_link'),
+                            is_scheduler=data.get('is_scheduler'),
+                            type_downloads=data.get('type_downloads'),
+                            user_modifed=current_user.id
+                        )
+                        db.session.merge(dist_price)
+                        db.session.commit()
+
+                    else:
+                        dist_price = DistributorPrice(
+                            id=upload_prices_id,
+                            price_name=data.get('dist_price_name'),
+                            distributor=data.get('settings_name_dist'),
+                            login_dist_price=data.get('login_dist_price'),
+                            dist_price_markup=data.get('dist_price_markup'),
+                            key_dist_price=data.get('key_dist_price'),
+                            price_link=data.get('price_link'),
+                            is_scheduler=data.get('is_scheduler'),
+                            type_downloads=data.get('type_downloads'),
+                            user_modifed=current_user.id
+                        )
+                        db.session.merge(dist_price)
+                        db.session.commit()
+
+                    flash('Настройки прайса поставщика удачно обновлены', 'success')
 
             elif data.get('check_dist_price') == 'check':
                 if data.get('settings_name_dist') == 'Выбрать':
@@ -2286,11 +2333,18 @@ def distributor_settings():
                         .filter_by(distributor=data.get('settings_name_dist')).first()
                     # print(333555553333, dist_price)
                     dist_price_data = dist_price.__dict__
-                    # key_api_dist = dist_price.key_api_dist
-                    # login_api_dist = dist_price.login_api_dist
+                    key_api_dist = dist_price_data.get('key_dist_price', '0')
+                    login_api_dist = dist_price_data.get('login_dist_price')
+                    if not login_api_dist:
+                        login_api_dist = '0'
+                    store = dist_price_data.get('upload_prices_store', 'Выбрать')
+                    print(111111111111111111111111111111111111111111111111111111111111111111, login_api_dist)
                     return render_template('distributor-settings.html',
                                            role=role, rows=rows,
                                            dist_price_data=dist_price_data,
+                                           login_api_dist=login_api_dist,
+                                           key_api_dist=key_api_dist,
+                                           store=store,
                                            distributors=LOCAL_MODE,
                                            show=True,
                                            photo=photo,
@@ -2314,7 +2368,6 @@ def distributors_table():
     else:
         if request.method == "POST":
             data = request.form.to_dict()
-            # print(77777, data)
             proxy_settings = {}
             if len(data.keys()) > 0:
                 for key, value in data.items():
@@ -2442,7 +2495,6 @@ def distributors_prices():
     else:
         if request.method == "POST":
             data = request.form.to_dict()
-            # print(77777, data)
             proxy_settings = {}
             if len(data.keys()) > 0:
                 for key, value in data.items():

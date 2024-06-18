@@ -1,4 +1,5 @@
 import json
+import os
 import sys
 from xml.dom import minidom
 import datetime
@@ -14,6 +15,7 @@ need_cats = ['NEO', 'Wheels UP', 'iFree', 'CARWEL', 'КИК', 'Tech-Line',
              'Carwel', 'RST', 'КиК', 'Venti', 'IFREE',
              'VENTI', 'TECH-LINE', 'СКАД', 'KHOMEN']
 
+special_wheels = {}  #TODO make brand dict?
 
 # ll = [i.upper() for i in need_cats]
 # need_cats.extend(ll)
@@ -22,7 +24,7 @@ need_cats = ['NEO', 'Wheels UP', 'iFree', 'CARWEL', 'КИК', 'Tech-Line',
 
 def clean_standart_data():
     data = {}
-    with open(DATA_PATH + 'standart_data.json', 'w') as f:
+    with open(os.getcwd() + DATA_PATH + 'standart_data.json', 'w') as f:
         json.dump(data, f)
 
     print('Clean standart data successfuly ')
@@ -79,15 +81,16 @@ def create_ym_xml(stocks_is_null=False, without_db=False, addons=False,
     categoryChild.appendChild(textCategory)
     categoriesChild.appendChild(categoryChild)
 
-    for key in special_wheels.keys():
-        category_vendor = key
-        categories_id = special_wheels[category_vendor]
-        categoryChild = root.createElement('category')
-        categoryChild.setAttribute('id', f'{categories_id}')
-        categoryChild.setAttribute('parentId', '1')
-        textCategory = root.createTextNode(f'{category_vendor}')
-        categoryChild.appendChild(textCategory)
-        categoriesChild.appendChild(categoryChild)
+    if len(special_wheels.keys()) > 0:
+        for key in special_wheels.keys():
+            category_vendor = key
+            categories_id = special_wheels[category_vendor]
+            categoryChild = root.createElement('category')
+            categoryChild.setAttribute('id', f'{categories_id}')
+            categoryChild.setAttribute('parentId', '1')
+            textCategory = root.createTextNode(f'{category_vendor}')
+            categoryChild.appendChild(textCategory)
+            categoriesChild.appendChild(categoryChild)
 
     offersChild = root.createElement('offers')
 
@@ -259,7 +262,7 @@ def create_ym_xml(stocks_is_null=False, without_db=False, addons=False,
 
     # save_path_file = "/home/ivanovka/data/www/1000koles.ru/pictures/yandex.xml"
 
-    with open(DATA_PATH + "yandex.xml", "wb") as f:
+    with open(os.getcwd() + DATA_PATH + "yandex.xml", "wb") as f:
         f.write(xml_str)
 
     # with open(DATA_IMG + "sber.xml", "wb") as f:
@@ -267,6 +270,8 @@ def create_ym_xml(stocks_is_null=False, without_db=False, addons=False,
 
     clean_standart_data()
     common.dowload_images()
+
+    return "success {}".format(counter)
 
 
 # create_ym_xml(without_db=True, stocks_is_null=False)
