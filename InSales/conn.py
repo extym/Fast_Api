@@ -78,13 +78,13 @@ async def execute_query_update(data):
     cursor = connection.cursor()
     for row in data:
         try:
-            # print(row)
+            # print(777777777777, row)
             cursor.execute(query_write_site_categories_v2, row)
-            print("Query from execute_many_query executed successfully")
+            print("Query from execute_query executed successfully")
             result = True
         except OperationalError as err:
                 cursor.execute(query_update_site_categories, row)
-                print(f"The ERROR from execute_many_query '{err}' occured ")
+                print(f"The ERROR from execute_query '{err}' occured ")
         else:
             print('FUCK_UP_222')
             result = False

@@ -272,8 +272,11 @@ async def edit_vendor_products():
     print('Закрыли БД')
 
     return unescape(
-        render_template("products.html", url_categories=url_categories,  login=LOGIN, passw=PASSW, vendor_name=vendor_name,
-                        status_text=status_text, index_url=index_url, rows=rows, result_url=result_url, upload_url=upload_url)) #edit_seller_url=edit_seller_url, index_url=index_url,
+        render_template("products.html", url_categories=url_categories,
+                        login=LOGIN, passw=PASSW,
+                        vendor_name=vendor_name,
+                        status_text=status_text, index_url=index_url,
+                        rows=rows, result_url=result_url, upload_url=upload_url)) #edit_seller_url=edit_seller_url, index_url=index_url,
 
 
 
@@ -349,8 +352,10 @@ def resutl_edit_vendor():
             status_text = f"Связи категорий без изменений"
 
     return unescape(
-        render_template("products.html", url=url, login=LOGIN, passw=PASSW, vendor_name=vendor_name,
-                        status_text=status_text, index_url=index_url, result_url=result_url
+        render_template("products.html", url=url, login=LOGIN,
+                        passw=PASSW, vendor_name=vendor_name,
+                        status_text=status_text, index_url=index_url,
+                        result_url=result_url
                         ))  # edit_seller_url=edit_seller_url, index_url=index_url,
 
 

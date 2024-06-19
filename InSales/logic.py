@@ -1,3 +1,5 @@
+import datetime
+
 import requests
 import csv
 from creds import *
@@ -68,8 +70,9 @@ def get_category_list():  # getCategoryList
         data_list = zeep.helpers.serialize_object(category_list)
     # print('getCategoryList', len(data_list), data_list, sep='\n')
     except Exception as error:
-        print(" Мы получили от 2LOGIC {}".format(error))
-        print('getCategoryList', len(data_list))
+        print(" Мы получили от 3LOGIC {}".format(error))
+    print('getCategoryList', len(data_list))
+    print(type(data_list), data_list)
     return data_list
 
 
@@ -81,7 +84,9 @@ def get_product_list(category_id: int):
         product_list = client.service.getProductList(category_id, get_image, get_description)
         return zeep.helpers.serialize_object(product_list)
     except Exception as error:
-        print('Error getProductList wsdl {}',format(error))
+        times = datetime.datetime.now()
+        print('Error getProductList wsdl {},  {} category_id {}.'
+              .format(times, error, category_id))
 
 
 def get_price_list(mat_ids):
@@ -161,73 +166,81 @@ def create_csv_for_category_from_logic():  ##for import goods only (maybe)
             site_category_name = category_ids[category_id][1]
             try:
                 data = get_product_list(category_id)
-            except:
-                continue
-
-            for prod in data:
-                proxy = dict()
-                quantity = prod.get('product_remain', 0)
-                if quantity == 0:
-                    continue
-                else:
-                    ids.append(prod.get('product_id'))
-                    proxy['id'] = prod.get('product_id')
-                    proxy['published'] = site_category_path[category_id]
-                    proxy['category_id'] = site_category_name  # category_id
-
-                    proxy['quantity'] = quantity
-                    proxy['price'] = prod.get('product_price_dealer') * 1.05
-                    proxy['brand'] = logic_brand_list.get(prod.get('brand_id'))
-                    proxy['full_name'] = prod.get('product_full_name')
-                    # proxy['id'] = prod.get('product_id')
-                    pre_descr = prod.get('product_description')
-                    if pre_descr:
-                        description = rewrite_description(prod.pop('product_description'))
-                        ########### extend fields. Is it need? #############
-
-                        # print('description_logic', description)
-                        proxy.update(description)
-                        rewrite_properties.update(description)  # TODO It's need if size fields is not constant
-                    ####################################################
-                    # else:
-                    #     description = prod.get('product_full_name')
-                    #     print('FUCK_UP_description', prod)
-                    if prod.get('product_image_main'):
-                        proxy['image_main'] = add_link + prod.get('product_image_main')
-                    else:
-                        proxy['image_main'] = 'NOT_FOUND'
-
-                    if prod.get('product_image_short'):
-                        proxy['image_short'] = add_link + prod.get('product_image_short')
-                    else:
-                        proxy['image_short'] = 'NOT_FOUND'
-
-                    if prod.get('product_image_additional'):
-                        proxy['image_additional'] = add_link + prod.get('product_image_additional')
-                    else:
-                        proxy['image_additional'] = 'NOT_FOUND'
-
-                    count += 1
-                    result_list.append(proxy.copy())
-
-                # print(f'prod_{key} ', len(prod.keys()), prod.keys())
-            try:
-                rewrite_properties.update(prod)
             except Exception as error:
-                print('Some_fuck_up_logic {} \n {}'.format(error, prod))
+                print("get_product_list", error)
                 continue
+            if data:
+                for prod in data:
+                    proxy = dict()
+                    quantity = prod.get('product_remain', 0)
+                    if quantity == 0:
+                        continue
+                    else:
+                        ids.append(prod.get('product_id'))
+                        proxy['id'] = prod.get('product_id')
+                        proxy['published'] = site_category_path[category_id]
+                        proxy['category_id'] = site_category_name  # category_id
+
+                        proxy['quantity'] = quantity
+                        proxy['price'] = prod.get('product_price_dealer') * 1.05
+                        proxy['brand'] = logic_brand_list.get(prod.get('brand_id'))
+                        proxy['full_name'] = prod.get('product_full_name')
+                        # proxy['id'] = prod.get('product_id')
+                        pre_descr = prod.get('product_description')
+                        if pre_descr:
+                            description = rewrite_description(prod.pop('product_description'))
+                            ########### extend fields. Is it need? #############
+
+                            # print('description_logic', description)
+                            proxy.update(description)
+                            rewrite_properties.update(description)  # TODO It's need if size fields is not constant
+                        ####################################################
+                        # else:
+                        #     description = prod.get('product_full_name')
+                        #     print('FUCK_UP_description', prod)
+                        if prod.get('product_image_main'):
+                            proxy['image_main'] = add_link + prod.get('product_image_main')
+                        else:
+                            proxy['image_main'] = 'NOT_FOUND'
+
+                        if prod.get('product_image_short'):
+                            proxy['image_short'] = add_link + prod.get('product_image_short')
+                        else:
+                            proxy['image_short'] = 'NOT_FOUND'
+
+                        if prod.get('product_image_additional'):
+                            proxy['image_additional'] = add_link + prod.get('product_image_additional')
+                        else:
+                            proxy['image_additional'] = 'NOT_FOUND'
+
+                        count += 1
+                        result_list.append(proxy.copy())
+
+                    # print(f'prod_{key} ', len(prod.keys()), prod.keys())
+                try:
+                    rewrite_properties.update(prod)
+                except Exception as error:
+                    print('Some_fuck_up_logic {} \n {}'.format(error, prod))
+                    continue
+            else:
+                print(1111111, category_id)
+                continue
+
         print(3311111133, len(ids), ids)
-        price_list = get_price_list(ids)
-        # print(3333333, len(price_list), price_list)
-        pro_result_list = []
-        for item in result_list.copy():
-            id_item = item.get('id')
-            if id_item in price_list.keys():
-                item.update(price_list[id_item])
-                pro_result_list.append(item)
-        # pro_result_list = [i.update(price_list.get(i['id'])) for i in result_list
-        #                   if i['id'] in price_list.keys()]
-        # print(5555555555555, len(pro_result_list), pro_result_list)
+        if len(ids) > 0:
+            price_list = get_price_list(ids)
+            # print(3333333, len(price_list), price_list)
+            pro_result_list = []
+            for item in result_list.copy():
+                id_item = item.get('id')
+                if id_item in price_list.keys():
+                    item.update(price_list[id_item])
+                    pro_result_list.append(item)
+            # pro_result_list = [i.update(price_list.get(i['id'])) for i in result_list
+            #                   if i['id'] in price_list.keys()]
+            # print(5555555555555, len(pro_result_list), pro_result_list)
+        else:
+            continue
 
         fields = base_fields.copy()
         # pr = set([i.strip().capitalize() for i in set(rewrite_properties.keys())])
@@ -267,7 +280,7 @@ def create_csv_for_category_from_logic():  ##for import goods only (maybe)
 # get_price_list(ids)
 
 # get_category_list()
-# get_product_list(177)
+# get_product_list(199)
 # get_brand_list()
 # asyncio.run(save_categories_vendor(data_list))
 # create_csv_for_category_from_logic()
