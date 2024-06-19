@@ -88,17 +88,18 @@ def get_price_tires(product):
     else:
         price = pre_price * 1.12
 
-    price = round(price, 0)
+    opt_price = round(pre_price, 0)
 
-    return price
+    return opt_price, price
 
 
 def id_generator(size=8, chars=string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
 
-def standart_wheels_from_json(without_db=False):
-    link_downloads = conn.get_distibutor_link('4tochki', 'json', 'wheels_tires')
+def standart_wheels_from_json(shop_name=None,
+                            name_price=None):
+    link_downloads = conn.get_distibutor_data('4tochki', 'json', 'wheels_tires')
     wheels = get_data_from_json(link_downloads)[0]
     diction, proxy = {}, []
     for prod in wheels:
@@ -167,11 +168,6 @@ def standart_wheels_from_json(without_db=False):
                   .format(error, prod))
             continue
 
-    if not without_db:
-        check_write_json_v4(diction)
-        tttires = standart_tires_from_json()  # return dict
-        check_write_json_v4(tttires)
-
     print("ALL_RIDE_get_wheels_json {}".format(len(diction.keys())))
 
     return diction
@@ -196,10 +192,6 @@ def standart_addons_from_json(without_db=True, data=None):
         elif vendor == '':
             break
         # check category wheels and tyres
-        category_id = categories_wheels.get(vendor, categories_wheels_upper.get(vendor.upper()))
-        if not category_id:
-            category_id = cats_wheels_upper.get(vendor.upper(), 4000)
-            print(444000, prod)
         category_id = 4
         price_data = get_price(prod)
         price = price_data[0]
@@ -239,16 +231,20 @@ def standart_addons_from_json(without_db=True, data=None):
 # print(standart_addons_from_json(without_db=True, data=ventil_LS))
 
 
-def standart_tires_from_json():
-    link_downloads = conn.get_distibutor_link('4tochki', 'json', 'wheels_tires')
-    tyres = get_data_from_json(link_downloads)[1]
+def standart_tires_from_json(name_price=None):
+    type_data = 'wheels_tires'
+    provider = '4tochki'
+    price_type = 'json'
+    # TODO make provider&price
+    get_distibutor_data = conn.get_distibutor_data(provider,
+                                                   price_type,
+                                                   name_price)
+    price_murkup = get_distibutor_data[1]
+    link = get_distibutor_data[0]
+    tyres = get_data_from_json(link)[1]
     diction = {}
     for prod in tyres:
         in_stock = count(prod)
-        if in_stock >= 4:
-            enabled = 1
-        else:
-            enabled = 0
         name = prod['name']
         vendor = prod['brand']
         description = vendor + ' ' + name
@@ -256,18 +252,10 @@ def standart_tires_from_json():
             description = name
         elif vendor == '':
             continue  # break
-        # check category wheels and tyres
-        # category_id = 0
-        # if not category_id and prod.get('season') == 'Летняя':
-        #     category_id = cats_summer_upper.get(vendor.upper(), 4000)
-        # elif not category_id and prod.get('season') == 'Зимняя':
-        #     category_id = cats_winter_upper.get(vendor.upper(), 5000)
-        # elif not category_id and prod.get('season') == 'Всесезонная':
-        #     category_id = cats_winter_upper.get(vendor.upper(), 6000)
-        price = get_price_tires(prod)
-        category_id = prod.get('season')
+        opt_price = get_price_tires(prod)[0]
+        category = prod.get('season')
         tiretype = prod.get('tiretype')
-        category = 12
+        category_id = 12
         rule = False
         product_code = prod['cae']
         name_picture = '88888888'
@@ -275,11 +263,8 @@ def standart_tires_from_json():
         if image_url:
             name_picture = vendor.strip() + '_' + product_code + '.png'
         image_tuple = (name_picture, image_url)
-        koeff = 1
-        meta_d = 'летняя и зимняя резина ' + name + ' в интернет-магазине шин и дисков 1000koles.ru'
-        meta_k = 'летняя и зимняя резина, колеса, цена, купить, в Москве, в интернет-магазине'
-        meta_h1 = ' '
-        params = 1
+        articul_product = vendor.strip() + '_' + product_code
+        id_1c = ''
         provider = '4tochki'
         options = {
             'diameter': prod.get('diameter'),
@@ -289,23 +274,15 @@ def standart_tires_from_json():
 
         diction.update({vendor.strip() + product_code:
             (
-                [
-                    category_id, name, description, price, in_stock,
-                    enabled, product_code, vendor, meta_d, meta_k,
-                    params, koeff, meta_h1, provider, category
-                ],
+                (category_id, name, description,
+                 opt_price, in_stock,
+                 product_code, vendor, category,
+                 articul_product, id_1c, image_url,
+                 price_murkup),
                 image_tuple,
                 options,
-                rule
+                provider
             )})
 
     return diction
 
-# standart_wheels_from_json()
-# wwwheels = wheels_from_json(wheels)
-
-# tires = get_data_from_json()[1]
-# tttires = standart_tires_from_json(tires)  # return dict
-# check_write_json(tttires)
-
-# check_write_json(wwwheels)

@@ -101,15 +101,14 @@ def count_price_tyres(string, size):
         return price
 
 
-def standart_tyres_csv(name_price=None, shop_name='all'):
-    proxy_data, proxy = [], []
+def standart_tyres_csv(name_price=None):
     global_result = {}
     provider = 'shins'
     price_type = 'csv'
     # TODO make provider&price
-    get_distibutor_data = conn.get_distibutor_link(provider,
-                                                  price_type,
-                                                  name_price)
+    get_distibutor_data = conn.get_distibutor_data(provider,
+                                                   price_type,
+                                                   name_price)
     link_downloads_csv = get_distibutor_data[0]
     price_murkup = get_distibutor_data[1]
     link = link_downloads_csv + date
@@ -120,10 +119,6 @@ def standart_tyres_csv(name_price=None, shop_name='all'):
                 continue
             else:
                 in_stock = int(data[i][22])
-                if in_stock >= 4:
-                    enabled = 1
-                else:
-                    enabled = 0
                 name = data[i][1]
                 vendor = data[i][5].replace('-', '')
                 if vendor == 'Carwel':
@@ -132,24 +127,17 @@ def standart_tyres_csv(name_price=None, shop_name='all'):
                     continue
                 else:
                     description = data[i][1]
-                category_id = 7000
-                # if data[i][4] in ['S', 's', 'Летняя']:
-                #     category_id = cats_summer_upper.get(vendor.upper(), 4000)
-                # elif data[i][4] in ["W", 'Зимняя']:
-                #     category_id = cats_winter_upper.get(vendor.upper(), 5000)
-                # elif data[i][4] in ["allseason", 'Всесезонная']:
-                #     category_id = cats_allseason_upper.get(vendor.upper(), 6000)
-                # else:
-                #     print('1212_category_id', data[i][4])
+
                 if data[i][4] in ['S', 's', 'Летняя']:
-                    category_id = 'Летняя'
+                    category = 'Летняя'
                 elif data[i][4] in ["W", 'Зимняя']:
-                    category_id = 'Зимняя'
+                    category = 'Зимняя'
                 elif data[i][4] in ["allseason", 'Всесезонная']:
-                    category_id = 'Всесезонная'
+                    category = 'Всесезонная'
                 else:
+                    category = data[i][4]
                     print('1212_category_id', data[i][4])
-                category = 12
+                category_id = 12
                 rule = False
                 # check category wheels and tyres
                 product_code = data[i][2]
@@ -165,18 +153,13 @@ def standart_tyres_csv(name_price=None, shop_name='all'):
                 image_tuple = (name_picture, image_url)
                 opt_price = data[i][17]
                 id_1c = ''
-                # price = count_price_tyres(data[i][17], size)
-                # koeff = 1
-                # meta_d = 'летняя и зимняя резина ' + name + ' в интернет-магазине шин и дисков 1000koles.ru'
-                # meta_k = 'летняя и зимняя резина, колеса, цена, купить, в Москве, в интернет-магазине'
-                # meta_h1 = ' '
                 articul_product = vendor.strip() + '_' + product_code
                 provider = 'shins'
                 id_1c = ''
                 options = {
-                    'category_id': category_id,
-                    'distributor': provider,
-                    'distibutor_price': name_price,
+                    'name_category_id': "Шины",
+                    'category_mark': category,
+                    'name_price': name_price,
                     'diameter': size,
                     'width': width,
                     'profile': height
@@ -184,13 +167,14 @@ def standart_tyres_csv(name_price=None, shop_name='all'):
 
                 global_result.update({articul_product:
                     (
-                        (category, name, description,
+                        (category_id, name, description,
                          opt_price, in_stock,
-                         product_code, vendor, category_id,
+                         product_code, vendor, category,
                          articul_product, id_1c, image_url,
-                         price_murkup, shop_name),
+                         price_murkup),
                         image_tuple,
-                        options
+                        options,
+                        provider
                     )})
 
         except KeyError as error:
@@ -198,17 +182,21 @@ def standart_tyres_csv(name_price=None, shop_name='all'):
             print(5555, str(data[i]))
             continue
 
-    mem = sys.getsizeof(proxy_data)
-
-    print(mem / 1000, 'Kb--')
-    print("ALL_RIDE_get_tyres_csv ()".format(len(global_result)))
     return global_result
 
 
-def standart_wheels_csv(without_db=False):
-    link_downloads_csv = conn.get_distibutor_link('shins', 'csv', 'wheels')
+def standart_wheels_csv(name_price=None,
+                        shop_name='all'):
+    provider = 'shins'
+    price_type = 'csv'
+    # TODO make provider&price
+    get_distibutor_data = conn.get_distibutor_data(provider,
+                                                   price_type,
+                                                   name_price)
+    link_downloads_csv = get_distibutor_data[0]
+    price_markup = get_distibutor_data[1]
     link = link_downloads_csv + date
-    data = get_data_wheels_csv(link)
+    data = get_data_csv(link)
     global_result = {}
     for i in range(1, len(data)):
         if data[i][1] == 'title':
@@ -216,10 +204,6 @@ def standart_wheels_csv(without_db=False):
         else:
             try:
                 in_stock = int(data[i][17]) + int(data[i][18])
-                if in_stock >= 4:
-                    enabled = 1
-                else:
-                    enabled = 0
                 name = data[i][1]
                 vendor = data[i][3]
                 description = name
@@ -241,45 +225,39 @@ def standart_wheels_csv(without_db=False):
                 image_tuple = (name_picture, image_url)
                 price_rrc = data[i][15]
                 price = float(price_rrc)
-                price_opt = data[i][14]
+                opt_price = data[i][14]
                 rule = False
-                if int(price_opt) * 1.18 >= int(price_rrc):
+                if int(opt_price) * 1.18 >= int(price_rrc):
                     rule = True
-                koeff = 1
-                meta_d = 'летняя и зимняя резина ' + name + ' в интернет-магазине шин и дисков 1000koles.ru'
-                meta_k = 'летняя и зимняя резина, колеса, цена, купить, в Москве, в интернет-магазине'
-                meta_h1 = ' '
-                params = 1
+
                 provider = 'shins'
+                articul_product = vendor.strip() + '_' + product_code
+                provider = 'shins'
+                id_1c = ''
                 options = {
+                    'name_category_id': "Шины",
+                    'category_mark': category,
+                    'name_price': name_price,
                     'et': et,  # 18
                     "bolts_spacing": bolts_spacing,  # 17
                     'diameter': diameter,  # 16
                     'dia': hole,  # 19
                     'width': width  # 20
                 }
-                global_result.update({vendor.strip() + product_code:
+
+                global_result.update({articul_product:
                     (
-                        [category, name, description, price, in_stock,
-                         enabled, product_code, vendor, meta_d, meta_k,
-                         params, koeff, meta_h1, provider, category_id],
+                        (category_id, name, description,
+                         opt_price, in_stock,
+                         product_code, vendor, category,
+                         articul_product, id_1c, image_url,
+                         price_markup, shop_name),
                         image_tuple,
                         options,
-                        rule,
-                        price_opt
+                        provider
                     )})
-                # result = ([category_id, name, description, price, in_stock, enabled, product_code, vendor, meta_d, meta_k,
-                #            params, koeff, meta_h1, category], image_tuple, options)
-                # proxy_data.append(result)
             except Exception as er:
                 print('fuckup standart getcsv {} {}'.format(er, data[i]))
-
-    if not without_db:
-        check_write_json_v4(global_result)
-        data = standart_tyres_csv()
-        mems = sys.getsizeof(data)
-        print('from_csv', mems / 1000, 'Kb')
-        check_write_json_v4(data)
 
     print('ALL_RIDE_get_wheels_csv ', len(global_result))
     return global_result

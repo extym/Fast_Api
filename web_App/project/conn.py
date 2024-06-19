@@ -308,6 +308,7 @@ CREATE TABLE IF NOT EXISTS  attributes_product (
     name_category_id varchar,
     category_mark varchar,
     category_sign varchar,
+    name_price varchar,
     mark_1 varchar,
     mark_2 varchar,
     mark_3 varchar,
@@ -560,19 +561,27 @@ query_add_product = (" INSERT INTO products "
                      " articul_product, id_1c, photo, shop_k_product, shop_name ) "
                      " VALUES (%s, %s, %s, %s, %s, now(), now(), %s, %s, %s, %s, %s, %s, %s, %s)")
 
-query_add_tyres_options = (" INSERT INTO attributes_product "
-                           " ()"
-                           " VALUES ()")
-
 query_add_wheels_options = (" INSERT INTO attributes_product "
-                           " ()"
-                           " VALUES ()")
+                           " (name_category_id, category_mark, name_price, "
+                           " mark_1, mark_2, mark_3, mark_4, mark_5 )"
+                           " VALUES (%s, %s, %s, %s, %s, %s, %s, %s)")
+
+query_add_tyres_options = (" INSERT INTO attributes_product "
+                           " ( name_category_id, category_mark, name_price, mark_1, mark_2, mark_3 )"
+                           " VALUES (%s, %s, %s, %s, %s, %s)")
 
 read_new_order = (" SELECT * from fresh_orders "
                   " WHERE our_status = 'NEW' ")
 
 read_order_items = (" SELECT * from order_items "
                     " WHERE id_mp = %s and shop_name = %s ")
+
+read_product = (" SELECT * FROM products "
+                "WHERE articul_product = %s and shop_name = %s ")
+
+update_product_price_qnt = (" UPDATE products "
+                            " SET price_product_base = %s, quantity = %s "
+                            " WHERE articul_product = %s and shop_name = %s")
 
 update_send_data_order = (
     " UPDATE fresh_orders SET dateSendData = NOW(), dateModifed = NOW(), ourStatus = 'SEND_TO_1C' "
@@ -685,10 +694,12 @@ def execute_query_v3(query, data):
         with create_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute(query, data)
-                print("Query from execute_query executed successfully")
+                # print("Query from execute_query executed successfully")
+                return True
 
     except (OperationalError, psycopg2.DatabaseError) as err:
         print(f"The ERROR from execute_query '{err}' occured ")
+        return False
 
 
 async def executemany_query(query, data):
@@ -804,11 +815,28 @@ def check_is_exist_in_db(query, data):
     with create_connection() as connection:
         with connection.cursor() as cursor:
             cursor.execute(query, data)
-            for (id, quantity, price_product_base, final_rice) in cursor:
+            for (id, quantity, price_product_base, final_price) in cursor:
                 if id:
-                    result = (True, quantity, price_product_base, final_rice)
+                    result = (True, quantity, price_product_base, final_price)
 
     return result
+
+
+def check_product_is_exist_in_db(articul_product: str = None,
+                                 shop_name:str = None):
+    query = f" SELECT id, quantity, price_product_base, final_price " \
+            f" FROM products " \
+            f" WHERE articul_product='{articul_product}' and shop_name='{shop_name}' "
+    result = (False, 0, 0, 0)
+    with create_connection() as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(query)
+            for (id, quantity, price_product_base, final_price) in cursor:
+                if id:
+                    result = (True, quantity, price_product_base, final_price)
+
+    return result
+
 
 
 def make_query_get_id(query, data):
@@ -1015,6 +1043,8 @@ update_db = [
 # print(rewrite_orders_v3())
 # print(rewrite_orders_v2(query_join, query_insert))
 # # rewrite_orders("select * from fresh_orders  where date_added<'%2023-03-29'")
+
+# print(execute_query_v3(update_product_price_qnt, [333, 555, "LPFilipSuСушенБаСухо2п100гр/200", "Low Price"]))
 
 # maintenans_query(create_fresh_orders_table)
 # maintenans_query(create_order_items)

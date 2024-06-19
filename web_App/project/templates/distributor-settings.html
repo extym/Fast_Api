@@ -38,7 +38,7 @@
             <div class="col-xl-6">
                 <section class="box ">
                     <header class="panel_header">
-                        <h2 class="title float-left">добавить поставщика</h2>
+                        <h2 class="title float-left">добавить поставщика ( API )</h2>
                         <div class="actions panel_actions float-right">
                             <i class="box_toggle fa fa-chevron-down"></i>
                             <i class="box_setting fa fa-cog" data-toggle="modal" href="#section-settings"></i>
@@ -122,7 +122,7 @@
             <div class="col-xl-6">
                 <section class="box ">
                     <header class="panel_header">
-                        <h2 class="title float-left">Редактировать поставщика</h2>
+                        <h2 class="title float-left">Редактировать поставщика ( API )</h2>
                         <div class="actions panel_actions float-right">
                             <i class="box_toggle fa fa-chevron-down"></i>
                             <i class="box_setting fa fa-cog" data-toggle="modal" href="#section-settings"></i>
@@ -221,7 +221,7 @@
             <div class="col-xl-12">
                 <section class="box ">
                     <header class="panel_header">
-                        <h2 class="title float-left">Настройки обновления данных из прайса поставщика </h2>
+                        <h2 class="title float-left">Настройки обновления данных из прайса поставщика (файл) </h2>
                         <div class="actions panel_actions float-right">
                             <i class="box_toggle fa fa-chevron-down"></i>
                             <i class="box_setting fa fa-cog" data-toggle="modal" href="#section-settings"></i>
@@ -367,8 +367,8 @@
                                                 <option value="Выбрать" >Выбрать</option>
                                                 <option value="all" >Все магазины</option>
                                             {% else %}
-                                            <option selected>Выбрать</option>
-                                            <option value="all" >Все магазины</option>
+                                            <option >Выбрать</option>
+                                            <option selected value="all" >Все магазины</option>
                                                 {% for row in rows %}
                                                 <option value="{{ row }}" >{{ row }}</option>
                                                 {% endfor %}
@@ -472,7 +472,7 @@
                                                 {% if show %}
                                                 <input type="password" value="{{ key_api_dist }}" class="form-control" id="formfield21"  autocomplete="off" name="key_dist_price" >
                                                 {% else %}
-                                                <input type="password" value="0" class="form-control" id="formfield21" autocomplete="off" name="key_dist_price" >
+                                                <input type="password" value="" class="form-control" id="formfield21" autocomplete="off" name="key_dist_price" >
                                                 {% endif %}
                                             </div>
                                         </div>

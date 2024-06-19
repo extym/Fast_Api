@@ -157,6 +157,7 @@ class AttributesProduct(db.Model):
     name_category_id = db.Column(db.String(250))
     category_mark = db.Column(db.String(250))
     category_sign = db.Column(db.String(250))
+    name_price = db.Column(db.String(250))
     mark_1 = db.Column(db.String(250))
     mark_2 = db.Column(db.String(250))
     mark_3 = db.Column(db.String(250))

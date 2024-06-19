@@ -2352,6 +2352,13 @@ def distributor_settings():
 
             return redirect(url_for('auth.distributor_settings'))
 
+        shops_list = Marketplaces.query.\
+            filter_by(company_id=current_user.company_id)\
+            .all()
+
+        for shop in shops_list:
+            rows.append(shop.shop_name)
+
         return render_template('distributor-settings.html',
                                role=role,
                                rows=rows, rows_mp=set(rows_mp),
