@@ -693,17 +693,17 @@ def check_import_limit(seller_id):
     pass
 
 
-def make_internal_import_oson_product(donor=None, recipient=None, k=1,
-                                      source=None, donor_mp=None, recipient_mp=None):
+def make_internal_import_oson_product(donor=None, acceptor=None, k=1,
+                                      source=None, donor_mp=None, acceptor_mp=None):
     # metod = 'https://api-seller.ozon.ru/v3/product/import'
     metod = 'https://api-seller.ozon.ru/v1/product/import-by-sku'
-    if donor is not None and recipient is not None:
+    if donor is not None and acceptor is not None:
         pre_data = []
         with Session(engine) as session:
             session.begin()
-            recipient_data = session.execute(select(Marketplaces.seller_id,
+            acceptor_data = session.execute(select(Marketplaces.seller_id,
                                                     Marketplaces.key_mp)
-                                             .where(Marketplaces.shop_name == recipient)) \
+                                             .where(Marketplaces.shop_name == acceptor)) \
                 .first()
             product_data = session.query(Product).filter_by(shop_name=donor).all()
 
@@ -726,11 +726,11 @@ def make_internal_import_oson_product(donor=None, recipient=None, k=1,
                     'currency_code': 'RUB'
                 }
                 pre_data.append(item)
-            # print(1111, recipient_data[0], recipient_data[1])
+            # print(1111, acceptor_data[0], acceptor_data[1])
             data = {"items": pre_data}
             header = {
-                'Client-Id': recipient_data[0],
-                'Api-Key': recipient_data[1],
+                'Client-Id': acceptor_data[0],
+                'Api-Key': acceptor_data[1],
                 'Content-Type': 'application/json'
             }
 
@@ -738,7 +738,7 @@ def make_internal_import_oson_product(donor=None, recipient=None, k=1,
                 print('Client-Id {} from internal import oson'.format(header.get('Client-Id')))
                 os.abort()
 
-            elif donor_mp == 'ozon' and recipient_mp == 'ozon':
+            elif donor_mp == 'ozon' and acceptor_mp == 'ozon':
                 answer = requests.post(url=metod,
                                        headers=header,
                                        json=data)
@@ -754,8 +754,8 @@ def make_internal_import_oson_product(donor=None, recipient=None, k=1,
                             old_price = str(int(price) * 4)
                             new_prod = {
                                 'articul_product': product.articul_product,
-                                'shop_name': recipient,
-                                'store_id': recipient_data[0],
+                                'shop_name': acceptor,
+                                'store_id': acceptor_data[0],
                                 'quantity': product.quantity,
                                 'reserved': product.reserved,
                                 'price_product_base': product.price_product_base,
@@ -821,30 +821,30 @@ def make_internal_import_oson_product(donor=None, recipient=None, k=1,
 
                 else:
                     print('Error make_response_internal_import_oson_product'
-                          ' status_code {},  recipient_mp {}, answer.text {}'
-                    .format(answer.status_code, recipient_mp, answer.text))
+                          ' status_code {},  acceptor_mp {}, answer.text {}'
+                    .format(answer.status_code, acceptor_mp, answer.text))
                     return "Что-то пошло не так с запросом на сервер озона"
 
-            elif donor_mp == 'ozon' and recipient_mp == 'wb':
+            elif donor_mp == 'ozon' and acceptor_mp == 'wb':
                 pass
 
             else:
                 print('Error make_internal_import_oson_product'
-                      ' status_code {},  recipient_mp {}, donor_mp {}'
-                      .format(donor, donor_mp, recipient_mp))
-                return 'Check you data', donor, donor_mp, recipient_mp
+                      ' status_code {},  acceptor_mp {}, donor_mp {}'
+                      .format(donor, donor_mp, acceptor_mp))
+                return 'Check you data', donor, donor_mp, acceptor_mp
 
 
-def make_import_export_oson_price(donor=None, recipient=None,
+def make_import_export_oson_price(donor=None, acceptor=None,
                                   k=1, send_to_mp=False):
     # metod = 'https://api-seller.ozon.ru/v1/product/import-by-sku'
-    if donor is not None and recipient is not None:
+    if donor is not None and acceptor is not None:
         data = []
         with Session(engine) as session:
             session.begin()
-            recipient_data = session.execute(select(Marketplaces.seller_id,
+            acceptor_data = session.execute(select(Marketplaces.seller_id,
                                                     Marketplaces.key_mp)
-                                             .where(Marketplaces.shop_name == recipient)) \
+                                             .where(Marketplaces.shop_name == acceptor)) \
                 .first()
             product_data = session.query(Product).filter_by(shop_name=donor).all()
 
@@ -867,22 +867,22 @@ def make_import_export_oson_price(donor=None, recipient=None,
                     session.begin()
                     session.execute(update(Product)
                                     .where(Product.articul_product == row.articul_product)
-                                    .where(Product.shop_name == recipient).values(item))
+                                    .where(Product.shop_name == acceptor).values(item))
                     session.commit()
 
             print('All Ride make_internal_import_oson_product'
-                  ' donor_mp {}, recipient {}'
-                  .format(donor, recipient))
+                  ' donor_mp {}, acceptor {}'
+                  .format(donor, acceptor))
             return "All ride"
         else:
             print('Error make_internal_import_oson_product'
-                  ' donor_mp {}, recipient {}'
-                  .format(donor, recipient))
+                  ' donor_mp {}, acceptor {}'
+                  .format(donor, acceptor))
             return "NOT all ride"
 
-# make_import_export_oson_price(donor='Low Price', recipient='Полиция Вкуса', k=0)
+# make_import_export_oson_price(donor='Low Price', acceptor='Полиция Вкуса', k=0)
 
-# print(make_internal_import_oson(donor='ImportGoods', recipient='Ф-фторник'))
+# print(make_internal_import_oson(donor='ImportGoods', acceptor='Ф-фторник'))
 
 
 # product_info_price('34253142-0058-7', 1713959)

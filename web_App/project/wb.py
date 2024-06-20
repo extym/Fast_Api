@@ -271,15 +271,15 @@ def send_price_to_wb(seller_id=None, sourse=None):
                          .format(seller_id, len(data), answer.text))
 
 
-def make_import_export_wb_price(donor=None, recipient=None,
+def make_import_export_wb_price(donor=None, acceptor=None,
                                   k=1):
-    if donor is not None and recipient is not None:
+    if donor is not None and acceptor is not None:
         data = []
         with Session(engine) as session:
             session.begin()
-            recipient_data = session.execute(select(Marketplaces.seller_id,
+            acceptor_data = session.execute(select(Marketplaces.seller_id,
                                                     Marketplaces.key_mp)
-                                             .where(Marketplaces.shop_name == recipient)) \
+                                             .where(Marketplaces.shop_name == acceptor)) \
                 .first()
             product_data = session.query(Product).filter_by(shop_name=donor).all()
 
@@ -303,7 +303,7 @@ def make_import_export_wb_price(donor=None, recipient=None,
                     session.begin()
                     session.execute(update(Product)
                                     .where(Product.articul_product == row.articul_product)
-                                    .where(Product.shop_name == recipient).values(item))
+                                    .where(Product.shop_name == acceptor).values(item))
                     session.commit()
 
 
@@ -357,25 +357,25 @@ def send_stocks_wb_v2(seller_id=None, is_stocks_null=None, sourse=None):
 
 # send_stocks_wb_v2(seller_id='admin100500')
 
-def send_stocks_wb_v3(donor=None, recipient=None):
-    key_wh_recip, key_recipient = '', ''
+def send_stocks_wb_v3(donor=None, acceptor=None):
+    key_wh_recip, key_acceptor = '', ''
     with Session(engine) as session:
         session.begin()
         data_keys = session.execute(select(Marketplaces)
-                                    .where(Marketplaces.shop_name == recipient) \
+                                    .where(Marketplaces.shop_name == acceptor) \
                                     .where(Marketplaces.name_mp == "wb")) \
             .all()
     for datas in data_keys:
         if 'Маркетплейс' in datas.tags:
             key_wh_recip = datas.mp_key
-            key_recipient = datas.mp_key
+            key_acceptor = datas.mp_key
 
-    if key_wh_recip != ''  and key_recipient != '':
+    if key_wh_recip != ''  and key_acceptor != '':
         data = make_send_data_stocks_v3(key_wh_recip=key_wh_recip, seller_id=donor)
         for wh_id, value in data.items():
             metod = f'https://suppliers-api.wildberries.ru/api/v3/stocks/{wh_id}'
             headers = {'Content-type': 'application/json',
-                       'Authorization': key_recipient}
+                       'Authorization': key_acceptor}
             print('SEND_WB', wh_id, len(value['stocks']))
             answer = requests.put(metod, data=json.dumps(value), headers=headers)
             if answer.ok:
@@ -386,7 +386,7 @@ def send_stocks_wb_v3(donor=None, recipient=None):
                       .format(wh_id, len(wh_id), answer.text))
     else:
         logging.error("Some error with keys from send_stocks_wb_v3 - donor {}, res {}"
-                      .format(donor, recipient))
+                      .format(donor, acceptor))
 
 
 def check_is_exist(id_mp, shop):

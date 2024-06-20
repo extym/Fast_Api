@@ -346,8 +346,8 @@ def create_data_price_for_send(seller_id=None, from_db=True):
     return result
 
 
-def create_data_price_for_send_v2(koef_recipient=None, donor=None,
-                                  recipient=None, from_db=True):
+def create_data_price_for_send_v2(koef_acceptor=None, donor=None,
+                                  acceptor=None, from_db=True):
     result = []
     prices = []
     if from_db:
@@ -356,15 +356,15 @@ def create_data_price_for_send_v2(koef_recipient=None, donor=None,
                 .where(Product.final_price > 0) \
                 .where(Product.store_id == donor) \
                 .all()
-            # koef_recipient = session.execute(select(InternalImport.internal_import_markup_1)
-            #                        .where(InternalImport.internal_import_store_1 == donor) \
-            #                        .where(InternalImport.internal_import_store_2 == recipient)) \
+            # koef_acceptor = session.execute(select(InternalImport.i_import_donor_markup)
+            #                        .where(InternalImport.i_import_donor_store == donor) \
+            #                        .where(InternalImport.i_import_acceptor_store == acceptor)) \
             #     .first()
 
             for product in data:
                 #############################3
                 # Make price ended for '9'
-                price = int(product.final_price) * (1 + int(koef_recipient) / 100)
+                price = int(product.final_price) * (1 + int(koef_acceptor) / 100)
                 final_price = str(price).split('.')[0][:-1] + "9"
                 old_price = str(int(price) * 4)
                 ##############################
@@ -392,7 +392,7 @@ def create_data_price_for_send_v2(koef_recipient=None, donor=None,
 
     oson_logger.info("From create_data_prices_for_send_v2_oson_x1000 -"
                      " donor {}, k_resip={}, make from_db {}, len result {}"
-                     .format(donor, koef_recipient, from_db, len(result)))
+                     .format(donor, koef_acceptor, from_db, len(result)))
     print('create_data_prices_for_send_v2_oson_x1000', len(result))
     return result
 
@@ -439,15 +439,15 @@ def send_stocks_oson_v2(key=None, seller_id=None, is_stocks_null=False):
             sleep(0.6)
 
 
-def send_stocks_oson_v3(key_recipient=None, donor_name=None, recipient=None):
-    print('SEND_STOCK_OSON_start_v3 len key {}, recipient {}, donor_name {}'
-          .format(key_recipient, recipient, donor_name))
+def send_stocks_oson_v3(key_acceptor=None, donor_name=None, acceptor=None):
+    print('SEND_STOCK_OSON_start_v3 len key {}, acceptor {}, donor_name {}'
+          .format(key_acceptor, acceptor, donor_name))
     pre_data = create_data_stocks_from_db_v3(donor_name=donor_name,
-                                             recip_id=recipient,
+                                             recip_id=acceptor,
                                              is_stocks_null=False)
     headers = {
-        'Client-Id': recipient,
-        'Api-Key': key_recipient,
+        'Client-Id': acceptor,
+        'Api-Key': key_acceptor,
         'Content-Type': 'application/json'
     }
     metod = '/v2/products/stocks'
@@ -474,14 +474,14 @@ def send_stocks_oson_v3(key_recipient=None, donor_name=None, recipient=None):
                     #     print('SUCCES update from send_stocks_on', row)
                 proxy.append(answer)
             oson_logger.info('ALL RIDE send_stocks_oson - donor {},'
-                             ' recipient {}, updated {}, errors update {}'
-                             .format( donor_name, recipient, count, error))
+                             ' acceptor {}, updated {}, errors update {}'
+                             .format( donor_name, acceptor, count, error))
             sleep(0.6)
         else:
 
             oson_logger.info('Error send_stocks_oson - answer {}, donor {},'
-                             ' recipient {}, len key_recip {}'
-                             .format(response.text, donor_name, recipient, len(key_recipient)))
+                             ' acceptor {}, len key_recip {}'
+                             .format(response.text, donor_name, acceptor, len(key_acceptor)))
             print('answer send_stocks_on_v3', response.text)
             sleep(0.6)
 
@@ -490,18 +490,18 @@ def send_stocks_oson_v3(key_recipient=None, donor_name=None, recipient=None):
 
     all =  (len(pre_data) - 1) * 1000 + len(row)
     send_get("Отправлено остатки селлеру {}: удачно {}, неудачно {} из {} доступных. Финишная ошибка- {}"
-             .format(recipient, global_count, global_error, all, last_error))
+             .format(acceptor, global_count, global_error, all, last_error))
 
 
-def send_product_price(key_recipient=None, recipient=None):
+def send_product_price(key_acceptor=None, acceptor=None):
     metod = 'https://api-seller.ozon.ru/v1/product/import/prices'
     #   "limit": 1000
     headers = {
-        'Client-Id': recipient,
-        'Api-Key': key_recipient,
+        'Client-Id': acceptor,
+        'Api-Key': key_acceptor,
         'Content-Type': 'application/json'
     }
-    data = create_data_price_for_send(seller_id=recipient, from_db=True)
+    data = create_data_price_for_send(seller_id=acceptor, from_db=True)
     count, errors = 0, 0
     row = []
     for row in data:
@@ -513,20 +513,20 @@ def send_product_price(key_recipient=None, recipient=None):
                 if not line.get('updated'):
                     errors += 1
                     # print('product_NOT_UPDATED_offer_id {} {}'
-                    #       .format(line.get('offer_id'), recipient))
+                    #       .format(line.get('offer_id'), acceptor))
                 else:
                     count += 1
             oson_logger.info('product_UPDATED_price_offer_id '
-                             'recipient {}, errors {}, count {}'
-                             .format(recipient, errors, count))
+                             'acceptor {}, errors {}, count {}'
+                             .format(acceptor, errors, count))
 
         else:
             oson_logger.info('Some_trouble_from_export_price_oson -'
-                             ' recipient {}, answer {}, len data {}'
-                             .format(recipient, resp.text, len(data)))
+                             ' acceptor {}, answer {}, len data {}'
+                             .format(acceptor, resp.text, len(data)))
 
     send_get("Отправлено цены селлеру {}: удачно {}, неудачно {} из {} доступных."
-             .format(recipient, count, errors, len(row)))
+             .format(acceptor, count, errors, len(row)))
     return count, errors
 
 # get_product_info(38010832, "OWLT190601")

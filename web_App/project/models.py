@@ -256,17 +256,18 @@ class Marketplaces(db.Model):
 
 
 class InternalImport(db.Model):
+    __tablename__ = 'internal_import'
     id = db.Column(db.Integer(), primary_key=True)
-    internal_import_mp_1 = db.Column(db.String(50))
-    internal_import_store_1 = db.Column(db.String(50))
-    internal_import_role_1 = db.Column(db.String(50))
-    internal_import_discount_1 = db.Column(db.Integer())
-    internal_import_markup_1 = db.Column(db.Integer())
-    internal_import_mp_2 = db.Column(db.String(50))
-    internal_import_store_2 = db.Column(db.String(50))
-    internal_import_role_2 = db.Column(db.String(50))
-    internal_import_discount_2 = db.Column(db.Integer())
-    internal_import_markup_2 = db.Column(db.Integer())
+    i_import_donor_mp = db.Column(db.String(50))
+    i_import_donor_store = db.Column(db.String(50))
+    i_import_donor_role = db.Column(db.String(50))
+    i_import_donor_discount = db.Column(db.Integer())
+    i_import_donor_markup = db.Column(db.Integer())
+    i_import_acceptor_mp = db.Column(db.String(50))
+    i_import_acceptor_store = db.Column(db.String(50))
+    i_import_acceptor_role = db.Column(db.String(50))
+    i_import_acceptor_discount = db.Column(db.Integer())
+    i_import_acceptor_markup = db.Column(db.Integer())
     company_id = db.Column(db.String(50))
     user_id = db.Column(db.String(50))
 

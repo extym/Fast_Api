@@ -53,7 +53,7 @@ def standart_product(name_price=None):
             if not description:
                 description = name
             vendor = dictionary.get('vendor').replace('"', '')
-            category =
+            category = dictionary.get('type').strip('"')
             opt_price = int(dictionary.get('price').strip('"').replace('\xa0', '').split('.')[0])
             price = float(dictionary.get('RoznicaPrice').strip('"').replace('\xa0', '').split('.')[0])
             rule = False

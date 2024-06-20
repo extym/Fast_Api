@@ -88,25 +88,24 @@ def back_shops_tasks():
 
         if row.send_common_stocks:
             ii_raw = session.query(InternalImport) \
-                .where(InternalImport.internal_import_store_2 == row.shop_name) \
-                .where(InternalImport.internal_import_role_2 == 'recipient') \
+                .where(InternalImport.i_import_acceptor_store == row.shop_name) \
                 .first()
-            store_1 = ii_raw.internal_import_store_1
+            store_1 = ii_raw.i_import_donor_store
             # seller_id = row.seller_id
             if row.name_mp == 'ozon':
-                oson.send_stocks_oson_v3(key_recipient=key,
+                oson.send_stocks_oson_v3(key_acceptor=key,
                                          donor_name=store_1,
-                                         recipient=seller_id)
-                print('Send_stocks_oson_v3 - donor_name {}, recipient_id {}, key_recipient {}'
+                                         acceptor=seller_id)
+                print('Send_stocks_oson_v3 - donor_name {}, acceptor_id {}, key_acceptor {}'
                       .format(store_1, seller_id, key))
-                logging.info('Send_stocks_oson_v3 - donor {}, recipient {}'
+                logging.info('Send_stocks_oson_v3 - donor {}, acceptor {}'
                              .format(store_1, seller_id))
             if row.name_mp == 'wb':
                 wb.send_stocks_wb_v3(donor=store_1,
-                                     recipient=seller_id)
-                print('send_stocks_wb_v3 - donor {}, recipient {}'
+                                     acceptor=seller_id)
+                print('send_stocks_wb_v3 - donor {}, acceptor {}'
                       .format(store_1, seller_id))
-                logging.info('send_stocks_wb_v3 - donor {}, recipient {}'
+                logging.info('send_stocks_wb_v3 - donor {}, acceptor {}'
                              .format(store_1, seller_id))
 
         if row.enable_orders_submit:
@@ -147,11 +146,11 @@ def back_shops_tasks():
 
         if row.enable_sync_price:
             if row.name_mp == 'ozon':
-                ozon.send_product_price(key_recipient=key,
-                                        recipient=seller_id)
+                ozon.send_product_price(key_acceptor=key,
+                                        acceptor=seller_id)
                 print('Send_product_price oson - len key {},  seller_id {}'
                       .format(len(key), row.seller_id))
-                logging.info('Send_product_price oson - key {}, recipient_id {}'
+                logging.info('Send_product_price oson - key {}, acceptor_id {}'
                              .format(key, seller_id))
 
             if row.name_mp == 'wb':
@@ -583,29 +582,29 @@ def import_settings():
         #     photo = current_user.photo
         #     if not photo or photo is None:
         #         photo = 'prof-music-2.jpg'
-        #     internal_import_role_1 = request.args.get("internal_import_role_1")
-        #     internal_import_markup_1 = request.args.get("internal_import_markup_1")
-        #     internal_import_store_2 = request.args.get("internal_import_store_2")
-        #     internal_import_discount_2 = request.args.get("internal_import_discount_2")
-        #     internal_import_mp_1 = request.args.get("internal_import_mp_1")
-        #     internal_import_store_1 = request.args.get("internal_import_store_1")
-        #     internal_import_discount_1 = request.args.get("internal_import_discount_1")
-        #     internal_import_mp_2 = request.args.get("internal_import_mp_2")
-        #     internal_import_role_2 = request.args.get("internal_import_role_2")
-        #     internal_import_markup_2 = request.args.get("internal_import_markup_2")
+        #     i_import_donor_role = request.args.get("i_import_donor_role")
+        #     i_import_donor_markup = request.args.get("i_import_donor_markup")
+        #     i_import_acceptor_store = request.args.get("i_import_acceptor_store")
+        #     i_import_acceptor_discount = request.args.get("i_import_acceptor_discount")
+        #     i_import_donor_mp = request.args.get("i_import_donor_mp")
+        #     i_import_donor_store = request.args.get("i_import_donor_store")
+        #     i_import_donor_discount = request.args.get("i_import_donor_discount")
+        #     i_import_acceptor_mp = request.args.get("i_import_acceptor_mp")
+        #     i_import_acceptor_role = request.args.get("i_import_acceptor_role")
+        #     i_import_acceptor_markup = request.args.get("i_import_acceptor_markup")
         #
         #     return render_template('/import_settings.html',
         #                            uid=uid, role=role,
-        #                            internal_import_role_1=internal_import_role_1,
-        #                            internal_import_markup_1=internal_import_markup_1,
-        #                            internal_import_store_2=internal_import_store_2,
-        #                            internal_import_discount_2=internal_import_discount_2,
-        #                            internal_import_mp_1=internal_import_mp_1,
-        #                            internal_import_store_1=internal_import_store_1,
-        #                            internal_import_discount_1=internal_import_discount_1,
-        #                            internal_import_mp_2=internal_import_mp_2,
-        #                            internal_import_role_2=internal_import_role_2,
-        #                            internal_import_markup_2=internal_import_markup_2,
+        #                            i_import_donor_role=i_import_donor_role,
+        #                            i_import_donor_markup=i_import_donor_markup,
+        #                            i_import_acceptor_store=i_import_acceptor_store,
+        #                            i_import_acceptor_discount=i_import_acceptor_discount,
+        #                            i_import_donor_mp=i_import_donor_mp,
+        #                            i_import_donor_store=i_import_donor_store,
+        #                            i_import_donor_discount=i_import_donor_discount,
+        #                            i_import_acceptor_mp=i_import_acceptor_mp,
+        #                            i_import_acceptor_role=i_import_acceptor_role,
+        #                            i_import_acceptor_markup=i_import_acceptor_markup,
         #                            rows=rows, rows_mp=set(rows_mp),
         #                            photo=photo,
         #                            show=True,
@@ -661,23 +660,22 @@ def import_settings_post():
         return redirect('/import_settings')
 
     elif make == 'save_internal_import':
-        internal_import_mp_1 = data.get('internal_import_mp_1')
-        internal_import_store_1 = data.get('internal_import_store_1')
-        internal_import_role_1 = data.get('internal_import_role_1')
+        i_import_donor_mp = data.get('i_import_donor_mp')
+        i_import_donor_store = data.get('i_import_donor_store')
+        i_import_donor_role = data.get('i_import_donor_role')
 
-        if internal_import_mp_1 != 'Выбрать' and internal_import_store_1 != 'Выбрать' \
-                and internal_import_role_1 == 'donor':
+        if i_import_donor_mp != 'Выбрать' and i_import_donor_store != 'Выбрать':
             in_import = InternalImport(
-                internal_import_mp_1=internal_import_mp_1,
-                internal_import_store_1=internal_import_store_1,
-                internal_import_role_1=internal_import_role_1,
-                internal_import_markup_1=data.get('internal_import_markup_1'),
-                internal_import_discount_1=data.get('internal_import_discount_1'),
-                internal_import_mp_2=data.get('internal_import_mp_2'),
-                internal_import_store_2=data.get('internal_import_store_2'),
-                internal_import_role_2=data.get('internal_import_role_2'),
-                internal_import_discount_2=data.get('internal_import_discount_2'),
-                internal_import_markup_2=data.get('internal_import_markup_2'),
+                i_import_donor_mp=i_import_donor_mp,
+                i_import_donor_store=i_import_donor_store,
+                i_import_donor_role='donor',
+                i_import_donor_markup=data.get('i_import_donor_markup'),
+                i_import_donor_discount=data.get('i_import_donor_discount'),
+                i_import_acceptor_mp=data.get('i_import_acceptor_mp'),
+                i_import_acceptor_store=data.get('i_import_acceptor_store'),
+                i_import_acceptor_role='acceptor',
+                i_import_acceptor_discount=data.get('i_import_acceptor_discount'),
+                i_import_acceptor_markup=data.get('i_import_acceptor_markup'),
                 company_id=current_user.company_id,
                 user_id=current_user.name
             )
@@ -689,92 +687,84 @@ def import_settings_post():
             return redirect('/import_settings')
 
     elif make == 'start_internal_import_product':
-        internal_import_mp_1 = data.get('internal_import_mp_1')
-        internal_import_store_1 = data.get('internal_import_store_1')
-        internal_import_role_1 = data.get('internal_import_role_1')
-        internal_import_mp_2 = data.get('internal_import_mp_2')
-        internal_import_store_2 = data.get('internal_import_store_2')
-        internal_import_role_2 = data.get('internal_import_role_2')
+        i_import_donor_mp = data.get('i_import_donor_mp')
+        i_import_donor_store = data.get('i_import_donor_store')
+        i_import_donor_role='donor'
+        i_import_acceptor_mp = data.get('i_import_acceptor_mp')
+        i_import_acceptor_store = data.get('i_import_acceptor_store')
+        i_import_acceptor_role='acceptor'
 
-        if internal_import_role_1 != internal_import_role_2 and \
-                internal_import_store_1 != internal_import_store_2 and \
-                internal_import_mp_1 != 'Выбрать ' and \
-                internal_import_mp_2 != 'Выбрать ':
-            if internal_import_role_2 == 'donor' and internal_import_role_1 == 'recipient':
-                donor = data.get('internal_import_store_2')
-                recipient = data.get('internal_import_store_1')
-                donor_mp = data.get('internal_import_mp_2')
-                recipient_mp = data.get('internal_import_mp_1')
-            else:
-                donor = data.get('internal_import_store_1')
-                recipient = data.get('internal_import_store_2')
-                donor_mp = data.get('internal_import_mp_1')
-                recipient_mp = data.get('internal_import_mp_2')
+        if i_import_donor_store != i_import_acceptor_store and \
+                i_import_donor_mp != 'Выбрать ' and \
+                i_import_acceptor_mp != 'Выбрать ':
+            donor = data.get('i_import_donor_store')
+            acceptor = data.get('i_import_acceptor_store')
+            donor_mp = data.get('i_import_donor_mp')
+            acceptor_mp = data.get('i_import_acceptor_mp')
 
             job = q.enqueue_call(make_internal_import_oson_product
                                  (donor=donor,
-                                  recipient=recipient,
+                                  acceptor=acceptor,
                                   source='front',
                                   donor_mp=donor_mp,
-                                  recipient_mp=recipient_mp))
+                                  acceptor_mp=acceptor_mp))
             print(989898989, job.get_id)
         # print(*data.items(), sep='\n')
 
     elif make == 'start_internal_import_price':
         print('!!!!!!_start_internal_import_price_!!!!!')
-        internal_import_mp_1 = data.get('internal_import_mp_1')
-        internal_import_store_1 = data.get('internal_import_store_1')
-        internal_import_role_1 = data.get('internal_import_role_1')
-        internal_import_mp_2 = data.get('internal_import_mp_2')
-        internal_import_store_2 = data.get('internal_import_store_2')
-        internal_import_role_2 = data.get('internal_import_role_2')
-        internal_import_markup_2 = data.get('internal_import_markup_2')
+        i_import_donor_mp = data.get('i_import_donor_mp')
+        i_import_donor_store = data.get('i_import_donor_store')
+        i_import_donor_role='donor'
+        i_import_acceptor_mp = data.get('i_import_acceptor_mp')
+        i_import_acceptor_store = data.get('i_import_acceptor_store')
+        i_import_acceptor_role='acceptor'
+        i_import_acceptor_markup = data.get('i_import_acceptor_markup')
 
-        if internal_import_role_1 != internal_import_role_2 and \
-                internal_import_store_1 != internal_import_store_2 and \
-                internal_import_mp_1 != 'Выбрать ' and \
-                internal_import_mp_2 != 'Выбрать ':
-            if internal_import_role_2 == 'recipient' and internal_import_role_1 == 'donor':
-                job = q.enqueue_call(make_import_export_oson_price(
-                    donor=internal_import_role_1,
-                    recipient=internal_import_role_2,
-                    k=int(internal_import_markup_2),
-                    send_to_mp=False)
-                )
-                print(4545454545, job.get_id)
+        if i_import_donor_store != i_import_acceptor_store and \
+                i_import_donor_mp != 'Выбрать ' and \
+                i_import_acceptor_mp != 'Выбрать ':
+
+            job = q.enqueue_call(make_import_export_oson_price(
+                donor=i_import_donor_role,
+                acceptor=i_import_acceptor_role,
+                k=int(i_import_acceptor_markup),
+                send_to_mp=False)
+            )
+            print(4545454545, job.get_id)
         else:
             flash("Проверьте правильность ввода данных", 'error')
 
     elif make == 'check_settings':
         # print('!!!!!!check_settings!!!!!11')
-        if data.get('internal_import_mp_1') == 'Выбрать' \
-                and data.get('internal_import_store_1') == 'Выбрать' \
-                and data.get('internal_import_mp_2') == 'Выбрать' \
-                and data.get('internal_import_store_2') == 'Выбрать':
+        if data.get('i_import_donor_mp') == 'Выбрать' \
+                and data.get('i_import_donor_store') == 'Выбрать' \
+                and data.get('i_import_acceptor_mp') == 'Выбрать' \
+                and data.get('i_import_acceptor_store') == 'Выбрать':
             flash("Укажите хотя бы один магазин для которого нужен просмотр настроек", "alert")
         else:
             result = {k: v for k, v in data.items() if (v != '0' and v != 'Выбрать')}
             port_set, mprt_setts = {}, {}
-            if result.get('internal_import_store_1') is not None \
-                    and result.get("internal_import_store_2") is not None:
+            if result.get('i_import_donor_store') is not None \
+                    and result.get("i_import_acceptor_store") is not None:
                 import_set = db.session.scalars(select(InternalImport)
                 .where(
-                    InternalImport.internal_import_store_1 == data.get('internal_import_store_1'))
+                    InternalImport.i_import_donor_store == data.get('i_import_donor_store'))
                 .where(
-                    InternalImport.internal_import_store_2 == data.get('internal_import_store_2'))) \
+                    InternalImport.i_import_acceptor_store == data.get('i_import_acceptor_store'))) \
                     .first()
                 try:
                     port_set = import_set.__dict__
-                    internal_import_role_1 = port_set.get("internal_import_role_1")
-                    internal_import_markup_1 = port_set.get("internal_import_markup_1")
-                    internal_import_store_2 = port_set.get("internal_import_store_2")
-                    internal_import_discount_2 = port_set.get("internal_import_discount_2")
-                    internal_import_mp_1 = port_set.get("internal_import_mp_1")
-                    internal_import_store_1 = port_set.get("internal_import_store_1")
-                    internal_import_discount_1 = port_set.get("internal_import_discount_1")
-                    internal_import_mp_2 = port_set.get("internal_import_mp_2")
-                    internal_import_role_2 = port_set.get("internal_import_role_2")
-                    internal_import_markup_2 = port_set.get("internal_import_markup_2")
+                    i_import_donor_role = port_set.get("i_import_donor_role")
+                    i_import_donor_markup = port_set.get("i_import_donor_markup")
+                    i_import_acceptor_store = port_set.get("i_import_acceptor_store")
+                    i_import_acceptor_discount = port_set.get("i_import_acceptor_discount")
+                    i_import_donor_role='donor'
+                    i_import_donor_store = port_set.get("i_import_donor_store")
+                    i_import_donor_discount = port_set.get("i_import_donor_discount")
+                    i_import_acceptor_mp = port_set.get("i_import_acceptor_mp")
+                    i_import_acceptor_role='acceptor'
+                    i_import_acceptor_markup = port_set.get("i_import_acceptor_markup")
 
                     # for row in port_set.items():
                     #     # print(row + ' = ' + 'request.args.get("' + row + '")')
@@ -794,39 +784,37 @@ def import_settings_post():
                                            photo=photo,
                                            user_name=user_name,
                                            show=True,
-                                           internal_import_role_1=internal_import_role_1,
-                                           internal_import_markup_1=internal_import_markup_1,
-                                           internal_import_store_2=internal_import_store_2,
-                                           internal_import_discount_2=internal_import_discount_2,
-                                           internal_import_mp_1=internal_import_mp_1,
-                                           internal_import_store_1=internal_import_store_1,
-                                           internal_import_discount_1=internal_import_discount_1,
-                                           internal_import_mp_2=internal_import_mp_2,
-                                           internal_import_role_2=internal_import_role_2,
-                                           internal_import_markup_2=internal_import_markup_2)
+                                           i_import_donor_role=i_import_donor_role,
+                                           i_import_donor_markup=i_import_donor_markup,
+                                           i_import_acceptor_store=i_import_acceptor_store,
+                                           i_import_acceptor_discount=i_import_acceptor_discount,
+                                           i_import_donor_mp='donor',
+                                           i_import_donor_store=i_import_donor_store,
+                                           i_import_donor_discount=i_import_donor_discount,
+                                           i_import_acceptor_mp=i_import_acceptor_mp,
+                                           i_import_acceptor_role='acceptor',
+                                           i_import_acceptor_markup=i_import_acceptor_markup)
                 except:
                     flash("Настройки для указанных магазинов не найдены. Введите требуемые настройки и сохраните их.",
                           "alert")
 
-            elif result.get('internal_import_store_1') is not None:
+            elif result.get('i_import_donor_store') is not None:
                 import_set = db.session.scalars(select(InternalImport)
                 .where(
-                    InternalImport.internal_import_store_1 == data.get('internal_import_store_1'))
-                .where(
-                    InternalImport.internal_import_role_1 == data.get('internal_import_role_1'))) \
+                    InternalImport.i_import_donor_store == data.get('i_import_donor_store'))) \
                     .first()
                 try:
                     port_set = import_set.__dict__
-                    internal_import_role_1 = port_set.get("internal_import_role_1")
-                    internal_import_markup_1 = port_set.get("internal_import_markup_1")
-                    internal_import_store_2 = port_set.get("internal_import_store_2")
-                    internal_import_discount_2 = port_set.get("internal_import_discount_2")
-                    internal_import_mp_1 = port_set.get("internal_import_mp_1")
-                    internal_import_store_1 = port_set.get("internal_import_store_1")
-                    internal_import_discount_1 = port_set.get("internal_import_discount_1")
-                    internal_import_mp_2 = port_set.get("internal_import_mp_2")
-                    internal_import_role_2 = port_set.get("internal_import_role_2")
-                    internal_import_markup_2 = port_set.get("internal_import_markup_2")
+                    i_import_donor_role = 'donor'
+                    i_import_donor_markup = port_set.get("i_import_donor_markup")
+                    i_import_acceptor_store = port_set.get("i_import_acceptor_store")
+                    i_import_acceptor_discount = port_set.get("i_import_acceptor_discount")
+                    i_import_donor_mp = port_set.get("i_import_donor_mp")
+                    i_import_donor_store = port_set.get("i_import_donor_store")
+                    i_import_donor_discount = port_set.get("i_import_donor_discount")
+                    i_import_acceptor_mp = port_set.get("i_import_acceptor_mp")
+                    i_import_acceptor_role = 'acceptor'
+                    i_import_acceptor_markup = port_set.get("i_import_acceptor_markup")
 
                     uid = current_user.id
                     role = current_user.roles
@@ -841,39 +829,37 @@ def import_settings_post():
                                            photo=photo,
                                            user_name=user_name,
                                            show=True,
-                                           internal_import_role_1=internal_import_role_1,
-                                           internal_import_markup_1=internal_import_markup_1,
-                                           internal_import_store_2=internal_import_store_2,
-                                           internal_import_discount_2=internal_import_discount_2,
-                                           internal_import_mp_1=internal_import_mp_1,
-                                           internal_import_store_1=internal_import_store_1,
-                                           internal_import_discount_1=internal_import_discount_1,
-                                           internal_import_mp_2=internal_import_mp_2,
-                                           internal_import_role_2=internal_import_role_2,
-                                           internal_import_markup_2=internal_import_markup_2)
+                                           i_import_donor_role='donor',
+                                           i_import_donor_markup=i_import_donor_markup,
+                                           i_import_acceptor_store=i_import_acceptor_store,
+                                           i_import_acceptor_discount=i_import_acceptor_discount,
+                                           i_import_donor_mp=i_import_donor_mp,
+                                           i_import_donor_store=i_import_donor_store,
+                                           i_import_donor_discount=i_import_donor_discount,
+                                           i_import_acceptor_mp=i_import_acceptor_mp,
+                                           i_import_acceptor_role='acceptor',
+                                           i_import_acceptor_markup=i_import_acceptor_markup)
                 except:
                     flash("Настройки для указанного магазина не найдены. Введите требуемые настройки и сохраните их.",
                           "alert")
 
-            elif result.get('internal_import_store_2') is not None:
+            elif result.get('i_import_acceptor_store') is not None:
                 import_settings = db.session.scalars(select(InternalImport)
                 .where(
-                    InternalImport.internal_import_store_2 == data.get('internal_import_store_2'))
-                .where(
-                    InternalImport.internal_import_role_2 == data.get('internal_import_role_2'))) \
+                    InternalImport.i_import_acceptor_store == data.get('i_import_acceptor_store'))) \
                     .first()
                 try:
                     mprt_setts = import_settings.__dict__
-                    internal_import_role_1 = mprt_setts.get("internal_import_role_1")
-                    internal_import_markup_1 = mprt_setts.get("internal_import_markup_1")
-                    internal_import_store_2 = mprt_setts.get("internal_import_store_2")
-                    internal_import_discount_2 = mprt_setts.get("internal_import_discount_2")
-                    internal_import_mp_1 = mprt_setts.get("internal_import_mp_1")
-                    internal_import_store_1 = mprt_setts.get("internal_import_store_1")
-                    internal_import_discount_1 = mprt_setts.get("internal_import_discount_1")
-                    internal_import_mp_2 = mprt_setts.get("internal_import_mp_2")
-                    internal_import_role_2 = mprt_setts.get("internal_import_role_2")
-                    internal_import_markup_2 = mprt_setts.get("internal_import_markup_2")
+                    i_import_donor_role = 'donor'
+                    i_import_donor_markup = mprt_setts.get("i_import_donor_markup")
+                    i_import_acceptor_store = mprt_setts.get("i_import_acceptor_store")
+                    i_import_acceptor_discount = mprt_setts.get("i_import_acceptor_discount")
+                    i_import_donor_mp = mprt_setts.get("i_import_donor_mp")
+                    i_import_donor_store = mprt_setts.get("i_import_donor_store")
+                    i_import_donor_discount = mprt_setts.get("i_import_donor_discount")
+                    i_import_acceptor_mp = mprt_setts.get("i_import_acceptor_mp")
+                    i_import_acceptor_role = 'acceptor'
+                    i_import_acceptor_markup = mprt_setts.get("i_import_acceptor_markup")
 
                     uid = current_user.id
                     role = current_user.roles
@@ -888,16 +874,16 @@ def import_settings_post():
                                            photo=photo,
                                            user_name=user_name,
                                            show=True,
-                                           internal_import_role_1=internal_import_role_1,
-                                           internal_import_markup_1=internal_import_markup_1,
-                                           internal_import_store_2=internal_import_store_2,
-                                           internal_import_discount_2=internal_import_discount_2,
-                                           internal_import_mp_1=internal_import_mp_1,
-                                           internal_import_store_1=internal_import_store_1,
-                                           internal_import_discount_1=internal_import_discount_1,
-                                           internal_import_mp_2=internal_import_mp_2,
-                                           internal_import_role_2=internal_import_role_2,
-                                           internal_import_markup_2=internal_import_markup_2)
+                                           i_import_donor_role=i_import_donor_role,
+                                           i_import_donor_markup=i_import_donor_markup,
+                                           i_import_acceptor_store=i_import_acceptor_store,
+                                           i_import_acceptor_discount=i_import_acceptor_discount,
+                                           i_import_donor_mp=i_import_donor_mp,
+                                           i_import_donor_store=i_import_donor_store,
+                                           i_import_donor_discount=i_import_donor_discount,
+                                           i_import_acceptor_mp=i_import_acceptor_mp,
+                                           i_import_acceptor_role=i_import_acceptor_role,
+                                           i_import_acceptor_markup=i_import_acceptor_markup)
                 except:
                     flash("Настройки для указанного магазина не найдены. Введите требуемые настройки и сохраните их.",
                           "alert")
@@ -1854,7 +1840,7 @@ def upload_prices_table():
                                             rows=rows, role=role,
                                             photo=photo,
                                             user_name=user_name,
-                                            distributors=LOCAL_MODE))
+                                            distributors=WHEELS))
 
 
 @auth.route('/upload-prices-settings', methods=['GET', 'POST'])
@@ -2179,7 +2165,7 @@ def upload_prices_settings():
                            uid=uid, role=role,
                            rows=rows, rows_mp=set(rows_mp),
                            photo=photo,
-                           distributors=LOCAL_MODE,
+                           distributors=WHEELS,
                            user_name=user_name)
 
 
@@ -2219,7 +2205,7 @@ def distributor_settings():
                                        distributor=dist_name,
                                        api_link=api_link,
                                        show_dist=True,
-                                       distributors=LOCAL_MODE,
+                                       distributors=WHEELS,
                                        photo=photo,
                                        user_name=user_name)
 
@@ -2345,7 +2331,7 @@ def distributor_settings():
                                            login_api_dist=login_api_dist,
                                            key_api_dist=key_api_dist,
                                            store=store,
-                                           distributors=LOCAL_MODE,
+                                           distributors=WHEELS,
                                            show=True,
                                            photo=photo,
                                            user_name=user_name)
@@ -2364,7 +2350,7 @@ def distributor_settings():
                                rows=rows, rows_mp=set(rows_mp),
                                photo=photo,
                                user_name=user_name,
-                               distributors=LOCAL_MODE)
+                               distributors=WHEELS)
 
 
 @auth.route('/distributors-table', methods=['GET', 'POST'])
@@ -2491,7 +2477,7 @@ def distributors_table():
                                             rows=rows, role=role,
                                             photo=photo,
                                             user_name=user_name,
-                                            distributors=LOCAL_MODE))
+                                            distributors=WHEELS))
 
 
 @auth.route('/distributors-prices', methods=['GET', 'POST'])
@@ -2601,7 +2587,7 @@ def distributors_prices():
                                             rows=rows, role=role,
                                             photo=photo,
                                             user_name=user_name,
-                                            distributors=LOCAL_MODE))
+                                            distributors=WHEELS))
 
 
 @auth.app_errorhandler(404)
