@@ -3,7 +3,7 @@ import logging
 import os
 import time
 from html import unescape
-from .creds import LOCAL_MODE
+from .creds import LOCAL_MODE, WHEELS
 from flask import Blueprint, request, flash, render_template, redirect, url_for
 from flask_login import login_user, logout_user, login_required, current_user
 from psycopg2.errors import UniqueViolation
