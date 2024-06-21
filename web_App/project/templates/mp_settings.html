@@ -144,14 +144,14 @@
                     </header>
                     <div class="content-body">
                         <div class="row">
-                            <div class="col-lg-12 col-md-12 col-12">
-                                {% with messages = get_flashed_messages() %}
-                                {% if messages %}
-                                    <div class="notification danger">
-                                        {{ messages[0] }}
-                                    </div>
-                                {% endif %}
-                                {% endwith %}
+<!--                            <div class="col-lg-12 col-md-12 col-12">-->
+<!--                                {% with messages = get_flashed_messages() %}-->
+<!--                                {% if messages %}-->
+<!--                                    <div class="notification danger">-->
+<!--                                        {{ messages[0] }}-->
+<!--                                    </div>-->
+<!--                                {% endif %}-->
+<!--                                {% endwith %}-->
                                 <form autocomplete="off" name="validate_edit_mp" action="/edit_mp" method="post" >
 
                                     <div class="input-group mb-3">
@@ -206,8 +206,9 @@
 
                             </div>
                         </div>
-                    </div>
-                </section></div>
+<!--                    </div>-->
+                </section>
+    </div>
 
 
             <div class="col-xl-12">
@@ -232,119 +233,125 @@
                                             <label class="input-group-text" for="name_mp">Маркетплейс</label>
                                         </div>
                                         <select class="custom-select" id="name_mp" name="name_mp">
+                                        {% if show_sett %}
+
+                                                <option selected value="{{ name_mp }}">{{ name_mp }}</option>
+                                                <option></option>
+                                        {% else %}
+
                                                 <option selected></option>
                                                 <option value="yandex">ЯндексМаркет</option>
                                                 <option value="sber">СберМегаМаркет</option>
                                                 <option value="ozon">Озон</option>
                                                 <option value="wb">Вайлдбериз</option>
                                                 <option value="leroy">ЛеруаМерлен</option>
-                                            </select>
+
+                                            {% endif %}
+                                        </select>
                                     </div>
 
                                         <div class="form-group">
                                             <label class="form-label" for="formfield1">Общая наценка на маркетплейс</label>
                                             <span class="desc">% например "16"</span>
                                             <div class="controls">
+                                                {% if show_sett %}
+                                                <input type="text" class="form-control" name="mp_markup" value="{{ mp_markup }}" >
+                                                {% else %}
                                                 <input type="text" class="form-control" id="formfield1" name="mp_markup" >
+                                                {% endif %}
                                             </div>
                                         </div>
-
-<!--                                        <div class="form-group">-->
-<!--                                            <label class="form-label" for="formfield24">Общая скидка на маркетплейс</label>-->
-<!--                                            <span class="desc">% например "13"</span>-->
-<!--                                            <div class="controls">-->
-<!--                                                <input type="text" class="form-control" id="formfield24" name="mp_discount" >-->
-<!--                                            </div>-->
-<!--                                        </div>-->
 
                                         <div class="form-group">
                                             <label class="form-label" for="formfield21">Общая наценка для "Цена до скидки"</label>
                                             <span class="desc">% например "16"</span>
                                             <div class="controls">
-                                                <input type="text" class="form-control" id="formfield21" name="price_before" >
+                                                {% if show_sett %}
+                                                <input type="text" class="form-control" name="mp_discount" value="{{ mp_discount }}" >
+                                                {% else %}
+                                                <input type="text" class="form-control" id="formfield21" name="mp_discount" >
+                                                {% endif %}
                                             </div>
                                         </div>
 
-<!--                                        <div class="form-group">-->
-<!--                                            <label class="form-label" for="formfield3">Добавить артикул на маркетплейс</label>-->
-<!--                                            <span class="desc">можно несколько через запятую</span>-->
-<!--                                            <div class="controls">-->
-<!--                                                <input type="text" class="form-control" id="formfield3" name="add_articul_mp" >-->
-<!--                                            </div>-->
-<!--                                        </div>-->
-
-<!--                                        <div class="form-group">-->
-<!--                                            <label class="form-label" for="formfield4">Исключить артикул из маркетплейса</label>-->
-<!--                                            <span class="desc">можно несколько через запятую</span>-->
-<!--                                            <div class="controls">-->
-<!--                                                <input type="text" class="form-control" id="formfield4" name="extract_articul_mp" >-->
-<!--                                            </div>-->
-<!--                                        </div>-->
-
 
                                     </div>
+
                                     <div class="col-lg-6 col-md-6 col-6">
 
                                         <div class="input-group mb-3">
                                         <div class="input-group-prepend">
                                             <label class="input-group-text" for="input_shop_name">Магазин</label>
                                         </div>
-                                        <select class="custom-select" id="input_shop_name" name="shop_name">
-                                        <option selected>Выбрать </option>
-                                            {% for row in rows %}
-                                            <option value="{{ row }}" >{{ row }}</option>
-                                            {% endfor %}
 
-                                        </select>
+                                        <select class="custom-select" id="input_shop_name" name="shop_name">
+                                            {% if show_sett %}
+                                            <option selected >{{ shop_name }}</option>
+                                                <option >Выбрать </option>
+                                                <option value="all">Все магазины </option>
+
+                                            {% else %}
+                                            <option selected>Выбрать </option>
+                                                {% for row in rows %}
+                                                <option value="{{ row }}" >{{ row }}</option>
+                                                {% endfor %}
+                                            {% endif %}
+                                            </select>
+
                                         </div>
 
                                         <div class="form-group">
                                             <label class="form-label" for="formfield5">Дополнительная наценка на магазин</label>
                                             <span class="desc">% например "33"</span>
                                             <div class="controls">
+                                                {% if show_sett %}
+                                                <input type="text" class="form-control" name="store_markup" value="{{ store_markup }}" >
+                                                {% else %}
                                                 <input type="text" class="form-control" id="formfield5" name="store_markup" >
+                                                {% endif %}
                                             </div>
                                         </div>
 
-<!--                                        <div class="form-group">-->
-<!--                                            <label class="form-label" for="formfield6">Дополнительная скидка на магазин</label>-->
-<!--                                            <span class="desc">% например "23"</span>-->
-<!--                                            <div class="controls">-->
-<!--                                                <input type="text" class="form-control" id="formfield6" name="store_discount" >-->
-<!--                                            </div>-->
-<!--                                        </div>-->
 
                                         <div class="form-group">
                                             <label class="form-label" for="formfield22">Дополнительная наценка для "Цена до скидки"</label>
                                             <span class="desc">% например "16"</span>
                                             <div class="controls">
-                                                <input type="text" class="form-control" id="formfield22" name="shop_add_price_before" >
+                                                {% if show_sett %}
+                                                <input type="text" class="form-control" name="store_discount" value="{{ store_discount }}" >
+                                                {% else %}
+                                                <input type="text" class="form-control" id="formfield22" name="store_discount" >
+                                                {% endif %}
                                             </div>
                                         </div>
 
-<!--                                        <div class="form-group">-->
-<!--                                            <label class="form-label" for="formfield7">Добавить артикул в магазин</label>-->
-<!--                                            <span class="desc">можно несколько через запятую</span>-->
-<!--                                            <div class="controls">-->
-<!--                                                <input type="text" class="form-control" id="formfield7" name="formfield7" >-->
-<!--                                            </div>-->
-<!--                                        </div>-->
-
-<!--                                        <div class="form-group">-->
-<!--                                            <label class="form-label" for="formfield11">Исключить артикул из магазина</label>-->
-<!--                                            <span class="desc">можно несколько через запятую</span>-->
-<!--                                            <div class="controls">-->
-<!--                                                <input type="text" class="form-control" id="formfield11" name="extract_articul_shop" >-->
-<!--                                            </div>-->
-<!--                                        </div>-->
 
                                     </div>
+
+                                    {% if show_wb_sett %}
+                                    <div class="col-lg-9 col-md-9 col-9">
+                                        <div class="form-group">
+                                            <label class="form-label" for="tagsinput-2">Склады WB</label>
+                                            <br>
+<!--                                            <span class="desc">УКазать определенные</span>-->
+                                            <div class="controls">
+                                                <input type="text" name="tags" class="form-control" id="tagsinput-2" data-role="tagsinput" value="{{ warehouses }}" />
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+
                                 </div>
 
                                 <div class="col-lg-12 col-md-12 col-12">
                                     <div class="float-right ">
-                                        <button type="submit" class="btn btn-primary">Сохранить</button>
+                                        <button type="submit" name="save_edited_shop" class="btn btn-primary">Сохранить</button>
                                         <button class="btn" type="reset">Очистить</button>
+                                    </div>
+                                    <div class="float-left ">
+                                        <button type="submit" name="check_mp_shop" class="btn">Проверить настройки</button>
+
                                     </div>
                                 </div>
 

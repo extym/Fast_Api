@@ -222,22 +222,26 @@ def create_data_stocks_from_db_v2(seller_id=None, is_stocks_null=False):
     else:
         result.append(stocks)
 
-    oson_logger.info("From create_data_stocks_oson x100 - seller_id {}, is_stocks_null {}, len result {}"
+    oson_logger.info("From create_data_stocks_oson x100 - seller_id {}, "
+                     "is_stocks_null {}, len result {}"
                      .format(seller_id, is_stocks_null, len(result)))
     print('create_data_stocks_oson_x100', len(result))
     return result
 
 
 def create_data_stocks_from_db_v3(donor_name=None,
-                                  recip_id=None, is_stocks_null=False):
+                                  recip_id=None,
+                                  is_stocks_null=False):
     result = []
     stocks = []
     print('{} SELLER_ID_create_data_stocks donor_name {},'
           ' recip_id {},  is_stocks_null {}'
-          .format(datetime.datetime.now(), donor_name, recip_id, is_stocks_null))
+          .format(datetime.datetime.now(), donor_name,
+                  recip_id, is_stocks_null))
     with Session(engine) as session:
-        key = session.scalars(select(Marketplaces.key_mp)
-                                          .where(Marketplaces.seller_id == recip_id)) \
+        key = session.scalars(
+            select(Marketplaces.key_mp)
+            .where(Marketplaces.seller_id == recip_id)) \
             .first()
 
         print('{} SELLER_ID_1 key {}, seller_id {}'
@@ -424,13 +428,14 @@ def send_stocks_oson_v2(key=None, seller_id=None, is_stocks_null=False):
                 proxy.append(answer)
 
             logging.info('All Ride Send_stocks_oson_v2 - seller_id {}, is_stocks_null {},'
-                          ' len key {}, updated {}, errors {}.'
-                          .format(seller_id, is_stocks_null, len(key), count, error))
+                         ' len key {}, updated {}, errors {}.'
+                         .format(seller_id, is_stocks_null, len(key), count, error))
             sleep(0.6)
         else:
             logging.info('Trouble_stocks_oson_v2 - seller_id {}, is_stocks_null {},'
-                          ' len key {}, updated {}, errors {}, answer {}'
-                          .format(seller_id, is_stocks_null, len(key), count, error, response.text))
+                         ' len key {}, updated {}, errors {}, answer {}'
+                         .format(seller_id, is_stocks_null, len(key),
+                                 count, error, response.text))
             print('answer send_stocks_oson_v2', response.text)
             sleep(0.6)
 
@@ -449,9 +454,9 @@ def send_stocks_oson_v3(key_acceptor=None, donor_name=None,
     }
     metod = '/v2/products/stocks'
     link = host + metod
-    proxy, row,  last_error = [], [], ''
+    proxy, row, last_error = [], [], ''
     count, error = 0, 0
-    global_count, global_error = 0, 0 
+    global_count, global_error = 0, 0
     for row in pre_data:
         data = {'stocks': row}
         # os.abort()
@@ -472,13 +477,14 @@ def send_stocks_oson_v3(key_acceptor=None, donor_name=None,
                 proxy.append(answer)
             oson_logger.info('ALL RIDE send_stocks_oson - donor {},'
                              ' acceptor {}, updated {}, errors update {}'
-                             .format( donor_name, acceptor, count, error))
+                             .format(donor_name, acceptor, count, error))
             sleep(0.6)
         else:
 
             oson_logger.info('Error send_stocks_oson - answer {}, donor {},'
                              ' acceptor {}, len key_recip {}'
-                             .format(response.text, donor_name, acceptor, len(key_acceptor)))
+                             .format(response.text, donor_name,
+                                     acceptor, len(key_acceptor)))
             print('answer send_stocks_on_v3', response.text)
             sleep(0.6)
 
@@ -486,8 +492,9 @@ def send_stocks_oson_v3(key_acceptor=None, donor_name=None,
         global_error += error
 
     if send_tg:
-        all =  (len(pre_data) - 1) * 1000 + len(row)
-        send_get("Отправлено остатки селлеру {}: удачно {}, неудачно {} из {} доступных. Финишная ошибка- {}"
+        all = (len(pre_data) - 1) * 1000 + len(row)
+        send_get("Отправлено остатки селлеру {}: удачно {},"
+                 " неудачно {} из {} доступных. Финишная ошибка- {}"
                  .format(acceptor, global_count, global_error, all, last_error))
 
 
@@ -528,8 +535,6 @@ def send_product_price(key_acceptor=None, acceptor=None, send_tg=True):
                  .format(acceptor, count, errors, len(data)))
     return count, errors
 
-
-
 # get_product_info(38010832, "OWLT190601")
 # with app.app_context():
 #     product_info_price("463727127", "OWLC19-014")
@@ -540,4 +545,3 @@ def send_product_price(key_acceptor=None, acceptor=None, send_tg=True):
 # asyncio.run(create_data_stocks())
 # create_data_stocks_from_db(seller_id="1278621", is_stocks_null=False)
 # create_data_price_for_send(seller_id="1278621", from_db=True)
-

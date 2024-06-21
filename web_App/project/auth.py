@@ -542,17 +542,24 @@ def edit_store_post():
     data = request.form.to_dict()
     uid = current_user.id
     role = current_user.roles
+    user_name = current_user.name
     company_id = current_user.company_id
+    photo = current_user.photo
+    if not photo or photo is None:
+        photo = 'prof-music-2.jpg'
     print(*data.items(), sep='\n')
 
-    if 'name_mp' in data:
+    if 'save_edited_shop' in data:
         settings = dict()
         if data['shop_name'] != 'Выбрать':
             for key, value in data.items():
                 if value != '':
                     settings.update({key: value})
+                else:
+                    value = 0
+                    settings.update({key: value})
 
-            # del settings['settings_store']
+            del settings['save_edited_shop']
             market = Marketplaces.query \
                 .filter_by(shop_name=settings['shop_name']) \
                 .update(settings)
@@ -560,7 +567,61 @@ def edit_store_post():
             flash('Настройки удачно сохранены', 'success')
 
         else:
-            flash('Выберите редактируемый магазин')
+            flash('Выберите редактируемый магазин', 'alert')
+
+    if 'check_mp_shop' in data:
+        print('!!!!!!!!!!!!!!!!!!!!!-check_mp_shop')
+        if data['shop_name'] != 'Выбрать':
+            shop_name = data.get('shop_name')
+            shop_data = Marketplaces.query \
+                .filter_by(shop_name=shop_name) \
+                .first()
+
+            if data.get('name_mp') == 'wb':
+                name_mp = shop_data.name_mp
+                mp_markup = shop_data.mp_markup
+                mp_discount = shop_data.mp_discount
+                shop_name = shop_data.shop_name
+                store_markup = shop_data.store_markup
+                store_discount = shop_data.store_discount
+                # warehouses = shop_data.warehouses
+
+                return render_template('mp_settings.html', uid=uid,
+                                       role=role,
+                                       photo=photo,
+                                       name_mp=name_mp,
+                                       mp_markup=mp_markup,
+                                       mp_discount=mp_discount,
+                                       shop_name=shop_name,
+                                       store_markup=store_markup,
+                                       store_discount=store_discount,
+                                       warehouses=warehouses,
+                                       show_wb_sett=True,
+                                       show_sett=True,
+                                       user_name=user_name)
+
+            else:
+                name_mp = shop_data.name_mp
+                mp_markup = shop_data.mp_markup
+                mp_discount = shop_data.mp_discount
+                shop_name = shop_data.shop_name
+                store_markup = shop_data.store_markup
+                store_discount = shop_data.store_discount
+
+                return render_template('mp_settings.html', uid=uid,
+                                       role=role,
+                                       photo=photo,
+                                       name_mp=name_mp,
+                                       mp_markup=mp_markup,
+                                       mp_discount=mp_discount,
+                                       shop_name=shop_name,
+                                       store_markup=store_markup,
+                                       store_discount=store_discount,
+                                       show_sett=True,
+                                       user_name=user_name)
+
+        else:
+            flash('Выберите редактируемый магазин', 'alert')
 
     return redirect('/add_mp')
 
@@ -693,7 +754,6 @@ def import_settings_post():
         if i_import_donor_store != i_import_acceptor_store and \
                 i_import_donor_mp != 'Выбрать ' and \
                 i_import_acceptor_mp != 'Выбрать ':
-
             job = q.enqueue_call(make_internal_import_oson_product
                                  (donor=i_import_donor_store,
                                   acceptor=i_import_acceptor_store,
@@ -707,10 +767,10 @@ def import_settings_post():
         print('!!!!!!_start_internal_import_price_!!!!!')
         i_import_donor_mp = data.get('i_import_donor_mp')
         i_import_donor_store = data.get('i_import_donor_store')
-        i_import_donor_role='donor'
+        i_import_donor_role = 'donor'
         i_import_acceptor_mp = data.get('i_import_acceptor_mp')
         i_import_acceptor_store = data.get('i_import_acceptor_store')
-        i_import_acceptor_role='acceptor'
+        i_import_acceptor_role = 'acceptor'
         i_import_acceptor_markup = data.get('i_import_acceptor_markup')
 
         if i_import_donor_store != i_import_acceptor_store and \
@@ -751,11 +811,11 @@ def import_settings_post():
                     i_import_donor_markup = port_set.get("i_import_donor_markup")
                     i_import_acceptor_store = port_set.get("i_import_acceptor_store")
                     i_import_acceptor_discount = port_set.get("i_import_acceptor_discount")
-                    i_import_donor_role='donor'
+                    i_import_donor_role = 'donor'
                     i_import_donor_store = port_set.get("i_import_donor_store")
                     i_import_donor_discount = port_set.get("i_import_donor_discount")
                     i_import_acceptor_mp = port_set.get("i_import_acceptor_mp")
-                    i_import_acceptor_role='acceptor'
+                    i_import_acceptor_role = 'acceptor'
                     i_import_acceptor_markup = port_set.get("i_import_acceptor_markup")
 
                     # for row in port_set.items():
@@ -2214,7 +2274,7 @@ def distributor_settings():
                 db.session.commit()
                 flash('Настройки поставщика удачно сохранены')
 
-            elif data.get('distributor_price') == 'save' :
+            elif data.get('distributor_price') == 'save':
                 print(88888, data)
                 if data.get('settings_name_dist') == '':
                     flash('Выберите поставщика')
@@ -2235,7 +2295,7 @@ def distributor_settings():
                     )
                     db.session.add(dist_price)
                     db.session.commit()
-    
+
                     flash('Настройки прайса поставщика удачно сохранены')
                 else:
                     keypass = data.get('key_dist_price')
@@ -2330,8 +2390,8 @@ def distributor_settings():
 
             return redirect(url_for('auth.distributor_settings'))
 
-        shops_list = Marketplaces.query.\
-            filter_by(company_id=current_user.company_id)\
+        shops_list = Marketplaces.query. \
+            filter_by(company_id=current_user.company_id) \
             .all()
 
         for shop in shops_list:

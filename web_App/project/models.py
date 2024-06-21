@@ -232,9 +232,11 @@ class SalesToday(db.Model):
 
 
 class Marketplaces(db.Model):
+    __tablename__ = 'marketplaces'
     id = db.Column(db.Integer(), primary_key=True)
     user_id = db.Column(db.String(50))
     seller_id = db.Column(db.String(50))
+    warehouses = db.Column(db.String(50))
     name_mp = db.Column(db.String(50))
     key_mp = db.Column(db.String(1000))
     shop_name = db.Column(db.String(50))
