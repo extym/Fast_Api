@@ -116,19 +116,15 @@ def post_smth_v2(metod, seller_id=None, key=None):
 
 
 # def get_product_info(product_id, offer_id):
-#     metod = '/v2/product/info'
-#     link = host + metod
-#     data = {
-#         "offer_id": offer_id,
-#         "product_id": int(product_id),
-#         "sku": 0
-#     }
-#     response = requests.post(link, headers=header, json=data)
-#     answer = response.json()
-#     result = answer['result']["fbs_sku"]
-#     sleep(0.4)
-#     # print('get_product_info_onon', len(result)) #{'product_id': 38010832, 'offer_id': 'OWLT190601', 'is_fbo_visible': True, 'is_fbs_visible': True, 'archived': False, 'is_discounted': False}
-#     return result
+# metod = '/v2/product/info'
+# link = host + metod
+# data = { "offer_id": offer_id,
+# "product_id": int(product_id),
+# "sku": 0 }
+# response = requests.post(link, headers=header, json=data)
+# answer = response.json()
+# result = answer['result']["fbs_sku"] sleep(0.4) # print('get_product_info_onon',
+# len(result))
 
 
 # def create_data_stocks():
@@ -439,7 +435,8 @@ def send_stocks_oson_v2(key=None, seller_id=None, is_stocks_null=False):
             sleep(0.6)
 
 
-def send_stocks_oson_v3(key_acceptor=None, donor_name=None, acceptor=None):
+def send_stocks_oson_v3(key_acceptor=None, donor_name=None,
+                        acceptor=None, send_tg=True):
     print('SEND_STOCK_OSON_start_v3 len key {}, acceptor {}, donor_name {}'
           .format(key_acceptor, acceptor, donor_name))
     pre_data = create_data_stocks_from_db_v3(donor_name=donor_name,
@@ -488,12 +485,13 @@ def send_stocks_oson_v3(key_acceptor=None, donor_name=None, acceptor=None):
         global_count += count
         global_error += error
 
-    all =  (len(pre_data) - 1) * 1000 + len(row)
-    send_get("Отправлено остатки селлеру {}: удачно {}, неудачно {} из {} доступных. Финишная ошибка- {}"
-             .format(acceptor, global_count, global_error, all, last_error))
+    if send_tg:
+        all =  (len(pre_data) - 1) * 1000 + len(row)
+        send_get("Отправлено остатки селлеру {}: удачно {}, неудачно {} из {} доступных. Финишная ошибка- {}"
+                 .format(acceptor, global_count, global_error, all, last_error))
 
 
-def send_product_price(key_acceptor=None, acceptor=None):
+def send_product_price(key_acceptor=None, acceptor=None, send_tg=True):
     metod = 'https://api-seller.ozon.ru/v1/product/import/prices'
     #   "limit": 1000
     headers = {
@@ -525,9 +523,12 @@ def send_product_price(key_acceptor=None, acceptor=None):
                              ' acceptor {}, answer {}, len data {}'
                              .format(acceptor, resp.text, len(data)))
 
-    send_get("Отправлено цены селлеру {}: удачно {}, неудачно {} из {} доступных."
-             .format(acceptor, count, errors, len(row)))
+    if send_tg:
+        send_get("Отправлено цены селлеру {}: удачно {}, неудачно {} из {} доступных."
+                 .format(acceptor, count, errors, len(data)))
     return count, errors
+
+
 
 # get_product_info(38010832, "OWLT190601")
 # with app.app_context():
@@ -535,13 +536,6 @@ def send_product_price(key_acceptor=None, acceptor=None):
 # send_stocks_on()
 # asyncio.run(post_send_stocks())
 # create_data_stocks()
-
-# def convert(string):
-#     data = json.dumps(string)
-#     print(data)
-# # pr = [{'id': 'MP1703473-001', 'pickup': {'deliveryServiceId': 123600, 'deliveryServiceName': 'Леруа Мерлен сервис доставки', 'warehouseId': '1200', 'timeInterval': 'Invalid Interval', 'pickupDate': '2022-12-14'}, 'products': [{'lmId': '90115665', 'vendorCode': 'BT2834B', 'price': 5860, 'qty': 3, 'comissionRate': 0}, {'lmId': '90121362', 'vendorCode': 'HPUV65ELC', 'price': 5860, 'qty': 3, 'comissionRate': 0}], 'deliveryCost': 0, 'parcelPrice': 5860, 'creationDate': '2022-12-14', 'promisedDeliveryDate': '2022-12-22', 'calculatedWeight': 4.8, 'calculatedLength': 707, 'calculatedHeight': 156, 'calculatedWidth': 686}, {'id': 'MP1703472-001', 'pickup': {'deliveryServiceId': 123600, 'deliveryServiceName': 'Леруа Мерлен сервис доставки', 'warehouseId': '1200', 'timeInterval': 'Invalid Interval', 'pickupDate': '2022-12-14'}, 'products': [{'lmId': '90115665', 'vendorCode': 'BT2834B', 'price': 5860, 'qty': 3, 'comissionRate': 0}, {'lmId': '90121362', 'vendorCode': 'HPUV65ELC', 'price': 5860, 'qty': 3, 'comissionRate': 0}], 'deliveryCost': 0, 'parcelPrice': 5860, 'creationDate': '2022-12-14', 'promisedDeliveryDate': '2022-12-22', 'calculatedWeight': 4.8, 'calculatedLength': 707, 'calculatedHeight': 156, 'calculatedWidth': 686}, {'id': 'MP1703471-001', 'pickup': {'deliveryServiceId': 123600, 'deliveryServiceName': 'Леруа Мерлен сервис доставки', 'warehouseId': '1200', 'timeInterval': 'Invalid Interval', 'pickupDate': '2022-12-14'}, 'products': [{'lmId': '90115665', 'vendorCode': 'BT2834B', 'price': 5860, 'qty': 3, 'comissionRate': 0}, {'lmId': '90121362', 'vendorCode': 'HPUV65ELC', 'price': 5860, 'qty': 3, 'comissionRate': 0}], 'deliveryCost': 0, 'parcelPrice': 5860, 'creationDate': '2022-12-14', 'promisedDeliveryDate': '2022-12-22', 'calculatedWeight': 4.8, 'calculatedLength': 707, 'calculatedHeight': 156, 'calculatedWidth': 686}]
-# pr = {'message_type': 'TYPE_NEW_POSTING', 'seller_id': 90963, 'warehouse_id': 1020000075732000, 'posting_number': '13223249-0059-1', 'in_process_at': '2023-03-18T03:56:36Z', 'products': [{'sku': 789880982, 'quantity': 1}]}
-# convert(pr)
 
 # asyncio.run(create_data_stocks())
 # create_data_stocks_from_db(seller_id="1278621", is_stocks_null=False)

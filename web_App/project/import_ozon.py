@@ -700,21 +700,23 @@ def make_internal_import_oson_product(donor=None, acceptor=None, k=1,
     metod = 'https://api-seller.ozon.ru/v1/product/import-by-sku'
     if donor is not None and acceptor is not None and articul is not None:
         pre_data = []
+        product_data = []
         with Session(engine) as session:
             session.begin()
             acceptor_data = session.execute(select(Marketplaces.seller_id,
                                                    Marketplaces.key_mp)
                                             .where(Marketplaces.shop_name == acceptor)) \
                 .first()
-            product_data = session.query(Product)\
+            product = session.query(Product)\
                 .filter_by(shop_name=donor)\
                 .filter_by(articul_product=articul)\
                 .first()
+            product_data.append(product)
 
-        if product_data:
+        if len(product_data) > 0:
             for row in product_data:
-                # print(22222, row )
-                #############################3
+                print(22222, row )
+                #############################
                 # Make price ended for '9'
                 price = int(row.price_product_base) * (1 + k / 100)
                 price = str(price).split('.')[0][:-1] + "9"
@@ -1025,7 +1027,7 @@ def make_import_export_oson_price(donor=None, acceptor=None,
 
 # make_import_export_oson_price(donor='Low Price', acceptor='Полиция Вкуса', k=0)
 
-# print(make_internal_import_oson(donor='ImportGoods', acceptor='Ф-фторник'))
+print(make_internal_import_oson_product(donor='ImportGoods', acceptor='Ф-фторник', ))
 
 
 # product_info_price('34253142-0058-7', 1713959)
