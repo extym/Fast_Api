@@ -694,10 +694,152 @@ def check_import_limit(seller_id):
 
 
 def make_internal_import_oson_product(donor=None, acceptor=None, k=1,
-                                      source=None, donor_mp=None, acceptor_mp=None):
+                                      source=None, donor_mp=None,
+                                      acceptor_mp=None, articul=None):
     # metod = 'https://api-seller.ozon.ru/v3/product/import'
     metod = 'https://api-seller.ozon.ru/v1/product/import-by-sku'
-    if donor is not None and acceptor is not None:
+    if donor is not None and acceptor is not None and articul is not None:
+        pre_data = []
+        with Session(engine) as session:
+            session.begin()
+            acceptor_data = session.execute(select(Marketplaces.seller_id,
+                                                   Marketplaces.key_mp)
+                                            .where(Marketplaces.shop_name == acceptor)) \
+                .first()
+            product_data = session.query(Product)\
+                .filter_by(shop_name=donor)\
+                .filter_by(articul_product=articul)\
+                .first()
+
+        if product_data:
+            for row in product_data:
+                # print(22222, row )
+                #############################3
+                # Make price ended for '9'
+                price = int(row.price_product_base) * (1 + k / 100)
+                price = str(price).split('.')[0][:-1] + "9"
+                old_price = str(int(price) * 4)
+                ##############################3
+                item = {
+                    'name': row.name_product,
+                    'articul_product': row.articul_product,
+                    'price': price,
+                    'old_price': old_price,
+                    'external_sku': row.external_sku,
+                    'vat': '0',  # TODO make it's not magic num
+                    'currency_code': 'RUB'
+                }
+                pre_data.append(item)
+            # print(1111, acceptor_data[0], acceptor_data[1])
+            data = {"items": pre_data}
+            header = {
+                'Client-Id': acceptor_data[0],
+                'Api-Key': acceptor_data[1],
+                'Content-Type': 'application/json'
+            }
+
+            if source is None:
+                print('Client-Id {} from internal import oson'
+                      .format(header.get('Client-Id')))
+                os.abort()
+
+            elif donor_mp == 'ozon' and acceptor_mp == 'ozon':
+                answer = requests.post(url=metod,
+                                       headers=header,
+                                       json=data)
+                if answer.ok:
+                    data_json = answer.json()
+                    result = data_json.get('result')
+                    if result:
+                        sku_list = result.get('unmatched_sku_list')
+                        count, count_error = 0, 0
+                        for product in product_data:
+                            price = int(product.price_product_base) * (1 + k / 100)
+                            final_price = str(price).split('.')[0][:-1] + "9"
+                            old_price = str(int(price) * 4)
+                            new_prod = {
+                                'articul_product': product.articul_product,
+                                'shop_name': acceptor,
+                                'store_id': acceptor_data[0],
+                                'quantity': product.quantity,
+                                'reserved': product.reserved,
+                                'price_product_base': product.price_product_base,
+                                'final_price': final_price,
+                                'old_price': old_price,
+                                'discount': product.discount,
+                                'description_product': product.description_product,
+                                'photo': product.photo,
+                                'id_1c': product.id_1c,
+                                'date_added': datetime.now(),
+                                'date_modifed': datetime.now(),
+                                'selected_mp': product.selected_mp,
+                                'name_product': product.name_product,
+                                'status_mp': product.status_mp,
+                                'images_product': product.images_product,
+                                'price_add_k': product.price_add_k,
+                                'discount_mp_product': product.discount_mp_product,
+                                'set_shop_name': product.set_shop_name,
+                                'external_sku': product.external_sku,
+                                'alias_prod_name': product.alias_prod_name,
+                                'status_in_shop': product.status_in_shop,
+                                'shop_k_product': product.shop_k_product,
+                                'discount_shop_product': product.discount_shop_product,
+                                'quantity_for_shop': product.quantity_for_shop,
+                                'description_product_add': product.description_product_add,
+                                'uid_edit_user': product.uid_edit_user,
+                                'description_category_id': product.description_category_id,
+                                'type_id': product.type_id,
+                                'volume_weight': product.volume_weight,
+                                'barcode': product.barcode
+                            }
+                            if int(product.external_sku) in sku_list:
+
+                                # print(3333, product.shop_name, product.id, product.external_sku)
+                                # print(777777777, *product.as_dict(), sep=':,\n')
+                                with Session(engine) as session:
+                                    session.begin()
+                                    smth = insert(Product).values(new_prod)
+                                try:
+                                    session.execute(smth)
+                                    count += 1
+                                    print('We are write {} product'.format(count))
+                                except sqlalchemy.exc.IntegrityError as error:
+                                    session.rollback()
+                                    ## TODO We need know is nessasery update product
+                                    # session.begin()
+                                    # update_prod = update(Product)\
+                                    #     .where( Product.articul_product == new_prod.get('articul_product')) \
+                                    #     .where(Product.store_id == new_prod.get('store_id')) \
+                                    #     .values(new_prod)
+                                    # session.execute(update_prod)
+                                    count_error += 1
+                                    print(22222222222222, count_error)
+                                    continue
+                                finally:
+                                    session.commit()
+
+                            else:
+                                # print(5555, product.external_sku)
+                                continue
+
+                        return "Всё ок", count, len(result), count_error
+
+                else:
+                    print('Error make_response_internal_import_oson_product'
+                          ' status_code {},  acceptor_mp {}, answer.text {}'
+                          .format(answer.status_code, acceptor_mp, answer.text))
+                    return "Что-то пошло не так с запросом на сервер озона"
+
+            elif donor_mp == 'ozon' and acceptor_mp == 'wb':
+                pass
+
+            else:
+                print('Error make_internal_import_oson_product'
+                      ' status_code {},  acceptor_mp {}, donor_mp {}'
+                      .format(donor, donor_mp, acceptor_mp))
+                return 'Check you data', donor, donor_mp, acceptor_mp
+
+    elif donor is not None and acceptor is not None:
         pre_data = []
         with Session(engine) as session:
             session.begin()
@@ -735,7 +877,8 @@ def make_internal_import_oson_product(donor=None, acceptor=None, k=1,
             }
 
             if source is None:
-                print('Client-Id {} from internal import oson'.format(header.get('Client-Id')))
+                print('Client-Id {} from internal import oson'
+                      .format(header.get('Client-Id')))
                 os.abort()
 
             elif donor_mp == 'ozon' and acceptor_mp == 'ozon':

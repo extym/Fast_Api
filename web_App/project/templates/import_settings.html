@@ -112,6 +112,23 @@
                     </div>
                 </section>
 
+            <div>
+                {% with messages = get_flashed_messages() %}
+                    {% if messages and messages[1] == 'alert' %}
+                    <div class="alert alert-warning" role="alert">
+                    {% elif messages and messages[1] == 'success' %}
+                    <div class="alert alert-success" role="alert">
+                    {{ messages[0] }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                    {% endif %}
+                {% endwith %}
+
+                </div>
+
+
                 <section class="box ">
                     <header class="panel_header">
                         <h2 class="title float-left">Настроить импорт между магазинами </h2>
@@ -149,7 +166,7 @@
                                         </div>
 
                                         <div class="form-group">
-                                            <label class="form-label" for="edit_shop_name">Выбрать Магазин донор</label>
+                                            <label class="form-label" for="edit_shop_name">Выбрать Магазин источник</label>
 
                                             <div class="controls">
                                                 <select class="custom-select" id="select_shop_name" name="i_import_donor_store">
@@ -204,6 +221,23 @@
                                             </div>
                                         </div>
 
+                                        <div class="form-group">
+                                            <label class="form-label" for="formfield3">Отправить артикул из магазина</label>
+                                            <span class="desc"></span>
+                                            <div class="controls">
+                                                <input type="text"  placeholder="Введите артикул для переноса" class="form-control" id="formfield3" name="add_articul_donor" >
+                                            </div>
+                                        </div>
+
+                                        {% if smth_addons %}
+                                        <div class="form-group">
+                                            <label class="form-label" for="formfield4">Исключить артикул из маркетплейса</label>
+                                            <span class="desc">введите артикул, если хотите изменить его</span>
+                                            <div class="controls">
+                                                <input type="text" class="form-control" id="formfield4" name="extract_articul_donor" >
+                                            </div>
+                                        </div>
+                                        {% endif %}
 
                                     </div>
                                     <div class="col-lg-6 col-md-6 col-6">
@@ -281,6 +315,24 @@
 
                                             </div>
                                         </div>
+
+                                         <div class="form-group">
+                                            <label class="form-label" for="formfield7">Добавить артикул в магазин</label>
+                                            <span class="desc"></span>
+                                            <div class="controls">
+                                                <input type="text" placeholder="Укажите артикул, если хотите его изменить." title="Если оставить поле пустым, то артикул останется как в магазине источнике." class="form-control" id="formfield7" name="add_articul_acceptor" >
+                                            </div>
+                                        </div>
+
+                                        {% if smth_addons %}
+                                        <div class="form-group">
+                                            <label class="form-label" for="formfield11">Исключить артикул из магазина</label>
+                                            <span class="desc">введите артикул, ЕСЛИ ХОТИТЕ ИЗМЕНИТЬ</span>
+                                            <div class="controls">
+                                                <input type="text" class="form-control" id="formfield11" name="extract_articul_acceptor" >
+                                            </div>
+                                        </div>
+                                        {% endif %}
 
                                     </div>
                                 </div>

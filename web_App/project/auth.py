@@ -641,6 +641,7 @@ def import_settings_post():
     company_id = current_user.company_id
     data = request.form.to_dict()
     make = data.get('make')
+    print(57575, data)
     if make == 'start_import':
         mp = data.get('import_mp_name')
         shop_name = data.get('import_shop_names')
@@ -662,18 +663,15 @@ def import_settings_post():
     elif make == 'save_internal_import':
         i_import_donor_mp = data.get('i_import_donor_mp')
         i_import_donor_store = data.get('i_import_donor_store')
-        i_import_donor_role = data.get('i_import_donor_role')
 
         if i_import_donor_mp != 'Выбрать' and i_import_donor_store != 'Выбрать':
             in_import = InternalImport(
                 i_import_donor_mp=i_import_donor_mp,
                 i_import_donor_store=i_import_donor_store,
-                i_import_donor_role='donor',
                 i_import_donor_markup=data.get('i_import_donor_markup'),
                 i_import_donor_discount=data.get('i_import_donor_discount'),
                 i_import_acceptor_mp=data.get('i_import_acceptor_mp'),
                 i_import_acceptor_store=data.get('i_import_acceptor_store'),
-                i_import_acceptor_role='acceptor',
                 i_import_acceptor_discount=data.get('i_import_acceptor_discount'),
                 i_import_acceptor_markup=data.get('i_import_acceptor_markup'),
                 company_id=current_user.company_id,
@@ -689,25 +687,19 @@ def import_settings_post():
     elif make == 'start_internal_import_product':
         i_import_donor_mp = data.get('i_import_donor_mp')
         i_import_donor_store = data.get('i_import_donor_store')
-        i_import_donor_role='donor'
         i_import_acceptor_mp = data.get('i_import_acceptor_mp')
         i_import_acceptor_store = data.get('i_import_acceptor_store')
-        i_import_acceptor_role='acceptor'
 
         if i_import_donor_store != i_import_acceptor_store and \
                 i_import_donor_mp != 'Выбрать ' and \
                 i_import_acceptor_mp != 'Выбрать ':
-            donor = data.get('i_import_donor_store')
-            acceptor = data.get('i_import_acceptor_store')
-            donor_mp = data.get('i_import_donor_mp')
-            acceptor_mp = data.get('i_import_acceptor_mp')
 
             job = q.enqueue_call(make_internal_import_oson_product
-                                 (donor=donor,
-                                  acceptor=acceptor,
+                                 (donor=i_import_donor_store,
+                                  acceptor=i_import_acceptor_store,
                                   source='front',
-                                  donor_mp=donor_mp,
-                                  acceptor_mp=acceptor_mp))
+                                  donor_mp=i_import_donor_mp,
+                                  acceptor_mp=i_import_acceptor_mp))
             print(989898989, job.get_id)
         # print(*data.items(), sep='\n')
 
