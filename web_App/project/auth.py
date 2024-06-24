@@ -400,13 +400,6 @@ def add_mp_post():
                 result = check_api(key_mp, shop_id)
             print('result', result)
             if result:
-                # d_b = Db()
-                # d_b.insert_new_mp(uid, shop_id, shop_name, mp, key_mp, company_id)
-                # mp_sett = (uid, shop_id, shop_name, mp, key_mp)
-                # db.session.add(mp_sett)
-                # db.session.commit()
-                # d_b = Db()
-                # d_b.insert_new_mp(uid, shop_id, shop_name, mp, key_mp, company_id)
                 mp_sett = Marketplaces(
                     user_id=uid,
                     seller_id=shop_id,
@@ -416,7 +409,6 @@ def add_mp_post():
                     company_id=company_id,
                     date_added=date_add)
                 db.session.add(mp_sett)
-                print(2222222222222222222222222222222222222222222222)
                 db.session.commit()
                 flash('Настройки удачно сохранены', 'success')
             else:
@@ -635,42 +627,6 @@ def import_settings():
     else:
         rows, rows_mp = [], []
         show = request.args.get('show')
-        # if show:
-        #     uid = current_user.id
-        #     role = current_user.roles
-        #     need_id = current_user.company_id
-        #     user_name = current_user.name
-        #     photo = current_user.photo
-        #     if not photo or photo is None:
-        #         photo = 'prof-music-2.jpg'
-        #     i_import_donor_role = request.args.get("i_import_donor_role")
-        #     i_import_donor_markup = request.args.get("i_import_donor_markup")
-        #     i_import_acceptor_store = request.args.get("i_import_acceptor_store")
-        #     i_import_acceptor_discount = request.args.get("i_import_acceptor_discount")
-        #     i_import_donor_mp = request.args.get("i_import_donor_mp")
-        #     i_import_donor_store = request.args.get("i_import_donor_store")
-        #     i_import_donor_discount = request.args.get("i_import_donor_discount")
-        #     i_import_acceptor_mp = request.args.get("i_import_acceptor_mp")
-        #     i_import_acceptor_role = request.args.get("i_import_acceptor_role")
-        #     i_import_acceptor_markup = request.args.get("i_import_acceptor_markup")
-        #
-        #     return render_template('/import_settings.html',
-        #                            uid=uid, role=role,
-        #                            i_import_donor_role=i_import_donor_role,
-        #                            i_import_donor_markup=i_import_donor_markup,
-        #                            i_import_acceptor_store=i_import_acceptor_store,
-        #                            i_import_acceptor_discount=i_import_acceptor_discount,
-        #                            i_import_donor_mp=i_import_donor_mp,
-        #                            i_import_donor_store=i_import_donor_store,
-        #                            i_import_donor_discount=i_import_donor_discount,
-        #                            i_import_acceptor_mp=i_import_acceptor_mp,
-        #                            i_import_acceptor_role=i_import_acceptor_role,
-        #                            i_import_acceptor_markup=i_import_acceptor_markup,
-        #                            rows=rows, rows_mp=set(rows_mp),
-        #                            photo=photo,
-        #                            show=True,
-        #                            user_name=user_name)
-        # else:
         uid = current_user.id
         role = current_user.roles
         need_id = current_user.company_id
@@ -1540,15 +1496,11 @@ def sales_today(page=1):
             # print(row)
             rows += '<tr>' \
                     f'<td>{row.shop_order_id}</td>' \
-                    f'<td >{row.article}</td>' \
-                    f'<td >{row.article_mp}</td>' \
+                    f'<td >{row.name}</td>' \
                     f'<td >{row.quantity}</td>' \
                     f'<td >{row.price}</td>' \
                     f'<td >{row.shop_name}</td>' \
-                    f'<td >{row.date_added}</td>' \
                     f'<td >{row.shipment_date}</td>' \
-                    f'<td >{row.order_status}</td>' \
-                    f'<td >{row.category}</td>' \
                     f'</tr>'
 
         return unescape(render_template('table-sales-today.html',
@@ -1594,14 +1546,16 @@ def assembly_sales(page=1):
             assembly_orders = db.session.query(SalesToday.article_mp,
                                                SalesToday.shop_name,
                                                SalesToday.article,
-                                               SalesToday.order_status,
+                                               SalesToday.name,
+                                               SalesToday.shipment_date,
                                                func.sum(SalesToday.quantity)
                                                .label('total_sales')) \
                 .group_by(SalesToday.article_mp,
                           SalesToday.shop_name,
                           SalesToday.article,
-                          SalesToday.order_status) \
-                .where(SalesToday.date_added > yesterday) \
+                          SalesToday.shipment_date,
+                          SalesToday.name) \
+                .where(SalesToday.shipment_date < yesterday) \
                 .where(SalesToday.our_status == "NEW") \
                 .order_by(SalesToday.article_mp) \
                 .paginate(page=page, per_page=limit, error_out=False)
@@ -1642,9 +1596,10 @@ def assembly_sales(page=1):
             rows += '<tr>' \
                     f'<td ><img class="img-fluid" src="{photo[0]}" alt="" style="max-width:50px;"></td>' \
                     f'<td>{row.article}</td>' \
+                    f'<td>{row.name}</td>' \
                     f'<td >{row.shop_name}</td>' \
                     f'<td >{row.total_sales}</td>' \
-                    f'<td >{row.order_status}</td>' \
+                    f'<td >{row.shipment_date}</td>' \
                     f'</tr>'
 
         return unescape(render_template('table-assembly-sales.html',

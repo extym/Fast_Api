@@ -504,7 +504,7 @@
                                             <a class="" href="{{ url_for('auth.import_settings')}}"  >Настройки импорта</a>
                                         </li>
                                         {% endif %}
-                                        {% if role in ['owner', 'admin'] %}
+                                        {% if role in ['owner', 'admin'] and distributors %}
 
                                         <li>
                                             <a href="javascript:;"> <span class="title">Настройки экспорта</span>  <span class="arrow "></span> </a>
@@ -516,7 +516,7 @@
                                         {% endif %}
 
                                         <li>
-                                            <a class="" href="{{ url_for('auth.shops') }}"  target = '_blank' >Все магазины</a>
+                                            <a class="" href="{{ url_for('auth.shops') }}"  >Все магазины</a>
                                         </li>
 
                                 </ul>
@@ -530,15 +530,18 @@
                             </a>
                             <ul class="sub-menu" >
                                 <li>
-                                    <a class="" href="{{ url_for('auth.assembly_sales') }}" >СБОРКА ЗАКАЗОВ</a>
+                                    <a class="" href="{{ url_for('auth.assembly_sales') }}" >Отгрузки сегодня</a>
                                 </li>
+
                                 <li>
-                                    <a class="" href="{{ url_for('auth.sales_today') }}" >ЗАКАЗЫ на сегодня</a>
+                                    <a class="" href="{{ url_for('auth.sales_today') }}" >ЗАКАЗЫ сегодня</a>
                                 </li>
+                                {% if distributors %}
                                 <li>
                                     <a class="" href="{{ url_for('auth.sales_page') }}" >ЗАКАЗЫ СВОДНЫЕ</a>
 <!--{#                                    <a class="" {{main_table_href}} >ЗАКАЗЫ СВОДНЫЕ</a>#}-->
                                 </li>
+                                {% endif %}
 <!--                                <li>-->
 <!--                                    <a class="" href="ui-calendar.html" >ЗАКАЗЫ ЗА ПЕРИОДЫ</a>-->
 <!--                                </li>-->

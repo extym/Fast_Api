@@ -248,7 +248,9 @@ def reformat_data_items_v2(order, shop_name, mp):
                 item["quantity"],
                 item["price"][:-2],
                 item['offer_id'],
-                item['sku']
+                item['sku'],
+                order["shipping_date"],
+                item['name']
             )
             result.append(proxy)
 
@@ -359,10 +361,10 @@ async def onon_push():
                 order['our_id'], order['id'], order['status'], order['our_status'] \
                     = our_id, id_mp, "NEW", "NEW"  # TODO change place id_mp & our_id
                 ref_data = reformat_data_order(order, 'Ozon')
-                # list_items = reformat_data_items(order, 'Ozon')
+                order["shipping_date"] = ref_data[3]
                 list_items = reformat_data_items_v2(order, shop_name, 'Ozon')
                 await write_order(query1=query_write_order, data1=ref_data,
-                                  query2=query_write_items_v2, data2=list_items)
+                                  query2=query_write_items_v3, data2=list_items)
                 # await execute_query(query_write_order, ref_data)
                 # await executemany_query(query_write_items, list_items)
 

@@ -605,7 +605,7 @@ def import_oson_data_prod(user_id=None, shop_name=None, company_id=None, update_
                             .values(product)
                         session.execute(update_prod)
                         count_error += 1
-                        print(22222222222222, update_prod, product)
+                        # print(22222222222222, update_prod, product)
                     finally:
                         session.commit()
 
@@ -815,7 +815,6 @@ def make_internal_import_oson_product(donor=None, acceptor=None, k=1,
                                     #     .values(new_prod)
                                     # session.execute(update_prod)
                                     count_error += 1
-                                    print(22222222222222, count_error)
                                     continue
                                 finally:
                                     session.commit()
@@ -953,7 +952,7 @@ def make_internal_import_oson_product(donor=None, acceptor=None, k=1,
                                     #     .values(new_prod)
                                     # session.execute(update_prod)
                                     count_error += 1
-                                    print(22222222222222, count_error)
+                                    # print(22222222222222, count_error)
                                     continue
                                 finally:
                                     session.commit()
@@ -1027,7 +1026,7 @@ def make_import_export_oson_price(donor=None, acceptor=None,
 
 # make_import_export_oson_price(donor='Low Price', acceptor='Полиция Вкуса', k=0)
 
-# print(make_internal_import_oson_product(donor='ImportGoods', acceptor='Ф-фторник', articul=))
+# print(make_internal_import_oson_product(donor='ImportGoods', acceptor='Ф-фторник', articul='ЧеКа250гМодТу'))
 
 
 # product_info_price('34253142-0058-7', 1713959)

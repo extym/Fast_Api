@@ -548,6 +548,12 @@ query_write_items_v2 = ("INSERT INTO order_items "
                         "date_Added, date_Modifed)"
                         "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, now(), now())")
 
+query_write_items_v3 = ("INSERT INTO order_items "
+                        "(mp_order_id, shop_order_id, mp, shop_Name, order_status, "
+                        "our_status, vendor_code, id_1c, quantity, price, article, article_mp, "
+                        "date_Added, date_Modifed, shipment_date, name )"
+                        "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, now(), now(), %s, %s)")
+
 query_rm_full_order = (" SELECT * from fresh_orders, order_items "
                        " WHERE id_mp = %s")
 
