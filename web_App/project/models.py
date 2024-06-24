@@ -176,13 +176,10 @@ class AttributesProduct(db.Model):
 
 
 class Sales(db.Model):
+    __tablename__ = 'fresh_orders'
     id = db.Column(db.Integer, primary_key=True)
-    shop_order_id = db.Column(db.String(250))
+    our_id = db.Column(db.String(250))
     mp_order_id = db.Column(db.String(250))
-    article = db.Column(db.String(250))
-    article_mp = db.Column(db.String(250))
-    id_1c = db.Column(db.String(250))
-    name = db.Column(db.String(250))
     shop_name = db.Column(db.String(250))
     mp = db.Column(db.String(250))
     company_id = db.Column(db.String(250))

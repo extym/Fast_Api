@@ -1,4 +1,5 @@
 import logging
+import sys
 import time
 from datetime import datetime, timedelta
 import random
@@ -63,7 +64,7 @@ def day_for_stm(time_string):
 def get_wh(key=None):
     headers = {'Content-type': 'application/json',
                'Authorization': key}
-    link = 'https://suppliers-api.wildberries.ru/api/v2/warehouses'
+    link = 'https://suppliers-api.wildberries.ru/api/v3/warehouses'
     answer = requests.get(link, headers=headers)
     if answer.ok:
         print('get_wh', answer.json())
@@ -71,6 +72,36 @@ def get_wh(key=None):
     else:
         print('errot_get_wh', answer.text)
         return answer.status_code, answer.text
+
+
+def get_wh_v2(shop_name=None):
+    with Session(engine) as session:
+        key_data = session.scalars(select(Marketplaces)
+                             .where(Marketplaces.shop_name==shop_name)).all()
+    for row in key_data:
+        proxy = ''
+        if 'Маркетплейс' in row.tags and proxy != row.shop_name:
+            key = row.key_mp
+            proxy = row.shop_name
+            headers = {'Content-type': 'application/json',
+                       'Authorization': key}
+            link = 'https://suppliers-api.wildberries.ru/api/v3/warehouses'
+            answer = requests.get(link, headers=headers)
+            if answer.ok:
+                wh = [i['id'] for i in answer.json()]
+                # wh = {i['id']: i['name'] for i in answer.json()}
+                result = session.execute(update(Marketplaces)
+                                         .where(Marketplaces.shop_name==proxy)
+                                         .values(warehouses=wh)
+                                         )
+                session.commit()
+                print('get_wh', wh,  result)
+                return answer.status_code, answer.json()
+            else:
+                send_get("Ошибка получения списка складов WB для {}, статус {}, ответ {}"
+                         .format(proxy, answer.status_code, answer.text))
+                print('errot_get_wh', answer.text, answer.status_code)
+                return answer.status_code, answer.text
 
 
 def get_curent_stocks(key=None, warehouse_id=None):
@@ -329,6 +360,7 @@ def send_stocks_wb_v2(seller_id=None, is_stocks_null=None, sourse=None):
                                     .where(Marketplaces.seller_id == seller_id) \
                                     .where(Marketplaces.name_mp == "wb")) \
             .all()
+        print(333333333, data_keys)
     for datas in data_keys:
         if 'Маркетплейс' in datas.tags:
             api_key = datas.key_mp
@@ -355,7 +387,7 @@ def send_stocks_wb_v2(seller_id=None, is_stocks_null=None, sourse=None):
                 print('All_ride_send to WB - wh {} stocks {} - result {}'
                       .format(wh_id, len(wh_id), answer.text))
 
-# send_stocks_wb_v2(seller_id='admin100500')
+# send_stocks_wb_v2(seller_id='198178')
 
 def send_stocks_wb_v3(donor=None, acceptor=None):
     key_wh_recip, key_acceptor = '', ''
@@ -848,3 +880,5 @@ def import_product_from_wb(shop_name=None, company_id=None,
 # get_wh()
 
 # run_processing_orders_wb()
+
+get_wh_v2(shop_name='Полиция Вкуса')

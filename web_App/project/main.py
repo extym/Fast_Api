@@ -89,7 +89,7 @@ def day_for_stm(string):
     return dtt
 
 
-def reformat_data_order(order, shop):
+def reformat_data_order(order, shop, seller_id):
     result = None
     if shop == 'Yandex':
         try:
@@ -113,6 +113,7 @@ def reformat_data_order(order, shop):
         result = (
             order['id'],
             order["our_id"],
+            seller_id,
             shop,
             order["shipment_date"],
             order["status"],

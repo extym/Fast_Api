@@ -536,6 +536,11 @@ query_write_order_2 = ("INSERT INTO fresh_orders "
                        "shipment_Date, status, our_status, payment_Type, delivery)"
                        "VALUES (%s, %s, NOW(), NOW(), %s, %s, %s, %s, %s, %s, %s)")
 
+query_write_order_3 = ("INSERT INTO fresh_orders "
+                       "(id_mp, our_id, date_Added, date_Modifed, seller_id, mp, "
+                       "shipment_Date, status, our_status, payment_Type, delivery)"
+                       "VALUES (%s, %s, NOW(), NOW(), %s, %s, %s, %s, %s, %s, %s)")
+
 query_write_items = ("INSERT INTO order_items "
                      "(id_mp, shop_order_id, shop_Name, "
                      "our_status, vendor_code, id_1c, quantity, price, "
