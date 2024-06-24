@@ -32,9 +32,9 @@ def post_smth_to(market, metod, data, token):
 
     url = host + metod
     answer = requests.post(url=url,json=data, headers=headers)
-
+    # TODO make double request if nothing return
     data = answer.json()
-    print(222222, data)
+    print(2222112, data)
     return data
 
 

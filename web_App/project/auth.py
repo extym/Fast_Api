@@ -576,7 +576,7 @@ def edit_store_post():
                 shop_name = shop_data.shop_name
                 store_markup = shop_data.store_markup
                 store_discount = shop_data.store_discount
-                # warehouses = shop_data.warehouses
+                warehouses = shop_data.warehouses
 
                 return render_template('mp_settings.html', uid=uid,
                                        role=role,
@@ -1485,9 +1485,13 @@ def sales_today(page=1):
             photo = 'prof-music-2.jpg'
         rows = ''
         limit = 30
+        HOUR = '09:00:00'
+        yesterday = (datetime.datetime.today() - datetime.timedelta(days=1)) \
+            .strftime(f"%Y-%m-%d")
         # sales_today = db.session.query(SalesToday) \
         #     .paginate(page=page, per_page=limit, error_out=False)
-        sales_today = db.session.query(SalesToday) \
+        sales_today = db.session.query(SalesToday)\
+            .where(SalesToday.date_added > yesterday) \
             .paginate(page=page, per_page=limit, error_out=False)
         my_query = db.func.count(SalesToday.id)
         total_sales_today = db.session.execute(my_query).scalar()
@@ -1542,7 +1546,6 @@ def assembly_sales(page=1):
             total_assembly_sales = db.session.execute(my_query).scalar()
             max_page = total_assembly_sales // limit
 
-            # TODO
             assembly_orders = db.session.query(SalesToday.article_mp,
                                                SalesToday.shop_name,
                                                SalesToday.article,
@@ -1562,12 +1565,11 @@ def assembly_sales(page=1):
 
             # print(333333, assembly)
             # print(assembly)
-            print(222222, shop)
+            # print(222222, shop)
         else:
             my_query = db.func.count(SalesToday.id)
             total_assembly_sales = db.session.execute(my_query).scalar()
             max_page = total_assembly_sales // limit
-            # TODO
             assembly_orders = db.session.query(SalesToday.article_mp,
                                                SalesToday.shop_name,
                                                SalesToday.article,

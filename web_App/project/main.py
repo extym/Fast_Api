@@ -93,9 +93,9 @@ def reformat_data_order(order, shop):
     result = None
     if shop == 'Yandex':
         try:
-            day = reverse_time(order["delivery"]["shipments"][0]["shipmentDate"])
+            day = order["delivery"]["shipments"][0]["shipmentDate"]
         except:
-            day = reverse_time(order['delivery']['dates']['fromDate'])
+            day = order['delivery']['dates']['fromDate']
         result = (
             order["id"],
             order["our_id"],
@@ -114,7 +114,7 @@ def reformat_data_order(order, shop):
             order['id'],
             order["our_id"],
             shop,
-            reverse_time(time),
+            order["shipment_date"],
             order["status"],
             order["our_status"],
             "PREPAID",
@@ -127,7 +127,7 @@ def reformat_data_order(order, shop):
             order["shipments"][0]["shipmentId"],
             order['our_id'],
             shop,  # order["shop"],
-            reverse_time(time),
+            order["shipments"][0]["shipping"]["shippingDate"],
             order["status"],
             order["our_status"],
             "PREPAID",  # order['data'].get("paymentType"),
@@ -230,11 +230,8 @@ def reformat_data_items_v2(order, shop_name, mp):
         list_items = order['products']
 
         for item in list_items:
-            sku = str(item["sku"])
-            # vendor_code = items_skus[sku][1]
             vendor_code = item["offer_id"]
-            print('product_info_price', sku[0], vendor_code)
-            # price = product_info_price(items_skus[sku][0], vendor_code)
+            print('product_info', vendor_code)
             id_1c = try_get_id_1c(item["offer_id"])
             proxy = (
                 order["id"],
