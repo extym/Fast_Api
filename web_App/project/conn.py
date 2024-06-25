@@ -115,12 +115,11 @@ CREATE TABLE IF NOT EXISTS order_items (
         ON UPDATE CASCADE ON DELETE CASCADE,
     shop_order_id varchar,
     shop_name TEXT NOT NULL,
-    our_status text,
     article varchar NOT NULL,
     article_mp varchar,
     name TEXT,
     id_1c varchar,
-    shop_status TEXT, 
+    seller_id INT, 
     vendor_code varchar,
     quantity varchar, 
     price varchar,
@@ -134,7 +133,9 @@ CREATE TABLE IF NOT EXISTS order_items (
     delivery_type TEXT,
     is_cancelled bool,
     date_added varchar,
-    date_modifed varchar
+    date_modifed varchar,
+    our_status text, 
+    delivery_point varchar
     )
 """
 
@@ -331,30 +332,23 @@ CREATE TABLE IF NOT EXISTS  attributes_product (
 create_sales = """
 CREATE TABLE IF NOT EXISTS sales (
 id SERIAL PRIMARY KEY,
-shop_order_id varchar,
-mp_order_id varchar,
-article varchar NOT NULL,
-article_mp varchar,
-id_1c varchar,
-name TEXT,
+our_id varchar,
+id_mp varchar,
 shop_name varchar, 
 mp text NOT NULL,
 company_id TEXT,
-quantity INT,
-price TEXT,
-add_price TEXT,
-discount float4,
-description TEXT,
-photo varchar,
-category TEXT,
 shipment_date TEXT,
-delivery_type varchar,
-delivery_point varchar,
-order_status varchar,
-shop_status varchar,
-returned bool,
+delivery varchar,
+status varchar,
+our_status varchar,
+is_cancelled text,
 date_Added varchar,
 date_Modifed varchar,
+date_send_data varchar,
+date_1c varchar,
+payment_type text,
+summ_order varchar,
+seller_id int, 
 UNIQUE (id)
 )
 """
@@ -532,19 +526,19 @@ query_write_order = ("INSERT INTO fresh_orders "
                      "VALUES (%s, %s, NOW(), NOW(), %s, %s, %s, %s, %s, %s)")
 
 query_write_order_2 = ("INSERT INTO fresh_orders "
-                       "(id_mp, our_id, date_Added, date_Modifed, shop_Name, mp, "
+                       "(id_mp, our_id, date_Added, seller_id, shop_name, mp, "
                        "shipment_Date, status, our_status, payment_Type, delivery)"
-                       "VALUES (%s, %s, NOW(), NOW(), %s, %s, %s, %s, %s, %s, %s)")
+                       "VALUES (%s, %s, NOW(), %s, %s, %s, %s, %s, %s, %s, %s)")
 
 query_write_items = ("INSERT INTO order_items "
-                     "(id_mp, shop_order_id, shop_Name, "
-                     "our_status, vendor_code, id_1c, quantity, price, "
+                     "(mp_order_id, shop_order_id, shop_Name,  "
+                     "our_status, article, id_1c, quantity, price, "
                      "date_Added, date_Modifed)"
                      "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
 
 query_write_items_v2 = ("INSERT INTO order_items "
-                        "(mp_order_id, shop_order_id, mp, shop_Name, order_status, "
-                        "our_status, vendor_code, id_1c, quantity, price, article, article_mp, "
+                        "(mp_order_id, shop_order_id, mp, shop_Name, seller_id, order_status, "
+                        "our_status, id_1c, quantity, price, article, article_mp, "
                         "date_Added, date_Modifed)"
                         "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, now(), now())")
 

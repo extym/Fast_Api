@@ -137,6 +137,60 @@ def reformat_data_order(order, shop):
     return result
 
 
+def reformat_data_order_v2(order, mp, seller_id, shop_name):
+    result = None
+    if mp == 'Yandex':
+        try:
+            day = order["delivery"]["shipments"][0]["shipmentDate"]
+        except:
+            day = order['delivery']['dates']['fromDate']
+        result = (
+            order["id"],
+            order["our_id"],
+            seller_id,
+            shop_name,
+            mp,
+            day,
+            order["status"],
+            order["our_status"],
+            order["paymentType"],
+            order["delivery"]["type"]
+        )
+
+    elif mp == 'Ozon':
+        time = order["shipment_date"]  #.split('T')[0]
+
+        result = (
+            order['id'],
+            order["our_id"],
+            seller_id,
+            shop_name,
+            mp,
+            time,
+            order["status"],
+            order["our_status"],
+            "PREPAID",
+            order["delivery_method"]["warehouse_id"]
+        )
+
+    elif mp == 'Sber':
+        time = order["shipments"][0]["shipping"]["shippingDate"]  #.split('T')[0]
+        result = (
+            order["shipments"][0]["shipmentId"],
+            order['our_id'],
+            seller_id,
+            shop_name,
+            mp,
+            time,
+            order["status"],
+            order["our_status"],
+            "PREPAID",  # order['data'].get("paymentType"),
+            order["shipments"][0]['fulfillmentMethod']
+        )
+
+    return result
+
+
 def try_get_id_1c(offer_id):
     # items_skus = read_skus()
     # we wait dict[vendor_code] = (id_1c, price, quantity)
@@ -208,7 +262,7 @@ def reformat_data_items(order, shop):
     return result
 
 
-def reformat_data_items_v2(order, shop_name, mp):
+def reformat_data_items_v2(order, shop_name, mp, seller_id):
     result = []
     if mp == 'Yandex':
         list_items = order['items']
@@ -217,6 +271,8 @@ def reformat_data_items_v2(order, shop_name, mp):
                 order["id"],
                 order["our_id"],
                 mp,
+                shop_name,
+                seller_id,
                 order["our_status"],
                 item["offerId"],
                 item["id_1c"],
@@ -241,9 +297,9 @@ def reformat_data_items_v2(order, shop_name, mp):
                 order["our_id"],
                 mp,
                 shop_name,
+                seller_id,
                 order['status'],
                 order["our_status"],
-                vendor_code,
                 id_1c,
                 item["quantity"],
                 item["price"][:-2],
@@ -260,6 +316,8 @@ def reformat_data_items_v2(order, shop_name, mp):
                 order["shipments"][0]["shipmentId"],
                 order["our_id"],
                 mp,
+                shop_name,
+                seller_id,
                 order["our_status"],
                 item["offerId"],
                 item["id_1c"],
@@ -358,10 +416,10 @@ async def onon_push():
                 # print('new_order_onon', order['posting_number'])
                 order['our_id'], order['id'], order['status'], order['our_status'] \
                     = our_id, id_mp, "NEW", "NEW"  # TODO change place id_mp & our_id
-                ref_data = reformat_data_order(order, 'Ozon')
+                ref_data = reformat_data_order_v2(order, 'Ozon', seller_id, shop_name)
                 # list_items = reformat_data_items(order, 'Ozon')
-                list_items = reformat_data_items_v2(order, shop_name, 'Ozon')
-                await write_order(query1=query_write_order, data1=ref_data,
+                list_items = reformat_data_items_v2(order, shop_name, 'Ozon', seller_id)
+                await write_order(query1=query_write_order_2, data1=ref_data,
                                   query2=query_write_items_v2, data2=list_items)
                 # await execute_query(query_write_order, ref_data)
                 # await executemany_query(query_write_items, list_items)

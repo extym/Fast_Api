@@ -1027,7 +1027,7 @@ def make_import_export_oson_price(donor=None, acceptor=None,
 
 # make_import_export_oson_price(donor='Low Price', acceptor='Полиция Вкуса', k=0)
 
-print(make_internal_import_oson_product(donor='ImportGoods', acceptor='Ф-фторник', ))
+# print(make_internal_import_oson_product(donor='ImportGoods', acceptor='Ф-фторник', ))
 
 
 # product_info_price('34253142-0058-7', 1713959)
