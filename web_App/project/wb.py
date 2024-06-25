@@ -76,11 +76,14 @@ def get_wh(key=None):
 
 def get_wh_v2(shop_name=None):
     with Session(engine) as session:
+        # we get ALL because maybe a few keys with different tags
         key_data = session.scalars(select(Marketplaces)
                              .where(Marketplaces.shop_name==shop_name)).all()
     for row in key_data:
+        print(346788888, row.tags,  key_data)
         proxy = ''
         if 'Маркетплейс' in row.tags and proxy != row.shop_name:
+            count_wh = 0
             key = row.key_mp
             proxy = row.shop_name
             headers = {'Content-type': 'application/json',
@@ -92,11 +95,11 @@ def get_wh_v2(shop_name=None):
                 # wh = {i['id']: i['name'] for i in answer.json()}
                 result = session.execute(update(Marketplaces)
                                          .where(Marketplaces.shop_name==proxy)
-                                         .values(warehouses=wh)
+                                         .values(warehouses=wh, warehouse_name='all_wh')
                                          )
                 session.commit()
-                print('get_wh', wh,  result)
-                return answer.status_code, answer.json()
+                print('SUCCESS_get_warehouses', wh,  result)
+                return answer.status_code, len(wh)
             else:
                 send_get("Ошибка получения списка складов WB для {}, статус {}, ответ {}"
                          .format(proxy, answer.status_code, answer.text))
@@ -881,4 +884,4 @@ def import_product_from_wb(shop_name=None, company_id=None,
 
 # run_processing_orders_wb()
 
-get_wh_v2(shop_name='Полиция Вкуса')
+# get_wh_v2(shop_name='Полиция Вкуса')

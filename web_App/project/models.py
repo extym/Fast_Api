@@ -232,7 +232,6 @@ class Marketplaces(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     user_id = db.Column(db.String(50))
     seller_id = db.Column(db.String(50))
-    warehouses = db.Column(db.String(50))
     name_mp = db.Column(db.String(50))
     key_mp = db.Column(db.String(1000))
     shop_name = db.Column(db.String(50))
@@ -251,6 +250,9 @@ class Marketplaces(db.Model):
     is_1c = db.Column(db.Boolean())
     date_added = db.Column(db.String(50))
     date_modifed = db.Column(db.String(50))
+    warehouse_id = db.Column(db.Integer())
+    warehouse_name = db.Column(db.String(50))
+    warehouses = db.Column(db.String(50))
 
 
 class InternalImport(db.Model):

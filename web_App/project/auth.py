@@ -389,7 +389,7 @@ def add_mp_post():
             flash('Укажите, пожалуйста, название магазина, желательно как на маркетплейсе', 'error')
             return redirect('/add_mp')
 
-        if shop_name is None:
+        if key_mp is None:
             flash('Укажите, пожалуйста, API ключ магазина на маркетплейсе', 'error')
             return redirect('/add_mp')
 
@@ -425,7 +425,7 @@ def add_mp_post():
 
         if mp == 'wb':
             tags = data.get('tags')
-            # print(data)
+            print(1212121212, data)
             if not tags or tags == '':
                 uid = current_user.id
                 role = current_user.roles
@@ -539,11 +539,13 @@ def edit_store_post():
     photo = current_user.photo
     if not photo or photo is None:
         photo = 'prof-music-2.jpg'
-    print(*data.items(), sep='\n')
+    print(12312, *data.items(), sep='\n')
 
     if 'save_edited_shop' in data:
         settings = dict()
-        if data['shop_name'] != 'Выбрать':
+        if data['shop_name'] != 'Выбрать' \
+                and not data.get('split_settings_wb'):
+            print((33333333333333))
             for key, value in data.items():
                 if value != '':
                     settings.update({key: value})
@@ -552,6 +554,25 @@ def edit_store_post():
                     settings.update({key: value})
 
             del settings['save_edited_shop']
+            settings['warehouse_name'] = 'all_wh'
+            market = Marketplaces.query \
+                .filter_by(shop_name=settings['shop_name']) \
+                .update(settings)
+            db.session.commit()
+            flash('Настройки удачно сохранены', 'success')
+
+        elif data['shop_name'] != 'Выбрать' \
+                and data.get('split_settings_wb'):
+            print(55555555555555555555555555555555)
+            for key, value in data.items():
+                if value != '':
+                    settings.update({key: value})
+                else:
+                    value = 0
+                    settings.update({key: value})
+
+            del settings['save_edited_shop']
+            del settings['split_settings_wb']
             market = Marketplaces.query \
                 .filter_by(shop_name=settings['shop_name']) \
                 .update(settings)
@@ -576,7 +597,7 @@ def edit_store_post():
                 shop_name = shop_data.shop_name
                 store_markup = shop_data.store_markup
                 store_discount = shop_data.store_discount
-                warehouses = shop_data.warehouses
+                warehouses = shop_data.warehouses.strip('{').strip('}')
 
                 return render_template('mp_settings.html', uid=uid,
                                        role=role,
@@ -614,6 +635,14 @@ def edit_store_post():
 
         else:
             flash('Выберите редактируемый магазин', 'alert')
+
+    if 'get_wh_wb' in data:
+        result = wb.get_wh_v2(shop_name=data.get('shop_name'))
+        if result[0] == 200:
+            flash(f'удачно получено {result[1]} склада(ов).')
+        else:
+            flash(f'Проблема получения складов - статус {result[0]},'
+                  f' ответ - {result[1]}', 'error')
 
     return redirect('/add_mp')
 

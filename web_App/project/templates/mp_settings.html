@@ -274,6 +274,26 @@
                                             </div>
                                         </div>
 
+                                        {% if show_wb_sett and warehouses %}
+<!--                                        <div class="col-lg-6 col-md-6 col-6">-->
+                                            <div class="form-group">
+                                                <label class="form-label" for="tagsinput-2">Склады WB</label>
+                                                <br>
+    <!--                                            <span class="desc">УКазать определенные</span>-->
+                                                <div class="controls">
+                                                    <input type="text" name="warehouses" class="form-control" id="tagsinput-2" data-role="tagsinput" value="{{ warehouses }}" />
+
+                                                </div>
+                                            </div>
+<!--                                        </div>-->
+
+                                        {% elif show_wb_sett and not warehouses %}
+                                        <div class="form-group ">
+                                            <button type="submit" name="get_wh_wb" class="btn btn-primary">Получить склады ВБ</button>
+
+                                        </div>
+
+                                        {% endif %}
 
                                     </div>
 
@@ -325,22 +345,25 @@
                                             </div>
                                         </div>
 
-
-                                    </div>
-
-                                    {% if show_wb_sett %}
-                                    <div class="col-lg-9 col-md-9 col-9">
+                                        {% if show_wb_sett %}
+<!--                                        <div class="col-lg-6 col-md-6 col-6">-->
                                         <div class="form-group">
-                                            <label class="form-label" for="tagsinput-2">Склады WB</label>
-                                            <br>
-<!--                                            <span class="desc">УКазать определенные</span>-->
-                                            <div class="controls">
-                                                <input type="text" name="tags" class="form-control" id="tagsinput-2" data-role="tagsinput" value="{{ warehouses }}" />
 
-                                            </div>
+                                                <h6>Разделить настройки по складам </h6>
+                                            <label class="form-label" title="При включении этой функции базовая цена будет пересчитана на основе импортируемой цены и сохранена" for="edit_shop_name">Включить</label>
+
+                                            <input type="checkbox" name="split_settings_wb"  class="iswitch iswitch-warning">
+
                                         </div>
+<!--                                    </div>-->
+
+
+                                        {% endif %}
+
+
                                     </div>
-                                    {% endif %}
+
+
 
                                 </div>
 
