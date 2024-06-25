@@ -585,6 +585,7 @@ async def new_order_sber(uuid):
     token = request.headers.get('Basic auth')
     if token == None or token != None:
         data_req = request.json
+        print(55555555555, data_req)
         order = data_req["data"]
         order_id = order.get("shipments")[0]["shipmentId"]
         pre_proxy = order["shipments"][0]["items"]
@@ -610,9 +611,6 @@ async def new_order_sber(uuid):
             = "NEW", "NEW", proxy
         ref_data = reformat_data_order_v2(order, 'Sber', model=model,
                                           client_id_ps=client_id_ps)
-        # print(12345678, type(ref_data[0]), ref_data[0])
-        # print(123, type(ref_data[1]), ref_data[1])
-        # print(123, type(ref_data[2]), ref_data[2])
         not_exist = execute_query_return_bool(query_write_order, ref_data[0])
         if not_exist:
             await executemany_query(query_write_items, ref_data[1])

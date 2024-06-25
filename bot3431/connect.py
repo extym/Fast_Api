@@ -194,7 +194,7 @@ async def execute_query_v3(query, data):
         conn.autocommit = True
         with conn.cursor() as cursor:
             try:
-                print("Query from execute_query {} {}".format(len(data), data))
+                # print("Query from execute_query {} {}".format(len(data), data))
                 cursor.execute(query, data)
                 # print("Query from execute_query executed successfully")
             except OperationalError as err:
@@ -534,7 +534,7 @@ query_get_shop_client_id = \
 
 
 query_get_shop_campain_id = \
-    (" SELECT model, client_id, upload_link, api_key_ps "
+    (" SELECT model, client_id, upload_link, api_key_ps, autoreorder "
      " FROM stores "
      " WHERE campain_id = %s ")
 
