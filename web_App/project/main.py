@@ -420,7 +420,7 @@ async def onon_push():
                 order["shipping_date"] = ref_data[3]
                 list_items = reformat_data_items_v2(order, shop_name, 'Ozon', seller_id)
                 await write_order(query1=query_write_order_2, data1=ref_data,
-                                  query2=query_write_items_v2, data2=list_items)
+                                  query2=query_write_items_v3, data2=list_items)
                 # await execute_query(query_write_order, ref_data)
                 # await executemany_query(query_write_items, list_items)
 

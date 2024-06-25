@@ -572,7 +572,7 @@ query_add_product = (" INSERT INTO products "
                      " price_product_base, quantity,  "
                      " date_added, date_modifed, vendor_code, brand,   "
                      " articul_product, id_1c, photo, shop_k_product, shop_name ) "
-                     " VALUES (%s, %s, %s, %s, %s, now(), now(), %s, %s, %s, %s, %s, %s, %s, %s)")
+                     " VALUES (%s, %s, %s, %s, %s, now(), now(), %s, %s, %s, %s, %s, %s, %s)")
 
 query_add_wheels_options = (" INSERT INTO attributes_product "
                            " (name_category_id, category_mark, name_price, "
