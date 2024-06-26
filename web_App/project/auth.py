@@ -544,7 +544,7 @@ def edit_store_post():
     if 'save_edited_shop' in data:
         settings = dict()
         if data['shop_name'] != 'Выбрать' \
-                and not data.get('split_settings_wb'):
+                and not data.get('split_wh'):
             print((33333333333333))
             for key, value in data.items():
                 if value != '':
@@ -554,6 +554,7 @@ def edit_store_post():
                     settings.update({key: value})
 
             del settings['save_edited_shop']
+            settings['split_wh'] = 0
             settings['warehouse_name'] = 'all_wh'
             market = Marketplaces.query \
                 .filter_by(shop_name=settings['shop_name']) \
@@ -562,7 +563,7 @@ def edit_store_post():
             flash('Настройки удачно сохранены', 'success')
 
         elif data['shop_name'] != 'Выбрать' \
-                and data.get('split_settings_wb'):
+                and data.get('split_wh'):
             print(55555555555555555555555555555555)
             for key, value in data.items():
                 if value != '':
@@ -572,12 +573,22 @@ def edit_store_post():
                     settings.update({key: value})
 
             del settings['save_edited_shop']
-            del settings['split_settings_wb']
+            settings['split_wh'] = 1
             market = Marketplaces.query \
                 .filter_by(shop_name=settings['shop_name']) \
                 .update(settings)
             db.session.commit()
-            flash('Настройки удачно сохранены', 'success')
+            result = wb.get_wh_v2(shop_name=data.get('shop_name'),
+                                  split_wh=True,
+                                  user_id=current_user.id)
+            if result[0] == 200:
+                flash(f'Удачно получено {result[1]} склада(ов).'
+                      f' Настройки удачно сохранены', 'success')
+            else:
+                flash(f'Проблема получения складов - статус {result[0]},'
+                      f' ответ - {result[1]}', 'error')
+
+            # flash('Настройки удачно сохранены', 'success')
 
         else:
             flash('Выберите редактируемый магазин', 'alert')
@@ -636,8 +647,19 @@ def edit_store_post():
         else:
             flash('Выберите редактируемый магазин', 'alert')
 
-    if 'get_wh_wb' in data:
-        result = wb.get_wh_v2(shop_name=data.get('shop_name'))
+    if 'get_wh_wb' in data and data.get('split_wh') == 'on':
+        result = wb.get_wh_v2(shop_name=data.get('shop_name'),
+                              split_wh=True,
+                              user_id=current_user.id)
+        if result[0] == 200:
+            flash(f'удачно получено {result[1]} склада(ов).')
+        else:
+            flash(f'Проблема получения складов - статус {result[0]},'
+                  f' ответ - {result[1]}', 'error')
+    elif 'get_wh_wb' in data and data.get('split_wh') != 'on':
+        result = wb.get_wh_v2(shop_name=data.get('shop_name'),
+                              split_wh=False,
+                              user_id=current_user.id)
         if result[0] == 200:
             flash(f'удачно получено {result[1]} склада(ов).')
         else:

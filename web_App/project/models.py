@@ -253,6 +253,7 @@ class Marketplaces(db.Model):
     warehouse_id = db.Column(db.Integer())
     warehouse_name = db.Column(db.String(50))
     warehouses = db.Column(db.String(50))
+    split_wh = db.Column(db.Boolean())
 
 
 class InternalImport(db.Model):
