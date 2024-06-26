@@ -74,13 +74,13 @@ def get_wh(key=None):
         return answer.status_code, answer.text
 
 
-def get_wh_v2(shop_name=None):
+def get_wh_v2(shop_name=None, split_wh=False, user_id=None):
     with Session(engine) as session:
         # we get ALL because maybe a few keys with different tags
         key_data = session.scalars(select(Marketplaces)
                              .where(Marketplaces.shop_name==shop_name)).all()
     for row in key_data:
-        print(346788888, row.tags,  key_data)
+        print(346788888, row.tags)
         proxy = ''
         if 'Маркетплейс' in row.tags and proxy != row.shop_name:
             count_wh = 0
@@ -91,14 +91,36 @@ def get_wh_v2(shop_name=None):
             link = 'https://suppliers-api.wildberries.ru/api/v3/warehouses'
             answer = requests.get(link, headers=headers)
             if answer.ok:
-                wh = [i['id'] for i in answer.json()]
-                # wh = {i['id']: i['name'] for i in answer.json()}
-                result = session.execute(update(Marketplaces)
-                                         .where(Marketplaces.shop_name==proxy)
-                                         .values(warehouses=wh, warehouse_name='all_wh')
-                                         )
-                session.commit()
-                print('SUCCESS_get_warehouses', wh,  result)
+                if not split_wh:
+                    wh = [i['id'] for i in answer.json()]
+                    result = session.execute(update(Marketplaces)
+                                             .where(Marketplaces.shop_name==proxy)
+                                             .values(warehouses=wh, warehouse_name='all_wh')
+                                             )
+                    session.commit()
+                    print('SUCCESS_get_warehouses', wh,  result)
+                else:
+                    wh = {i['id']: i['name'] for i in answer.json()}
+                    for key, value in wh.items():
+                        market = {
+                            "user_id": user_id,
+                            "seller_id": row.seller_id,
+                            "name_mp": row.name_mp,
+                            "key_mp": row.key_mp,
+                            "shop_name": row.shop_name + "_" + value,
+                            "company_id": row.company_id,
+                            "tags": row.tags,
+                            "mp_discount": row.mp_discount,
+                            "mp_markup": row.mp_markup,
+                            "is_1c": row.is_1c,
+                            "date_added": datetime.datetime.now(),
+                            "warehouse_id": key,
+                            "warehouse_name": value,
+                            "split_wh": True
+                        }
+                        result = session.execute(insert(Marketplaces).values(market))
+                        session.commit()
+
                 return answer.status_code, len(wh)
             else:
                 send_get("Ошибка получения списка складов WB для {}, статус {}, ответ {}"
