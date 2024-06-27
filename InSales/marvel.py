@@ -1,6 +1,8 @@
 import asyncio
 import datetime
 import json
+import os
+
 from creds import marvel_login, marvel_password, CSV_PATH
 import requests
 import csv
@@ -192,9 +194,27 @@ def create_csv_for_category_from_marvel_v2():
         writer.writeheader()
         writer.writerows(allpro)
 
-def make_data_cats():
+
+def write_excel_v2(data, remote=True):
+    if not remote:
+        with open('marvel_categories.csv', 'w') as file:
+            writer = csv.writer(file)
+            writer.writerows(data)
+            path_file = str(os.getcwd()) + 'marvel_categories.csv'
+            print('ALL_RIDE', path_file)
+
+    else:
+        with open(CSV_PATH + 'marvel_categories.csv', 'w') as file:
+            writer = csv.writer(file)
+            writer.writerows(data)
+            path_file = CSV_PATH + 'marvel_cats.csv'
+            print('ALL_RIDE', path_file)
+
+    return path_file
+
+def make_data_cats_marvel():
     try:
-        data = get_catalog()[1].get('Body').get('Categories')
+        data = get_catalog()  #[1].get('Body').get('Categories')
     except:
         data = read_json()
     categories = []
@@ -220,14 +240,14 @@ def make_data_cats():
 
     datas = [i for i in categories if i.get('SubCategories') == []]
     if len(datas) == len(categories):
-        write_excel(datas)
+        write_excel_v2(datas)
         # print(*datas, sep='\n')
         return True, datas
     else:
         return False, categories
 
 
-def make_data_cats_v2(datas):
+def make_data_cats_marvel_v2(datas):
     data = datas.get('Body').get('Categories')
     categories = list()
     if data:
@@ -264,17 +284,22 @@ def get_catalog():
     metod = 'GetCatalogCategories'
     url = link + metod
     answer = requests.post(url, params=params_marvel)
+    result = None
     try:
         data = answer.json()
         if data.get('Header').get('Code') == 0:
-            write_json(data.get('Body').get('Categories'))
-            make_data_cats_v2(data)
+            result = data.get('Body').get('Categories')
+            write_json(result)
+            return result
             # print('data', len(data.get('Body').get('Categories')))
+
         else:
             print('S0me_fuck_up_server_marvel_1 - ' + data.get('Header').get('Message'))
 
     except Exception as err:
         print("Some_fuck_up {}".format(err))
+
+    return result
 
 
 def get_full_stock():
@@ -378,8 +403,8 @@ def get_photos(list_ids):
     return proxy
 
 
-async def save_categories_vendors():
-    data = make_data_cats()[1]
+async def save_categories_marvel():
+    data = make_data_cats_marvel()[1]
     proxy = []
     for category in data:
         maxy = {
@@ -393,12 +418,13 @@ async def save_categories_vendors():
         proxy.append(maxy)
     write_data = [(i.get('vendor'), i.get('name'), i.get('category_treeId'), i.get('parentId', '0'), i.get('category')) for i in proxy]
 
-    # write_excel(write_data)
+    write_excel_v2(write_data)
     # print('write_data', write_data)
-    if await executemany_query(query_write_vendors_v2, write_data):
-        print('Categories tried saved')
-    else:
-        print("XS")
+    if write_data:
+        if await executemany_query(query_write_vendors_v2, write_data):
+            print('Categories tried saved')
+        else:
+            print("XS")
 
 
 # #

@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import os
 from time import sleep
 import requests
 
@@ -39,6 +40,18 @@ def get_netlab_token():
     # print(fresh_token)
     # print(answer.json())
 
+
+async def get_netlab_token_v2():
+    url = 'http://services.netlab.ru/rest/authentication/token.json?'
+    params = {'username': nick, 'password': passw}
+    answer = requests.get(url, params=params)
+    # print(answer.text)
+    tokenResponse = json.loads(answer.text[5:])
+    fresh_token = tokenResponse.get('tokenResponse').get("data").get('token')
+    if fresh_token:
+        write_token(fresh_token)
+    else:
+        print('WE FUCK UP to get netlab token')
 
 def write_token(tokken):
     try:
@@ -389,6 +402,24 @@ def write_excel(data):
         print('ALL_RIDE')
 
 
+def write_excel_v2(data, remote=True):
+    if not remote:
+        with open('netlab_categories.csv', 'w') as file:
+            writer = csv.writer(file)
+            writer.writerows(data)
+            path_file = str(os.getcwd()) + 'netlab_categories.csv'
+            print('ALL_RIDE', path_file)
+
+    else:
+        with open(CSV_PATH + 'netlab_categories.csv', 'w') as file:
+            writer = csv.writer(file)
+            writer.writerows(data)
+            path_file = CSV_PATH + 'netlab_categories.csv'
+            print('ALL_RIDE', path_file)
+
+    return path_file
+
+
 def write_smth(smth):
     with open(CSV_PATH + 'prod_log', 'w') as file:
         json.dump(smth, file)
@@ -418,10 +449,10 @@ def get_netlab_catalog():
     return data
 
 
-async def save_categories_vendors():
+async def save_categories_netlab():
     data = get_netlab_catalog()
     write_data = [('netlab', i.get('name'), i.get('id'), i.get('parentId', '0')) for i in data]
-    write_excel(write_data)
+    write_excel_v2(write_data)
     if await executemany_query(query_write_vendors, write_data):
         print('Categories tried saved')
     else:

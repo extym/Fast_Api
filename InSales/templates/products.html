@@ -246,6 +246,13 @@ input[type=submit]:active {
     <div class="login" align = "center">
         <h1>Сопоставление категорий</h1>
         <h1>{{status_text}}</h1>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class=flashes>
+                <li>{{ messages[0] }}</li>
+            </ul>
+          {% endif %}
+        {% endwith %}
 
                 <form action = "{{result_url}}" method="POST">
                 <input type="hidden" name="login" value="{{login}}">

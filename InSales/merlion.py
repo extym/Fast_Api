@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import os
 
 import csv
 import json
@@ -66,20 +67,37 @@ def get_catalog_merlion():
     return data
 
 
+def write_excel_v2(data, remote=True):
+    if not remote:
+        with open('merlion_categories.csv', 'w') as file:
+            writer = csv.writer(file)
+            writer.writerows(data)
+            path_file = str(os.getcwd()) + 'merlion_cats.csv'
+            print('ALL_RIDE')
+
+    else:
+        with open(CSV_PATH + 'merlion_cats.csv', 'w') as file:
+            writer = csv.writer(file)
+            writer.writerows(data)
+            print('ALL_RIDE')
+            path_file = CSV_PATH + 'merlion_cats.csv'
+
+    return path_file
+
 #
 def write_categories_merlion():
     data_list = get_catalog_merlion()
     write_data = [('merlion', i.get('Description'), i.get('ID'), i.get('ID_PARENT', '0'))
                   for i in data_list]
-    write_excel(write_data)
+    write_excel_v2(write_data)
     print('ALL_RIDE')
 
 
-async def save_categories_vendor():
+async def save_categories_merlion():
     data_list = get_catalog_merlion()
     write_data = [('merlion', i.get('Description'), i.get('ID'), i.get('ID_PARENT', '0'))
                   for i in data_list]
-    write_excel(write_data)
+    write_excel_v2(write_data)
     if await executemany_query(query_write_vendors, write_data):
         print('Categories tried saved')
     else:

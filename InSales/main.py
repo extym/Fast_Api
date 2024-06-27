@@ -7,13 +7,18 @@ from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
 import pandas as pd
 
+from logic import write_categories_logic_v2
 from maintenance import update_categories_from_site, update_categories_from_site_v2, execute_query_update
-from psql import PgDatabase
+from marvel import save_categories_marvel
+from merlion import write_categories_merlion, save_categories_merlion
+from netlab import get_netlab_token_v2, save_categories_netlab
 from creds import secret_key, vendors
+from ocs import save_categories_ocs
+from psql import PgDatabase
 from settings import *
 from conn import executemany_query
 from conn_maintenance import query_update_from_file
-
+from treolan import write_categories_treolan, save_categories_treolan
 
 if LOCAL_MODE:
     UPLOAD_FOLDER = './'
@@ -23,6 +28,8 @@ else:
     UPLOAD_FOLDER = '/var/www/html/load/'
 
 ALLOWED = {'csv', 'xls', 'xlsx'}
+
+from urllib.parse import urlparse
 
 
 def check_allowed_filename(filename):
@@ -200,20 +207,51 @@ async def edit_vendor_products():
 
 
     if request.method == 'POST':
-        result = request.form
+        result = request.form.to_dict()
         login = result['login']
         passw = result['passw']
         vendor_name = result.get('vendor_name')
         # print('result_name', result)
         print('vendor_name_1', vendor_name)
-        ############################ Сохранение селлера #################################
+        ############################################################
 
         errors = 0
         jobs = 0
+        o = urlparse(request.base_url)
+        host = o.hostname
         if result.get('get_categories') and vendor_name:
             await update_categories_from_site_v2(vendor_name)
             result_status_text = 'Some update'
+        if result.get('get_categories_vendor') and vendor_name:
+            if vendor_name == 'netlab':
+                await get_netlab_token_v2()
+                await save_categories_netlab()
+                flash(f'Данные категорий получены. Файл находится  <a href="http://{host}/cs/logic_categories.csv">http://{host}/cs/netlab_categories.csv</a>')
+            elif vendor_name == 'logic':
+                await write_categories_logic_v2()
+                flash(f'Данные категорий получены. Файл находится  <a href="http://{host}/cs/logic_categories.csv">http://{host}/cs/logic_categories.csv</a>')
+            elif vendor_name == 'ocs':
+                await save_categories_ocs()
+                flash(f'Данные категорий получены. Файл находится  <a href="http://{host}/cs/logic_categories.csv">http://{host}/cs/ocs_categories.csv</a>')
+            elif vendor_name == 'marvel':
+                await save_categories_marvel()
+                flash(f'Данные категорий получены. Файл находится  <a href="http://{host}/cs/logic_categories.csv">http://{host}/cs/marvel_categories.csv</a>')
+            elif vendor_name == 'treolan':
+                await save_categories_treolan()
+                flash(f'Данные категорий получены. Файл находится  <a href="http://{host}/cs/logic_categories.csv">http://{host}/cs/treolan_categories.csv</a>')
+            elif vendor_name == 'merlion':
+                await save_categories_merlion()
+                flash(f'Данные категорий получены. Файл находится  <a href="http://{host}/cs/logic_categories.csv">http://{host}/cs/merlion_categories.csv</a>')
 
+            return redirect("index")
+            # return unescape(
+            #     render_template("products.html", url_categories=url_categories,
+            #                     login=LOGIN, passw=PASSW,
+            #                     vendor_name=vendor_name,
+            #                     status_text=status_text,
+            #                     index_url=index_url,
+            #                     result_url=result_url,
+            #                     upload_url=upload_url))  # edit_seller_url=edit_seller_url, index_url=index_url,
 
     if TEST_MODE:
         login = LOGIN
@@ -233,10 +271,10 @@ async def edit_vendor_products():
     # site_categodies = db.get_seller_id_category()
 
     site_categodies = db.get_seller_id_category_v2(vendor_name)
-    print(site_categodies, sep="/n")
+    # print(site_categodies, sep="/n")
     categories = sorted(site_categodies, key=compare_id)
     vendor_categories = db.get_vendor_id_categoies(vendor_name)
-    print(7777777, vendor_categories)
+    # print(7777777, vendor_categories)
     # vendor_categories = db.get_vendor_id_categoies_v2(vendor_name)
     for category in categories:
         # try:

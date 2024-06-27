@@ -31,6 +31,22 @@ def write_excel(data):
         writer.writerows(data)
         print('ALL_RIDE')
 
+def write_excel_v2(data, remote=True):
+    if not remote:
+        with open('logic_categories.csv', 'w') as file:
+            writer = csv.writer(file)
+            writer.writerows(data)
+            path_file = str(os.getcwd()) + 'logic_cats.csv'
+            print('ALL_RIDE')
+
+    else:
+        with open(CSV_PATH + 'logic_categories.csv', 'w') as file:
+            writer = csv.writer(file)
+            writer.writerows(data)
+            print('ALL_RIDE')
+            path_file = CSV_PATH + 'logic_cats.csv'
+
+    return path_file
 
 async def save_categories_vendor():
     data_list = get_category_list()
@@ -50,6 +66,14 @@ def write_categories_vendor():
     write_excel(write_data)
     print('ALL_RIDE')
 
+
+async def write_categories_logic_v2():
+    data_list = get_category_list()
+    write_data = [('logic', i.get('category_name'), i.get('category_id'), i.get('parent_id', '0'))
+                  for i in data_list]
+    path_file = write_excel_v2(write_data)
+    print('ALL_RIDE write_categories_vendor_v2')
+    return path_file
 
 def get_client_logic():
     session = Session()

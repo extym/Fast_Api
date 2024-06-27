@@ -1,4 +1,6 @@
 import json
+import os
+
 from conn import executemany_query, execute_query_return, execute_query_return_v2
 from conn_maintenance import *
 import requests
@@ -31,6 +33,23 @@ def write_excel(data):
         writer.writerows(data)
         print('ALL_RIDE')
 
+
+def write_excel_v2(data, remote=True):
+    if not remote:
+        with open('ocs_categories.csv', 'w') as file:
+            writer = csv.writer(file)
+            writer.writerows(data)
+            path_file = str(os.getcwd()) + 'ocs_categories.csv'
+            print('ALL_RIDE', path_file)
+
+    else:
+        with open(CSV_PATH + 'ocs_categories.csv', 'w') as file:
+            writer = csv.writer(file)
+            writer.writerows(data)
+            path_file = CSV_PATH + 'ocs_categories.csv'
+            print('ALL_RIDE', path_file)
+
+    return path_file
 
 
 def get_smth(method):
@@ -114,7 +133,7 @@ def get_product_banch(categories):
         return answer.status_code, resp
 
 
-async def save_categories_vendors():
+async def save_categories_ocs():
     data = get_categories()
     proxy = []
     for cat in data:
@@ -133,7 +152,7 @@ async def save_categories_vendors():
 
     write_data = [('ocs', i.get('name'), i.get('category'), i.get('parentId', '0')) for i in proxy]
 
-    write_excel(write_data)
+    write_excel_v2(write_data)
     # print('write_data', write_data)
     if await executemany_query(query_write_vendors, write_data):
         print('Categories tried saved')

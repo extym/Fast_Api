@@ -26,11 +26,29 @@ def write_excel(data):
         print('ALL_RIDE_treolan')
 
 
+def write_excel_v2(data, remote=True):
+    if not remote:
+        with open('logic_categories.csv', 'w') as file:
+            writer = csv.writer(file)
+            writer.writerows(data)
+            path_file = str(os.getcwd()) + 'logic_cats.csv'
+            print('ALL_RIDE')
+
+    else:
+        with open(CSV_PATH + 'logic_categories.csv', 'w') as file:
+            writer = csv.writer(file)
+            writer.writerows(data)
+            print('ALL_RIDE')
+            path_file = CSV_PATH + 'logic_cats.csv'
+
+    return path_file
+
+
 async def save_categories_treolan():
     data_list = get_categories_treolan()
     write_data = [('treolan', i.get('name'), i.get('id'), i.get('parent_id', '0'))
                   for i in data_list if i.get('name') != 'UNKNOW']
-    write_excel(write_data)
+    write_excel_v2(write_data)
     if await executemany_query(query_write_vendors, write_data):
         print('Categories tried saved')
     else:
@@ -41,7 +59,7 @@ def write_categories_treolan():
     data_list = get_categories_treolan()
     write_data = [('treolan', i.get('name'), i.get('id'), i.get('parent_id', '0'))
                   for i in data_list if i.get('name') != 'UNKNOW']
-    write_excel(write_data)
+    write_excel_v2(write_data)
     print('ALL_RIDE')
 
 
