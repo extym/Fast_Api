@@ -21,7 +21,7 @@ db_name = 'web_app'
 
 link = 'http://stm-data.i-bots.ru/data_json.json'
 
-WHEELS = 0
+WHEELS = 1
 LOCAL_MODE = 1
 # OfficeUser1
 #

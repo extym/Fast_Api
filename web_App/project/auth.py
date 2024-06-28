@@ -370,6 +370,7 @@ def add_mp():
 @login_required
 def add_mp_post():
     data = request.form.to_dict()
+    print(777777, data)
     uid = current_user.id
     role = current_user.roles
     company_id = current_user.company_id
@@ -389,9 +390,9 @@ def add_mp_post():
             flash('Укажите, пожалуйста, название магазина, желательно как на маркетплейсе', 'error')
             return redirect('/add_mp')
 
-        if key_mp is None:
-            flash('Укажите, пожалуйста, API ключ магазина на маркетплейсе', 'error')
-            return redirect('/add_mp')
+        # if key_mp is None:
+        #     flash('Укажите, пожалуйста, API ключ магазина на маркетплейсе', 'error')
+        #     return redirect('/add_mp')
 
         if mp == 'ozon' and key_mp != None and shop_id != None:
             if TEST_MODE:
@@ -412,7 +413,7 @@ def add_mp_post():
                 db.session.commit()
                 flash('Настройки удачно сохранены', 'success')
             else:
-                flash('Проверьте, пожалуйста, данные', 'error')
+                flash('Проверьте, пожалуйста, данные API ключа', 'error')
                 return redirect('/add_mp')
 
         if mp == 'yandex' and key_mp != None and shop_id != None:
@@ -464,12 +465,16 @@ def add_mp_post():
             d_b.insert_new_mp(uid, shop_id, shop_name, mp, key_mp, company_id)
             flash('Настройки удачно сохранены', 'success')
 
-        if mp == 'sber' and key_mp and shop_id:
-            d_b = Db()
-            d_b.insert_new_mp(uid, shop_id, shop_name, mp, key_mp, company_id)
-            # mp_sett = Marketplaces(uid, shop_id, shop_name, mp, key_mp)
-            # db.session.add(mp_sett)
-            # db.session.commit()
+        if mp == 'sber'  and shop_id:
+            mp_sett = Marketplaces(
+                user_id=uid,
+                seller_id=data.get('id_mp', 0),
+                shop_name=shop_name,
+                name_mp=mp,
+                key_mp=key_mp
+            )
+            db.session.add(mp_sett)
+            db.session.commit()
             flash('Настройки удачно сохранены', 'success')
 
     if 'import_from' in data:
@@ -1765,7 +1770,8 @@ def profile():
     return render_template('hos-profile-edit.html',
                            uid=user_id, user_role=role,
                            photo=photo,
-                           user_name=user_name)
+                           user_name=user_name,
+                           distributors=WHEELS)
 
 
 @auth.route('/upload_file', methods=['GET', 'POST'])
