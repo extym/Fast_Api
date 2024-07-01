@@ -49,9 +49,10 @@ async def save_categories_treolan():
     write_data = [('treolan', i.get('name'), i.get('id'), i.get('parent_id', '0'))
                   for i in data_list if i.get('name') != 'UNKNOW']
     write_excel_v2(write_data)
-    if await executemany_query(query_write_vendors, write_data):
-        print('Categories tried saved')
-    else:
+    try:
+        await executemany_query(query_write_vendors, write_data)
+        print('Categories tried saved_treolan')
+    except:
         print("XS")
 
 

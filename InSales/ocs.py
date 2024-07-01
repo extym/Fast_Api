@@ -154,9 +154,10 @@ async def save_categories_ocs():
 
     write_excel_v2(write_data)
     # print('write_data', write_data)
-    if await executemany_query(query_write_vendors, write_data):
-        print('Categories tried saved')
-    else:
+    try:
+        await executemany_query(query_write_vendors, write_data)
+        print('Categories tried saved_ocs')
+    except:
         print("XS")
 
 

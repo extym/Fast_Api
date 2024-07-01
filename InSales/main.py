@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
 import pandas as pd
 
-from logic import write_categories_logic_v2
+from logic import write_categories_logic_v2, save_categories_vendor
 from maintenance import update_categories_from_site, update_categories_from_site_v2, execute_query_update
 from marvel import save_categories_marvel
 from merlion import write_categories_merlion, save_categories_merlion
@@ -211,7 +211,7 @@ async def edit_vendor_products():
         login = result['login']
         passw = result['passw']
         vendor_name = result.get('vendor_name')
-        # print('result_name', result)
+        print('result_name', result)
         print('vendor_name_1', vendor_name)
         ############################################################
 
@@ -226,24 +226,24 @@ async def edit_vendor_products():
             if vendor_name == 'netlab':
                 await get_netlab_token_v2()
                 await save_categories_netlab()
-                flash(f'Данные категорий получены. Файл находится  <a href="http://{host}/cs/logic_categories.csv">http://{host}/cs/netlab_categories.csv</a>')
+                flash(f'Данные категорий получены. Файл находится  <a href="http://{host}/csv/logic_categories.csv">http://{host}/csv/netlab_categories.csv</a>')
             elif vendor_name == 'logic':
-                await write_categories_logic_v2()
-                flash(f'Данные категорий получены. Файл находится  <a href="http://{host}/cs/logic_categories.csv">http://{host}/cs/logic_categories.csv</a>')
+                await save_categories_vendor()
+                flash(f'Данные категорий получены. Файл находится  <a href="http://{host}/csv/logic_categories.csv">http://{host}/csv/logic_categories.csv</a>')
             elif vendor_name == 'ocs':
                 await save_categories_ocs()
-                flash(f'Данные категорий получены. Файл находится  <a href="http://{host}/cs/logic_categories.csv">http://{host}/cs/ocs_categories.csv</a>')
+                flash(f'Данные категорий получены. Файл находится  <a href="http://{host}/csv/logic_categories.csv">http://{host}/csv/ocs_categories.csv</a>')
             elif vendor_name == 'marvel':
                 await save_categories_marvel()
-                flash(f'Данные категорий получены. Файл находится  <a href="http://{host}/cs/logic_categories.csv">http://{host}/cs/marvel_categories.csv</a>')
+                flash(f'Данные категорий получены. Файл находится  <a href="http://{host}/csv/logic_categories.csv">http://{host}/csv/marvel_categories.csv</a>')
             elif vendor_name == 'treolan':
                 await save_categories_treolan()
-                flash(f'Данные категорий получены. Файл находится  <a href="http://{host}/cs/logic_categories.csv">http://{host}/cs/treolan_categories.csv</a>')
+                flash(f'Данные категорий получены. Файл находится  <a href="http://{host}/csv/logic_categories.csv">http://{host}/csv/treolan_categories.csv</a>')
             elif vendor_name == 'merlion':
                 await save_categories_merlion()
-                flash(f'Данные категорий получены. Файл находится  <a href="http://{host}/cs/logic_categories.csv">http://{host}/cs/merlion_categories.csv</a>')
+                flash(f'Данные категорий получены. Файл находится  <a href="http://{host}/csv/logic_categories.csv">http://{host}/csv/merlion_categories.csv</a>')
 
-            return redirect("index")
+            return redirect(url_for("index"))
             # return unescape(
             #     render_template("products.html", url_categories=url_categories,
             #                     login=LOGIN, passw=PASSW,

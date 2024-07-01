@@ -1,6 +1,7 @@
 import psycopg2
-from psycopg2 import OperationalError
+from psycopg2 import OperationalError, IntegrityError
 from conn_maintenance import *
+from psycopg2.errors import UniqueViolation
 
 
 def create_connection():
@@ -105,6 +106,10 @@ async def executemany_query(query, data):
     except OperationalError as err:
         print(f"The ERROR from execute_many_query '{err}' occured ")
         result = False
+    except IntegrityError as e:
+            if isinstance(UniqueViolation):
+                print('DUPLICATE_key_error')
+            result = False
     cursor.close()
     connection.close()
 

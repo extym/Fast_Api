@@ -273,8 +273,8 @@ def make_data_cats_marvel_v2(datas):
     data = [i for i in categories if i.get('SubCategories') == []]
     if len(data) == len(categories):
         write_excel(data)
-        print(*data, sep='\n')
-        print(type(data))
+        # print(*data, sep='\n')
+        # print(type(data))
         return True, data
     else:
         return False, categories
@@ -421,9 +421,10 @@ async def save_categories_marvel():
     write_excel_v2(write_data)
     # print('write_data', write_data)
     if write_data:
-        if await executemany_query(query_write_vendors_v2, write_data):
-            print('Categories tried saved')
-        else:
+        try:
+            await executemany_query(query_write_vendors, write_data)
+            print('Categories tried saved_marvel')
+        except:
             print("XS")
 
 

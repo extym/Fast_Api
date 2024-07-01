@@ -98,9 +98,10 @@ async def save_categories_merlion():
     write_data = [('merlion', i.get('Description'), i.get('ID'), i.get('ID_PARENT', '0'))
                   for i in data_list]
     write_excel_v2(write_data)
-    if await executemany_query(query_write_vendors, write_data):
-        print('Categories tried saved')
-    else:
+    try:
+        await executemany_query(query_write_vendors, write_data)
+        print('Categories tried saved_merlion')
+    except:
         print("XS")
 
 

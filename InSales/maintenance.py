@@ -52,7 +52,7 @@ def get_catalog_exist():
     answer = requests.get(url)
     data_resp = json.loads(answer.text[5:])
     data = data_resp.get('catalogResponse').get("data").get("category")
-    print(len(data), type(data))  #2846
+    # print(len(data), type(data))  #2846
     # print(*sorted(data, key=xy), sep='\n')
 
     return data
@@ -60,7 +60,7 @@ def get_catalog_exist():
 
 # def write_data_catalogs():
 #     data = get_catalog()
-#     print('DATA', type(data))
+
 #     if data:
 #         with open('net_catalogs.txt', 'w') as file:
 #             file.write(str(data))
@@ -152,7 +152,7 @@ def read_xlsx():
 
     data = wget.download(link, out='wget_xls.zip')
 
-    print(type(data))
+    # print(type(data))
 
 
 def wget_xlsx():

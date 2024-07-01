@@ -36,15 +36,16 @@ def write_excel_v2(data, remote=True):
         with open('logic_categories.csv', 'w') as file:
             writer = csv.writer(file)
             writer.writerows(data)
-            path_file = str(os.getcwd()) + 'logic_cats.csv'
-            print('ALL_RIDE')
+            path_file = str(os.getcwd()) + 'logic_categories.csv'
+            print('ALL_RIDE_write file', path_file)
 
     else:
+        print('!!!!!!!!!!!!!!!!!!!!!!', CSV_PATH)
         with open(CSV_PATH + 'logic_categories.csv', 'w') as file:
             writer = csv.writer(file)
             writer.writerows(data)
-            print('ALL_RIDE')
-            path_file = CSV_PATH + 'logic_cats.csv'
+            path_file = CSV_PATH + 'logic_categories.csv'
+            print('ALL_RIDE_write file_3LOGIC', path_file)
 
     return path_file
 
@@ -52,11 +53,12 @@ async def save_categories_vendor():
     data_list = get_category_list()
     write_data = [('logic', i.get('category_name'), i.get('category_id'), i.get('parent_id', '0'))
                   for i in data_list]
-    write_excel(write_data)
-    if await executemany_query(query_write_vendors, write_data):
-        print('Categories tried saved')
-    else:
-        print("XS")
+    write_excel_v2(write_data)
+    try:
+        await executemany_query(query_write_vendors, write_data)
+        print('Categories tried saved_3LOGIC')
+    except Exception as err:
+        print("ERror Categories saved_3LOGIC {}".format(err))
 
 
 def write_categories_vendor():
@@ -95,8 +97,8 @@ def get_category_list():  # getCategoryList
     # print('getCategoryList', len(data_list), data_list, sep='\n')
     except Exception as error:
         print(" Мы получили от 3LOGIC {}".format(error))
-    print('getCategoryList', len(data_list))
-    print(type(data_list), data_list)
+    print('getCategoryList_3LOGIC', len(data_list))
+
     return data_list
 
 

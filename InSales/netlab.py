@@ -453,9 +453,10 @@ async def save_categories_netlab():
     data = get_netlab_catalog()
     write_data = [('netlab', i.get('name'), i.get('id'), i.get('parentId', '0')) for i in data]
     write_excel_v2(write_data)
-    if await executemany_query(query_write_vendors, write_data):
-        print('Categories tried saved')
-    else:
+    try:
+        await executemany_query(query_write_vendors, write_data)
+        print('Categories tried saved_netlab')
+    except:
         print("XS")
 
 
