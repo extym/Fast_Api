@@ -14,7 +14,9 @@ def send_get(text):
         print(39999999999999999999933, response.text)
     sleep(2)
 
-# send_get(TEXT)
+    return response
+
+# print(send_get(TEXT))
 
 
 # print(answer)

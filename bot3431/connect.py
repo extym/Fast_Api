@@ -400,7 +400,7 @@ def check_order_exist(query, data):
 
 
 
-def async_execute_query_return_bool(query, data):
+async def async_execute_query_return_bool(query, data):
     with create_connection() as conn:
         conn.autocommit = True
         with conn.cursor() as cursor:
@@ -511,8 +511,17 @@ query_write_customer =\
    " VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s )"
 
 update_order_and_items = \
-    " UPDATE fresh_orders SET status = %s, date_modifed = %s " \
+    " UPDATE fresh_orders SET status = %s, our_status = %s, date_modifed = now() " \
                          " WHERE order_id_mp = %s  "
+
+query_update_order = \
+    " UPDATE fresh_orders SET our_order_id = %s, date_modifed = now() " \
+                         " WHERE order_id_mp = %s  "
+
+query_update_items= \
+    " UPDATE order_items SET our_order_id = %s, date_modifed = now() " \
+    " WHERE vendor_code = %s and order_id_mp = %s "
+
 
 query_add_settings_ym = \
     (" INSERT INTO stores "

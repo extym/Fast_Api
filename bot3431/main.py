@@ -30,6 +30,7 @@ from psycopg2.errors import UniqueViolation
 from psycopg2.extensions import register_adapter, AsIs
 import json
 
+filtered_prices = ["Магазин Культуры 63"]
 
 def adapt_dict(dict_var):
     return AsIs("'" + json.dumps(dict_var) + "'")
@@ -585,7 +586,7 @@ async def new_order_sber(uuid):
     token = request.headers.get('Basic auth')
     if token == None or token != None:
         data_req = request.json
-        print(55555555555, data_req)
+        # print(55555555555, data_req)
         order = data_req["data"]
         order_id = order.get("shipments")[0]["shipmentId"]
         pre_proxy = order["shipments"][0]["items"]
@@ -593,7 +594,7 @@ async def new_order_sber(uuid):
 
         store_data = conn.execute_query_return_one(
             query_get_shop_campain_id, uuid)
-        print(232323, proxy, store_data)
+        # print(232323, proxy, store_data)
         client_id_ps = store_data[1]
         model = store_data[0]
         link = store_data[2]
@@ -622,11 +623,23 @@ async def new_order_sber(uuid):
             result = ps.create_order_ps_if_not_exist(proxy, link,
                                                      key=store_data[3],
                                                      external_order_id=order_id)
+            # print(55555555555, result)
 
             if result:
                 final_result = ps.send_current_basket_to_order(key=store_data[3])
+                # print(77777777777777, final_result)
                 if final_result is not None and autoreorder:
-                    datas = ' '.join([str(i['id']) for i in final_result]).strip()
+                    # datas = ' '.join([str(i['id']) for i in final_result]).strip()
+                    write_data_order = [str(final_result['order_id']), final_result['comment']]
+                    write_data_items = [(str(j['id']), str(j['oem']), j['comment'])
+                                        for j in final_result]
+                    await execute_query_v3(query_update_order, write_data_order)
+                    await executemany_query(query_update_items, write_data_items)
+
+                    check_price = ps.get_smth(f'/orders/{write_data_order[0]}.json')
+                    # get_order_id_ps["order"]['order_items'][0]['sys_info']['visible_sup_logo']
+                    datas = ' '.join([str(i['id']) for i in check_price["order"]['order_items']
+                                     if i['sys_info']['visible_sup_logo'] not in filtered_prices]).strip()
                     finish = ps.change_status_v2(datas, status_id=2)
                     print(777755555777777, finish)
 
@@ -757,7 +770,7 @@ def check_status():
             if form.get('clientId') in ['715', '235', '710']:
                 pass
                 # make_pipeline(form)
-            # print('WE GET ORDER_form', form)
+            print('WE GET ORDER_form', form)
             # write_result(form)
 
         except:

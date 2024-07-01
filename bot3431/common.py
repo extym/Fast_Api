@@ -274,10 +274,12 @@ def make_orders_to_ps(delta_time:int=1):
                     check = conn.check_order_exist(conn.query_is_exist_order,
                                               str(canceled.get('id')))
                     if check[1] != 'CANCELLED':
-                        conn.execute_query_return_bool(conn.update_order_and_items,
-                                                  ('CANCELLED', str(canceled.get('id'))))
+
                         data = ' '.join([str(i['id']) for i in canceled.get('items')]).strip()
                         finish = ps.change_status_v2(data, status_id=10)
+                        if finish:
+                            conn.execute_query_return_bool(conn.update_order_and_items,
+                                                           ('CANCELLED', 'CANCELLED', str(canceled.get('id'))))
                         print('check_CANCELLED', check, str(canceled.get('id')), finish)
 
                     else:

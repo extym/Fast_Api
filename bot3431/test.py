@@ -1655,14 +1655,105 @@ ps_create_basket_answer = {
         "max_delivery_day": 3,
         "comment": "451642783"}}
 
-FINAL_result = {"result": "ok", "data": [{"id": 76395, "oem": "42140459SX", "make_name": "STELLOX",
-                                          "detail_name": "амортизатор передний газовый!\\ BMW E39 2.0-3.0/2.5TD/3.0D 95\u003e",
-                                          "cost": 3762.0, "qnt": 2, "qnt_confirmed": 0, "qnt_accept": None,
-                                          "qnt_income": None, "status": "Ожидает оплаты", "status_code": "processing",
-                                          "comment": "451642783", "created_at": "2024-05-02T16:37:34.832+03:00",
-                                          "order_id": 62821, "status_logs": [
-        {"status_code": "processing", "status_name": "Ожидает оплаты",
-         "created_at": "2024-05-02T16:37:35.074+03:00"}]}]}
+FINAL_result = {"result": "ok",
+                "data": [{"id": 76395, "oem": "42140459SX", "make_name": "STELLOX",
+                          "detail_name": "амортизатор передний газовый!\\ BMW E39 2.0-3.0/2.5TD/3.0D 95\u003e",
+                          "cost": 3762.0, "qnt": 2, "qnt_confirmed": 0, "qnt_accept": None,
+                          "qnt_income": None, "status": "Ожидает оплаты", "status_code": "processing",
+                          "comment": "451642783", "created_at": "2024-05-02T16:37:34.832+03:00",
+                          "order_id": 62821, "status_logs": [
+                        {"status_code": "processing", "status_name": "Ожидает оплаты",
+                         "created_at": "2024-05-02T16:37:35.074+03:00"}]}]}
+
+get_order_id_ps = {
+    "status": "OK",
+    "order": {
+        "id": 80188,
+        "order_id": 80188,
+        "customer_id": 2063,
+        "order_person": {
+            "family_name": None,
+            "second_name": None,
+            "name": None
+        },
+        "auto_id": None,
+        "id_1c": "site-80188-Yandeks Market II (2063)",
+        "comment": "",
+        "check_vin": False,
+        "source_type": "api",
+        "wait_assembling": False,
+        "external_crm_id": None,
+        "disable_balance_recalc": False,
+        "customer": {
+            "id": 2063,
+            "user_id": 18,
+            "region_id": 1,
+            "ur_type": 0,
+            "discount_type_id": 29,
+            "is_supplier": False,
+            "email": "auto_3431@ya.ru",
+            "email_org": "", "pay_delay": 5,
+            "credit_limit": 10000000.0, "name": "",
+            "second_name": "", "family_name": "",
+            "nds": 0.0, "send_email": True,
+            "send_sms": False,
+            "compile_name": "Яндекс Маркет II",
+            "login_or_email": "auto_3431@ya.ru",
+            "b1c_id": "", "customer_group_id": None,
+            "client_type_id": None, "visible_zone_id": None,
+            "tags": [], "delivery_route_id": None,
+            "created_at": "2024-04-27T10:11:42.641+03:00",
+            "block_order": False,
+            "block_order_description": "", "erp_balance": 0.0,
+            "erp_balance_day_delay": 0,
+            "essential": {"company_name": "Яндекс Маркет II", "company_type": "", "with_nds": False, "inn": "",
+                          "kpp": "", "bik": "", "bank": "", "city": None, "loro_account": "", "korr_schet": ""},
+            "contact": {"phone": "auto_3431", "cell_phone": ""},
+            "delivery_address": {"zip_code": "", "country": "", "region": "", "city": "", "street": "", "house": "",
+                                 "korpus": "", "flat": ""},
+            "official_address": {"zip_code": "", "country": "", "region": "", "city": "", "street": "", "house": "",
+                                 "korpus": "", "flat": ""}},
+        "delivery_address": {
+            "id": 14017, "zip_code": None,
+            "country": None, "region": None, "city": None,
+            "street": None, "house": None, "korpus": None,
+            "flat": None,
+            "passport": {"number": None,
+                         "series": None, "issued": None, "issued_date": None, "subdivision_code": None}},
+        "essential": {"company_name": None, "company_type": None, "with_nds": False, "inn": None, "kpp": None,
+                      "bik": None, "bank": None, "city": None, "loro_account": None, "korr_schet": None},
+        "delivery_type": "Доставка", "roistat_visit": None,
+        "order_items": [
+            {"id": 97736, "region_order_item_id": None, "divided_order_item_id": None, "supplier_order_item_id": None,
+             "order_id": 80188, "price_id": 116, "oem": "AK60U805588C", "make_name": "AKRADO",
+             "detail_name": "Панель передняя", "min_delivery_day": 1, "max_delivery_day": 1, "first_cost": 2520.0,
+             "cost": 3478.0, "qnt": 1, "qnt_confirmed": 0, "qnt_accept": 0, "qnt_income": 0, "weight": None,
+             "volume_weight": 0, "length": None, "width": None, "height": None, "gtd": None, "country": None,
+             "status_id": 2, "supplier_status_name": None, "check_best_price_status_id": None,
+             "sys_info": {"weight": 0.004, "version": 0,
+                          "sup_logo": "Магазин Культуры 63", "stat_group": 100,
+                          "ws_raw_cost": 2520.0, "distribyutor": False, "goods_img_url": "",
+                          "price_item_id": 3652833470, "requested_oem": "AK60U805588C",
+                          "visible_sup_logo": "Магазин Культуры 63", "central_warehouse": True,
+                          "is_warehouse_price": True, "client_visible_cost": 3478, "requested_make_name": "AKRADO",
+                          "hide_visible_sup_logo_www": True, "client_visible_cost_currency": "",
+                          "price_request_id": "401004", "checkout_options": "on-order-commit", "min_qnt": 1,
+                          "price_id": 116},
+             "comment": "484358963",
+             "company_comment": None, "can_reorder": True,
+             "add_in_ws": False, "id_1c": "C2063O80188I97736", "barcode": None, "cost_from_bonus": 0.0,
+             "inwork_at": "2024-06-28T14:16:48.078+03:00", "updated_at": "2024-06-28T14:16:48.447+03:00",
+             "created_at": "2024-06-28T14:16:45.913+03:00",
+             "stock_batches": [
+                {"stock_id": 3, "storage_place": {"id": 1325, "qnt": 1, "name": "O5"}, "stock_batch_id": 19097}],
+             "commit_user_id": 48}],
+        "marketplace_data": {},
+        "marketplace_id": None,
+        "load_order_client_number": None,
+        "order_email_subject": None, "created_at": "2024-06-28T14:16:45.927+03:00",
+        "updated_at": "2024-06-28T14:16:46.595+03:00"}}
+
+price = get_order_id_ps["order"]['order_items'][0]['sys_info']['visible_sup_logo']
 
 
 # print(len(one) + len(two), len(tree))
@@ -3186,7 +3277,8 @@ FINAL_result_2 = {"result": "ok",
                        "qnt_income": None,
                        "status": "Ожидает оплаты",
                        "status_code": "processing",
-                       "comment": "464012724", "created_at": "2024-05-27T11:59:17.465+03:00",
+                       "comment": "464012724",
+                       "created_at": "2024-05-27T11:59:17.465+03:00",
                        "order_id": 72152,
                        "status_logs": [
                            {"status_code": "processing",
@@ -3417,41 +3509,46 @@ ps_order_status_types = {
          "email_discount_groups": [21, 27, 22, 30, 16, 10, 17, 11, 18, 19, 20, 29, 13, 7, 6],
          "disable_check_status": False}]}
 
-
 order_dbs_sber = {
-    "meta":{},
-    "data":{
-        "shipments":[
+    "meta": {},
+    "data": {
+        "shipments": [
             {
-                "shipmentId":"612",
-                "shipmentDate":"2024-06-12T18:13:30+03:00",
-                "handover":{
-                    "packingDate":"2022-11-13T14:00:00+03:00",
-                    "reserveExpirationDate":"2022-11-29T00:00:00+03:00",
-                    "outletId":"",
-                    "serviceScheme":"DELIVERY_BY_MERCHANT","depositedAmount":0,
-                    "deliveryInterval":{
-                        "dateFrom":"2022-11-15T09:00:00+03:00",
-                        "dateTo":"2022-11-29T21:00:00+03:00"
+                "shipmentId": "612",
+                "shipmentDate": "2024-06-12T18:13:30+03:00",
+                "handover": {
+                    "packingDate": "2022-11-13T14:00:00+03:00",
+                    "reserveExpirationDate": "2022-11-29T00:00:00+03:00",
+                    "outletId": "",
+                    "serviceScheme": "DELIVERY_BY_MERCHANT", "depositedAmount": 0,
+                    "deliveryInterval": {
+                        "dateFrom": "2022-11-15T09:00:00+03:00",
+                        "dateTo": "2022-11-29T21:00:00+03:00"
                     },
-                    "deliveryId":692620459
+                    "deliveryId": 692620459
                 },
-                "customer":{
-                    "customerFullName":"Тест Тестович",
-                    "phone":"88888888888","email":"test@test.com",
-                    "address":{
-                        "source":"г Москва, ул Тестовая, д 1, кв. 58",
-                        "postalCode":"119019",
-                        "fias":{
-                            "regionId":"0c5b2444-70a0-4932-980c-b4dc0d3f02b5",
-                            "destinationId":"4cbce9f3-6fd7-4162-962d-41268b75aadc"
-                        },"geo":{"lat":"55.751812","lon":"37.599292"},
-                        "access":{
-                            "detachedHouse":False,"entrance":"1","floor":1,
-                            "intercom":"1","cargoElevator":False,
-                            "comment":"Дверь справа","apartment":"58"},
-                        "regionKladrId":"77","house":"д 1","block":None,
-                        "flat":"58","regionWithType":"г Москва","cityWithType":"г Москва",
-                        "cityArea":"Центральный","streetWithType":"ул Арбат"}},
-                "flags":[],
-                "items":[{"itemIndex":"1","goodsId":"100000572021","offerId":"BV001950-k","itemName":"Материнская плата Gigabyte GA-H110M-H","price":990,"finalPrice":990,"discounts":[],"quantity":1,"taxRate":"NOT","reservationPerformed":True,"isDigitalMarkRequired":True},{"itemIndex":"2","goodsId":"100025325086","offerId":"delivery","itemName":"Доставка","price":200,"finalPrice":200,"discounts":[],"quantity":1,"taxRate":None,"reservationPerformed":True,"isDigitalMarkRequired":False}]}],"merchantId":1111}}
+                "customer": {
+                    "customerFullName": "Тест Тестович",
+                    "phone": "88888888888", "email": "test@test.com",
+                    "address": {
+                        "source": "г Москва, ул Тестовая, д 1, кв. 58",
+                        "postalCode": "119019",
+                        "fias": {
+                            "regionId": "0c5b2444-70a0-4932-980c-b4dc0d3f02b5",
+                            "destinationId": "4cbce9f3-6fd7-4162-962d-41268b75aadc"
+                        }, "geo": {"lat": "55.751812", "lon": "37.599292"},
+                        "access": {
+                            "detachedHouse": False, "entrance": "1", "floor": 1,
+                            "intercom": "1", "cargoElevator": False,
+                            "comment": "Дверь справа", "apartment": "58"},
+                        "regionKladrId": "77", "house": "д 1", "block": None,
+                        "flat": "58", "regionWithType": "г Москва", "cityWithType": "г Москва",
+                        "cityArea": "Центральный", "streetWithType": "ул Арбат"}},
+                "flags": [],
+                "items": [{"itemIndex": "1", "goodsId": "100000572021", "offerId": "BV001950-k",
+                           "itemName": "Материнская плата Gigabyte GA-H110M-H", "price": 990, "finalPrice": 990,
+                           "discounts": [], "quantity": 1, "taxRate": "NOT", "reservationPerformed": True,
+                           "isDigitalMarkRequired": True},
+                          {"itemIndex": "2", "goodsId": "100025325086", "offerId": "delivery", "itemName": "Доставка",
+                           "price": 200, "finalPrice": 200, "discounts": [], "quantity": 1, "taxRate": None,
+                           "reservationPerformed": True, "isDigitalMarkRequired": False}]}], "merchantId": 1111}}

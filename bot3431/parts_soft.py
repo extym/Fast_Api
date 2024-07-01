@@ -36,7 +36,7 @@ def get_smth(metod):
     token_ps = HTTPBasicAuth(admin_ps_login, admin_ps_pass)
     answer = requests.get(url, auth=token_ps)
 
-    # print(3111133, answer.text)
+    print(3111133, answer.text)
     return answer.json()
 
 
@@ -63,7 +63,7 @@ def change_status_v2(ids: str, status_id=0):
     }
     token_ps = HTTPBasicAuth(admin_ps_login, admin_ps_pass)
     answer = requests.post(url=url, auth=token_ps, data=data)
-    print('answer_changed_status', answer.text)
+    print('answer_changed_status_v2 ids {}, to status {}, answer {}.'.format(ids, status_id, answer.text))
     if answer.ok:
         return True
     else:
@@ -184,7 +184,7 @@ def get_orders_v2(customer_id: str,
     except Exception as error:
         print(222222222222222222, proxy)
         print('datas_error', error)
-    print('datas', datas)
+    # print('datas', datas)
     return datas
 
 
@@ -434,9 +434,10 @@ def create_resp_if_not_exist(list_items, link, key=None,
             else:
                 print('SOME FUCKUP GET PROPOUSAL {}'.format(answer.text))
         else:
-            bot_tg.send_get('Проблема обработки заказа {}. '
+            bot_tg.send_get('ПРОБЛЕМА обработки \n заказа {}. '
                             'Требуется ручная обработка.'
-                            ' Not found oem for offer_id {} y'
+                            'Не найден номер производителя для offer_id {} \n'
+                            'YandexMarket'
                             .format(external_order_id, item.get('offerId')))
 
     if count_items == len(list_items):
@@ -444,9 +445,10 @@ def create_resp_if_not_exist(list_items, link, key=None,
         global_result_make_basket = True
     else:
         print("Result result_make_basket UNsuccessfully {}".format(count_items))
-        bot_tg.send_get('Проблема обработки заказа {}. '
+        bot_tg.send_get('ПРОБЛЕМА обработки \n заказа {}. '
                         'Требуется ручная обработка.'
-                        ' Not found oem for all offer_id {} y'
+                        'Не найден номер производителя для offer_id {} \n'
+                        'YandexMarket'
                         .format(external_order_id, offer_id))
 
     return global_result_make_basket
@@ -457,22 +459,23 @@ def create_order_ps_if_not_exist(list_items, link, key=None,
                                  autoreorder=False):
     # exter_order_id = external_order_id
     count_items = 0
+    proxy = []
     global_result_make_basket = False
     for item in list_items:
-        list_propousal = []
-        # vendor_data = get_vendor_code_from_xlm(item.get('offer_id)'), link=link)
         if item.get('offerId') != 'delivery':
             vendor_data = get_oem_from_xml_v2(item.get('offerId'), link=link)
             oem = vendor_data[1]
             brand = vendor_data[0]
             qnt = item.get("count")
-            print("oem---brand---qnt", oem, brand, qnt)
+            # print("oem---brand---qnt", oem, brand, qnt)
             # sys.exit()
             if not oem:
-                bot_tg.send_get('Проблема обработки заказа {}. '
-                            'Требуется ручная обработка.'
-                            ' Not found oem for offer_id {} s'
+                bot_tg.send_get('ПРОБЛЕМА обработки \n заказа {}. '
+                                'Требуется ручная обработка.'
+                                'Не найден номер производителя для offer_id {} \n'
+                                'SberMarket'
                             .format(external_order_id, item.get('offerId')))
+                proxy.append(item.get('offerId'))
             else:
                 params = {
                     "api_key": key,
@@ -504,6 +507,7 @@ def create_order_ps_if_not_exist(list_items, link, key=None,
                                                      exter_order_id=external_order_id)
                     if result_make_basket == 200:
                         count_items += 1
+                        print("Make basket SUCCESSFULLY {} {}".format(result_make_basket, item))
                     else:
                         print("Make basket failed {} {}".format(result_make_basket, item))
 
@@ -540,7 +544,10 @@ ym_orders_short = [459439792, 459438203, 459412869, 459372108, 459349047, 459339
 # get_smth('/regions.json')
 # get_smth("/orders.json")
 # get_smth("/order_status_types.json")
+write_order = "80188"
+get_smth(f'/orders/{write_order}.json')
 
 #  {"id":8,"name":"Выдано","code":"vydano"}
 
 # post_smth()
+
