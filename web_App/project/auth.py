@@ -1428,57 +1428,97 @@ def shops():
                 .all()
             # raw_list_products = db.session.query(Product)
             # .paginate(page=30, per_page=30, error_out=False).items
-            for row in raw_list_shops:
-                seller_id = row.seller_id
-                if row.date_modifed:
-                    date_modifed = row.date_modifed
-                else:
-                    date_modifed = "Нет"
-                if row.check_send_null:
-                    check_send_null = "checked"
-                else:
-                    check_send_null = "unchecked"
+            not_show_send_null = not LOCAL_MODE
+            if not_show_send_null:
+                for row in raw_list_shops:
+                    seller_id = row.seller_id
 
-                if row.send_common_stocks:
-                    send_common_stocks = "checked"
-                else:
-                    send_common_stocks = "unchecked"
 
-                if row.enable_sync_stocks:
-                    enable_sync_stocks = "checked"
-                else:
-                    enable_sync_stocks = "unchecked"
+                    if row.send_common_stocks:
+                        send_common_stocks = "checked"
+                    else:
+                        send_common_stocks = "unchecked"
 
-                if row.enable_sync_price:
-                    enable_sync_price = "checked"
-                else:
-                    enable_sync_price = "unchecked"
+                    if row.enable_sync_stocks:
+                        enable_sync_stocks = "checked"
+                    else:
+                        enable_sync_stocks = "unchecked"
 
-                if row.enable_orders_submit:
-                    enable_orders_submit = "checked"
-                else:
-                    enable_orders_submit = "unchecked"
+                    if row.enable_sync_price:
+                        enable_sync_price = "checked"
+                    else:
+                        enable_sync_price = "unchecked"
 
-                rows += '<tr>' \
-                        f'<td >{row.shop_name} </td>' \
-                        f'<td >{row.name_mp}</td>' \
-                        f'<td >{row.seller_id}</td>' \
-                        f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="enable_sync_stocks_{seller_id}' \
-                        f'" {enable_sync_stocks} class="iswitch iswitch iswitch-primary"></div></td>' \
-                        f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="enable_sync_price_{seller_id}' \
-                        f'" {enable_sync_price} class="iswitch iswitch iswitch-primary"></div></td>' \
-                        f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="send_common_stocks_{seller_id}' \
-                        f'" {send_common_stocks} class="iswitch iswitch iswitch-purple"></div></td>' \
-                        f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="check_send_null_{seller_id}' \
-                        f'" {check_send_null} class="iswitch iswitch iswitch-warning"></div></td>' \
-                        f'<td >{str(date_modifed).rsplit(":")[0]}</td>' \
-                        f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="enable_orders_submit_{seller_id}' \
-                        f'" {enable_orders_submit} class="iswitch iswitch iswitch-purple"></div></td>' \
-                        f'</tr>'
+                    if row.enable_orders_submit:
+                        enable_orders_submit = "checked"
+                    else:
+                        enable_orders_submit = "unchecked"
+
+                    rows += '<tr>' \
+                            f'<td >{row.shop_name} </td>' \
+                            f'<td >{row.name_mp}</td>' \
+                            f'<td >{row.seller_id}</td>' \
+                            f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="enable_sync_stocks_{seller_id}' \
+                            f'" {enable_sync_stocks} class="iswitch iswitch iswitch-primary"></div></td>' \
+                            f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="enable_sync_price_{seller_id}' \
+                            f'" {enable_sync_price} class="iswitch iswitch iswitch-primary"></div></td>' \
+                            f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="send_common_stocks_{seller_id}' \
+                            f'" {send_common_stocks} class="iswitch iswitch iswitch-purple"></div></td>' \
+                            f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="check_send_null_{seller_id}' \
+                            f'" {enable_orders_submit} class="iswitch iswitch iswitch-purple"></div></td>' \
+                            f'</tr>'
+            else:
+                for row in raw_list_shops:
+                    seller_id = row.seller_id
+                    if row.date_modifed:
+                        date_modifed = row.date_modifed
+                    else:
+                        date_modifed = "Нет"
+                    if row.check_send_null:
+                        check_send_null = "checked"
+                    else:
+                        check_send_null = "unchecked"
+
+                    if row.send_common_stocks:
+                        send_common_stocks = "checked"
+                    else:
+                        send_common_stocks = "unchecked"
+
+                    if row.enable_sync_stocks:
+                        enable_sync_stocks = "checked"
+                    else:
+                        enable_sync_stocks = "unchecked"
+
+                    if row.enable_sync_price:
+                        enable_sync_price = "checked"
+                    else:
+                        enable_sync_price = "unchecked"
+
+                    if row.enable_orders_submit:
+                        enable_orders_submit = "checked"
+                    else:
+                        enable_orders_submit = "unchecked"
+
+                    rows += '<tr>' \
+                            f'<td >{row.shop_name} </td>' \
+                            f'<td >{row.name_mp}</td>' \
+                            f'<td >{row.seller_id}</td>' \
+                            f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="enable_sync_stocks_{seller_id}' \
+                            f'" {enable_sync_stocks} class="iswitch iswitch iswitch-primary"></div></td>' \
+                            f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="enable_sync_price_{seller_id}' \
+                            f'" {enable_sync_price} class="iswitch iswitch iswitch-primary"></div></td>' \
+                            f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="send_common_stocks_{seller_id}' \
+                            f'" {send_common_stocks} class="iswitch iswitch iswitch-purple"></div></td>' \
+                            f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="check_send_null_{seller_id}' \
+                            f'" {check_send_null} class="iswitch iswitch iswitch-warning"></div></td>' \
+                            f'<td ><div class="form-block"><input type="checkbox" value="{row.shop_name}" name="enable_orders_submit_{seller_id}' \
+                            f'" {enable_orders_submit} class="iswitch iswitch iswitch-purple"></div></td>' \
+                            f'</tr>'
 
             return unescape(render_template('tables-shops.html',
                                             rows=rows, role=role,
                                             photo=photo,
+                                            not_show_send_null=not_show_send_null,
                                             user_name=user_name))
 
 
@@ -1555,7 +1595,7 @@ def sales_today(page=1):
         for row in sales_today.items:
             # print(row)
             rows += '<tr>' \
-                    f'<td>{row.shop_order_id}</td>' \
+                    f'<td>{row.mp_order_id}</td>' \
                     f'<td >{row.name}</td>' \
                     f'<td >{row.quantity}</td>' \
                     f'<td >{row.price}</td>' \
