@@ -2345,7 +2345,8 @@ def distributor_settings():
                         price_link=data.get('price_link'),
                         is_scheduler=data.get('is_scheduler'),
                         type_downloads=data.get('type_downloads'),
-                        user_modifed=current_user.id
+                        user_modifed=current_user.id,
+                        shop_name=data.get('upload_prices_store')
                     )
                     db.session.add(dist_price)
                     db.session.commit()
@@ -2599,24 +2600,27 @@ def distributors_prices():
                 for key, value in data.items():
                     need_job = key.rsplit('_', maxsplit=1)[0]
                     proxy_settings[value] = proxy_settings.get(value, []) + [need_job]
-                # print(3242344314, proxy_settings)
+                print(3242344314, proxy_settings)
 
             disr_prices_data = DistributorPrice.query.all()
             for row in disr_prices_data:
                 current_work = {'is_scheduler': False,
                                 'enable_sync_bd': False,
-                                'send_tg_notice': False}
-                if row.distributor in proxy_settings.keys():
-                    current = {i: True for i in proxy_settings[row.distributor]}
+                                'send_tg_notice': False, 
+                                'remove_price': False}
+                if str(row.id) in proxy_settings.keys():
+                    current = {i: True for i in proxy_settings[str(row.id)]}
+
                     current_work.update(current)
+                    print(33333333, current, current_work, row.id)
                     db.session.execute(update(DistributorPrice)
                                        .where(DistributorPrice.id == row.id)
                                        .values(current_work))
-                else:
-                    db.session.execute(update(DistributorPrice)
-                                       .where(DistributorPrice.id == row.id)
-                                       .values(current_work))
-                db.session.commit()
+                # else:
+                #     db.session.execute(update(DistributorPrice)
+                #                        .where(DistributorPrice.id == row.id)
+                #                        .values(current_work))
+                    db.session.commit()
 
             if len(data.keys()) > 0:
                 try:
@@ -2649,7 +2653,8 @@ def distributors_prices():
                 photo = 'prof-music-2.jpg'
             rows = ''
 
-            raw_list_prices = db.session.query(DistributorPrice) \
+            raw_list_prices = db.session.query(DistributorPrice)\
+                .where(DistributorPrice.remove_price == False)\
                 .order_by(DistributorPrice.id.asc()) \
                 .all()
 
@@ -2680,13 +2685,15 @@ def distributors_prices():
                         f'<td >{row.price_name}</td>' \
                         f'<td >{row.distributor}</td>' \
                         f'<td >{shop_name}</td>' \
-                        f'<td ><div class="form-block"><input type="checkbox" value="{row.distributor}" name="is_scheduler_{id}' \
+                        f'<td ><div class="form-block"><input type="checkbox" value="{row.id}" name="is_scheduler_{id}' \
                         f'" {is_scheduler} class="iswitch iswitch iswitch-purple"></div></td>' \
-                        f'<td ><div class="form-block"><input type="checkbox" value="{row.distributor}" name="enable_sync_bd_{id}' \
+                        f'<td ><div class="form-block"><input type="checkbox" value="{row.id}" name="enable_sync_bd_{id}' \
                         f'" {enable_sync_bd} class="iswitch iswitch iswitch-warning"></div></td>' \
                         f'<td >{row.type_downloads}</td>' \
-                        f'<td ><div class="form-block"><input type="checkbox" value="{row.distributor}" name="send_tg_notice_{id}' \
+                        f'<td ><div class="form-block"><input type="checkbox" value="{row.id}" name="send_tg_notice_{id}' \
                         f'" {send_tg_notice} class="iswitch iswitch iswitch-primary"></div></td>' \
+                        f'<td ><div class="form-block"><input type="checkbox" value="{row.id}" name="remove_price_{id}' \
+                        f'"  class="iswitch iswitch iswitch-danger"></div></td>' \
                         f'</tr>'
 
             return unescape(render_template('distributors-prices.html',

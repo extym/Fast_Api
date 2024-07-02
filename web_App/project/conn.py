@@ -243,6 +243,8 @@ send_tg_notice boolean,
 date_Added varchar,
 date_Modifed varchar,
 user_modifed int,
+shop_name varchar,
+remove_price boolean default false,
 UNIQUE (id)
 )
 """

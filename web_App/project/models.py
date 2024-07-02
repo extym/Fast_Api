@@ -94,6 +94,7 @@ class DistributorPrice(db.Model):
     date_modifed = db.Column(db.String(250))
     user_modifed = db.Column(db.Integer())
     shop_name = db.Column(db.String(250))
+    remove_price = db.Column(db.Boolean())
 
 
 class Product(db.Model):
