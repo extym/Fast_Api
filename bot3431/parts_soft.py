@@ -319,7 +319,7 @@ def get_oem_from_xml(offer_id, link=None):
         for row in doc['yml_catalog']['shop']['offers']['offer']:
             if row["@id"] == offer_id:
                 # print(type(row), *row.keys(), sep='\n')
-                print('$' * 50)
+                # print('$' * 50)
                 brand = row['vendor']
                 oem = row['vendorCode']
                 price = row['price']
@@ -335,7 +335,7 @@ def get_oem_from_xml_v2(offer_id, link=None):
         doc = xmltodict.parse(xml)
         for row in doc['yml_catalog']['shop']['offers']['offer']:
             if row["@id"] == offer_id:
-                print('$' * 50)
+                # print('$' * 50)
                 brand = row['vendor']
                 oem = row['vendorCode']
                 price = row['price']

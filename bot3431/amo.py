@@ -1085,8 +1085,9 @@ async def rewrite_leads_v2(chat_id, user_id):  # (leads_id, price, string):
                      format(answer.status_code, user_id, chat_id, leads_id, data, url))
         if answer.ok:
             # await re_write_link_v3(chat_id, leads_id, contact_id)
-            await execute_query_v3(query_update_contact_id,(chat_id,
-                                                            leads_id, contact_id))
+            await execute_query_v3(query_update_contact_id,(leads_id, 
+                                                            contact_id, 
+                                                            chat_id))
             logging.info('ALL_RIDE_rewrite_lead_v2 {} {} {} {} {} {} {}'.
                          format(answer.status_code, user_id, chat_id,
                                 leads_id, data, url, contact_id))

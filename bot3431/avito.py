@@ -658,7 +658,7 @@ async def get_avito_current_chat_v2(hook, check):
                          .format(answer.status_code, user_id))
 
         # await re_write_link_v2(chat_id, msg_id)
-        await execute_query_v3(query_update_msg_id, (chat_id, msg_id))
+        await execute_query_v3(query_update_msg_id, (msg_id, chat_id))
 
         author_id = hook.get('payload').get('value').get('author_id')
         await make_message_for_amo_v2(hook, raw_data, author_id, False)  # True)
