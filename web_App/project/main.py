@@ -303,7 +303,7 @@ def reformat_data_items_v2(order, shop_name, mp, seller_id):
                 item["price"][:-2],
                 item['offer_id'],
                 item['sku'],
-                order["shipping_date"],
+                order["shipment_date"],
                 item['name']
             )
             result.append(proxy)

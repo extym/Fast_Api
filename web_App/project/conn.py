@@ -558,8 +558,8 @@ query_write_items_v2 = ("INSERT INTO order_items "
                         "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, now(), now())")
 
 query_write_items_v3 = ("INSERT INTO order_items "
-                        "(mp_order_id, shop_order_id, mp, shop_Name, order_status, "
-                        "our_status, vendor_code, id_1c, quantity, price, article, article_mp, "
+                        "(mp_order_id, shop_order_id, mp, shop_Name, seller_id, order_status, "
+                        "our_status, id_1c, quantity, price, article, article_mp, "
                         "date_Added, date_Modifed, shipment_date, name )"
                         "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, now(), now(), %s, %s)")
 
