@@ -28,7 +28,7 @@ def get_pages():
 
 
 def get_new_pages():
-    resp = requests.get(link)
+    resp = requests.get(link_kolrad)
     data = xmltodict.parse(resp.text)
     data_product = data['data']['product']
     print(data['data']['product'][0], sep='\n')
@@ -43,7 +43,7 @@ def get_new_pages():
 
 
 def get_new_pages_v2():
-    resp = requests.get(link)
+    resp = requests.get(link_kolrad)
     data = xmltodict.parse(resp.text)
     data_product = data['data']['product']
     # print(data['data']['product'][0], sep='\n')
