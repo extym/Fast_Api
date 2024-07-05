@@ -776,27 +776,33 @@ def import_settings_post():
         i_import_donor_store = data.get('i_import_donor_store')
         i_import_acceptor_mp = data.get('i_import_acceptor_mp')
         i_import_acceptor_store = data.get('i_import_acceptor_store')
+        articul_donor = data.get("add_articul_donor")
 
         if i_import_donor_store != i_import_acceptor_store and \
                 i_import_donor_mp != 'Выбрать ' and \
                 i_import_acceptor_mp != 'Выбрать ':
-            job = q.enqueue_call(make_internal_import_oson_product
-                                 (donor=i_import_donor_store,
-                                  acceptor=i_import_acceptor_store,
-                                  source='front',
-                                  donor_mp=i_import_donor_mp,
-                                  acceptor_mp=i_import_acceptor_mp))
-            print(989898989, job.get_id)
-        # print(*data.items(), sep='\n')
+            # job = q.enqueue_call(make_internal_import_oson_product
+            job_call = make_internal_import_oson_product(
+                donor=i_import_donor_store,
+                acceptor=i_import_acceptor_store,
+                source='front',
+                donor_mp=i_import_donor_mp,
+                acceptor_mp=i_import_acceptor_mp,
+                articul=articul_donor)
+            # print(989898989, job.return_value(), job.get_id)
+            print(989898989, job_call)
+            flash(f'{job_call}')
+        else:
+            print(*data.items(), sep='\n')
+            flash(
+                'Проверьте заполнение обязательных полей - магазина, маркетплейса источника и магазина, маркетплейса назначения.')
 
     elif make == 'start_internal_import_price':
         print('!!!!!!_start_internal_import_price_!!!!!')
         i_import_donor_mp = data.get('i_import_donor_mp')
         i_import_donor_store = data.get('i_import_donor_store')
-        i_import_donor_role = 'donor'
         i_import_acceptor_mp = data.get('i_import_acceptor_mp')
         i_import_acceptor_store = data.get('i_import_acceptor_store')
-        i_import_acceptor_role = 'acceptor'
         i_import_acceptor_markup = data.get('i_import_acceptor_markup')
 
         if i_import_donor_store != i_import_acceptor_store and \
@@ -804,8 +810,8 @@ def import_settings_post():
                 i_import_acceptor_mp != 'Выбрать ':
 
             job = q.enqueue_call(make_import_export_oson_price(
-                donor=i_import_donor_role,
-                acceptor=i_import_acceptor_role,
+                donor=i_import_donor_store,
+                acceptor=i_import_acceptor_store,
                 k=int(i_import_acceptor_markup),
                 send_to_mp=False)
             )
@@ -821,8 +827,7 @@ def import_settings_post():
                 and data.get('i_import_acceptor_store') == 'Выбрать':
             flash("Укажите хотя бы один магазин для которого нужен просмотр настроек", "alert")
         else:
-            result = {k: v for k, v in data.items() if (v != '0' and v != 'Выбрать')}
-            port_set, mprt_setts = {}, {}
+            result = {k: v for k, v in data.items() if (v != '0' and v != 'Выбрать' and v != '')}
             if result.get('i_import_donor_store') is not None \
                     and result.get("i_import_acceptor_store") is not None:
                 import_set = db.session.scalars(select(InternalImport)
@@ -844,10 +849,10 @@ def import_settings_post():
                     i_import_acceptor_role = 'acceptor'
                     i_import_acceptor_markup = port_set.get("i_import_acceptor_markup")
 
-                    # for row in port_set.items():
-                    #     # print(row + ' = ' + 'request.args.get("' + row + '")')
-                    #     # print(row + '=' + row + ',')
-                    #     print(row)
+                    for row in port_set.items():
+                        # print(row + ' = ' + 'request.args.get("' + row + '")')
+                        # print(row + '=' + row + ',')
+                        print(3434, row)
 
                     uid = current_user.id
                     role = current_user.roles
@@ -876,12 +881,13 @@ def import_settings_post():
                     flash("Настройки для указанных магазинов не найдены. Введите требуемые настройки и сохраните их.",
                           "alert")
 
-            elif result.get('i_import_donor_store') is not None:
+            elif result.get('i_import_donor_store') is not None \
+                    and result.get('i_import_acceptor_store') is None:
                 import_set = db.session.scalars(select(InternalImport)
                 .where(
                     InternalImport.i_import_donor_store == data.get('i_import_donor_store'))) \
                     .first()
-                try:
+                if import_set:
                     port_set = import_set.__dict__
                     i_import_donor_role = 'donor'
                     i_import_donor_markup = port_set.get("i_import_donor_markup")
@@ -917,11 +923,13 @@ def import_settings_post():
                                            i_import_acceptor_mp=i_import_acceptor_mp,
                                            i_import_acceptor_role='acceptor',
                                            i_import_acceptor_markup=i_import_acceptor_markup)
-                except:
-                    flash("Настройки для указанного магазина не найдены. Введите требуемые настройки и сохраните их.",
+                else:
+                    flash("Настройки для указанного магазина не найдены. "
+                          "Введите требуемые настройки и сохраните их.",
                           "alert")
 
-            elif result.get('i_import_acceptor_store') is not None:
+            elif result.get('i_import_donor_store') is None \
+                    and result.get('i_import_acceptor_store') is not None:
                 import_settings = db.session.scalars(select(InternalImport)
                 .where(
                     InternalImport.i_import_acceptor_store == data.get('i_import_acceptor_store'))) \

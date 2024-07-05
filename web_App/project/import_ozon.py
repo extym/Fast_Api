@@ -696,6 +696,7 @@ def check_import_limit(seller_id):
 def make_internal_import_oson_product(donor=None, acceptor=None, k=1,
                                       source=None, donor_mp=None,
                                       acceptor_mp=None, articul=None):
+    print(77777777777777777777, donor, acceptor, donor_mp, acceptor_mp, articul, k)
     # metod = 'https://api-seller.ozon.ru/v3/product/import'
     metod = 'https://api-seller.ozon.ru/v1/product/import-by-sku'
     if donor is not None and acceptor is not None and articul is not None:
@@ -711,9 +712,11 @@ def make_internal_import_oson_product(donor=None, acceptor=None, k=1,
                 .filter_by(shop_name=donor)\
                 .filter_by(articul_product=articul)\
                 .first()
-            product_data.append(product)
-
+            if product:
+                product_data.append(product)
+        print(7773333777, product)
         if len(product_data) > 0:
+            print(22222, product_data)
             for row in product_data:
                 print(22222, row )
                 #############################
@@ -732,7 +735,7 @@ def make_internal_import_oson_product(donor=None, acceptor=None, k=1,
                     'currency_code': 'RUB'
                 }
                 pre_data.append(item)
-            # print(1111, acceptor_data[0], acceptor_data[1])
+            print(1111, acceptor_data[0], acceptor_data[1])
             data = {"items": pre_data}
             header = {
                 'Client-Id': acceptor_data[0],
@@ -829,16 +832,22 @@ def make_internal_import_oson_product(donor=None, acceptor=None, k=1,
                     print('Error make_response_internal_import_oson_product'
                           ' status_code {},  acceptor_mp {}, answer.text {}'
                           .format(answer.status_code, acceptor_mp, answer.text))
-                    return "Что-то пошло не так с запросом на сервер озона"
+                    return "Что-то пошло не так с запросом на сервер озона - {}".format(answer.text)
 
             elif donor_mp == 'ozon' and acceptor_mp == 'wb':
                 pass
 
             else:
-                print('Error make_internal_import_oson_product'
-                      ' status_code {},  acceptor_mp {}, donor_mp {}'
+                print('Error_make_internal_import_oson_product'
+                      ' donor {}, donor_mp {}, acceptor_mp {}'
                       .format(donor, donor_mp, acceptor_mp))
                 return 'Check you data', donor, donor_mp, acceptor_mp
+
+        else:
+            return "Указанные артикулы товров не найдены в базе магазина донора. " \
+                   "Выполните импорт товаров с маркетплейса для магазина донора " \
+                   "(Маркетплейсы - Настройки импорта - Запустить импорт товаров из маркетплейса)" \
+                   " или создайте товар."
 
     elif donor is not None and acceptor is not None:
         pre_data = []
@@ -967,7 +976,7 @@ def make_internal_import_oson_product(donor=None, acceptor=None, k=1,
                     print('Error make_response_internal_import_oson_product'
                           ' status_code {},  acceptor_mp {}, answer.text {}'
                     .format(answer.status_code, acceptor_mp, answer.text))
-                    return "Что-то пошло не так с запросом на сервер озона"
+                    return "Что-то пошло не так с запросом на сервер озона - {}".format(answer.text)
 
             elif donor_mp == 'ozon' and acceptor_mp == 'wb':
                 pass

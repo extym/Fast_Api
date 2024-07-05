@@ -20,10 +20,9 @@
             </div>
             <div>
                 {% with messages = get_flashed_messages() %}
-                    {% if messages and messages[1] == 'alert' %}
+                    {% if  messages %}
                     <div class="alert alert-warning" role="alert">
-                    {% elif messages and messages[1] == 'success' %}
-                    <div class="alert alert-success" role="alert">
+
                     {{ messages[0] }}
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                         <span aria-hidden="true">×</span>
@@ -40,7 +39,7 @@
 
                 <section class="box ">
                     <header class="panel_header">
-                        <h2 class="title float-left">Запустить импорт товаров из маркетплейса в таблицу</h2>
+                        <h2 class="title float-left">Запустить импорт товаров из маркетплейса</h2>
                         <div class="actions panel_actions float-right">
                             <i class="box_toggle fa fa-chevron-down"></i>
                             <i class="box_setting fa fa-cog" data-toggle="modal" href="#section-settings"></i>
