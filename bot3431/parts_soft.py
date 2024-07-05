@@ -36,7 +36,7 @@ def get_smth(metod):
     token_ps = HTTPBasicAuth(admin_ps_login, admin_ps_pass)
     answer = requests.get(url, auth=token_ps)
 
-    print(3111133, answer.text)
+    # print(3111133, answer.text)
     return answer.json()
 
 
@@ -328,6 +328,7 @@ def get_oem_from_xml(offer_id, link=None):
 
     return brand, oem
 
+
 def get_oem_from_xml_v2(offer_id, link=None):
     brand, oem = '', ''
     print("OFFER ID", offer_id)
@@ -335,18 +336,16 @@ def get_oem_from_xml_v2(offer_id, link=None):
         doc = xmltodict.parse(xml)
         for row in doc['yml_catalog']['shop']['offers']['offer']:
             if row["@id"] == offer_id:
-                # print('$' * 50)
                 brand = row['vendor']
                 oem = row['vendorCode']
                 price = row['price']
-                # print(44444444444, brand, oem, price)
                 break
 
         if not oem and not brand:
             result = False
             while not result:
                 for i in range(1, 7):
-                    offer = offer_id[: - 6]
+                    offer = offer_id[: -i]
                     print("OFFER_ID", offer_id, offer)
                     for row in doc['yml_catalog']['shop']['offers']['offer']:
                         id_prod = row["@id"][: - i]
@@ -358,6 +357,45 @@ def get_oem_from_xml_v2(offer_id, link=None):
                 result = True
 
     return brand, oem
+
+
+def get_barcode_from_xml_v2(offer_id=None, link=None,
+                            vendor_code=None, vendor=None):
+    barcode = None
+    with urlopen(link) as xml:
+        doc = xmltodict.parse(xml)
+        if not vendor_code and not vendor:
+            for row in doc['yml_catalog']['shop']['offers']['offer']:
+                if row["@id"] == offer_id:
+                    brand = row['vendor']
+                    oem = row['vendorCode']
+                    barcode = row['barcode']
+                    break
+
+            if not oem and not brand:
+                result = False
+                while not result:
+                    for i in range(1, 7):
+                        offer = offer_id[: -i]
+                        print("OFFER_ID", offer_id, offer)
+                        for row in doc['yml_catalog']['shop']['offers']['offer']:
+                            id_prod = row["@id"][: - i]
+                            if offer == id_prod:
+                                brand = row['vendor']
+                                barcode = row['barcode']
+                                oem = row['vendorCode'][: -i] + offer_id[-i:]
+                                break
+
+                    result = True
+
+        else:
+            for row in doc['yml_catalog']['shop']['offers']['offer']:
+                if row["vendorCode"].upper() == vendor_code.upper() \
+                        and row['vendor'].upper() == vendor.upper():
+                    barcode = row.get('barcode')
+                    break
+
+    return barcode
 
 
 def get_vendor_code_from_xlm(offer_id, link=None):
@@ -375,10 +413,6 @@ def get_vendor_code_from_xlm(offer_id, link=None):
 
     return vendor, vendor_code
 
-
-#
-# print(get_oem_from_xml_v2("CHERY204000455AA",
-#                          link = 'https://3431.ru/system/unload_prices/33/yandex_market.xml'))
 
 
 def create_resp_if_not_exist(list_items, link, key=None,
@@ -446,10 +480,9 @@ def create_resp_if_not_exist(list_items, link, key=None,
     else:
         print("Result result_make_basket UNsuccessfully {}".format(count_items))
         bot_tg.send_get('ПРОБЛЕМА обработки \n заказа {}. '
-                        'Требуется ручная обработка.'
-                        'Не найден номер производителя для offer_id {} \n'
+                        'Требуется ручная обработка позиций выше. \n'
                         'YandexMarket'
-                        .format(external_order_id, offer_id))
+                        .format(external_order_id))
 
     return global_result_make_basket
 
@@ -545,9 +578,17 @@ ym_orders_short = [459439792, 459438203, 459412869, 459372108, 459349047, 459339
 # get_smth("/orders.json")
 # get_smth("/order_status_types.json")
 write_order = "80188"
-get_smth(f'/orders/{write_order}.json')
+# get_smth(f'/orders/{write_order}.json')
 
 #  {"id":8,"name":"Выдано","code":"vydano"}
 
 # post_smth()
+
+# get_oem_from_xml_v2('OSVAR8502371602', link='https://3431.ru/system/unload_prices/33/yandex_market.xml')
+#
+# print(get_oem_from_xml_v2("OSVAR8502371602",
+#                          link = 'https://3431.ru/system/unload_prices/33/yandex_market.xml'))
+
+# print(get_barcode_from_xml_v2(vendor_code="K015631XS", vendor="Gates",
+#                          link = 'https://3431.ru/system/unload_prices/46/yandex_market.xml'))
 
