@@ -141,9 +141,9 @@ def create_need_data(without_db=False, shop_name=None,
         rewrite_standart_data(json_data)
 
         try:
-            data = kolrad.standart_product_v2()
+            data = kolrad.standart_product()
         except:
-            print("We don't ger kolrad data")
+            print("We don't get kolrad data")
 
         check_and_write(data, shop_name=shop_name)
 

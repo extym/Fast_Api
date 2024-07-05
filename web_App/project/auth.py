@@ -33,6 +33,7 @@ import project.yandex as yan
 import project.addons.kolrad as kolrad
 import project.addons.shins as shins
 import project.addons.four_tochki as tochki
+import project.addons.common as common
 
 import logging
 
@@ -179,11 +180,24 @@ def back_distibutors_tasks():
 def back_dist_prices_tasks():
     with Session(engine) as session:
         distr_prices = session.query(DistributorPrice) \
-            .filter(or_(DistributorPrice.is_scheduler == True)) \
+            .filter(DistributorPrice.is_scheduler == True) \
+            .filter(DistributorPrice.remove_price == False) \
             .all()
         for row in distr_prices:
-            if row.distributor == 'shins' and row.type_downloads == 'csv':
-                shins.get_data_csv(url=row.price_link)
+            if row.distributor == 'shins' \
+                    and row.format_link_downloads == 'csv' \
+                    and row.enable_sync_bd:
+                common.check_and_write(shins.get_data_csv(url=row.price_link),
+                                       shop_name=row.shop_name)
+            if row.distributor == 'kolrad' and row.format_link_downloads == 'xml' \
+                    and row.enable_sync_bd:
+                common.check_and_write(kolrad.get_kolrad_xml(row.price_link),
+                                       shop_name=row.shop_name)
+            if row.distributor == '4tochki' and row.format_link_downloads == 'json' \
+                    and row.enable_sync_bd:
+                common.check_and_write(
+                    tochki.standart_wheels_from_json(name_price=row.price_name),
+                    shop_name=row.shop_name)
 
 
 def back_upload_prices():
@@ -194,7 +208,7 @@ def back_upload_prices():
             .all()
 
         for row in upload_prices:
-            if row.upload_price_mp == 'sber' and row.type_downloads == 'xml':
+            if row.upload_price_mp == 'sber' and row.format_link_downloads == 'xml':
                 sber.create_sber_xml(stocks_is_null=row.is_null_stocks,
                                      without_db=row.enable_sync_bd,
                                      legal_name=row.upload_price_legal_name,
@@ -202,7 +216,7 @@ def back_upload_prices():
                                      markup=row.upload_prices_markup,
                                      discount=row.upload_price_discount,
                                      wh_id=row.warehouses_id)
-            if row.upload_price_mp == 'yandex' and row.type_downloads == 'xml':
+            if row.upload_price_mp == 'yandex' and row.format_link_downloads == 'xml':
                 yan.create_ym_xml(stocks_is_null=row.is_null_stocks,
                                   without_db=row.enable_sync_bd,
                                   legal_name=row.upload_price_legal_name,
@@ -465,7 +479,7 @@ def add_mp_post():
             d_b.insert_new_mp(uid, shop_id, shop_name, mp, key_mp, company_id)
             flash('Настройки удачно сохранены', 'success')
 
-        if mp == 'sber'  and shop_id:
+        if mp == 'sber' and shop_id:
             mp_sett = Marketplaces(
                 user_id=uid,
                 seller_id=data.get('id_mp', 0),
@@ -1433,7 +1447,6 @@ def shops():
                 for row in raw_list_shops:
                     seller_id = row.seller_id
 
-
                     if row.send_common_stocks:
                         send_common_stocks = "checked"
                     else:
@@ -1586,7 +1599,7 @@ def sales_today(page=1):
             .strftime(f"%Y-%m-%d")
         # sales_today = db.session.query(SalesToday) \
         #     .paginate(page=page, per_page=limit, error_out=False)
-        sales_today = db.session.query(SalesToday)\
+        sales_today = db.session.query(SalesToday) \
             .where(SalesToday.date_added > yesterday) \
             .paginate(page=page, per_page=limit, error_out=False)
         my_query = db.func.count(SalesToday.id)
@@ -2345,6 +2358,7 @@ def distributor_settings():
                         price_link=data.get('price_link'),
                         is_scheduler=data.get('is_scheduler'),
                         type_downloads=data.get('type_downloads'),
+                        format_link_downloads=data.get('format_link_downloads'),
                         user_modifed=current_user.id,
                         shop_name=data.get('upload_prices_store')
                     )
@@ -2365,6 +2379,7 @@ def distributor_settings():
                             price_link=data.get('price_link'),
                             is_scheduler=data.get('is_scheduler'),
                             type_downloads=data.get('type_downloads'),
+                            format_link_downloads=data.get('format_link_downloads'),
                             user_modifed=current_user.id
                         )
                         db.session.merge(dist_price)
@@ -2380,6 +2395,7 @@ def distributor_settings():
                             price_link=data.get('price_link'),
                             is_scheduler=data.get('is_scheduler'),
                             type_downloads=data.get('type_downloads'),
+                            format_link_downloads=data.get('format_link_downloads'),
                             user_modifed=current_user.id
                         )
                         db.session.merge(dist_price)
@@ -2394,6 +2410,7 @@ def distributor_settings():
                             price_link=data.get('price_link'),
                             is_scheduler=data.get('is_scheduler'),
                             type_downloads=data.get('type_downloads'),
+                            format_link_downloads=data.get('format_link_downloads'),
                             user_modifed=current_user.id
                         )
                         db.session.merge(dist_price)
@@ -2410,6 +2427,7 @@ def distributor_settings():
                             price_link=data.get('price_link'),
                             is_scheduler=data.get('is_scheduler'),
                             type_downloads=data.get('type_downloads'),
+                            format_link_downloads=data.get('format_link_downloads'),
                             user_modifed=current_user.id
                         )
                         db.session.merge(dist_price)
@@ -2606,7 +2624,7 @@ def distributors_prices():
             for row in disr_prices_data:
                 current_work = {'is_scheduler': False,
                                 'enable_sync_bd': False,
-                                'send_tg_notice': False, 
+                                'send_tg_notice': False,
                                 'remove_price': False}
                 if str(row.id) in proxy_settings.keys():
                     current = {i: True for i in proxy_settings[str(row.id)]}
@@ -2616,17 +2634,17 @@ def distributors_prices():
                     db.session.execute(update(DistributorPrice)
                                        .where(DistributorPrice.id == row.id)
                                        .values(current_work))
-                # else:
-                #     db.session.execute(update(DistributorPrice)
-                #                        .where(DistributorPrice.id == row.id)
-                #                        .values(current_work))
+                    # else:
+                    #     db.session.execute(update(DistributorPrice)
+                    #                        .where(DistributorPrice.id == row.id)
+                    #                        .values(current_work))
                     db.session.commit()
 
             if len(data.keys()) > 0:
                 try:
                     scheduler.remove_job('distibutors_prices')
                 except:
-                    print('Job_update_error')
+                    print('Job_distibutors_prices_update_error')
                 finally:
                     current_job = scheduler.add_job(back_dist_prices_tasks,
                                                     id='distibutors_prices',
@@ -2653,8 +2671,8 @@ def distributors_prices():
                 photo = 'prof-music-2.jpg'
             rows = ''
 
-            raw_list_prices = db.session.query(DistributorPrice)\
-                .where(DistributorPrice.remove_price == False)\
+            raw_list_prices = db.session.query(DistributorPrice) \
+                .where(DistributorPrice.remove_price == False) \
                 .order_by(DistributorPrice.id.asc()) \
                 .all()
 
@@ -2689,7 +2707,7 @@ def distributors_prices():
                         f'" {is_scheduler} class="iswitch iswitch iswitch-purple"></div></td>' \
                         f'<td ><div class="form-block"><input type="checkbox" value="{row.id}" name="enable_sync_bd_{id}' \
                         f'" {enable_sync_bd} class="iswitch iswitch iswitch-warning"></div></td>' \
-                        f'<td >{row.type_downloads}</td>' \
+                        f'<td >{row.format_link_downloads}</td>' \
                         f'<td ><div class="form-block"><input type="checkbox" value="{row.id}" name="send_tg_notice_{id}' \
                         f'" {send_tg_notice} class="iswitch iswitch iswitch-primary"></div></td>' \
                         f'<td ><div class="form-block"><input type="checkbox" value="{row.id}" name="remove_price_{id}' \

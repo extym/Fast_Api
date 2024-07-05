@@ -215,7 +215,7 @@ login_api_dist text,
 key_api_dist text,
 api_link text,
 type_downloads varchar,
-link_downloads text,
+format_link_downloads text,
 is_scheduler boolean,
 enable_sync_bd boolean,
 enable_orders_submit boolean,
@@ -237,7 +237,7 @@ login_dist_price text,
 key_dist_price text,
 price_link text,
 type_downloads varchar,
-link_downloads text,
+format_link_downloads text,
 is_scheduler boolean,
 send_tg_notice boolean,
 date_Added varchar,
@@ -647,13 +647,14 @@ def create_connection():
     return connection
 
 
-def get_distibutor_data(distibutor, type_downloads, name):
-    query = " SELECT link_downloads, dist_price_markup " \
+def get_distibutor_price_data(distibutor, format_link_downloads, type_downloads):
+    # type_downloads is enum - wheels, tires, wheels_tires
+    query = " SELECT price_link, dist_price_markup " \
             " FROM distributor_price" \
-            " WHERE distributor = %s and type_downloads = %s and name = %s "
+            " WHERE distributor = %s and format_link_downloads = %s and type_downloads = %s "
     with create_connection() as conn:
         with conn.cursor() as cursor:
-            cursor.execute(query, [distibutor, type_downloads, name])
+            cursor.execute(query, [distibutor, format_link_downloads, type_downloads])
             raw_data = cursor.fetchall()
             # print("Query from execute_query executed successfully")
     return raw_data

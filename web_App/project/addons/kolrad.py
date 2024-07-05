@@ -23,9 +23,6 @@ def get_kolrad_xml(link):
     return data_product
 
 
-
-
-
 def standart_product(name_price=None):
     provider = 'kolrad'
     price_type = 'xml'

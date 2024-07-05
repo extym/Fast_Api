@@ -298,35 +298,87 @@
                                             </div>
                                         </div>
 
-                                        <div class="form-group">
+<!--                                        <div class="form-group">-->
 
-                                                <label class="form-label" title="Включить регулярную загрузку данных цен и остатков из прайса поставщика." for="status_feed">Включить загрузку</label>
-                                                    <span class="desc"></span>
+<!--                                                <label class="form-label" title="Включить регулярную загрузку данных цен и остатков из прайса поставщика." for="status_feed">Включить загрузку</label>-->
+<!--                                                    <span class="desc"></span>-->
 
-    <!--                                            <h6>Checkbox Buttons</h6>-->
-                                                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+<!--    &lt;!&ndash;                                            <h6>Checkbox Buttons</h6>&ndash;&gt;-->
+<!--                                                <div class="btn-group btn-group-toggle" data-toggle="buttons">-->
 
-                                                    {% if show and dist_price_data.get('is_scheduler') == 'on' %}
-                                                    <label class="btn btn-secondary active">
-                                                        <input type="checkbox" name="enabled_upload_price" checked="" autocomplete="off"> Включено
-                                                    </label>
-                                                    {% elif show and dist_price_data.get('is_scheduler') == 'off' %}
-                                                    <label class="btn btn-secondary active">
-                                                        <input type="checkbox" name="enabled_upload_price" autocomplete="off"> Включено
-                                                    </label>
-
-                                                    {% else %}
-                                                    <label class="btn btn-secondary active">
-                                                        <input type="checkbox" name="enabled_upload_price" autocomplete="off"> Включено
-                                                    </label>
-<!--                                                    <label class="btn btn-secondary">-->
-<!--                                                        <input type="checkbox" name="is_null_stocks" autocomplete="off"> Включить нулевые остатки-->
+<!--                                                    {% if show and dist_price_data.get('is_scheduler') == 'on' %}-->
+<!--                                                    <label class="btn btn-secondary active">-->
+<!--                                                        <input type="checkbox" name="enabled_upload_price" checked="" autocomplete="off"> Включено-->
+<!--                                                    </label>-->
+<!--                                                    {% elif show and dist_price_data.get('is_scheduler') == 'off' %}-->
+<!--                                                    <label class="btn btn-secondary active">-->
+<!--                                                        <input type="checkbox" name="enabled_upload_price" autocomplete="off"> Включено-->
 <!--                                                    </label>-->
 
+<!--                                                    {% else %}-->
+<!--                                                    <label class="btn btn-secondary active">-->
+<!--                                                        <input type="checkbox" name="enabled_upload_price" autocomplete="off"> Включено-->
+<!--                                                    </label>-->
+<!--&lt;!&ndash;                                                    <label class="btn btn-secondary">&ndash;&gt;-->
+<!--&lt;!&ndash;                                                        <input type="checkbox" name="is_null_stocks" autocomplete="off"> Включить нулевые остатки&ndash;&gt;-->
+<!--&lt;!&ndash;                                                    </label>&ndash;&gt;-->
+
+<!--                                                    {% endif %}-->
+
+<!--                                                </div>-->
+
+
+<!--                                            </div>-->
+
+                                        <div class="form-group">
+
+<!--                                                <h6> </h6>-->
+
+                                                <label class="form-label" for="option1">Прайс в формате</label>
+                                                    <span class="desc"></span>
+                                                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+
+                                                    {% if show and dist_price_data.get('type_downloads') == 'wheels' %}
+                                                    <label class="btn btn-secondary">
+                                                        <input type="radio" name="type_downloads"  checked="" value="wheels" id="option1" autocomplete="off" > Диски
+                                                    </label>
+                                                    <label class="btn btn-secondary">
+                                                        <input type="radio" name="type_downloads" value="tires" id="option2" autocomplete="off"> Шины
+                                                    </label>
+                                                    <label class="btn btn-secondary active">
+                                                        <input type="radio" name="type_downloads" value="wheels_tires"  autocomplete="off"> Диски и Шины
+                                                    </label>
+                                                    {% elif show and dist_price_data.get('type_downloads') == 'tires' %}
+                                                    <label class="btn btn-secondary">
+                                                        <input type="radio" name="type_downloads" value="wheels"  autocomplete="off" > Диски
+                                                    </label>
+                                                    <label class="btn btn-secondary">
+                                                        <input type="radio" name="type_downloads" checked="" value="tires"  autocomplete="off"> Шины
+                                                    </label>
+                                                    <label class="btn btn-secondary active">
+                                                        <input type="radio" name="type_downloads" value="wheels_tires"  autocomplete="off"> Диски и Шины
+                                                    </label>
+                                                    {% elif show and dist_price_data.get('type_downloads') == 'wheels_tires' %}<label class="btn btn-secondary">
+                                                        <input type="radio" name="type_downloads" value="wheels"  autocomplete="off" > Диски
+                                                    </label>
+                                                    <label class="btn btn-secondary">
+                                                        <input type="radio" name="type_downloads" value="tires"  autocomplete="off"> Шины
+                                                    </label>
+                                                    <label class="btn btn-secondary active">
+                                                        <input type="radio" name="type_downloads" checked="" value="wheels_tires" id="option3" autocomplete="off"> Диски и Шины
+                                                    </label>
+                                                    {% else %}
+                                                    <label class="btn btn-secondary">
+                                                        <input type="radio" name="type_downloads" value="wheels"   autocomplete="off" > Диски
+                                                    </label>
+                                                    <label class="btn btn-secondary">
+                                                        <input type="radio" name="type_downloads" value="tires"  autocomplete="off"> Шины
+                                                    </label>
+                                                    <label class="btn btn-secondary active">
+                                                        <input type="radio" name="type_downloads" value="wheels_tires" autocomplete="off"> Диски и Шины
+                                                    </label>
                                                     {% endif %}
-
                                                 </div>
-
 
                                             </div>
 
@@ -397,65 +449,65 @@
                                                     <span class="desc"></span>
                                                 <div class="btn-group btn-group-toggle" data-toggle="buttons">
 
-                                                    {% if show and dist_price_data.get('type_downloads') == 'xml' %}
+                                                    {% if show and dist_price_data.get('format_link_downloads') == 'xml' %}
                                                     <label class="btn btn-secondary">
-                                                        <input type="radio" name="type_downloads"  checked="" value="xml" id="option1" autocomplete="off" > XML
-                                                    </label>
-                                                    <label class="btn btn-secondary">
-                                                        <input type="radio" name="type_downloads" value="csv" id="option2" autocomplete="off"> CSV
-                                                    </label>
-                                                    <label class="btn btn-secondary active">
-                                                        <input type="radio" name="type_downloads" value="xlsx"  autocomplete="off"> XLS
-                                                    </label>
-                                                    <label class="btn btn-secondary active">
-                                                        <input type="radio" name="type_downloads"  value="json" id="option3" autocomplete="off"> JSON
-                                                    </label>
-                                                    {% elif show and dist_price_data.get('type_downloads') == 'csv' %}
-                                                    <label class="btn btn-secondary">
-                                                        <input type="radio" name="type_downloads" value="xml"  autocomplete="off" > XML
+                                                        <input type="radio" name="format_link_downloads"  checked="" value="xml" id="option1" autocomplete="off" > XML
                                                     </label>
                                                     <label class="btn btn-secondary">
-                                                        <input type="radio" name="type_downloads" checked="" value="csv"  autocomplete="off"> CSV
+                                                        <input type="radio" name="format_link_downloads" value="csv" id="option2" autocomplete="off"> CSV
                                                     </label>
                                                     <label class="btn btn-secondary active">
-                                                        <input type="radio" name="type_downloads" value="xlsx"  autocomplete="off"> XLS
+                                                        <input type="radio" name="format_link_downloads" value="xlsx"  autocomplete="off"> XLS
                                                     </label>
                                                     <label class="btn btn-secondary active">
-                                                        <input type="radio" name="type_downloads"  value="json" id="option3" autocomplete="off"> JSON
+                                                        <input type="radio" name="format_link_downloads"  value="json" id="option3" autocomplete="off"> JSON
                                                     </label>
-                                                    {% elif show and dist_price_data.get('type_downloads') == 'xlsx' %}<label class="btn btn-secondary">
-                                                        <input type="radio" name="type_downloads" value="xml"  autocomplete="off" > XML
+                                                    {% elif show and dist_price_data.get('format_link_downloads') == 'csv' %}
+                                                    <label class="btn btn-secondary">
+                                                        <input type="radio" name="format_link_downloads" value="xml"  autocomplete="off" > XML
                                                     </label>
                                                     <label class="btn btn-secondary">
-                                                        <input type="radio" name="type_downloads" value="csv"  autocomplete="off"> CSV
+                                                        <input type="radio" name="format_link_downloads" checked="" value="csv"  autocomplete="off"> CSV
                                                     </label>
                                                     <label class="btn btn-secondary active">
-                                                        <input type="radio" name="type_downloads" checked="" value="xlsx" id="option3" autocomplete="off"> XLS
+                                                        <input type="radio" name="format_link_downloads" value="xlsx"  autocomplete="off"> XLS
                                                     </label>
-                                                    {% elif show and dist_price_data.get('type_downloads') == 'json' %}<label class="btn btn-secondary">
-                                                        <input type="radio" name="type_downloads" value="xml"  autocomplete="off" > XML
+                                                    <label class="btn btn-secondary active">
+                                                        <input type="radio" name="format_link_downloads"  value="json" id="option3" autocomplete="off"> JSON
+                                                    </label>
+                                                    {% elif show and dist_price_data.get('format_link_downloads') == 'xlsx' %}<label class="btn btn-secondary">
+                                                        <input type="radio" name="format_link_downloads" value="xml"  autocomplete="off" > XML
                                                     </label>
                                                     <label class="btn btn-secondary">
-                                                        <input type="radio" name="type_downloads" value="csv"  autocomplete="off"> CSV
+                                                        <input type="radio" name="format_link_downloads" value="csv"  autocomplete="off"> CSV
                                                     </label>
                                                     <label class="btn btn-secondary active">
-                                                        <input type="radio" name="type_downloads" value="xlsx"  autocomplete="off"> XLS
+                                                        <input type="radio" name="format_link_downloads" checked="" value="xlsx" id="option3" autocomplete="off"> XLS
+                                                    </label>
+                                                    {% elif show and dist_price_data.get('format_link_downloads') == 'json' %}<label class="btn btn-secondary">
+                                                        <input type="radio" name="format_link_downloads" value="xml"  autocomplete="off" > XML
+                                                    </label>
+                                                    <label class="btn btn-secondary">
+                                                        <input type="radio" name="format_link_downloads" value="csv"  autocomplete="off"> CSV
                                                     </label>
                                                     <label class="btn btn-secondary active">
-                                                        <input type="radio" name="type_downloads" checked="" value="json" id="option3" autocomplete="off"> JSON
+                                                        <input type="radio" name="format_link_downloads" value="xlsx"  autocomplete="off"> XLS
+                                                    </label>
+                                                    <label class="btn btn-secondary active">
+                                                        <input type="radio" name="format_link_downloads" checked="" value="json" id="option3" autocomplete="off"> JSON
                                                     </label>
                                                     {% else %}
                                                     <label class="btn btn-secondary">
-                                                        <input type="radio" name="type_downloads" value="xml"   autocomplete="off" > XML
+                                                        <input type="radio" name="format_link_downloads" value="xml"   autocomplete="off" > XML
                                                     </label>
                                                     <label class="btn btn-secondary">
-                                                        <input type="radio" name="type_downloads" value="csv"  autocomplete="off"> CSV
+                                                        <input type="radio" name="format_link_downloads" value="csv"  autocomplete="off"> CSV
                                                     </label>
                                                     <label class="btn btn-secondary active">
-                                                        <input type="radio" name="type_downloads" value="xlsx" autocomplete="off"> XLS
+                                                        <input type="radio" name="format_link_downloads" value="xlsx" autocomplete="off"> XLS
                                                     </label>
                                                     <label class="btn btn-secondary active">
-                                                        <input type="radio" name="type_downloads"  value="json" id="option3" autocomplete="off"> JSON
+                                                        <input type="radio" name="format_link_downloads"  value="json" id="option3" autocomplete="off"> JSON
                                                     </label>
 
                                                     {% endif %}

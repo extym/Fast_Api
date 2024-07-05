@@ -99,7 +99,7 @@ def id_generator(size=8, chars=string.ascii_lowercase + string.digits):
 
 def standart_wheels_from_json(shop_name=None,
                             name_price=None):
-    link_downloads = conn.get_distibutor_data('4tochki', 'json', 'wheels_tires')
+    link_downloads = conn.get_distibutor_price_data('4tochki', 'json', 'wheels_tires')
     wheels = get_data_from_json(link_downloads)[0]
     diction, proxy = {}, []
     for prod in wheels:
@@ -236,7 +236,7 @@ def standart_tires_from_json(name_price=None):
     provider = '4tochki'
     price_type = 'json'
     # TODO make provider&price
-    get_distibutor_data = conn.get_distibutor_data(provider,
+    get_distibutor_data = conn.get_distibutor_price_data(provider,
                                                    price_type,
                                                    name_price)
     price_murkup = get_distibutor_data[1]
