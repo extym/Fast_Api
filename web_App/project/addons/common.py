@@ -123,8 +123,8 @@ def clean():
 
 
 def create_need_data(without_db=False, shop_name=None,
-                     name_price=None):
-    json_data, csv_data, data = {}, {}, {}
+                     name_price=None, min_quantity=1):
+    json_data, csv_data, xml_data = {}, {}, {}
     if not without_db:
         try:
             csv_data = shins.standart_wheels_csv()
@@ -141,12 +141,11 @@ def create_need_data(without_db=False, shop_name=None,
         rewrite_standart_data(json_data)
 
         try:
-            data = kolrad.standart_product()
+            xml_data = kolrad.standart_product()
         except:
             print("We don't get kolrad data")
 
-        check_and_write(data, shop_name=shop_name)
-
+        check_and_write(xml_data, shop_name=shop_name)
 
     else:
         try:
@@ -162,37 +161,58 @@ def create_need_data(without_db=False, shop_name=None,
         rewrite_standart_data(json_data)
 
         try:
-            data = kolrad.standart_product(name_price=name_price)
+            xml_data = kolrad.standart_product(name_price=name_price)
         except:
             print("We don't ger kolrad data")
-            rewrite_standart_data(data)
+            rewrite_standart_data(xml_data)
 
     # if we don't get data from distributors, we make feed from database
-    if len(json_data) == 0 and len(csv_data) == 0 and len(data) == 0:
+    if len(json_data) == 0 and len(csv_data) == 0 and len(xml_data) == 0:
         data = standart_product()
         # sys.exit   # more variants
 
-    pre_csv_data = {key: value for key, value in csv_data.items() if int(value[0][4]) >= 4}
-    pre_json_data = {k: v for k, v in json_data.items() if int(v[0][4]) >= 4}
+    pre_csv_data = {key: value for key, value in csv_data.items() if int(value[0][4]) >= min_quantity}
+    pre_json_data = {k: v for k, v in json_data.items() if int(v[0][4]) >= min_quantity}
+    pre_xml_data = {k: v for k, v in xml_data.items() if int(v[0][4]) >= min_quantity}
     need_data = dict()
-    for ke, val in data.items():
+    for ke, val in pre_xml_data.items():
+        in_stok = int(val[0][4])
         pre_count_json = pre_json_data.get(ke)
+        new_data = val[0].copy()
         if pre_count_json:
-            count_json = int(pre_count_json[0][4])
-        else:
-            count_json = 0
-            # print(111, ke, type(val[0][4]), val[0][4])
+            opt_price_json = int(pre_count_json[4])
+            if opt_price_json < int(val[4]):
+                count_json = int(pre_count_json[0][4])
+                del new_data[4]
+                new_data.insert(4, count_json)
+                need_data.update({ke: (new_data, val[1], val[2], val[3], opt_price_json)})
+            elif opt_price_json == int(val[4]):
+                count_json = int(pre_count_json[0][4])
+                in_stok += count_json
+                del new_data[4]
+                new_data.insert(4, in_stok)
+                need_data.update({ke: (new_data, val[1], val[2], val[3], val[4])})
+
         pre_count_csv = pre_csv_data.get(ke)
         if pre_count_csv:
-            count_csv = int(pre_count_csv[0][4])
-        else:
-            count_csv = 0
-            # print(222, ke, type(val[0][4]), val[0][4])
-        in_stok = int(val[0][4]) + count_json + count_csv
-        new_data = val[0].copy()
-        del new_data[4]
-        new_data.insert(4, in_stok)
-        need_data.update({ke: (new_data, val[1], val[2], val[3], val[4])})
+            opt_price_csv = int(pre_count_csv[4])
+            if opt_price_csv < int(val[4]):
+                count_csv = int(pre_count_csv[0][4])
+                del new_data[4]
+                new_data.insert(4, count_csv)
+                need_data.update({ke: (new_data, val[1], val[2], val[3], opt_price_csv)})
+            elif opt_price_csv == int(val[4]):
+                count_csv = int(pre_count_csv[0][4])
+                in_stok += count_csv
+                del new_data[4]
+                new_data.insert(4, in_stok)
+                need_data.update({ke: (new_data, val[1], val[2], val[3], val[4])})
+
+        # in_stok += count_csv
+        # new_data = val[0].copy()
+        # del new_data[4]
+        # new_data.insert(4, in_stok)
+        # need_data.update({ke: (new_data, val[1], val[2], val[3], val[4])})
     print('ALL_RIDE create_need_data ', len(need_data))
 
     return need_data

@@ -1,5 +1,6 @@
 import json
 import sys
+import uuid
 
 # from connect import check_write_json_v4
 import requests
@@ -139,6 +140,7 @@ def standart_wheels_from_json(shop_name=None,
             params = 1
             provider = '4tochki'
             category = 5
+            hash_id = str(uuid.uuid4())
             options = {
                 'et': 'ET' + str(prod.get('et')).replace('.', ','),  # 18
                 "bolts_spacing": str(prod.get('bolts_count'))  # 17
@@ -160,7 +162,8 @@ def standart_wheels_from_json(shop_name=None,
                     image_tuple,
                     options,
                     rule,
-                    price_opt
+                    price_opt,
+                    hash_id
                 )})
 
         except Exception as error:

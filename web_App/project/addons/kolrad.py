@@ -1,5 +1,7 @@
 import datetime
 import sys
+import uuid
+
 import requests
 import json
 import xmltodict
@@ -26,9 +28,9 @@ def get_kolrad_xml(link):
 def standart_product(name_price=None):
     provider = 'kolrad'
     price_type = 'xml'
-    distrib_data = conn.get_distibutor_data(provider,
-                                           price_type,
-                                           name_price)
+    distrib_data = conn.get_distibutor_price_data(provider,
+                                                  price_type,
+                                                  name_price)
     link = distrib_data[0]
     price_murkup = distrib_data[1]
     list_wheels_json = get_kolrad_xml(link)
@@ -68,6 +70,7 @@ def standart_product(name_price=None):
             id_1c = ''
             provider = 'colrad'
             articul_product = vendor.strip() + '_' + product_code
+            hash_id = str(uuid.uuid4())
             options = {
                 'et': 'ET' + dictionary.get('et').strip('"'),
                 "bolts_spacing": dictionary.get('pcd1').strip('"')
@@ -78,16 +81,27 @@ def standart_product(name_price=None):
             }
 
             global_result.update({articul_product:
-                    (
-                        (category_id, name, description,
-                         opt_price, in_stock,
-                         product_code, vendor, category,
-                         articul_product, id_1c, image_url,
-                         price_murkup),
-                        image_tuple,
-                        options,
-                        provider
-                    )})
+                (
+                    (category_id, name, description,
+                     opt_price, in_stock,
+                     product_code, vendor, category,
+                     articul_product, id_1c, image_url,
+                     price_murkup),
+                    image_tuple,
+                    options,
+                    provider
+                )})
+            # global_result.update({articul_product:
+            #                           {"data": (category_id, name, description,
+            #                                     opt_price, in_stock,
+            #                                     product_code, vendor, category,
+            #                                     articul_product, id_1c, image_url,
+            #                                     price_murkup),
+            #                            "image_tuple": image_tuple,
+            #                            "options": options,
+            #                            "provider": provider,
+            #                            "hash": hash_id}
+            #                       })
 
         except:
             # print("FUCKUP_standart_product_v2", dictionary)
