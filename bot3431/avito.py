@@ -668,9 +668,9 @@ async def get_avito_current_chat_v2(hook, check):
                 await rewrite_leads_v2(chat_id, user_id)
                 logging.info('TRY_REWRITE_DATA_TO_AMO_11_ {} {} {} {} '.
                              format(chat_id, user_id, title, target_link))
-            except:
-                logging.error('FuckUp_TRY_REWRITE_DATA_TO_AMO_ {} {} {} {} '.
-                             format(chat_id, user_id, title, target_link))
+            except Exception as error:
+                logging.error('FuckUp_TRY_REWRITE_DATA_TO_AMO_ {} {} {} {} {}'.
+                             format(chat_id, user_id, title, target_link, error))
 
     elif not check[2]:
         # try:

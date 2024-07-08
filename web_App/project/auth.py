@@ -281,13 +281,14 @@ def form_consult():
     return redirect('blank-2.html', role=role)
 
 
-@auth.route('/signup')
-def signup():
-    return render_template('ui-register.html')
+@auth.route('/signup/<referer:str>')
+def signup(referer=None):
+    return render_template('ui-register.html',
+                           referer=referer)
 
 
-@auth.route('/signup', methods=['POST'])
-def signup_post():
+@auth.route('/signup/<referer:str>', methods=['POST'])
+def signup_post(referer=None):
     # ('cabinetID', '1'), ('login', '1'), ('email', '1'), ('password', '1234'), ('remember', 'forever'), ('wp-submit', 'Зарегистрироваться')
     email = request.form.get('email')
     user_login = request.form.get('login')
@@ -380,7 +381,7 @@ def add_mp():
                                user_name=user_name)
 
 
-@auth.route('/add_mp', methods=['POST'])  # /<int:uid>')
+@auth.route('/add_mp', methods=['POST'])
 @login_required
 def add_mp_post():
     data = request.form.to_dict()
@@ -512,7 +513,7 @@ def add_mp_post():
     return redirect('/add_mp')
 
 
-@auth.route('/edit_mp', methods=['POST'])  # /<int:uid>')
+@auth.route('/edit_mp', methods=['POST'])
 @login_required
 def edit_mp_post():
     data = request.form.to_dict()
@@ -547,7 +548,7 @@ def edit_mp_post():
     return redirect('/add_mp')
 
 
-@auth.route('/edit_store', methods=['POST'])  # /<int:uid>')
+@auth.route('/edit_store', methods=['POST'])
 @login_required
 def edit_store_post():
     data = request.form.to_dict()
