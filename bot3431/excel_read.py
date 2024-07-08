@@ -40,13 +40,13 @@ def read_xlsx_v2(file, market):
             except:
                 continue
             shipment_date = row[11]
-    elif market == "710" or market == "715":
+    elif market == "710" or market == "715" or market == "1972" or market == "1973":
         for row in df:
             maxy.append(int(row[0]))
             shipment_date = row[13][:-5]
 
     # print(*row, sep='\n')
-    # print(1111111111, maxy, type(maxy[0]))
+    print(1111111111, maxy, type(maxy))
     return sorted(maxy), shipment_date
 
 

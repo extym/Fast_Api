@@ -800,7 +800,7 @@ def get_new_leads_amo():
 async def wait_amo_hook():
     if request.method == "POST":
         data_json = request.get_json()
-        logging.info('WE_GET_DATA_FROM_AMO {}'.format(data_json))
+        logging.info('WE_GET_DATA_FROM_AMO {} {}'.format(type(data_json), data_json))
         try:
             await make_data_for_avito_v2(data_json)
         except Exception as err:

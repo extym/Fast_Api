@@ -89,6 +89,7 @@ def get_orders_v2(customer_id: str,
     """
     result, result_list = '', []
     page, error = 0, 0
+    # TODO change magik number
     if customer_id == '710' or customer_id == '715' \
             or customer_id == '235':
         while marketplace_id != result:
@@ -125,8 +126,8 @@ def get_orders_v2(customer_id: str,
                                 .format(answer.status_code, answer.text))
                 if page >= 5:
                     break
-
-    elif customer_id == '2063' or customer_id == '2504':
+    # TODO change magik number
+    elif customer_id == '2063' or customer_id == '2504' or customer_id == '1972' or customer_id == '1973':
         while marketplace_id != result:
             params = {
                 'search[customer_id_eq]': customer_id,
@@ -184,7 +185,7 @@ def get_orders_v2(customer_id: str,
     except Exception as error:
         print(222222222222222222, proxy)
         print('datas_error', error)
-    # print('datas', datas)
+    print('datas', datas)
     return datas
 
 

@@ -415,7 +415,7 @@ async def get_avito_token_v3(user_id):
 
 async def make_data_for_avito_v2(data):
     user_id = 0
-    # logging.info('111444444111 {} '.format(data))
+    logging.info('111444444111 {} '.format(data))
     try:
         chat_id = data.get('message').get('conversation').get('client_id')
     except:
@@ -438,24 +438,22 @@ async def make_data_for_avito_v2(data):
         message = {
             "message": {
                 "text": data_text
-            },
+          },
             "type": "text"
         }
+
+        if chat_id and user_id:
+            answer = requests.post(url, headers=header_avito, json=message)
+            response = answer.json()
+            if response.get('created'):
+                logging.info('ALL_RIDE_make_data_for_avito')
+                return True
+            else:
+                logging.error('FUCK_UP_with_get_answer_json_from_avito {} {} {}'
+                              .format(answer.text, user_id, chat_id))
+                return False
     else:
-        logging.info('FUCK_UP_with_chatId_from_amo_1 {} {}'.format(data, pre_user_id))
-
-    if chat_id and user_id:
-        answer = requests.post(url, headers=header_avito, json=message)
-        response = answer.json()
-        if response.get('created'):
-            logging.info('ALL_RIDE_make_data_for_avito')
-            return True
-        else:
-            logging.error('FUCK_UP_with_get_answer_json_from_avito {} {} {}'
-                          .format(answer.text, user_id, chat_id))
-            return False
-
-    logging.info('FUCK_UP_with_chatId_from_amo_2 {} {}'.format(data, pre_user_id))
+        logging.info('FUCK_UP_with_chatId_from_db_1 {} {}'.format(data, pre_user_id))
 
 
 def make_first_answer_avito(chat_id, user_id):
