@@ -331,16 +331,26 @@ def get_oem_from_xml(offer_id, link=None):
 
 
 def get_oem_from_xml_v2(offer_id, link=None):
-    brand, oem = '', ''
+    brand, oem, confirm_brand = '', '', False
     print("OFFER ID", offer_id)
     with urlopen(link) as xml:
         doc = xmltodict.parse(xml)
+        maybe_brand = ''
+        for char in offer_id:
+            if char.isdigit():
+                maybe_brand += char
+            else:
+                break
         for row in doc['yml_catalog']['shop']['offers']['offer']:
             if row["@id"] == offer_id:
                 brand = row['vendor']
                 oem = row['vendorCode']
                 price = row['price']
-                break
+                return brand, oem
+                # break
+
+            elif row['vendor'] == maybe_brand:
+                confirm_brand = True
 
         if not oem and not brand:
             result = False
@@ -356,6 +366,10 @@ def get_oem_from_xml_v2(offer_id, link=None):
                             break
 
                 result = True
+
+        if not oem and not brand and confirm_brand:
+            maybe_vendor_code = offer_id[len(maybe_brand):]
+            return maybe_brand, maybe_vendor_code
 
     return brand, oem
 
