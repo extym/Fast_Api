@@ -18,6 +18,7 @@ class Users(db.Model, UserMixin):
     photo = db.Column(db.String(250))
     date_added = db.Column(db.String(250))
     date_modifed = db.Column(db.String(250))
+    referer = db.Column(db.String(250))
 
 
 class ConsultUsers(db.Model, UserMixin):

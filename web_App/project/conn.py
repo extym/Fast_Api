@@ -173,8 +173,7 @@ roles TEXT,
 photo text,
 date_Added varchar,
 date_Modifed varchar,
-upload_prices_url text,
-upload_price_category varchar,
+referer varchar,
 UNIQUE (email)
 )
 """

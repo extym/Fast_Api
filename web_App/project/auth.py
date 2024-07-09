@@ -281,13 +281,15 @@ def form_consult():
     return redirect('blank-2.html', role=role)
 
 
-@auth.route('/signup/<referer:str>')
+@auth.route('/signup')
+@auth.route('/signup/<referer>')
 def signup(referer=None):
     return render_template('ui-register.html',
                            referer=referer)
 
 
-@auth.route('/signup/<referer:str>', methods=['POST'])
+@auth.route('/signup', methods=['POST'])
+@auth.route('/signup/<referer>', methods=['POST'])
 def signup_post(referer=None):
     # ('cabinetID', '1'), ('login', '1'), ('email', '1'), ('password', '1234'), ('remember', 'forever'), ('wp-submit', 'Зарегистрироваться')
     email = request.form.get('email')
@@ -2748,12 +2750,15 @@ def page_not_found(error):
 
 @auth.app_errorhandler(500)
 def page_server_error(error):
-    photo = current_user.photo
-    if not photo or photo is None:
-        photo = 'prof-music-2.jpg'
-    user_name = current_user.name
-    role = current_user.roles
-    return render_template("blank-500.html", title='500',
+    if not current_user.is_authenticated:
+        return redirect(url_for('main.index_main'))
+    else:
+        photo = current_user.photo
+        if not photo or photo is None:
+            photo = 'prof-music-2.jpg'
+        user_name = current_user.name
+        role = current_user.roles
+        return render_template("blank-500.html", title='500',
                            role=role,
                            photo=photo,
                            user_name=user_name,
