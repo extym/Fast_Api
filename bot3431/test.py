@@ -3553,3 +3553,5 @@ order_dbs_sber = {
                           {"itemIndex": "2", "goodsId": "100025325086", "offerId": "delivery", "itemName": "Доставка",
                            "price": 200, "finalPrice": 200, "discounts": [], "quantity": 1, "taxRate": None,
                            "reservationPerformed": True, "isDigitalMarkRequired": False}]}], "merchantId": 1111}}
+
+
