@@ -237,16 +237,16 @@ def login():
 
 @auth.route('/login-ui', methods=['POST'])
 def login_post():
-    print(request.form)
-    email = request.form.get('email')
-    password = request.form.get('password')
-    name = request.form.get('login')
-    company_id = request.form.get('company_id')
-    remember = True if request.form.get('remember') else False
+    data = request.form.to_dict()
+    email = data.get('email')
+    password = data.get('password')
+    name = data.get('login')
+    user_login = data.get('login')
+    company_id = data.get('company_id')
+    remember = True if data.get('remember') else False
 
-    # user = Users.query.filter_by(email=email).first()
-    user = Users.query.filter_by(name=name, company_id=company_id).first()
-
+    # user = Users.query.filter_by(name=name, company_id=company_id).first()
+    user = Users.query.filter_by(login=user_login, company_id=company_id).first()
     if not user or not check_password_hash(user.password, password):
         flash("Проверте правильность ввода логина и пароля")
         return redirect(url_for('auth.login'))
@@ -295,11 +295,12 @@ def signup_post(referer=None):
     email = request.form.get('email')
     user_login = request.form.get('login')
     password = request.form.get('password')
+    company_id = request.form.get('company_id')
     photo = ''
     user = Users.query.filter_by(
-        email=email).first()  # if this returns a user, then the email already exists in database
+        email=email, company_id=company_id).first()  # if this returns a user, then the email already exists in database
     now_date = datetime.datetime.strftime(datetime.datetime.now(), '%H:%M %d/%m/%Y')
-    name = request.form.get('name', f'{user_login}_{now_date}')
+    name = request.form.get('name', user_login)
     company_id = request.form.get('cabinetID')
 
     if user:
@@ -1712,8 +1713,8 @@ def assembly_sales(page=1):
                        .where(Product.shop_name == row.shop_name))
 
             photo = db.session.execute(s_today).first()
-            if photo is None:
-                photo = ('нет фото',)
+            if not photo or photo is None:
+                photo = 'prof-music-2.jpg'
 
             rows += '<tr>' \
                     f'<td ><img class="img-fluid" src="{photo[0]}" alt="" style="max-width:50px;"></td>' \
