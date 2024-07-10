@@ -1679,14 +1679,12 @@ def assembly_sales(page=1):
                           SalesToday.article,
                           SalesToday.shipment_date,
                           SalesToday.name) \
-                .where(SalesToday.shipment_date < yesterday) \
+                .where(SalesToday.shipment_date > yesterday) \
                 .where(SalesToday.our_status == "NEW") \
                 .order_by(SalesToday.article_mp) \
                 .paginate(page=page, per_page=limit, error_out=False)
 
-            # print(333333, assembly)
-            # print(assembly)
-            # print(222222, shop)
+            # print(333333, assembly_orders)
         else:
             my_query = db.func.count(SalesToday.id)
             total_assembly_sales = db.session.execute(my_query).scalar()
@@ -1701,7 +1699,7 @@ def assembly_sales(page=1):
                           SalesToday.shop_name,
                           SalesToday.article,
                           SalesToday.order_status) \
-                .where(SalesToday.date_added > yesterday) \
+                .where(SalesToday.shipment_date > yesterday) \
                 .where(SalesToday.our_status == "NEW") \
                 .filter(SalesToday.shop_name == shop) \
                 .order_by(SalesToday.article_mp) \
@@ -1712,17 +1710,17 @@ def assembly_sales(page=1):
                        .where(Product.articul_product == row.article)
                        .where(Product.shop_name == row.shop_name))
 
-            photo = db.session.execute(s_today).first()
-            if not photo or photo is None:
-                photo = 'prof-music-2.jpg'
+            photo_prod = db.session.execute(s_today).first()
+            if not photo_prod or photo_prod is None:
+                photo_prod = 'нет фото'
 
             rows += '<tr>' \
-                    f'<td ><img class="img-fluid" src="{photo[0]}" alt="" style="max-width:50px;"></td>' \
+                    f'<td ><img class="img-fluid" src="{photo_prod[0]}" alt="" style="max-width:50px;"></td>' \
                     f'<td>{row.article}</td>' \
                     f'<td>{row.name}</td>' \
                     f'<td >{row.shop_name}</td>' \
                     f'<td >{row.total_sales}</td>' \
-                    f'<td >{row.shipment_date}</td>' \
+                    f'<td >{str(row.shipment_date).replace("T", " ").replace("Z","")}</td>' \
                     f'</tr>'
 
         return unescape(render_template('table-assembly-sales.html',
