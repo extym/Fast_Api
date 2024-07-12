@@ -173,7 +173,7 @@ def read_csv(link=None):
 # read_xlsx('заказы-2024-04-10- отменен_покупателем.xlsx')
 # read_xlsx('shipment_orders_2024-05-21.xlsx')
 # rewrite_xlsx('02-07-2024.xlsx', 'fbo-0207.xlsx')
-rewrite_xlsx_v2("source-11-07.xlsx", "111111111111.xlsx")
+# rewrite_xlsx_v2("source-11-07.xlsx", "111111111111.xlsx")
 # read_csv(link='https://3431.ru/system/unload_prices/45/sbermegamarket3431rucc.csv')
 
 # read_xlsx('1234.xlsx')  #its uploading file
