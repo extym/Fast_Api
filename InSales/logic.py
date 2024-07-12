@@ -22,7 +22,6 @@ from brand import *
 # client = zeep.Client(wsdl=wsdl)
 #
 
-add_link = 'https://3logic.ru/'
 
 
 def write_excel(data):
@@ -225,17 +224,17 @@ def create_csv_for_category_from_logic():  ##for import goods only (maybe)
                         #     description = prod.get('product_full_name')
                         #     print('FUCK_UP_description', prod)
                         if prod.get('product_image_main'):
-                            proxy['image_main'] = add_link + prod.get('product_image_main')
+                            proxy['image_main'] = prod.get('product_image_main')
                         else:
                             proxy['image_main'] = 'NOT_FOUND'
 
                         if prod.get('product_image_short'):
-                            proxy['image_short'] = add_link + prod.get('product_image_short')
+                            proxy['image_short'] = prod.get('product_image_short')
                         else:
                             proxy['image_short'] = 'NOT_FOUND'
 
                         if prod.get('product_image_additional'):
-                            proxy['image_additional'] = add_link + prod.get('product_image_additional')
+                            proxy['image_additional'] = prod.get('product_image_additional')
                         else:
                             proxy['image_additional'] = 'NOT_FOUND'
 

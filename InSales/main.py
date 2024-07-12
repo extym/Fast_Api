@@ -226,22 +226,22 @@ async def edit_vendor_products():
             if vendor_name == 'netlab':
                 await get_netlab_token_v2()
                 await save_categories_netlab()
-                flash(f'Данные категорий получены. Файл находится  <a href="http://{host}/csv/logic_categories.csv">http://{host}/csv/netlab_categories.csv</a>')
+                flash(f'Данные категорий получены. Файл находится  <a href="http://{host}/csv/netlab_categories.csv">http://{host}/csv/netlab_categories.csv</a>')
             elif vendor_name == 'logic':
                 await save_categories_vendor()
                 flash(f'Данные категорий получены. Файл находится  <a href="http://{host}/csv/logic_categories.csv">http://{host}/csv/logic_categories.csv</a>')
             elif vendor_name == 'ocs':
                 await save_categories_ocs()
-                flash(f'Данные категорий получены. Файл находится  <a href="http://{host}/csv/logic_categories.csv">http://{host}/csv/ocs_categories.csv</a>')
+                flash(f'Данные категорий получены. Файл находится  <a href="http://{host}/csv/ocs_categories.csv">http://{host}/csv/ocs_categories.csv</a>')
             elif vendor_name == 'marvel':
                 await save_categories_marvel()
-                flash(f'Данные категорий получены. Файл находится  <a href="http://{host}/csv/logic_categories.csv">http://{host}/csv/marvel_categories.csv</a>')
+                flash(f'Данные категорий получены. Файл находится  <a href="http://{host}/csv/marvel_categories.csv">http://{host}/csv/marvel_categories.csv</a>')
             elif vendor_name == 'treolan':
                 await save_categories_treolan()
-                flash(f'Данные категорий получены. Файл находится  <a href="http://{host}/csv/logic_categories.csv">http://{host}/csv/treolan_categories.csv</a>')
+                flash(f'Данные категорий получены. Файл находится  <a href="http://{host}/csv/treolan_categories.csv">http://{host}/csv/treolan_categories.csv</a>')
             elif vendor_name == 'merlion':
                 await save_categories_merlion()
-                flash(f'Данные категорий получены. Файл находится  <a href="http://{host}/csv/logic_categories.csv">http://{host}/csv/merlion_categories.csv</a>')
+                flash(f'Данные категорий получены. Файл находится  <a href="http://{host}/csv/merlion_categories.csv">http://{host}/csv/merlion_categories.csv</a>')
 
             return redirect(url_for("index"))
             # return unescape(
