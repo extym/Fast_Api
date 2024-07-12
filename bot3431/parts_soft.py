@@ -337,10 +337,11 @@ def get_oem_from_xml_v2(offer_id, link=None):
         doc = xmltodict.parse(xml)
         maybe_brand = ''
         for char in offer_id:
-            if char.isdigit():
+            if char.isalpha():
                 maybe_brand += char
             else:
                 break
+
         for row in doc['yml_catalog']['shop']['offers']['offer']:
             if row["@id"] == offer_id:
                 brand = row['vendor']
@@ -349,10 +350,11 @@ def get_oem_from_xml_v2(offer_id, link=None):
                 return brand, oem
                 # break
 
-            elif row['vendor'] == maybe_brand:
+            elif not confirm_brand and row['vendor'].upper().replace(" ", '') == maybe_brand.upper():
                 confirm_brand = True
+                maybe_split_brand = row['vendor']
 
-        if not oem and not brand:
+        if not confirm_brand and not brand and not oem:
             result = False
             while not result:
                 for i in range(1, 7):
@@ -363,13 +365,15 @@ def get_oem_from_xml_v2(offer_id, link=None):
                         if offer == id_prod:
                             brand = row['vendor']
                             oem = row['vendorCode'][: -i] + offer_id[-i:]
-                            break
+
+                            return brand, oem
 
                 result = True
 
-        if not oem and not brand and confirm_brand:
+        elif not oem and not brand and confirm_brand:
             maybe_vendor_code = offer_id[len(maybe_brand):]
-            return maybe_brand, maybe_vendor_code
+            # print(4444, maybe_vendor_code, maybe_brand, confirm_brand)
+            return maybe_split_brand, maybe_vendor_code
 
     return brand, oem
 
@@ -406,7 +410,7 @@ def get_barcode_from_xml_v2(offer_id=None, link=None,
         else:
             for row in doc['yml_catalog']['shop']['offers']['offer']:
                 if row["vendorCode"].upper() == vendor_code.upper() \
-                        and row['vendor'].upper() == vendor.upper():
+                        and row['vendor'].upper().strip() == vendor.upper():
                     barcode = row.get('barcode')
                     break
 
@@ -484,7 +488,7 @@ def create_resp_if_not_exist(list_items, link, key=None,
                 print('SOME FUCKUP GET PROPOUSAL {}'.format(answer.text))
         else:
             bot_tg.send_get('ПРОБЛЕМА обработки \n заказа {}. '
-                            'Требуется ручная обработка.'
+                            'Требуется ручная обработка. '
                             'Не найден номер производителя для offer_id {} \n'
                             'YandexMarket'
                             .format(external_order_id, item.get('offerId')))
@@ -492,7 +496,7 @@ def create_resp_if_not_exist(list_items, link, key=None,
     if count_items == len(list_items):
         # print("Result result_make_basket successfully {}".format(count_items))
         global_result_make_basket = True
-    else:
+    elif count_items != len(list_items) and count_items > 1:
         print("Result result_make_basket UNsuccessfully {}".format(count_items))
         bot_tg.send_get('ПРОБЛЕМА обработки \n заказа {}. '
                         'Требуется ручная обработка позиций выше. \n'
@@ -519,7 +523,7 @@ def create_order_ps_if_not_exist(list_items, link, key=None,
             # sys.exit()
             if not oem:
                 bot_tg.send_get('ПРОБЛЕМА обработки \n заказа {}. '
-                                'Требуется ручная обработка.'
+                                'Требуется ручная обработка. '
                                 'Не найден номер производителя для offer_id {} \n'
                                 'SberMarket'
                             .format(external_order_id, item.get('offerId')))
@@ -599,7 +603,8 @@ write_order = "80188"
 
 # post_smth()
 
-# get_oem_from_xml_v2('OSVAR8502371602', link='https://3431.ru/system/unload_prices/33/yandex_market.xml')
+# print(get_oem_from_xml_v2('FOBOS30100', link='https://3431.ru/system/unload_prices/33/yandex_market.xml'))
+# print(get_oem_from_xml_v2("GREATWALL1106100K00", link="https://3431.ru/system/unload_prices/33/yandex_market.xml"))
 #
 # print(get_oem_from_xml_v2("OSVAR8502371602",
 #                          link = 'https://3431.ru/system/unload_prices/33/yandex_market.xml'))
@@ -607,3 +612,9 @@ write_order = "80188"
 # print(get_barcode_from_xml_v2(vendor_code="K015631XS", vendor="Gates",
 #                          link = 'https://3431.ru/system/unload_prices/46/yandex_market.xml'))
 
+# ПРОБЛЕМА обработки
+#  заказа 491531611. Требуется ручная обработка.
+#  Не найден номер производителя для
+#  offer_id GREATWALL3103102K00
+# GEELY1400516180
+# YandexMarket

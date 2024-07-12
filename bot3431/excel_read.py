@@ -116,7 +116,9 @@ def rewrite_xlsx_v2(file1, file2): # for uploading if file2 has form uploading
         sber_articul = sber.values[i][0]
         for row in df2:
             articul = str(row[0])
+
             if articul.upper() == sber_articul.upper():
+                print(55555555555, articul, sber_articul)
                 maxy = list(sber.values[i])
                 sber_max = sber.values[i][5]
                 availible_stock = int(row[4])
@@ -148,14 +150,14 @@ def rewrite_xlsx_v2(file1, file2): # for uploading if file2 has form uploading
     print(7777, len(faxy.keys()))
     baxy = [i for i in faxy.values()]
     pr = pd.DataFrame(proxy)
-    pr.to_excel('output-0907-new.xlsx', sheet_name='Товары, доступные для поставки')   #,
+    pr.to_excel('output-11-07-new.xlsx', sheet_name='Товары, доступные для поставки')   #,
                 # columns=['number', 'Артикул товара продавца', 'Наименование товара', 'Штрихкод',
                 #          'Необходимость маркировки', 'План поставки (шт.)',
                 #          'Максимальный план поставки (шт.)', 'Комментарии'])
     print("ALL RIDE")
 
     pr = pd.DataFrame(baxy)
-    pr.to_excel('delta-0907-new.xlsx', sheet_name='Товары, доступные для поставки')
+    pr.to_excel('delta-11-07-new.xlsx', sheet_name='Товары, доступные для поставки')
 
 
 def read_csv(link=None):
@@ -171,7 +173,7 @@ def read_csv(link=None):
 # read_xlsx('заказы-2024-04-10- отменен_покупателем.xlsx')
 # read_xlsx('shipment_orders_2024-05-21.xlsx')
 # rewrite_xlsx('02-07-2024.xlsx', 'fbo-0207.xlsx')
-# rewrite_xlsx_v2("0907.xlsx", "111111111111.xlsx")
+rewrite_xlsx_v2("source-11-07.xlsx", "111111111111.xlsx")
 # read_csv(link='https://3431.ru/system/unload_prices/45/sbermegamarket3431rucc.csv')
 
 # read_xlsx('1234.xlsx')  #its uploading file
