@@ -31,12 +31,13 @@ def get_client():
     return session.auth
 
 
-def get_smth(metod):
+def get_smth(metod, params=None):
     url = ps_link + metod
     token_ps = HTTPBasicAuth(admin_ps_login, admin_ps_pass)
-    answer = requests.get(url, auth=token_ps)
+    answer = requests.get(url, auth=token_ps, params=params)
 
-    # print(3111133, answer.text)
+    print(3111133, answer.text)
+    print(444444, answer.url, answer.headers)
     return answer.json()
 
 
@@ -171,7 +172,7 @@ def get_orders_v2(customer_id: str,
             datas = ' '.join([str(i.get('id')) for i in result_list[0].get('order_items')])
         else:
             for item in result_list[0].get('order_items'):
-                if item.get('status_id')  in filter_status:
+                if item.get('status_id') in filter_status:
                     # datas = ' '.join(str(item.get('id')))
                     datas += ' ' + str(item.get('id')).strip()
                 elif item.get('status_id') == 8:
@@ -194,9 +195,9 @@ async def make_data_for_request_v2(data_file, market):
     proxy = ''
     shipment_date = data_file[1]
     for number in data_file[0]:
-        item_ids = get_orders_v2(market, 
+        item_ids = get_orders_v2(market,
                                  marketplace_id=str(number),
-                                 filter_status = [7, 21, 22, 27])
+                                 filter_status=[7, 21, 22, 27])
         if item_ids:
             proxy += item_ids.strip() + ' '
             count += 1
@@ -285,25 +286,35 @@ def choice_function(items, full_items, qnt):
     return result
 
 
-def choice_function_v2(items, full_items, qnt, 
-                       filter_price=False, 
-                       name_price='Магазин Культуры 63'):
+def choice_function_v2(items, full_items, qnt,
+                       price_name_without_sale: List = None,
+                       name_price_for_sale_only: List = None ):
     result = []
-    if not filter_price:
+    if not price_name_without_sale and not name_price_for_sale_only:
+        # take five best proposal for price
         listing = sorted(items.values())[:5]
         for item in full_items:
             if item["cost"] in listing and item['qnt'] >= qnt:
                 result.append(item)
 
-    elif filter_price and name_price:
+    elif not price_name_without_sale and name_price_for_sale_only:
         for item in full_items:
-            if item["price_name"] == name_price and item['qnt'] >= qnt:
+            if item["price_name"] in name_price_for_sale_only and item['qnt'] >= qnt:
                 result.append(item)
             else:
-                listing = sorted(items.values())[:5]
+                listing = sorted(items.values())[:10]
                 for item in full_items:
                     if item["cost"] in listing and item['qnt'] >= qnt:
                         result.append(item)
+
+    elif price_name_without_sale and not name_price_for_sale_only:
+        # take five best proposal for price
+        listing = sorted(items.values())[:10]
+        for item in full_items:
+            if item["cost"] in listing \
+                    and item['qnt'] >= qnt \
+                    and item["price_name"] not in price_name_without_sale:
+                result.append(item)
 
     return result
 
@@ -433,7 +444,6 @@ def get_vendor_code_from_xlm(offer_id, link=None):
     return vendor, vendor_code
 
 
-
 def create_resp_if_not_exist(list_items, link, key=None,
                              external_order_id=None):
     offer_id = ''
@@ -468,7 +478,10 @@ def create_resp_if_not_exist(list_items, link, key=None,
             if len(need_data) > 0:
                 propousal = {i['hash_key']: i['cost'] for i in need_data if
                              (i["oem"] == oem and i['make_name'] == brand)}
-                list_propousal = choice_function(propousal, need_data, qnt)
+                # list_propousal = choice_function(propousal, need_data, qnt)
+                list_propousal = choice_function_v2(propousal, need_data, qnt,
+                                                    price_name_without_sale=None,
+                                                    name_price_for_sale=['Магазин Культуры 63'])
 
                 # print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
                 # for row in list_propousal:
@@ -526,7 +539,7 @@ def create_order_ps_if_not_exist(list_items, link, key=None,
                                 'Требуется ручная обработка. '
                                 'Не найден номер производителя для offer_id {} \n'
                                 'SberMarket'
-                            .format(external_order_id, item.get('offerId')))
+                                .format(external_order_id, item.get('offerId')))
                 proxy.append(item.get('offerId'))
             else:
                 params = {
@@ -598,6 +611,9 @@ ym_orders_short = [459439792, 459438203, 459412869, 459372108, 459349047, 459339
 # get_smth("/order_status_types.json")
 write_order = "80188"
 # get_smth(f'/orders/{write_order}.json')
+# print(*get_smth('/prices.json', params={"page": 10}).get('prices'), sep='\n')
+
+# get_prices()
 
 #  {"id":8,"name":"Выдано","code":"vydano"}
 

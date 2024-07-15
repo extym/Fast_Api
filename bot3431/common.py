@@ -264,7 +264,6 @@ def make_orders_to_ps(delta_time:int=1):
                                 finish = ps.change_status_v2(data, status_id=2)
                                 print('finish_change_status_order', finish)
 
-
                     else:
                         continue
 

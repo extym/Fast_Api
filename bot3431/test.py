@@ -1826,7 +1826,7 @@ yandex_order = {'id': 459557016, 'status': 'PROCESSING', 'substatus': 'STARTED',
 from cred import ps_YM_II_api_key
 
 
-def get_test(oem, brand):
+def get_test_propousal(oem, brand):
     print(3333, oem, brand)
     # sys.exit()
     params = {
@@ -1839,8 +1839,9 @@ def get_test(oem, brand):
     url = "http://3431.ru" + metod
     answer = requests.get(url, params=params)
     print(111111111111111111111, answer.text)
-    print(2222222222222, answer.url)
+    print(2222222222222, *answer.json().get('data')[0].items(), sep='\n')
 
+get_test_propousal('C36003', 'MANN-FILTER')
 
 response_ps_get_orders = {
     "status": "OK",
