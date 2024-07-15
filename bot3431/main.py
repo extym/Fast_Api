@@ -698,7 +698,7 @@ async def cancel_order_sber(uuid):
 async def avito_webhook():
     # headers = request.headers
     if request.headers.get('X-Avito-Messenger-Signature'):
-        hook = request.get_json()
+        hook = request.json
         logging.info('WE_GET_HOOK_from_avito {} '.format(hook))
 
         author_id = hook.get('payload').get('value').get('author_id')
