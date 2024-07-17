@@ -1692,13 +1692,15 @@ def assembly_sales(page=1):
             assembly_orders = db.session.query(SalesToday.article_mp,
                                                SalesToday.shop_name,
                                                SalesToday.article,
-                                               SalesToday.order_status,
+                                               SalesToday.name,
+                                               SalesToday.shipment_date,
                                                func.sum(SalesToday.quantity)
                                                .label('total_sales')) \
                 .group_by(SalesToday.article_mp,
                           SalesToday.shop_name,
+                          SalesToday.name,
                           SalesToday.article,
-                          SalesToday.order_status) \
+                          SalesToday.shipment_date) \
                 .where(SalesToday.shipment_date > yesterday) \
                 .where(SalesToday.our_status == "NEW") \
                 .filter(SalesToday.shop_name == shop) \
@@ -1706,6 +1708,7 @@ def assembly_sales(page=1):
                 .paginate(page=page, per_page=limit, error_out=False)
 
         for row in assembly_orders.items:
+            print(row)
             s_today = (select(Product.photo)
                        .where(Product.articul_product == row.article)
                        .where(Product.shop_name == row.shop_name))
