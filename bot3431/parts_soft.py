@@ -288,7 +288,7 @@ def choice_function(items, full_items, qnt):
 
 def choice_function_v2(items, full_items, qnt,
                        price_name_without_sale: List = None,
-                       name_price_for_sale_only: List = None ):
+                       name_price_for_sale_only: List = None):
     result = []
     if not price_name_without_sale and not name_price_for_sale_only:
         # take five best proposal for price
@@ -480,7 +480,7 @@ def create_resp_if_not_exist(list_items, link, key=None,
                              (i["oem"] == oem and i['make_name'] == brand)}
                 # list_propousal = choice_function(propousal, need_data, qnt)
                 list_propousal = choice_function_v2(propousal, need_data, qnt,
-                                                    price_name_without_sale=None,
+                                                    price_name_without_sale=['ФБО'],
                                                     name_price_for_sale=['Магазин Культуры 63'])
 
                 # print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
@@ -561,7 +561,10 @@ def create_order_ps_if_not_exist(list_items, link, key=None,
                 if len(need_data) > 0:
                     propousal = {i['hash_key']: i['cost'] for i in need_data if
                                  (i["oem"] == oem and i['make_name'] == brand)}
-                    list_propousal = choice_function(propousal, need_data, qnt)
+                    # list_propousal = choice_function(propousal, need_data, qnt)
+                    list_propousal = choice_function_v2(propousal, need_data, qnt,
+                                                        price_name_without_sale=['ФБО'],
+                                                        name_price_for_sale=['Магазин Культуры 63'])
 
                     # print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@',
                     #       *list_propousal[0].items(), sep='\n')
