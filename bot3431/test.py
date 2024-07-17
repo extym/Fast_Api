@@ -1841,7 +1841,7 @@ def get_test_propousal(oem, brand):
     print(111111111111111111111, answer.text)
     print(2222222222222, *answer.json().get('data')[0].items(), sep='\n')
 
-get_test_propousal('C36003', 'MANN-FILTER')
+# get_test_propousal('C36003', 'MANN-FILTER')
 
 response_ps_get_orders = {
     "status": "OK",
