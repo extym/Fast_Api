@@ -10,11 +10,11 @@ from creds import *
 from time import sleep
 
 
-key = {'X-API-Key': 'juSYkZFINJDyvImhYkP6A-7v1GaYfJ'}
+key = {'X-API-Key': ocs_api_key}
 link = 'https://connector.b2b.ocs.ru'
 headers = {
     'accept': 'application/json',
-    'X-API-Key': 'juSYkZFINJDyvImhYkP6A-7v1GaYfJ'}
+    'X-API-Key': ocs_api_key}
 from test import osc_category
 
 
@@ -105,10 +105,8 @@ def get_content_batch(list_ids):
     proxy = []
     method = '/api/v2/content/batch'
     url = link + method
-    # print("categories_banch", len(categories), categories)
-
     answer = requests.post(url, json=list_ids, headers=headers)
-    # print(444444444, type(answer.json().get('result')))
+    print(444444444, answer.text)
     return answer.json().get('result')
 
 
@@ -366,6 +364,7 @@ def create_csv_for_category_from_ocs_v3():  ##for import goods only (maybe)
             print("Some_fuckup_ocs_bunch_v3 {} {} {}".format(error, prod, key))
             continue
         try:
+            print(77777, maxy)
             add_data = get_content_batch(maxy)
             pre_data = {i.get('itemId'): i for i in add_data}
             for product in result_list:
@@ -391,7 +390,7 @@ def create_csv_for_category_from_ocs_v3():  ##for import goods only (maybe)
             writer.writeheader()
             writer.writerows(result_list)
 
-        # break
+        break
 
         allpro.extend(result_list.copy())
 
@@ -422,5 +421,5 @@ def check_len_keys(cats):
 # get_product('V0303')
 # create_csv_for_category_from_ocs_v2()
 # create_csv_for_category_from_ocs()
-# create_csv_for_category_from_ocs_v3()
+create_csv_for_category_from_ocs_v3()
 
