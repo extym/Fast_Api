@@ -481,7 +481,7 @@ def create_resp_if_not_exist(list_items, link, key=None,
                 # list_propousal = choice_function(propousal, need_data, qnt)
                 list_propousal = choice_function_v2(propousal, need_data, qnt,
                                                     price_name_without_sale=['ФБО'],
-                                                    name_price_for_sale=['Магазин Культуры 63'])
+                                                    name_price_for_sale_only=['Магазин Культуры 63'])
 
                 # print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
                 # for row in list_propousal:
@@ -564,7 +564,7 @@ def create_order_ps_if_not_exist(list_items, link, key=None,
                     # list_propousal = choice_function(propousal, need_data, qnt)
                     list_propousal = choice_function_v2(propousal, need_data, qnt,
                                                         price_name_without_sale=['ФБО'],
-                                                        name_price_for_sale=['Магазин Культуры 63'])
+                                                        name_price_for_sale_only=['Магазин Культуры 63'])
 
                     # print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@',
                     #       *list_propousal[0].items(), sep='\n')
