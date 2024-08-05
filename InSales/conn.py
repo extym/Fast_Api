@@ -28,7 +28,7 @@ async def execute_query(query, data):
     cursor = connection.cursor()
     try:
         cursor.execute(query, data)
-        print("Query from execute_query executed successfully")
+        # print("Query from execute_query executed successfully")
 
     except OperationalError as err:
         print(f"The ERROR from execute_query '{err}' occured ")
@@ -43,7 +43,7 @@ def execute_query_return(query, data: str):
     # try:
     cursor.execute(query, data)
     raw_list = cursor.fetchall()
-    print("Query from execute_query executed successfully", type(raw_list))
+    # print("Query from execute_query executed successfully", type(raw_list))
     #
     # except OperationalError as err:
     #     print(f"The ERROR from execute_query '{err}' occured ")
@@ -77,18 +77,19 @@ async def execute_query_update(data):
     connection = create_connection()
     connection.autocommit = True
     cursor = connection.cursor()
+    result = False
     for row in data:
         try:
             # print(777777777777, row)
             cursor.execute(query_write_site_categories_v2, row)
-            print("Query from execute_query executed successfully")
+            # print("Query from execute_update_query executed successfully")
             result = True
         except OperationalError as err:
                 cursor.execute(query_update_site_categories, row)
                 print(f"The ERROR from execute_query '{err}' occured ")
-        else:
-            print('FUCK_UP_222')
-            result = False
+        # else :
+        #     print('FUCK_UP_222')
+
     cursor.close()
     connection.close()
 
@@ -101,10 +102,10 @@ async def executemany_query(query, data):
     cursor = connection.cursor()
     try:
         cursor.executemany(query, data)
-        print("Query from execute_many_query executed successfully")
+        # print("Query from execute_many_query executed successfully")
         result = True
     except OperationalError as err:
-        print(f"The ERROR from execute_many_query '{err}' occured ")
+        print(f"The ERROR from execute_many_query '{err}' occurred ")
         result = False
     except IntegrityError as e:
             if isinstance(UniqueViolation):
@@ -123,7 +124,7 @@ def execute_query_return_id(connection, query, data):
     try:
         cursor.execute(query, data)
         lastrowid = cursor.lastroid()
-        print("Query from execute_query_return_id executed successfully")
+        # print("Query from execute_query_return_id executed successfully")
 
     except OperationalError as err:
         print(f"The ERROR from execute_query_return_id '{err}' occured ")
@@ -141,7 +142,7 @@ def check_order(query, data):
         print('check_order', query, data)
         cursor.execute(query, data)
         re_data = cursor.fetchall()
-        print("Query from check_order executed successfully")
+        # print("Query from check_order executed successfully")
     except OperationalError as err:
         print(f"The ERROR from check_order '{err}' occured ")
 
@@ -158,7 +159,7 @@ def check_is_exist_in_db(query, data):
     try:
         cursor.execute(query, data)
         redata = cursor.fetchone()
-        print(f"Query from check_is_exist_in_db '{data[0]}' executed successfully")
+        # print(f"Query from check_is_exist_in_db '{data[0]}' executed successfully")
         if redata is not None:
             result = True
     except OperationalError as err:

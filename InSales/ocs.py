@@ -364,7 +364,7 @@ def create_csv_for_category_from_ocs_v3():  ##for import goods only (maybe)
             print("Some_fuckup_ocs_bunch_v3 {} {} {}".format(error, prod, key))
             continue
         try:
-            print(77777, maxy)
+            # print(77777, maxy)
             add_data = get_content_batch(maxy)
             pre_data = {i.get('itemId'): i for i in add_data}
             for product in result_list:
@@ -383,14 +383,14 @@ def create_csv_for_category_from_ocs_v3():  ##for import goods only (maybe)
         fields = base_fields.copy()
         pr = sorted(set(rewrite_properties.keys()))
         fields.extend(pr)
-        print(f'fields_ocs_{key}', fields)
+        # print(f'fields_ocs_{key}', fields)
         with open(CSV_PATH + f'ocs_{key}.csv', 'w') as file:
             writer = csv.DictWriter(file, delimiter=';', dialect='excel',
                                     restval='', fieldnames=fields)
             writer.writeheader()
             writer.writerows(result_list)
 
-        break
+        # break
 
         allpro.extend(result_list.copy())
 
@@ -421,5 +421,5 @@ def check_len_keys(cats):
 # get_product('V0303')
 # create_csv_for_category_from_ocs_v2()
 # create_csv_for_category_from_ocs()
-create_csv_for_category_from_ocs_v3()
+# create_csv_for_category_from_ocs_v3()
 

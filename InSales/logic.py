@@ -18,10 +18,10 @@ from conn_maintenance import *
 import asyncio
 from brand import *
 
+
 # wsdl = 'https://3logic.ru/ws/soap/soap.php?wsdl'
 # client = zeep.Client(wsdl=wsdl)
 #
-
 
 
 def write_excel(data):
@@ -29,6 +29,7 @@ def write_excel(data):
         writer = csv.writer(file)
         writer.writerows(data)
         print('ALL_RIDE')
+
 
 def write_excel_v2(data, remote=True):
     if not remote:
@@ -47,6 +48,7 @@ def write_excel_v2(data, remote=True):
             print('ALL_RIDE_write file_3LOGIC', path_file)
 
     return path_file
+
 
 async def save_categories_vendor():
     data_list = get_category_list()
@@ -75,6 +77,7 @@ async def write_categories_logic_v2():
     path_file = write_excel_v2(write_data)
     print('ALL_RIDE write_categories_vendor_v2')
     return path_file
+
 
 def get_client_logic():
     session = Session()
@@ -116,15 +119,16 @@ def get_product_list(category_id: int):
 
 def get_price_list(mat_ids):
     client = SudsClient(url='https://3logic.ru/ws/soap/soap.php?wsdl',
-                    transport=HttpAuthenticated(username=login, password=password))
+                        transport=HttpAuthenticated(username=login, password=password))
     # try:
     response = client.service.getPriceList(mat_ids)
     # ll = [asdict(i) for i in response]
     return {i['mat_id']: {'price': i['price'] * 1.05, 'stock': i['remain']} for i in response if
-              (i['no_price'] != 1 and i['remain'] != 0)}
+            (i['no_price'] != 1 and i['remain'] != 0)}
     # except:
     #     print("Error 3logic get_price_list", mat_ids)
     #     return {}
+
 
 def get_brand_list():
     product_list = get_client_logic().service.getBrandList()
@@ -251,7 +255,7 @@ def create_csv_for_category_from_logic():  ##for import goods only (maybe)
                 print(1111111, category_id)
                 continue
 
-        print(3311111133, len(ids), ids)
+        # print(3311111133, len(ids), ids)
         if len(ids) > 0:
             price_list = get_price_list(ids)
             # print(3333333, len(price_list), price_list)
@@ -271,16 +275,16 @@ def create_csv_for_category_from_logic():  ##for import goods only (maybe)
         # pr = set([i.strip().capitalize() for i in set(rewrite_properties.keys())])
         pr = sorted(set(rewrite_properties.keys()))
         fields.extend(pr)
-        print(count, '_all_prod_group')
-        print('fields_logic_{}_group {} {}'.format(key, len(fields), fields))
+        # print(count, '_all_prod_group')
+        # print('fields_logic_{}_group {} {}'.format(key, len(fields), fields))
 
         with open(CSV_PATH + f'logic_{key}.csv', 'w') as file:
             writer = csv.DictWriter(file, delimiter=';', dialect='excel',
                                     restval='', fieldnames=fields)
             writer.writeheader()
-            writer.writerows(pro_result_list)    #(result_list)
+            writer.writerows(pro_result_list)  # (result_list)
 
-        print(count, '_all_prod_logic', key)
+        # print(count, '_all_prod_logic', key)
 
         # break
 
@@ -291,7 +295,6 @@ def create_csv_for_category_from_logic():  ##for import goods only (maybe)
                                 extrasaction='ignore', fieldnames=base_fields)
         writer.writeheader()
         writer.writerows(allpro)
-
 
 # dss = ['Операционная система:  Andoid 12, MIUI Pad 13', 'Тип дисплея:  IPS', 'Диагональ дисплея, дюйм:  10.61', 'Разрешение дисплея:  2000x1200', 'Яркость, кд/м2:  400', 'Процессор:  MediaTek Helio G99', 'Видеокарта:  ARM Mali-G57 MC2', 'Оперативная память, ГБ:  4', 'Хранение данных, ГБ:  128', 'Беспроводное подключение:  ', '   WiFi:  WLAN 802.11a/b/g/n/ac', '   Bluetooth:  5.3', 'Проводное подключение:  ', '   USB Type-C:  1', 'Слоты:  ', '   Слот для карт памяти:  1 x microSD (до 1ТБ)', 'Тыловая камера, Мп:  8', 'Фронтальная камера, Мп:  8', 'Микрофон:  Да', 'Динамики:  4 динамика с поддержкой Dolby Atmos', 'Датчики, сенсоры:  датчик света, акселерометр, компас, гироскоп, сканер отпечатков пальцев, распознавание лица', 'Основной цвет:  Серый', 'Материал:  Металл', 'Питание:  Аккумулятор: емкость - 8000 мАч', 'Габариты:  ', '   Высота, мм:  254.7', '   Ширина, мм:  166.3', '   Толщина, мм:  6.9', 'Вес нетто, грамм:  511', 'Особенности:  Поддержка быстрой зарядки до 18W', 'Ссылка на описание:  https://ru-mi.com/product/42837/', 'Комплект поставки:  Планшет, документация, зарядное устройство, кабель USB-C, скрепка']
 # desc = '\n'.join(dss)
