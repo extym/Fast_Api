@@ -1003,6 +1003,10 @@ section.box {
     background-color: #ffffff;
     margin: 15px 0;
 }
+section.box.edit-product {
+    background-color: #ffffff;
+    margin: 1px 0;
+}
 section header {
     width: 100%;
     display: inline-block;
@@ -1210,6 +1214,9 @@ input[type=checkbox], input[type=color], input[type=date], input[type=datetime-l
 }
 .form-group .controls {
     margin: 5px 0;
+}
+.form-group .controls.search-custom {
+    margin: 0 0;
 }
 .form-label {
     font-weight: 400;
@@ -6234,6 +6241,9 @@ border-left: 3px solid transparent;
     font-size: 13px;
 }
 .form-group .controls {
+    position: relative;
+}
+.form-group .controls-custom {
     position: relative;
 }
 .form-group.has-error i, .form-group.has-success i {

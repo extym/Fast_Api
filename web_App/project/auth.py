@@ -842,21 +842,21 @@ def import_settings_post():
                     .first()
                 try:
                     port_set = import_set.__dict__
-                    i_import_donor_role = port_set.get("i_import_donor_role")
+                    i_import_donor_role = "donor"
                     i_import_donor_markup = port_set.get("i_import_donor_markup")
-                    i_import_acceptor_store = port_set.get("i_import_acceptor_store")
-                    i_import_acceptor_discount = port_set.get("i_import_acceptor_discount")
-                    i_import_donor_role = 'donor'
+                    i_import_donor_mp = port_set.get("i_import_donor_mp")
                     i_import_donor_store = port_set.get("i_import_donor_store")
                     i_import_donor_discount = port_set.get("i_import_donor_discount")
                     i_import_acceptor_mp = port_set.get("i_import_acceptor_mp")
                     i_import_acceptor_role = 'acceptor'
                     i_import_acceptor_markup = port_set.get("i_import_acceptor_markup")
+                    i_import_acceptor_store = port_set.get("i_import_acceptor_store")
+                    i_import_acceptor_discount = port_set.get("i_import_acceptor_discount")
 
                     for row in port_set.items():
                         # print(row + ' = ' + 'request.args.get("' + row + '")')
                         # print(row + '=' + row + ',')
-                        print(3434, row)
+                        print(347734, row)
 
                     uid = current_user.id
                     role = current_user.roles
@@ -875,11 +875,11 @@ def import_settings_post():
                                            i_import_donor_markup=i_import_donor_markup,
                                            i_import_acceptor_store=i_import_acceptor_store,
                                            i_import_acceptor_discount=i_import_acceptor_discount,
-                                           i_import_donor_mp='donor',
+                                           i_import_donor_mp=i_import_donor_mp,
                                            i_import_donor_store=i_import_donor_store,
                                            i_import_donor_discount=i_import_donor_discount,
                                            i_import_acceptor_mp=i_import_acceptor_mp,
-                                           i_import_acceptor_role='acceptor',
+                                           i_import_acceptor_role=i_import_acceptor_role,
                                            i_import_acceptor_markup=i_import_acceptor_markup)
                 except:
                     flash("Настройки для указанных магазинов не найдены. Введите требуемые настройки и сохраните их.",
@@ -977,6 +977,9 @@ def import_settings_post():
                 except:
                     flash("Настройки для указанного магазина не найдены. Введите требуемые настройки и сохраните их.",
                           "alert")
+
+    elif make == 'reset_result':
+        return redirect('/import_settings')
 
     return redirect('/import_settings')
 
@@ -1164,7 +1167,7 @@ def edit_product_post():
     if not photo or photo is None:
         photo = 'prof-music-2.jpg'
     # print('/edit_product', *data, sep='\n')
-    # print('/edit_product', *data, sep=', \n')
+    print('/edit_product', *data, sep=', \n')
     if 'search_product' in data:
         articul = data.get('search_product')
         shop_name = data.get('import_shop_names')
@@ -1654,9 +1657,13 @@ def assembly_sales(page=1):
             user_photo = 'prof-music-2.jpg'
         rows = ''
         limit = 30
-        HOUR = '09:00:00'
+        HOUR = '00:00:00'
+        HOUR_2 = '00:00:00'
         yesterday = (datetime.datetime.today() - datetime.timedelta(days=1)) \
             .strftime(f"%Y-%m-%d {HOUR}")
+        tomorrow = (datetime.datetime.today() + datetime.timedelta(days=1))\
+            .strftime(f"%Y-%m-%d {HOUR_2}")
+        today = datetime.datetime.today().strftime(f"%Y-%m-%d")
         pre_rows_shops = db.session.query(Marketplaces.shop_name) \
             .where(Marketplaces.company_id == current_user.company_id).all()
         rows_shops = [i[0] for i in pre_rows_shops]
@@ -1679,7 +1686,7 @@ def assembly_sales(page=1):
                           SalesToday.article,
                           SalesToday.shipment_date,
                           SalesToday.name) \
-                .where(SalesToday.shipment_date > yesterday) \
+                .where(SalesToday.shipment_date.like(f"{today}%")) \
                 .where(SalesToday.our_status == "NEW") \
                 .order_by(SalesToday.article_mp) \
                 .paginate(page=page, per_page=limit, error_out=False)
@@ -1701,7 +1708,7 @@ def assembly_sales(page=1):
                           SalesToday.name,
                           SalesToday.article,
                           SalesToday.shipment_date) \
-                .where(SalesToday.shipment_date > yesterday) \
+                .where(SalesToday.shipment_date.like(f"{today}%")) \
                 .where(SalesToday.our_status == "NEW") \
                 .filter(SalesToday.shop_name == shop) \
                 .order_by(SalesToday.article_mp) \

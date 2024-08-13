@@ -13,11 +13,29 @@
                 <div class="float-left">
                     <h1 class="title">редактирование товаров</h1>
                 </div>
-            </div>
-        <form action="/edit_product" method="post" >
-            <div class="row">
+
+
                 <div class="col-lg-6 col-md-6 col-6">
-                        <div class="input-group primary ">
+                    <form action="/edit_product" method="post" >
+<!--                <div class="col-xl-6">-->
+                    <div class="form-group">
+
+                    <div class="controls">
+                        <select class="custom-select" id="import_shop_names" name="import_shop_names">
+                    <option selected>Выбрать Магазин</option>
+                        {% for row in rows %}
+                        <option value="{{ row }}" >{{ row }}</option>
+                        {% endfor %}
+
+                            </select>
+                        </div>
+                    </div>
+<!--                </div>-->
+
+<!--                <div class="col-xl-6">-->
+
+<!--                    <form action="/edit_product" method="post" >-->
+                    <div class="input-group primary">
 
                         <span class="input-group-addon">
                             <button type="submit" class="arrow" style="border: none; outline: none; background: transparent" >
@@ -29,188 +47,16 @@
 
                         <input type="text" name="search_product" class="form-control search-page-input" placeholder="Искать здесь..." value={{ search_value}}>
 
-<!--                    </div>-->
                     </div>
-
+                    </form>
                 </div>
-                <div class="col-lg-6 col-md-6 col-6">
-                    <form action="/edit_product" method="post" >
-                    <div class="form-group">
 
-                        <div class="controls search-custom">
-                            <select class="custom-select" id="import_shop_names" name="import_shop_names">
-                            <option selected>Выбрать Магазин</option>
-                                {% for row in rows %}
-                                <option value="{{ row }}" >{{ row }}</option>
-                                {% endfor %}
 
-                                </select>
-                        </div>
-                    </div>
-                </div>
+
             </div>
-            </form>
 
-
-<!--        </div>-->
-
-        <div>
-                {% with messages = get_flashed_messages() %}
-                    {% if  messages %}
-                    <div class="alert alert-warning" role="alert">
-
-                    {{ messages[0] }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                    {% endif %}
-                {% endwith %}
-
-                </div>
-
-<!--        <div class="clearfix"></div>-->
-
-
-        <div class="row margin-0">
-            <div class="col-xl-12">
-                <section class="box edit-product">
-                    <header class="panel_header">
-                        <h2 class="title float-left">редактировать товар на всех маркетах</h2>
-                        <div class="actions panel_actions float-right">
-                            <i class="box_toggle fa fa-chevron-down"></i>
-                            <i class="box_setting fa fa-cog" data-toggle="modal" href="#section-settings"></i>
-                            <i class="box_close fa fa-times"></i>
-                        </div>
-                    </header>
-
-                    <div class="content-body" >
-                        <div class="row">
-                            <form id="general_validate1"  action="/edit_product_short" method="post" novalidate="novalidate" style="width: 100%;">
-
-                                <div class="row margin-0">
-                                    <div class="col-lg-6 col-md-6 col-6">
-
-<!--                                    <div class="input-group mb-3">-->
-<!--                                            <div class="input-group-prepend">-->
-<!--                                                <label class="input-group-text" for="input_name_mp1">Маркетплейс</label>-->
-<!--                                            </div>-->
-<!--                                            <select class="custom-select" id="input_name_mp1" name="selected_mp">-->
-<!--                                                <option selected>Выбрать</option>-->
-<!--                                                <option value="yandex">ЯндексМаркет</option>-->
-<!--                                                <option value="sber">СберМегаМаркет</option>-->
-<!--                                                <option value="ozon">Озон</option>-->
-<!--                                                <option value="wb">Вайлдбериз</option>-->
-<!--                                                <option value="leroy">ЛеруаМерлен</option>-->
-<!--                                            </select>-->
-
-<!--                                        </div>-->
-
-
-                                        <div class="form-group">
-                                                <label class="form-label" for="field-3">Артикул товара  (ID)</label>
-                                                <span class="desc"></span>
-                                                <div class="controls">
-                                                    <input type="text" value="{{product.get('articul_product','')}}" class="form-control" id="field-3" name="articul_product">
-                                                </div>
-                                            </div>
-
-
-                                        <div class="form-group">
-                                            <label class="form-label" for="field-411">Цена до скидки</label>
-                                            <span class="desc"></span>
-                                            <div class="controls">
-<!--                                                    <input type="text" value="100.00" class="form-control" id="field-4" name="price_product_base">-->
-                                                <input type="text"  class="form-control" id="field-411" value="{{product.get('price_product','0')}}" name="price_product_base">
-                                            </div>
-                                        </div>
-
-
-                                        <div class="form-group">
-                                                <label class="form-label" for="field-51">Фото</label>
-                                                <span class="desc"></span>
-                                                <img class="img-fluid" src="{{product.get('photo') }}" alt="" style="max-width:120px;">
-                                                <div class="controls">
-                                                    <input type="file" class="form-control" id="field-51" name="photo">
-                                                </div>
-                                            </div>
-
-
-
-
-                                    </div>
-
-                                    <div class="col-lg-6 col-md-6 col-6">
-
-<!--                                        <div class="input-group mb-3">-->
-<!--                                            <div class="input-group-prepend">-->
-<!--                                                <label class="input-group-text" for="input_shop_name1">Магазин</label>-->
-<!--                                            </div>-->
-<!--                                            <select class="custom-select" id="input_shop_name1" name="set_shop_name">-->
-<!--    {#                                          <option selected>Выбрать </option>#}-->
-<!--                                                <option value="{{ product.get('shop_name', '') }}" >{{ product.get('shop_name', '') }}</option>-->
-
-<!--                                            </select>-->
-<!--                                            </div>-->
-
-
-                                        <div class="form-group" style="display: none">
-                                            <label class="form-label" for="formfield53">SKU Товара на МП</label>
-<!--                                            <span class="desc">e.g. "3423"</span>-->
-                                            <div class="controls">
-                                                <input type="text" value="{{ product.get('external_sku', '') }}"  class="form-control" id="formfield53" name="external_sku" >
-                                            </div>
-                                        </div>
-
-
-                                        <div class="form-group">
-                                                <label class="form-label" for="field-21">Название продукта</label>
-                                                <span class="desc"></span>
-                                                <div class="controls">
-                                                    <input type="text" value="{{product.get('name_product','')}}" class="form-control" id="field-21" name="name_product">
-                                                </div>
-                                            </div>
-
-
-                                        <div class="form-group">
-                                            <label class="form-label" for="field-4">Цена продукта</label>
-                                            <span class="desc"></span>
-                                            <div class="controls">
-<!--                                                    <input type="text" value="100.00" class="form-control" id="field-4" name="price_product_base">-->
-                                                <input type="text"  class="form-control" id="field-41" value="{{product.get('price_product_base','0')}}" name="price_product_base">
-                                            </div>
-                                        </div>
-
-
-                                        <div class="form-group">
-                                               <label class="form-label" for="field-13">Количество</label>
-                                         <span class="desc"></span>
-                                            <div class="controls">
-                                                <input type="text" value="{{product.get('quantity', '0') }}" class="form-control" id="field-13" name="quantity">
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-12 col-md-12 col-12">
-                                    <div class="float-right ">
-                                        <button type="submit" class="btn btn-primary">Сохранить</button>
-                                        <button class="btn" type="reset">Очистить</button>
-                                    </div>
-                                </div>
-
-
-
-                            </form>
-
-
-                        </div>
-                    </div>
-                </section></div>
         </div>
-
-
+        <div class="clearfix"></div>
 
         <div class="row margin-0">
             <div class="col-xl-12">
@@ -223,9 +69,19 @@
                             <i class="box_close fa fa-times"></i>
                         </div>
                     </header>
-                    <div class="content-body collapsed" style="display: none">
-                        <div class="row">
+                    <div class="content-body">    <div class="row">
+                        {% for mesg in get_flashed_messages() %}
+                        <h2>{{ mesg }}</h2>
+                        {% endfor %}
 
+<!--                        <div class="col-xl-12">-->
+<!--                            <div class="d3">-->
+<!--                            <form action="/edit_product" method="post" novalidate="novalidate" style="width: 100%;">-->
+<!--                              <input type="text" placeholder="Искать здесь...">-->
+<!--                              <button type="submit"></button>-->
+<!--                            </form>-->
+<!--                            </div>-->
+<!--                        </div>-->
 
                             <form id="general_validate"  action="/edit_product" method="post" novalidate="novalidate" style="width: 100%;">
 
@@ -311,7 +167,7 @@
 <!--                                            </div>-->
 <!--                                        </div>-->
                                         <div class="form-group">
-                                                <label class="form-label" for="field-5">Фото</label>shop_name
+                                                <label class="form-label" for="field-5">Фото</label>
                                                 <span class="desc"></span>
 <!--                                                <img class="img-fluid" src="../../static/data/eco-products/product-12.jpg" alt="" style="max-width:120px;">-->
                                                 <img class="img-fluid" src="{{product.get('photo', 'static/data/eco-products/product-12.jpg') }}" alt="" style="max-width:120px;">
