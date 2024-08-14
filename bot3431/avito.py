@@ -626,13 +626,12 @@ async def get_avito_current_chat_v2(hook, check):
         logging.info('WROTE_DATA_FOR___22 {}'.format(proxy))
         await execute_query_v3(query_write_bid, proxy)
         logging.info('WROTE_DATA_FOR___33 {}'.format(proxy))
+        # TODO maybe it's not needed ?
         await execute_query_v3(query_update_msg_id, (msg_id, chat_id))
         logging.info('TRY_REWRITE_DATA_TO_AMO_1 {} {} {} {} '.
                      format(chat_id, user_id, title, target_link))
         await rewrite_leads_v2(chat_id, user_id)
 
-
-    ### Now in there no send
     elif not check[0]:  # if it's a message exist  or not
         url = f'https://api.avito.ru/messenger/v2/accounts/{user_id}/chats/{chat_id}'
         answer = requests.get(url=url, headers=header_avito)

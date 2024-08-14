@@ -362,12 +362,11 @@ def check_is_exist_message_in_db_v2(msg_id, chat_id):
             try:
                 cursor.execute(query_check_is_message_exist, (chat_id,))
                 redata = cursor.fetchone()
-
-                if redata is not None and redata[0] == msg_id:
-                    compare = True
                 if redata is not None:
                     first_answer = redata[1]
                     rewrite_lead = redata[2]
+                    if redata[0] == msg_id:
+                        compare = True
                     logging.info(f"Query from check_is_exist_in_db '{msg_id, chat_id, redata}' executed successfully")
                     return compare, first_answer, rewrite_lead
 

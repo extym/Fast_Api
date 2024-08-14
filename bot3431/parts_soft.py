@@ -316,6 +316,19 @@ def choice_function_v2(items, full_items, qnt,
                     and item["price_name"] not in price_name_without_sale:
                 result.append(item)
 
+    else:
+        for item in full_items:
+            if item["price_name"] in name_price_for_sale_only \
+                    and item['qnt'] >= qnt \
+                    and item["price_name"] not in price_name_without_sale:
+                result.append(item)
+            elif item['qnt'] >= qnt and item["price_name"] not in price_name_without_sale:
+                result.append(item)
+            else:
+                listing = sorted(items.values())[:10]
+                if item["cost"] in listing and item['qnt'] >= qnt:
+                    result.append(item)
+
     return result
 
 
@@ -482,12 +495,6 @@ def create_resp_if_not_exist(list_items, link, key=None,
                 list_propousal = choice_function_v2(propousal, need_data, qnt,
                                                     price_name_without_sale=['ФБО'],
                                                     name_price_for_sale_only=['Магазин Культуры 63'])
-
-                # print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
-                # for row in list_propousal:
-                #     print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
-                #     print(*row.items(), sep='\n')
-                #     print(len(row))
 
                 result_make_basket = make_basket(propousal=list_propousal[0],
                                                  qnt=qnt, key=key,

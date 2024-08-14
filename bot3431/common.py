@@ -1,4 +1,3 @@
-
 import connect as conn
 import yandex as yan
 import parts_soft as ps
@@ -44,7 +43,7 @@ def reformat_data_order(order, mp, client_id_ps):
             order['creationDate'],
             order["status"],
             order["substatus"],
-            'new', # our_status
+            'new',  # our_status
             order["paymentType"],
             order["delivery"]["type"],
             order["buyerTotalBeforeDiscount"],
@@ -158,7 +157,7 @@ def reformat_data_order_v2(order, mp, client_id_ps,
             order["delivery_method"]["warehouse_id"]
         )
 
-    elif mp == 'Sber': #and it's request from mp to shop
+    elif mp == 'Sber':  # and it's request from mp to shop
         list_items = order["count_items"]
         summ_order = 0
         for item in list_items:
@@ -166,7 +165,7 @@ def reformat_data_order_v2(order, mp, client_id_ps,
                 order["shipments"][0]["shipmentId"],
                 mp,
                 item["offerId"],
-                '', # item["id_1c"],
+                '',  # item["id_1c"],
                 item["quantity"],
                 str(item["price"])
             )
@@ -189,7 +188,7 @@ def reformat_data_order_v2(order, mp, client_id_ps,
             order["status"],
             "new",  # order["substatus"],
             order["our_status"],
-            "PREPAID",  #order['data'].get("paymentType"),
+            "PREPAID",  # order['data'].get("paymentType"),
             delivery,
             str(summ_order),
             client_id_ps
@@ -215,7 +214,7 @@ def reformat_data_order_v2(order, mp, client_id_ps,
     return result, result_items, result_customer
 
 
-def make_orders_to_ps(delta_time:int=1):
+def make_orders_to_ps(delta_time: int = 1):
     campain_list = conn.execute_query_return_v3(conn.query_get_all_shops, "Yandex")
     if len(campain_list) > 0:
         for campain in campain_list:
@@ -271,7 +270,7 @@ def make_orders_to_ps(delta_time:int=1):
                 for canceled in list_canceled_orders:
 
                     check = conn.check_order_exist(conn.query_is_exist_order,
-                                              str(canceled.get('id')))
+                                                   str(canceled.get('id')))
                     if check[1] != 'CANCELLED':
 
                         data = ' '.join([str(i['id']) for i in canceled.get('items')]).strip()
@@ -286,6 +285,5 @@ def make_orders_to_ps(delta_time:int=1):
 
                     # elif not check[2]:
                     #     change_status(canceled)
-
 
 # make_orders_to_ps(delta_time=3)

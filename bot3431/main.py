@@ -707,48 +707,54 @@ async def avito_webhook():
         # check = await check_is_exist_message_answer_v2(msg_id, chat_id)
         check = check_is_exist_message_in_db_v2(msg_id, chat_id)
         logging.info('CheckFromMain {} {} {} '.format(check, chat_id, msg_id))
+
+        ## system message from avito or our
+        if author_id == 1 or check[0]:  # or (author_id in sender_ids and msg != bot_answer):
+            return app.response_class(
+                status=200
+            )
         try:
-
-            ## system message from avito or our
-            if author_id == 1 or check[0]:  # or (author_id in sender_ids and msg != bot_answer):
-                return app.response_class(
-                    status=200
-                )
-
             user_id = hook.get('payload').get('value').get('user_id')
             msg = hook.get('payload').get('value').get('content').get('text')
-            # is_phone = await get_phone(msg)
             ## our message or first
-            if author_id in sender_ids and (msg == bot_answer or msg == bot_rota_answer):
-                chat_id = hook.get('payload').get('value').get('chat_id')
-                await rewrite_leads_v2(chat_id, user_id)
-                msg_id = hook.get('payload').get('value').get('id')
-                await re_write_link_v2(chat_id, msg_id)
-                # await get_avito_current_chat_v2(hook, (False, True))
-                return app.response_class(
-                    status=200
-                )
-
-            ## random message, not first, not our
-            else:
-                try:
-                    await get_avito_current_chat_v2(hook, check)
-                    logging.info('Get_avito_current_chat_v2 {} {} {}'
-                                 .format(hook, check, chat_id))
-                    return app.response_class(
-                        status=200
-                    )
-                except Exception as err:
-                    logging.error('ERROR_GET_AVITO_CURRENT_CHAT {}, hook {}, {} {} {} {}'.
-                                  format(err, hook, check, msg_id, chat_id, user_id))
-                    return app.response_class(
-                        status=200
-                    )
         except Exception as error:
             logging.error('Web_hook_fuckup {} {}'.format(error, hook))
             return app.response_class(
                 status=200
             )
+        if author_id in sender_ids and (msg == bot_answer or msg == bot_rota_answer):
+            try:
+                chat_id = hook.get('payload').get('value').get('chat_id')
+                await rewrite_leads_v2(chat_id, user_id)
+                msg_id = hook.get('payload').get('value').get('id')
+                # await re_write_link_v2(chat_id, msg_id)
+                await execute_query_v3(query_update_msg_id, (msg_id, chat_id))
+
+                return app.response_class(
+                    status=200
+                )
+            except Exception as erro:
+                logging.error('Rewrite_leads_or_links_error {} {}'.format(erro, hook))
+                return app.response_class(
+                    status=200
+                )
+
+        ## random message, not first, not our
+        else:
+            try:
+                await get_avito_current_chat_v2(hook, check)
+                logging.info('Get_avito_current_chat_v2 {} {} {}'
+                             .format(hook, check, chat_id))
+                return app.response_class(
+                    status=200
+                )
+            except Exception as err:
+                logging.error('ERROR_GET_AVITO_CURRENT_CHAT {}, hook {}, {} {} {} {}'.
+                              format(err, hook, check, msg_id, chat_id, user_id))
+                return app.response_class(
+                    status=200
+                )
+
     else:
         print('WHOIS', request.get_data())
         print('WHOIS', request.headers)
