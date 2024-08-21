@@ -6,7 +6,7 @@ import time
 
 import pandas
 import requests
-from cred import oson_key_admin, oson_client_id
+from cred import oson_key_admin_3431, oson_client_id_3431
 # from read_json import read_json_on
 from time import sleep
 
@@ -24,8 +24,8 @@ host = 'https://api-seller.ozon.ru'
 last_id = 'WzQ2MzcyNzEyNyw0NjM3MjcxMjdd'
 
 headers = {
-    'Client-Id': oson_client_id,
-    'Api-Key': oson_key_admin,
+    'Client-Id': oson_client_id_3431,
+    'Api-Key': oson_key_admin_3431,
     'Content-Type': 'application/json'
 }
 wh_id = {'JP Express': 1020000245246000, 
@@ -154,7 +154,7 @@ def read_csv_from(file):
             faxy.update({proxy[1]: proxy})
 
         for k, v  in data.items():
-            print(11111111,k, type(k))
+            # print(11111111,k, type(k))
 
             os.abort()
 
@@ -166,8 +166,8 @@ def get_current_assortment():
     result = []
     link = host + metod_get_list_products
     headers = {
-        "Client-Id": oson_client_id,
-        "Api-Key": oson_key_admin
+        "Client-Id": oson_client_id_3431,
+        "Api-Key": oson_key_admin_3431
     }
     last_id = ""
     requesting = True
@@ -198,20 +198,20 @@ def get_current_assortment():
         except:
             time.sleep(1)
             continue
-    print(7777777777, len(result))  #, result[-50:])
+    print(7777777777, len(result), result[-50:])
     return result
 
 
 
-def read_xlsx_from(file):
+def read_xlsx_from(file, key_kolumn:int = 1):
     faxy = {}
     dt = pandas.read_excel(file)
     data = dt.to_dict()
 
     for row in dt.values:
         proxy = tuple(row)
-        faxy.update({proxy[1]: proxy})
-
+        faxy.update({proxy[key_kolumn]: proxy})
+    print(3434345, type(data))
     return faxy
 
 
@@ -249,32 +249,61 @@ def create_data_stocks_v2(file):
     return result
 
 
+def create_data_stocks_v3(file):
+    data_read = read_xlsx_from(file, key_kolumn=0)
+    # print('DATA READ {}'.format(data_read.keys()))
+    result = []
+    stocks = []
+    count = 0
+    current_wh = {'Культуры 63': 1020001947468000}
+    current_assortment = get_current_assortment()
+    for product in current_assortment:
+        proxy = {}
+        proxy_offer_id = product['offer_id'].strip("'")
+        if proxy_offer_id in data_read.keys():
+            proxy['offer_id'] = proxy_offer_id
+            proxy['product_id'] = product['product_id']
+            proxy['stock'] = data_read[proxy_offer_id][6]
+            proxy['warehouse_id'] = 1020001947468000
+            pr = proxy.copy()
+            # rr = proxy.copy().update({'warehouse_id': 1020001947468000})
+            stocks.append(pr)
+            # stocks.append(rr)
+        elif product['offer_id'] in data_read.keys():
+            proxy['offer_id'] = product['offer_id']
+            proxy['product_id'] = product['product_id']
+            proxy['stock'] = data_read[product['offer_id']][6]
+            proxy['warehouse_id'] = 1020001947468000
+            pr = proxy.copy()
+            # rr = proxy.copy().update({'warehouse_id': 1020001947468000})
+            stocks.append(pr)
+            # stocks.append(rr)
+        else:
+            count += 1
 
-# def read_skus():
-#     try:
-#         with open('/var/www/html/stm/onon_skus.json', 'r') as file:
-#             items_skus = json.load(file)
-#     except:
-#         with open('onon_skus.json', 'r') as file:
-#             items_skus = json.load(file)
-#
-#     print('items_skus', len(items_skus), type(items_skus))
-#     return items_skus
+    print("Found {} & Not found {} in {} "
+          .format(len(stocks), count, len(data_read.keys())))
+
+    while len(stocks) >= 100:
+        result.append(stocks[:100])
+        del stocks[:100]
+        print('stocks', len(stocks))
+    else:
+        result.append(stocks)
+
+    print('create_data_stocks_onon_x100', len(result), result[-5:])
+    return result
 
 
-#
-# read_skus()
-
-def send_stocks_on():
+def send_stocks_on(show_success: bool = False,
+                   show_errors: bool = True):
     pre_data = create_data_stocks()
     metod = '/v2/products/stocks'
     link = host + metod
     proxy = []
     for row in pre_data:
         data = {'stocks': row}
-        # print('SEND_DATA', data)
-        dt = json.dumps(data)
-        # print(len(data['stocks']), dt)
+        # dt = json.dumps(data)
         response = requests.post(link, headers=headers, json=data)
         answer = response.json()
         ans = response.text
@@ -282,12 +311,10 @@ def send_stocks_on():
         result = answer.get("result")
         if result:
             for row in result:
-                if len(row["errors"]) > 0:  # and row['warehouse_id'] != 23012928587000: #TODO temporary 'warehouse_id': 23012928587000
-                    print('ERROR from send_stocks_ozon', row)
-                elif row['updated'] == False:
+                if row['updated'] == False and show_errors:
                     print('ERROR update from send_stocks_ozon', row)
-                elif row['updated'] == True:  # and row['warehouse_id'] != 23012928587000:
-                    print('SUCCES update from send_stocks_on', row)
+                elif row['updated'] == True and show_success:  # and row['warehouse_id'] != 23012928587000:
+                    print('SUCCESS update from send_stocks_on', row)
             proxy.append(answer)
         sleep(1)
 
@@ -295,8 +322,11 @@ def send_stocks_on():
 # send_stocks_on()
 
 
-def send_stocks_on_oson(file):
-    pre_data = create_data_stocks_v2(file)
+def send_stocks_on_oson(file, type_data: int = 2):
+    if type_data == 3:
+        pre_data = create_data_stocks_v3(file)
+    else:
+        pre_data = create_data_stocks_v2(file)
     metod = '/v2/products/stocks'
     link = host + metod
     count_success, count_error = 0, 0
@@ -350,13 +380,9 @@ def product_info_price(id_mp):  # product_id, offer_id
 # send_stocks_on()
 # asyncio.run(post_send_stocks())
 # create_data_stocks()
-
-# def convert(string):
-#     data = json.dumps(string)
-#     print(data)
-# # pr = [{'id': 'MP1703473-001', 'pickup': {'deliveryServiceId': 123600, 'deliveryServiceName': 'Леруа Мерлен сервис доставки', 'warehouseId': '1200', 'timeInterval': 'Invalid Interval', 'pickupDate': '2022-12-14'}, 'products': [{'lmId': '90115665', 'vendorCode': 'BT2834B', 'price': 5860, 'qty': 3, 'comissionRate': 0}, {'lmId': '90121362', 'vendorCode': 'HPUV65ELC', 'price': 5860, 'qty': 3, 'comissionRate': 0}], 'deliveryCost': 0, 'parcelPrice': 5860, 'creationDate': '2022-12-14', 'promisedDeliveryDate': '2022-12-22', 'calculatedWeight': 4.8, 'calculatedLength': 707, 'calculatedHeight': 156, 'calculatedWidth': 686}, {'id': 'MP1703472-001', 'pickup': {'deliveryServiceId': 123600, 'deliveryServiceName': 'Леруа Мерлен сервис доставки', 'warehouseId': '1200', 'timeInterval': 'Invalid Interval', 'pickupDate': '2022-12-14'}, 'products': [{'lmId': '90115665', 'vendorCode': 'BT2834B', 'price': 5860, 'qty': 3, 'comissionRate': 0}, {'lmId': '90121362', 'vendorCode': 'HPUV65ELC', 'price': 5860, 'qty': 3, 'comissionRate': 0}], 'deliveryCost': 0, 'parcelPrice': 5860, 'creationDate': '2022-12-14', 'promisedDeliveryDate': '2022-12-22', 'calculatedWeight': 4.8, 'calculatedLength': 707, 'calculatedHeight': 156, 'calculatedWidth': 686}, {'id': 'MP1703471-001', 'pickup': {'deliveryServiceId': 123600, 'deliveryServiceName': 'Леруа Мерлен сервис доставки', 'warehouseId': '1200', 'timeInterval': 'Invalid Interval', 'pickupDate': '2022-12-14'}, 'products': [{'lmId': '90115665', 'vendorCode': 'BT2834B', 'price': 5860, 'qty': 3, 'comissionRate': 0}, {'lmId': '90121362', 'vendorCode': 'HPUV65ELC', 'price': 5860, 'qty': 3, 'comissionRate': 0}], 'deliveryCost': 0, 'parcelPrice': 5860, 'creationDate': '2022-12-14', 'promisedDeliveryDate': '2022-12-22', 'calculatedWeight': 4.8, 'calculatedLength': 707, 'calculatedHeight': 156, 'calculatedWidth': 686}]
-# pr = {'message_type': 'TYPE_NEW_POSTING', 'seller_id': 90963, 'warehouse_id': 1020000075732000, 'posting_number': '13223249-0059-1', 'in_process_at': '2023-03-18T03:56:36Z', 'products': [{'sku': 789880982, 'quantity': 1}]}
-# convert(pr)
+# post_get_smth('/v1/warehouse/list')
 
 # send_stocks_on_oson('https://3431.ru/system/unload_prices/17/ozon1.xlsx')
+# send_stocks_on_oson('https://3431.ru/system/unload_prices/30/novyyozon.xlsx', type_data=3)
+# create_data_stocks_v3('https://3431.ru/system/unload_prices/30/novyyozon.xlsx')
 # get_current_assortment()

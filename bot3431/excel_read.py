@@ -60,7 +60,7 @@ def read_xlsx_v2(file, market):
             shipment_date = row[13][:-5]
 
     # print(*row, sep='\n')
-    print(1111111111, maxy, type(maxy))
+    # print(1111111111, maxy, type(maxy))
     return sorted(maxy), shipment_date
 
 

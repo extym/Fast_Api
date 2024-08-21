@@ -147,5 +147,5 @@ def get_data_for_cards_from_xml(category_name: str = None,
 # get_data_for_cards_from_xml(category_name="Тормозные колодки",
 #                             link='https://3431.ru/system/unload_prices/45/sbermegamarket.xml')
 
-get_data_for_cards_from_xml(category_name="Колодки тормозные",
-                            link='https://3431.ru/system/unload_prices/45/yandex_market.xml')
+# get_data_for_cards_from_xml(category_name="Колодки тормозные",
+#                             link='https://3431.ru/system/unload_prices/45/yandex_market.xml')

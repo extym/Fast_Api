@@ -246,7 +246,7 @@ def get_amo_akk_v2(amo_name):
     logging.info('GET_USER_AKK_AMO {}'.format(amo_name))
     with open(PATH_DIR + '/amo_akk.json', 'r') as file:
         data = json.load(file)
-        print(111, data.get(amo_name))
+        # print(111, data.get(amo_name))
         return data.get(amo_name)
 
 

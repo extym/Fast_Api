@@ -36,8 +36,8 @@ def get_smth(metod, params=None):
     token_ps = HTTPBasicAuth(admin_ps_login, admin_ps_pass)
     answer = requests.get(url, auth=token_ps, params=params)
 
-    print(3111133, answer.text)
-    print(444444, answer.url, answer.headers)
+    # print(3111133, answer.text)
+    # print(444444, answer.url, answer.headers)
     return answer.json()
 
 

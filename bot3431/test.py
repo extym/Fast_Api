@@ -1046,7 +1046,7 @@ def read_sales(sales, price):
             if count > 0:
                 rero.insert(6, int(count))
                 proxy.append(rero)
-                print(111, count, rero)
+                # print(111, count, rero)
             else:
 
                 continue
