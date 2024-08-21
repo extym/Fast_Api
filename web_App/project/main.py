@@ -414,8 +414,8 @@ async def onon_push():
 
             if order:
                 # print('new_order_onon', order['posting_number'])
-                order['our_id'], order['id'], order['status'], order['our_status'] \
-                    = our_id, id_mp, "NEW", "NEW"  # TODO change place id_mp & our_id
+                order['our_id'], order['id'], order['our_status'] \
+                    = our_id, id_mp, "NEW"  # TODO change place id_mp & our_id
                 ref_data = reformat_data_order_v2(order, 'Ozon', seller_id, shop_name)
                 order["shipping_date"] = ref_data[3]
                 list_items = reformat_data_items_v2(order, shop_name, 'Ozon', seller_id)
@@ -445,6 +445,28 @@ async def onon_push():
             print('cencelled_order_onon', order_id)
             response = Response(
                 json.dumps(common_comfirm_response),
+                status=200
+            )
+
+        elif resp.get("message_type") != 'TYPE_STATE_CHANGED':
+            order_id = resp["posting_number"]
+            order_status = resp.get('new_state')
+            seller_id = str(resp.get('seller_id'))
+            shop_name = Marketplaces.query. \
+                filter_by(seller_id=seller_id).first().shop_name
+            data = (order_status, order_status, order_id, shop_name)
+            await execute_query_v4(query=update_status_order,
+                                   query2=update_status_order_items,
+                                   data=data)
+            print('change_status_order_oson', order_id)
+            response = Response(
+                json.dumps(common_comfirm_response),
+                status=200
+            )
+
+        elif resp.get("message_type") != None:
+            response = Response(
+                json.dumps(common_error),
                 status=200
             )
 

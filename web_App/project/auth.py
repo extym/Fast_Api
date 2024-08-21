@@ -52,6 +52,11 @@ auth = Blueprint('auth', __name__)
 
 ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
+def reverse_date(string_date):
+    t = string_date.split('/')
+    t.insert(0, t[-1])
+
+    return '-'.join(t[:-1])
 
 def back_shops_tasks():
     with Session(engine) as session:
@@ -501,7 +506,6 @@ def add_mp_post():
         # print(job.get_id)
 
     if 'edit_shop' in data:
-        print(33333333333333333333333, data)
         if 'edit_shop' == 'Выбрать' and 'edit_shop_settings' == 'Выбрать':
             flash('Не выбран магазин')
         if 'edit_shop_settings' != 'Выбрать' and 'key':
@@ -568,7 +572,6 @@ def edit_store_post():
         settings = dict()
         if data['shop_name'] != 'Выбрать' \
                 and not data.get('split_wh'):
-            print((33333333333333))
             for key, value in data.items():
                 if value != '':
                     settings.update({key: value})
@@ -1248,6 +1251,150 @@ def edit_product_post():
     return redirect('/edit_product')
 
 
+@auth.route('/edit_price_product')
+@login_required
+def edit_price_product(product=None):
+    if not current_user.is_authenticated:
+        return redirect(url_for('main.index_main'))
+    else:
+        rows_shops = db.session \
+            .execute(select(Marketplaces.shop_name) \
+                     .where(Marketplaces.company_id == current_user.company_id)) \
+            .all()
+        # print(rows_shops, type(rows_shops))
+        rows = [row[0] for row in rows_shops]
+        role = current_user.roles
+        user_name = current_user.name
+        photo = current_user.photo
+        if not photo or photo is None:
+            photo = 'prof-music-2.jpg'
+        if product is None:
+            product = {
+                'selected_mp': '',
+                'articul_product': '',
+                'name_product': '',
+                'status_mp': '',
+                'images_product': '',
+                'price_product_base': '0',
+                'price_add_k': '1',
+                'discount_mp_product': '1.0',
+                'quantity': '0',
+                'description_product': '',
+                'set_shop_name': '',
+                'external_sku': '',
+                'alias_prod_name': '',
+                'status_in_shop': '',
+                'shop_k_product': '1.0',
+                'discount_shop_product': '1.0',
+                'quantity_for_shop': '0',
+                'description_product_add': ''
+            }
+
+        # return render_template('product-edit.html', role=role)
+        return render_template('product-edit-price.html',
+                               TEST_MODE=TEST_MODE,
+                               role=role,
+                               product=product,
+                               price_product_base=product.get('price_product_base'),
+                               rows=rows,
+                               photo=photo,
+                               user_name=user_name)
+
+
+@auth.route('/edit_price_product', methods=['POST'])
+@login_required
+def edit_price_product_post():
+    data = request.form.to_dict()
+    print(23423456, data)
+    role = current_user.roles
+    photo = current_user.photo
+    user_name = current_user.name
+    if not photo or photo is None:
+        photo = 'prof-music-2.jpg'
+    # print('/edit_product', *data, sep='\n')
+    print('Page_edit_product', *data, sep=', \n')
+    if 'search_product' in data:
+        prod = None
+        articul = data.get('search_product')
+        shop_name = data.get('import_shop_names')
+        if articul and articul != '' and shop_name != 'Выбрать Магазин':
+            prod = db.session \
+                .execute(select(Product)
+                         .filter_by(shop_name=shop_name) \
+                         .where(Product.articul_product == articul)) \
+                .first()
+
+        elif articul and articul != '':
+            prod = db.session \
+                .execute(select(Product)
+                         .where(Product.articul_product == articul)) \
+                .first()
+        if not prod:
+            flash('Артикул не найден')
+            product = {}
+        else:
+            product = dict(prod[0].__dict__)
+            # print(111111111, *product.items(), sep='\n')
+        rows_shops = db.session \
+            .execute(select(Marketplaces.shop_name)
+                     .where(Marketplaces.company_id == current_user.company_id)) \
+            .all()
+        # print(rows_shops, type(rows_shops))
+        rows = [row[0] for row in rows_shops]
+        # prod = Product.query.filter_by(articul_product="12345").first().__dict__
+        # print(22222, *product.items(), sep='\n')  # ' sep=' = prod.get(""),\n')
+        # print(33333, product)
+
+        return render_template('/product-edit-price.html',
+                               product=product,
+                               rows=rows,
+                               photo=photo,
+                               role=role,
+                               user_name=user_name)
+
+    elif 'save_and_send' in data:
+        prod_set = Product(
+            uid_edit_user=current_user.id,
+            selected_mp=data.get('selected_mp', '0'),
+            shop_name=data.get('set_shop_name', '0'),
+            articul_product=data.get('articul_product', '0'),
+            name_product=data.get('name_product', '0'),
+            price_product_base=int(data.get('price_product_base', '0')),
+            price_add_k=data.get('price_add_k', '1'),
+            discount_mp_product=data.get('discount_mp_product', '0'),
+            quantity=data.get('quantity', '0'),
+            set_shop_name=data.get('set_shop_name', '0'),
+            # external_sku=data.get('external_sku', '0'),
+            quantity_for_shop=data.get('quantity_for_shop', '0'),
+            final_price=0.0
+        )
+
+        try:
+            db.session.merge(prod_set)
+            db.session.commit()
+            flash('Товар удачно сохранен', 'success')
+
+        except IntegrityError as e:
+            if isinstance(e.orig, UniqueViolation):
+                # print('!!!!!!!!!!!!!!!!!!!!!!!!!!', data)
+                db.session.rollback()
+                articul_product = data.get('articul_product')
+                product = Product.query.filter_by(articul_product=articul_product).update(data)
+                # # print('!!!!!!!!!!!!!!!!!!!!!!!!!!', data, product)
+                db.session.commit()
+                flash(f'Товар с артикулом {articul_product} удачно обновлен', 'success')
+        except Exception as error:
+            db.session.rollback()
+            logging.error('Ошибка сохранения отредактированного товара {} {}'
+                          .format(current_user.id, error))
+            flash('Уже существует продукт с таким Артикулом (ID)', 'error')
+
+        finally:
+            db.session.close()
+
+    return redirect('/edit_price_product')
+
+
 @auth.route('/add_product')  # /<int:uid>')
 @login_required
 def add_product():
@@ -1648,22 +1795,34 @@ def assembly_sales(page=1):
     if not current_user.is_authenticated:
         return redirect(url_for('main.index_main'))
     else:
+        data = request.form.to_dict()
+        # print(232345, data)
         uid = current_user.id
         role = current_user.roles
         user_name = current_user.name
         user_photo = current_user.photo
-        shop = request.args.get('select_shop_name')
+        shop = data.get('select_shop_name')
         if not user_photo or user_photo is None:
             user_photo = 'prof-music-2.jpg'
-        rows = ''
-        limit = 30
+        rows_assembly = ''
+        rows_shipment = ''
+        limit = 15
         HOUR = '00:00:00'
         HOUR_2 = '00:00:00'
+        need_date = data.get('need_date_time')
+        if need_date:
+            # try:
+            #     day = need_date.split(' ')[0]
+            # except:
+            day = reverse_date(need_date)
+            # print(33333333, day)
+        else:
+            day = datetime.datetime.today().strftime(f"%Y-%m-%d")
         yesterday = (datetime.datetime.today() - datetime.timedelta(days=1)) \
             .strftime(f"%Y-%m-%d {HOUR}")
-        tomorrow = (datetime.datetime.today() + datetime.timedelta(days=1))\
+        tomorrow = (datetime.datetime.today() + datetime.timedelta(days=1)) \
             .strftime(f"%Y-%m-%d {HOUR_2}")
-        today = datetime.datetime.today().strftime(f"%Y-%m-%d")
+
         pre_rows_shops = db.session.query(Marketplaces.shop_name) \
             .where(Marketplaces.company_id == current_user.company_id).all()
         rows_shops = [i[0] for i in pre_rows_shops]
@@ -1678,6 +1837,7 @@ def assembly_sales(page=1):
                                                SalesToday.shop_name,
                                                SalesToday.article,
                                                SalesToday.name,
+                                               SalesToday.price,
                                                SalesToday.shipment_date,
                                                func.sum(SalesToday.quantity)
                                                .label('total_sales')) \
@@ -1685,13 +1845,33 @@ def assembly_sales(page=1):
                           SalesToday.shop_name,
                           SalesToday.article,
                           SalesToday.shipment_date,
+                          SalesToday.price,
                           SalesToday.name) \
-                .where(SalesToday.shipment_date.like(f"{today}%")) \
-                .where(SalesToday.our_status == "NEW") \
+                .where(SalesToday.shipment_date.like(f"{day}%")) \
+                .where(SalesToday.order_status == "awaiting_packaging") \
                 .order_by(SalesToday.article_mp) \
                 .paginate(page=page, per_page=limit, error_out=False)
 
-            # print(333333, assembly_orders)
+            shipment_orders = db.session.query(SalesToday.article_mp,
+                                               SalesToday.shop_name,
+                                               SalesToday.article,
+                                               SalesToday.name,
+                                               SalesToday.price,
+                                               SalesToday.shipment_date,
+                                               func.sum(SalesToday.quantity)
+                                               .label('total_sales')) \
+                .group_by(SalesToday.article_mp,
+                          SalesToday.shop_name,
+                          SalesToday.article,
+                          SalesToday.shipment_date,
+                          SalesToday.price,
+                          SalesToday.name) \
+                .where(SalesToday.shipment_date.like(f"{day}%")) \
+                .where(SalesToday.our_status == "NEW") \
+                .order_by(SalesToday.article_mp) \
+                .paginate(page=page, per_page=limit, error_out=False)
+            print(1111111111111111111111111111111111111111111111111)
+
         else:
             my_query = db.func.count(SalesToday.id)
             total_assembly_sales = db.session.execute(my_query).scalar()
@@ -1701,40 +1881,85 @@ def assembly_sales(page=1):
                                                SalesToday.article,
                                                SalesToday.name,
                                                SalesToday.shipment_date,
+                                               SalesToday.price,
                                                func.sum(SalesToday.quantity)
                                                .label('total_sales')) \
                 .group_by(SalesToday.article_mp,
                           SalesToday.shop_name,
                           SalesToday.name,
                           SalesToday.article,
+                          SalesToday.price,
                           SalesToday.shipment_date) \
-                .where(SalesToday.shipment_date.like(f"{today}%")) \
+                .where(SalesToday.shipment_date.like(f"{day}%")) \
+                .where(SalesToday.order_status == "awaiting_packaging") \
+                .filter(SalesToday.shop_name == shop) \
+                .order_by(SalesToday.article_mp) \
+                .paginate(page=page, per_page=limit, error_out=False)
+
+            shipment_orders = db.session.query(SalesToday.article_mp,
+                                               SalesToday.shop_name,
+                                               SalesToday.article,
+                                               SalesToday.name,
+                                               SalesToday.price,
+                                               SalesToday.shipment_date,
+                                               func.sum(SalesToday.quantity)
+                                               .label('total_sales')) \
+                .group_by(SalesToday.article_mp,
+                          SalesToday.shop_name,
+                          SalesToday.article,
+                          SalesToday.shipment_date,
+                          SalesToday.price,
+                          SalesToday.name) \
+                .where(SalesToday.shipment_date.like(f"{day}%")) \
                 .where(SalesToday.our_status == "NEW") \
                 .filter(SalesToday.shop_name == shop) \
                 .order_by(SalesToday.article_mp) \
                 .paginate(page=page, per_page=limit, error_out=False)
 
         for row in assembly_orders.items:
-            print(row)
-            s_today = (select(Product.photo)
+            # print(1111111111, row)
+            get_photo_prod = (select(Product.photo)
                        .where(Product.articul_product == row.article)
                        .where(Product.shop_name == row.shop_name))
 
-            photo_prod = db.session.execute(s_today).first()
+            photo_prod = db.session.execute(get_photo_prod).first()
             if not photo_prod or photo_prod is None:
                 photo_prod = 'нет фото'
 
-            rows += '<tr>' \
-                    f'<td ><img class="img-fluid" src="{photo_prod[0]}" alt="" style="max-width:50px;"></td>' \
-                    f'<td>{row.article}</td>' \
+            rows_assembly += '<tr>' \
+                    f'<td ><img class="img-fluid" data-toggle="modal" href="#row-settings" src="{photo_prod[0]}" alt="" style="max-width:150px;"></td>' \
                     f'<td>{row.name}</td>' \
+                    f'<th >{row.total_sales} шт</th>' \
+                    f'<th>{row.price}</th>' \
+                    f'<td >{row.article}</td>' \
                     f'<td >{row.shop_name}</td>' \
-                    f'<td >{row.total_sales}</td>' \
-                    f'<td >{str(row.shipment_date).replace("T", " ").replace("Z","")}</td>' \
+                    f'<td >{str(row.shipment_date).replace("T", " ").replace("Z", "")}</td>' \
                     f'</tr>'
 
-        return unescape(render_template('table-assembly-sales.html',
-                                        rows=rows, role=role,
+        for row2 in shipment_orders.items:
+            # print(22222222222, row2)
+            get_photo_prod2 = (select(Product.photo)
+                       .where(Product.articul_product == row2.article)
+                       .where(Product.shop_name == row2.shop_name))
+
+            photo_prod2 = db.session.execute(get_photo_prod2).first()
+            if not photo_prod2 or photo_prod2 is None:
+                photo_prod2 = 'нет фото'
+
+            rows_shipment += '<tr>' \
+                    f'<td ><img class="img-fluid" data-toggle="modal" href="#row-settings" src="{photo_prod2[0]}" alt="" style="max-width:150px;"></td>' \
+                    f'<td>{row2.name}</td>' \
+                    f'<th >{row2.total_sales} шт</th>' \
+                    f'<th>{row2.price}</th>' \
+                    f'<td >{row2.article}</td>' \
+                    f'<td >{row2.shop_name}</td>' \
+                    f'<td >{str(row2.shipment_date).replace("T", " ").replace("Z", "")}</td>' \
+                    f'</tr>'
+
+
+        return unescape(render_template('table-assembly-shipment.html',
+                                        rows_assembly=rows_assembly, role=role,
+                                        rows_shipment=rows_shipment,
                                         max_page=max_page,
                                         total_assembly_sales=total_assembly_sales,
                                         assembly_sales=assembly_orders,
@@ -1742,6 +1967,7 @@ def assembly_sales(page=1):
                                         user_name=user_name,
                                         shops=rows_shops,
                                         select_shop_name=shop))
+
 
 
 @auth.route('/users-table')
@@ -2650,7 +2876,7 @@ def distributors_prices():
                     current = {i: True for i in proxy_settings[str(row.id)]}
 
                     current_work.update(current)
-                    print(33333333, current, current_work, row.id)
+                    # print(44444, current, current_work, row.id)
                     db.session.execute(update(DistributorPrice)
                                        .where(DistributorPrice.id == row.id)
                                        .values(current_work))
@@ -2768,7 +2994,7 @@ def page_server_error(error):
         user_name = current_user.name
         role = current_user.roles
         return render_template("blank-500.html", title='500',
-                           role=role,
-                           photo=photo,
-                           user_name=user_name,
-                           error=error), 500
+                               role=role,
+                               photo=photo,
+                               user_name=user_name,
+                               error=error), 500

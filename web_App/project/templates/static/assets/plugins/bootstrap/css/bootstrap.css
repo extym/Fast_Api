@@ -637,6 +637,13 @@ pre code {
   padding-left: 15px;
 }
 
+.col-6-2 {
+  position: relative;
+  width: 100%;
+  padding-right: 35px;
+  padding-left: 15px;
+}
+
 .col {
   -ms-flex-preferred-size: 0;
   flex-basis: 0;
@@ -719,6 +726,12 @@ pre code {
 }
 
 .col-6 {
+  -ms-flex: 0 0 50%;
+  flex: 0 0 50%;
+  max-width: 50%;
+}
+
+.col-6-2 {
   -ms-flex: 0 0 50%;
   flex: 0 0 50%;
   max-width: 50%;
