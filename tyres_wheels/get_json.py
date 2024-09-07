@@ -1,7 +1,7 @@
 import json
 import sys
 
-from connect import check_write_json_v4
+from connect_mysql import check_write_json_v4
 import requests
 import random
 import string
@@ -183,6 +183,115 @@ def standart_wheels_from_json(without_db=False):
     return diction
 
 
+def standart_wheels_from_json_v2(without_db=True):
+    wheels = get_data_from_json()[0]
+    diction, proxy = {}, []
+    dict_result = {}
+    for prod in wheels:
+        try:
+            in_stock = count(prod)
+            if in_stock >= 4:
+                enabled = 1
+            else:
+                enabled = 0
+            name = prod['name']
+            vendor = prod['brand']
+            description = prod.get("rim_type") + ' диск ' + vendor + name
+            if vendor == 'Carwel':
+                description = name
+            elif vendor == '':
+                break
+            # check category wheels and tyres
+            category_id = categories_wheels.get(vendor, categories_wheels_upper.get(vendor.upper()))
+            if not category_id:
+                category_id = cats_wheels_upper.get(vendor.upper(), 4000)
+                print(444000, prod)
+            price_data = get_price(prod)
+            price = price_data[0]
+            rule = price_data[1]
+            price_opt = price_data[2]
+            name_picture = '77777777'
+            product_code = prod['cae']
+            image_url = prod.get('img_big_my')
+            if image_url:
+                name_picture = vendor.replace(' ', '') + '_' + product_code + '.png'
+            image_tuple = (name_picture, image_url)
+            koeff = 1
+            meta_d = 'литые диски ' + name + ' в интернет-магазине шин и дисков 1000koles.ru'
+            meta_k = 'литые диски, легкосплавные диски, колеса, цена, купить, в Москве, в интернет-магазине'
+            meta_h1 = ' '
+            params = 1
+            provider = '4tochki'
+            category = 5
+            options = {
+                'et': 'ET' + str(prod.get('et')).replace('.', ','),  # 18
+                "bolts_spacing": str(prod.get('bolts_count'))  # 17
+                                 + '/' +
+                                 str(prod.get('bolts_spacing'))
+                                 .replace('.', ','),
+                'diameter': str(prod.get('diameter')),
+                'dia': 'D' + str(prod.get('dia')).replace('.', ','),
+                'width': str(prod.get('width')).replace('.', ',')
+            }
+
+            diction.update({vendor.strip() + product_code:
+                (
+                    [
+                        category_id, name, description, price, in_stock,
+                        enabled, product_code, vendor, meta_d, meta_k,
+                        params, koeff, meta_h1, provider, category
+                    ],
+                    image_tuple,
+                    options,
+                    rule,
+                    price_opt
+                )})
+
+            dict_result.update({vendor.strip() + product_code:
+                {
+                    "category_id": category_id,
+                    "name": name,
+                    "description": description,
+                    "price": price,
+                    "in_stock": in_stock,
+                    "enabled": enabled,
+                    "product_code": product_code,
+                    "vendor": vendor,
+                    "meta_d": meta_d,
+                    "meta_k": meta_k,
+                    "params": params,
+                    "koeff": koeff,
+                    "meta_h1": meta_h1,
+                    "provider": provider,
+                    "category": category,
+                    'et': 'ET' + str(prod.get('et')).replace('.', ','),  # 18
+                    "bolts_spacing": str(prod.get('bolts_count'))  # 17
+                                     + '/' +
+                                     str(prod.get('bolts_spacing'))
+                                     .replace('.', ','),
+                    'diameter': str(prod.get('diameter')),
+                    'dia': 'D' + str(prod.get('dia')).replace('.', ','),
+                    'width': str(prod.get('width')).replace('.', ',')
+                }
+            })
+
+        except Exception as error:
+            print('Some fuckup_standart_wheels_from_json {} {}'
+                  .format(error, prod))
+            continue
+
+    # if not without_db:
+    #     check_write_json_v4(diction)
+    # 
+    #     tires = get_data_from_json()[1]
+    #     tttires = standart_tires_from_json(tires)  # return dict
+    #     check_write_json_v4(tttires)
+
+    print("ALL_RIDE_get_wheels_json {}".format(len(diction.keys())))
+
+    return diction
+
+
 def standart_addons_from_json(without_db=True, data=None):
     if not data:
         data = get_data_from_json()[0]
@@ -247,6 +356,7 @@ def standart_addons_from_json(without_db=True, data=None):
 
 def standart_tires_from_json(tyres):
     diction = {}
+    dict_result = {}
     for prod in tyres:
         in_stock = count(prod)
         if in_stock >= 4:
@@ -301,7 +411,114 @@ def standart_tires_from_json(tyres):
                 rule
             )})
 
+        dict_result.update({vendor.strip() + product_code:
+            {
+                "category_id": category_id,
+                "name": name,
+                "description": description,
+                "price": price,
+                "in_stock": in_stock,
+                "enabled": enabled,
+                "product_code": product_code,
+                "vendor": vendor,
+                "meta_d": meta_d,
+                "meta_k": meta_k,
+                "params": params,
+                "koeff": koeff,
+                "meta_h1": meta_h1,
+                "provider": provider,
+                "category": category,
+                'diameter': prod.get('diameter'),
+                'width': prod.get('width'),
+                'profile': prod.get('height')
+            }
+        })
+
     return diction
+
+
+def standart_tires_from_json_v2(tyres):
+    diction = {}
+    dict_result = {}
+    for prod in tyres:
+        in_stock = count(prod)
+        if in_stock >= 4:
+            enabled = 1
+        else:
+            enabled = 0
+        name = prod['name']
+        vendor = prod['brand']
+        description = vendor + ' ' + name
+        if vendor == 'Carwel':
+            description = name
+        elif vendor == '':
+            continue  # break
+        # check category wheels and tyres
+        category_id = 0
+        if not category_id and prod.get('season') == 'Летняя':
+            category_id = cats_summer_upper.get(vendor.upper(), 4000)
+        elif not category_id and prod.get('season') == 'Зимняя':
+            category_id = cats_winter_upper.get(vendor.upper(), 5000)
+        elif not category_id and prod.get('season') == 'Всесезонная':
+            category_id = cats_winter_upper.get(vendor.upper(), 6000)
+        price = get_price_tires(prod)
+        category = 12
+        rule = False
+        product_code = prod['cae']
+        name_picture = '88888888'
+        image_url = prod.get('img_big_my')
+        if image_url:
+            name_picture = vendor.strip() + '_' + product_code + '.png'
+        image_tuple = (name_picture, image_url)
+        koeff = 1
+        meta_d = 'летняя и зимняя резина ' + name + ' в интернет-магазине шин и дисков 1000koles.ru'
+        meta_k = 'летняя и зимняя резина, колеса, цена, купить, в Москве, в интернет-магазине'
+        meta_h1 = ' '
+        params = 1
+        provider = '4tochki'
+        options = {
+            'diameter': prod.get('diameter'),
+            'width': prod.get('width'),
+            'profile': prod.get('height')
+        }
+
+        diction.update({vendor.strip() + product_code:
+            (
+                [
+                    category_id, name, description, price, in_stock,
+                    enabled, product_code, vendor, meta_d, meta_k,
+                    params, koeff, meta_h1, provider, category
+                ],
+                image_tuple,
+                options,
+                rule
+            )})
+
+        dict_result.update({vendor.strip() + product_code:
+            {
+                "category_id": category_id,
+                "name": name,
+                "description": description,
+                "price": price,
+                "in_stock": in_stock,
+                "enabled": enabled,
+                "product_code": product_code,
+                "vendor": vendor,
+                "meta_d": meta_d,
+                "meta_k": meta_k,
+                "params": params,
+                "koeff": koeff,
+                "meta_h1": meta_h1,
+                "provider": provider,
+                "category": category,
+                'diameter': prod.get('diameter'),
+                'width': prod.get('width'),
+                'profile': prod.get('height')
+            }
+        })
+
+    return diction
+
 
 # standart_wheels_from_json()
 # wwwheels = wheels_from_json(wheels)

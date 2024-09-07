@@ -6,7 +6,7 @@ from cred import DATA_PATH, magic_link_csv, magic_link_csv2
 import wget
 import csv
 import datetime
-from connect import check_write_json, check_write_json_v4
+from connect_mysql import check_write_json, check_write_json_v4
 from categories import *
 from urllib.request import urlretrieve
 import urllib3
@@ -193,6 +193,113 @@ def standart_tyres_csv():
     return global_result
 
 
+def standart_tyres_csv_v2():
+    proxy_data, proxy = [], []
+    global_result = {}
+    dict_result = {}
+    data = get_data_csv()
+    for i in range(1, len(data)):
+        try:
+            if data[i][1] == 'title':
+                continue
+            else:
+                in_stock = int(data[i][22])
+                if in_stock >= 4:
+                    enabled = 1
+                else:
+                    enabled = 0
+                name = data[i][1]
+                vendor = data[i][5]
+                if vendor == 'Carwel':
+                    description = name
+                elif vendor == '':
+                    continue
+                else:
+                    description = data[i][1]
+                category_id = 7000
+                if data[i][4] in ['S', 's', 'Летняя']:
+                    category_id = cats_summer_upper.get(vendor.upper(), 4000)
+                elif data[i][4] in ["W", 'Зимняя']:
+                    category_id = cats_winter_upper.get(vendor.upper(), 5000)
+                elif data[i][4] in ["allseason", 'Всесезонная']:
+                    category_id = cats_allseason_upper.get(vendor.upper(), 6000)
+                else:
+                    print('1212_category_id', data[i][4])
+                category = 12
+                rule = False
+                # check category wheels and tyres
+                product_code = data[i][2]
+                size = data[i][7]  # 16 'diameter'
+                width = data[i][8]  # 14
+                height = data[i][9]  # 15
+                sku = data[i][0]
+                name_picture = '88888888'
+                image_url = data[i][20]  # image_link
+                if image_url:
+                    # name_picture = 'shins-' + id_generator() + '.png'
+                    name_picture = 'shins-' + product_code + '.png'
+                image_tuple = (name_picture, image_url)
+                price = count_price(data[i][17], size)
+                koeff = 1
+                meta_d = 'летняя и зимняя резина ' + name + ' в интернет-магазине шин и дисков 1000koles.ru'
+                meta_k = 'летняя и зимняя резина, колеса, цена, купить, в Москве, в интернет-магазине'
+                meta_h1 = ' '
+                provider = 'shins'
+                params = 1
+                options = {
+                    'diameter': size,
+                    'width': width,
+                    'profile': height
+                }
+
+                global_result.update({vendor.strip() + product_code:
+                    (
+                        [category_id, name, description, price,
+                         in_stock, enabled, product_code, vendor, meta_d, meta_k,
+                         params, koeff, meta_h1, provider, category],
+                        image_tuple,
+                        options,
+                        rule
+                    )})
+                dict_result.update({vendor.strip() + product_code:
+                    {
+                        "category_id": category_id,
+                        "name": name,
+                        "description": description,
+                        "price": price,
+                        "in_stock": in_stock,
+                        "enabled": enabled,
+                        "product_code": product_code,
+                        "vendor": vendor,
+                        "meta_d": meta_d,
+                        "meta_k": meta_k,
+                        "params": params,
+                        "koeff": koeff,
+                        "meta_h1": meta_h1,
+                        "provider": provider,
+                        "category": category,
+                        'diameter': size,
+                        'width': width,
+                        'profile': height
+                    }
+                })
+                # result = ([category_id, name, description, price, in_stock, enabled, product_code, vendor, meta_d, meta_k,
+                #  params, koeff, meta_h1, category], image_tuple, options)
+                # proxy_data.append(result)
+
+        except KeyError as error:
+            print("Something went wrong KeyError from getcsv: {}".format(error))
+            # write(str(data))
+            print(str(data[i]))
+            continue
+
+    # mem = sys.getsizeof(proxy_data)
+    #
+    # print(mem / 1000, 'Kb--')
+    print("ALL_RIDE_get_tyres_csv ()".format(len(global_result)))
+    return dict_result, global_result
+
+
 def standart_wheels_csv(without_db=False):
     data = get_data_wheels_csv()
     global_result = {}
@@ -272,6 +379,108 @@ def standart_wheels_csv(without_db=False):
     print('ALL_RIDE_get_wheels_csv ', len(global_result))
     return global_result
 
+
+def standart_wheels_csv_v2(without_db=True):
+    data = get_data_wheels_csv()
+    global_result = {}
+    dict_result = {}
+    for i in range(1, len(data)):
+        if data[i][1] == 'title':
+            continue
+        else:
+            try:
+                in_stock = int(data[i][17]) + int(data[i][18])
+                if in_stock >= 4:
+                    enabled = 1
+                else:
+                    enabled = 0
+                name = data[i][1]
+                vendor = data[i][3]
+                description = name
+                category_id = categories_wheels.get(vendor)
+                if category_id is None:
+                    category_id = cats_wheels_upper.get(vendor.upper(), 4000)
+                category = 5
+                # check category wheels and tyres
+                product_code = data[i][2]
+                diameter = data[i][7].split(' / ')[0]  # 16 'diameter'
+                width = data[i][7].split(' / ')[1].strip("0").replace('.', ',').strip(',')  # 20
+                hole = 'D' + data[i][12].strip("0").replace('.', ',')  # 19
+                bolts_spacing = data[i][8] + '/' + \
+                                data[i][9].strip("0").replace('.', ',')  # 17
+                et = 'ET' + data[i][11].strip("0").replace('.', ',').strip(',')  # 18
+                sku = data[i][0]
+                name_picture = '777777777'
+                image_url = data[i][16]  # image_link
+                if image_url:
+                    name_picture = 'shins-' + product_code + '.png'
+                image_tuple = (name_picture, image_url)
+                price_rrc = data[i][15]
+                price = float(price_rrc)
+                price_opt = data[i][14]
+                rule = False
+                if int(price_opt) * 1.18 >= int(price_rrc):
+                    rule = True
+                koeff = 1
+                meta_d = 'летняя и зимняя резина ' + name + ' в интернет-магазине шин и дисков 1000koles.ru'
+                meta_k = 'летняя и зимняя резина, колеса, цена, купить, в Москве, в интернет-магазине'
+                meta_h1 = ' '
+                params = 1
+                provider = 'shins'
+                options = {
+                    'et': et,  # 18
+                    "bolts_spacing": bolts_spacing,  # 17
+                    'diameter': diameter,  # 16
+                    'dia': hole,  # 19
+                    'width': width  # 20
+                }
+                global_result.update({vendor.strip() + product_code:
+                    (
+                        [category_id, name, description, price, in_stock,
+                         enabled, product_code, vendor, meta_d, meta_k,
+                         params, koeff, meta_h1, provider, category],
+                        image_tuple,
+                        options,
+                        rule,
+                        price_opt
+                    )})
+                dict_result.update({vendor.strip() + product_code:
+                    {
+                        "category_id": category_id,
+                        "name": name,
+                        "description": description,
+                        "price": price,
+                        "in_stock": in_stock,
+                        "enabled": enabled,
+                        "product_code": product_code,
+                        "vendor": vendor,
+                        "meta_d": meta_d,
+                        "meta_k": meta_k,
+                        "params": params,
+                        "koeff": koeff,
+                        "meta_h1": meta_h1,
+                        "provider": provider,
+                        "category": category,
+                        'et': et,  # 18
+                        "bolts_spacing": bolts_spacing,
+                        'diameter': diameter,
+                        'dia': hole,
+                        'width': width
+                        }
+                })
+
+            except Exception as er:
+                print('fuckup standart getcsv {} {}'.format(er, data[i]))
+
+    # if not without_db:
+    #     check_write_json_v4(global_result)
+    #     data = standart_tyres_csv()
+    #     mems = sys.getsizeof(data)
+    #     print('from_csv', mems / 1000, 'Kb')
+    #     check_write_json_v4(data)
+
+    print('ALL_RIDE_get_wheels_csv ', len(global_result))
+    return dict_result, global_result
 
 # data = standart_tyres_csv()
 # mems = sys.getsizeof(data)

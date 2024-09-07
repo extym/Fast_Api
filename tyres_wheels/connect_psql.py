@@ -4,7 +4,7 @@ import csv
 import datetime
 # from pictures import write
 import json
-import mysql.connector
+import psycopg2
 from main import get_wheels, get_new_pages, get_new_pages_v2
 import requests
 from cred import *
@@ -13,6 +13,107 @@ from categories import *
 from pictures import dowload_images
 
 
+create_new_product = """
+CREATE TABLE IF NOT EXISTS products (
+id SERIAL PRIMARY KEY,
+vendor_code varchar,
+active TEXT,
+available varchar,
+bundle varchar,
+canBuyZero varchar,
+code varchar,
+createdBy varchar,
+dateActiveFrom varchar,
+dateActiveTo varchar,
+dateCreate varchar,
+detailPicture varchar,
+detailText varchar,
+detailTextType varchar,
+height varchar,
+iblockId int,
+iblockSectionId int,
+id_bitrix int,
+id_price int,
+length_prod varchar,
+measure varchar,
+modifiedBy varchar,
+name_prod varchar,
+previewPicture varchar,
+previewText varchar,
+previewTextType varchar,
+property574 varchar,
+property575 varchar,
+property576 varchar,
+property577 varchar,
+property578 varchar,
+property579 varchar,
+property580 varchar,
+property582 varchar,
+property583 varchar,
+property584 varchar,
+property585 varchar,
+property586 varchar,
+property587 varchar,
+property588 varchar,
+property589 varchar,
+property590 varchar,
+property591 varchar,
+property592 varchar,
+property593 varchar,
+property594 varchar,
+property595 varchar,
+property596 varchar,
+property597 varchar,
+property598 varchar,
+property599 varchar,
+property600 varchar,
+property601 varchar,
+property602 varchar,
+property603 varchar,
+property605 varchar,
+property606 varchar,
+property607 varchar,
+property610 varchar,
+property612 varchar,
+property614 varchar,
+property737 varchar,
+property738 varchar,
+property739 varchar,
+property740 varchar,
+property741 varchar,
+property742 varchar,
+property743 varchar,
+property744 varchar,
+property745 varchar,
+property746 varchar,
+property747 varchar,
+property748 varchar,
+property749 varchar,
+property750 varchar,
+property751 varchar,
+property752 varchar,
+property753 varchar,
+property754 varchar,
+property755 varchar,
+property756 varchar,
+property757 varchar,
+purchasingCurrency varchar,
+purchasingPrice varchar,
+quantity int,
+quantityReserved int,
+quantityTrace varchar,
+sort int,
+subscribe varchar,
+timestampX varchar,
+type_prod varchar,
+vatId varchar,
+vatIncluded varchar,
+weight varchar,
+width varchar,
+xmlId int,
+UNIQUE (id)
+)
+"""
 def write(smth):
     try:
         with open('log.txt', 'a') as file:
@@ -50,7 +151,6 @@ def write_pictures_data(listt):
 
 
 def rewrite_pictures_data(listt):
-
     with open(DATA_PATH + '/dict_images.json', "r") as read_file:
         data_list = json.load(read_file)
         print('file_images_read', len(data_list))
@@ -153,7 +253,7 @@ def standart_product_v2(list_wheels_json):
             if not description:
                 description = name
             vendor = dictionary.get('vendor').replace('"', '')
-            category_id = categories_wheels\
+            category_id = categories_wheels \
                 .get(vendor, cats_wheels_upper.get(vendor.upper(), 7000))
             price_opt = int(dictionary.get('price').strip('"').replace('\xa0', '').split('.')[0])
             price = float(dictionary.get('RoznicaPrice').strip('"').replace('\xa0', '').split('.')[0])
@@ -198,7 +298,7 @@ def standart_product_v2(list_wheels_json):
                 ],
                 image_tuple,
                 options,
-                rule, 
+                rule,
                 price_opt)})
 
             # result = ([category_id, name, description, price, in_stock, enabled, product_code, vendor, meta_d, meta_k,
@@ -294,18 +394,23 @@ def params_options(dictionary, product_id):
 
 
 def create_connection():
-    connx = None
+    connect = None
     try:
         if LOCAL_MODE:
-            connx = mysql.connector.connect(user=local_user_db, database=local_name_db,
-                                            password=local_pass_db, host=local_host_db)
+            with psycopg2.connect(user=local_user_pg,
+                                  database=local_name_pg,
+                                  password=local_pass_pg,
+                                  host=local_host_pg) as connect:
+                return connect
         else:
-            connx = mysql.connector.connect(user=user_db, database=name_db,
-                                            password=pass_db, host=host_db)
+            with psycopg2.connect(user=user_db_pg,
+                                  database=name_db_pg,
+                                  password=pass_db_pg,
+                                  host=host_db_pg) as connect:
+                return connect
+
     except ConnectionError as error:
         print(f'We have ERROR CREATE_CONN {error}')
-
-    return connx
 
 
 def make_query_get_id(connection, query, data_query):
@@ -324,7 +429,7 @@ def make_query_get_id(connection, query, data_query):
     return lastrow_id
 
 
-def make_query_get_id_v2( query, data_query):
+def make_query_get_id_v2(query, data_query):
     connection = create_connection()
     if connection.is_connected():
         cursor = connection.cursor()
@@ -348,6 +453,7 @@ def make_query_v2(query, data_query):
         cursor.close()
         connection.close()
 
+
 def make_query_many_v2(query, data_query):
     connection = create_connection()
     if connection.is_connected():
@@ -357,6 +463,7 @@ def make_query_many_v2(query, data_query):
 
         cursor.close()
         connection.close()
+
 
 def makery(connection, query, data):
     cursor = connection.cursor(buffered=True)
@@ -374,19 +481,20 @@ def makery(connection, query, data):
     cursor.close()
 
 
-def create_database(connection, query):
-    cursor = connection.cursor()
-    try:
-        cursor.execute(query)
-        print("Database created successfully")
-    except Exception as e:
-        print(f"The error DATABASE CREATE '{e}' occurred")
+def create_query(query):
+    connection = create_connection()
+    with connection.cursor() as cursor:
+        try:
+            cursor.execute(query)
+            print("Query created successfully")
+        except Exception as e:
+            print(f"The error CREATE '{e}' occurred")
 
 
 add_product_picture = ("UPDATE avl_products SET default_picture = %s  WHERE productID = %s")
 
 update = ("UPDATE avl_products SET Price = %s, in_stock = %s, enabled = %s, date_modified = NOW()  "
-                 "WHERE categoryID = %s AND product_code = %s")
+          "WHERE categoryID = %s AND product_code = %s")
 
 add_options = ("INSERT INTO avl_product_options_values (optionID, productID, option_value) VALUES (%s, %s, %s)")
 
@@ -578,9 +686,9 @@ def check_and_write_v4():
                 product_id = make_query_get_id_v2(add_product, data_product[0])
                 ij_data.append({product_id: data_product[1]})
                 picture_id = make_query_get_id_v2(add_pictures,
-                                               [product_id, data_product[1][0]])
+                                                  [product_id, data_product[1][0]])
                 proxy_data = [picture_id, product_id]
-                make_query_v2(add_product_picture,  proxy_data)
+                make_query_v2(add_product_picture, proxy_data)
                 data_options = params_optwheels(data_product[2], product_id)
                 # for option in data_options:
                 #     make_query_v2(add_options, option)
@@ -607,7 +715,7 @@ def check_and_write_v4():
                     product_id = make_query_get_id_v2(add_product, data_product[0])
                     ij_data.append({product_id: data_product[1]})
                     picture_id = make_query_get_id_v2(add_pictures,
-                                                   [product_id, data_product[1][0]])
+                                                      [product_id, data_product[1][0]])
                     proxy_data = [picture_id, product_id]
                     make_query_v2(add_product_picture, proxy_data)
 
@@ -768,7 +876,7 @@ def check_write_json_v4(data_from_json):
                 product_id = make_query_get_id_v2(add_product, data_product[0])
                 ij_data.append({product_id: data_product[1]})
                 picture_id = make_query_get_id_v2(add_pictures,
-                                               [product_id, data_product[1][0]])
+                                                  [product_id, data_product[1][0]])
                 proxy_data = [picture_id, product_id]
                 make_query_v2(add_product_picture, proxy_data)
                 data_options = params_optwheels(data_product[2], product_id)
@@ -796,7 +904,7 @@ def check_write_json_v4(data_from_json):
                     product_id = make_query_get_id_v2(add_product, data_product[0])
                     ij_data.append({product_id: data_product[1]})
                     picture_id = make_query_get_id_v2(add_pictures,
-                                                   [product_id, data_product[1][0]])
+                                                      [product_id, data_product[1][0]])
                     proxy_data = [picture_id, product_id]
                     make_query_v2(add_product_picture, proxy_data)
                     data_options_tyres = params_optyres(data_product[2], product_id)
@@ -842,3 +950,6 @@ def get_smth_please():
     data = response.json()
 
     return data
+
+
+create_query(create_new_product)
