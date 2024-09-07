@@ -397,6 +397,23 @@ def create_data_price_for_send_v2(koef_acceptor=None, donor=None,
     return result
 
 
+def post_get_warehouse(seller_id=None, key=None):
+    metod = '/v1/warehouse/list'
+    headers = {
+        'Client-Id': seller_id,
+        'Api-Key': key,
+        'Content-Type': 'application/json'
+    }
+    link = host + metod
+    response = requests.post(link, headers=headers)
+    if response.ok:
+        data = response.json()
+        print('post_get_warehouse', *data.get('result'), sep='\n')
+        return True, data
+    else:
+        print("Error_post_get_warehouse {}".format(response.text))
+        return False, response.json().get("message")
+
 def send_stocks_oson_v2(key=None, seller_id=None, is_stocks_null=False):
     pre_data = create_data_stocks_from_db_v2(seller_id=seller_id,
                                              is_stocks_null=is_stocks_null)
@@ -498,6 +515,88 @@ def send_stocks_oson_v3(key_acceptor=None, donor_name=None,
                  .format(acceptor, global_count, global_error, all, last_error))
 
 
+async def send_stocks_price_oson(articul_product=None,
+                                 external_sku=None,
+                                 quantity=None,
+                                 seller_id=None,
+                                 key_mp=None,
+                                 base_price: int = None):
+    flag_result_price = False
+    flag_result_stocks = False
+    result_stocks, stock_error = 0, 0
+    result_price, price_error = 0, 0
+    headers = {
+        'Client-Id': seller_id,
+        'Api-Key': key_mp,
+        'Content-Type': 'application/json'
+    }
+    if quantity:
+        wh_list = post_get_warehouse(seller_id=seller_id,
+                                     key=key_mp)
+        if wh_list[0]:
+            warehouses = [i['warehouse_id'] for i in wh_list[1]]
+            one_stock = {
+                'offer_id': articul_product,
+                'product_id': external_sku,
+                'stock': quantity
+            }
+            data_stocks = [one_stock.update({"warehouse_id": i}) for i in warehouses]
+
+            data = {'stocks': data_stocks}
+            response = requests.post(host + '/v2/products/stocks',
+                                     headers=headers, json=data)
+            if response.ok:
+                answer = response.json()
+                result = answer.get("result")
+                if result:
+                    for row in result:
+                        if len(row["errors"]) > 0:
+                            # print('ERROR from send_stocks_ozon', row)
+                            stock_error += 1
+                        elif row['updated'] == True:
+                            result_stocks += 1
+                        #     print('SUCCES update from send_stocks_on', row)
+                    flag_result_stocks = not len(warehouses) != result_stocks
+                logging.info('All Ride Send_stocks_oson_v2 - seller_id {}, '
+                             ' updated {}, errors {}.'
+                             .format(seller_id, result_stocks, stock_error))
+            else:
+                logging.info('Trouble_stocks_oson_v2 - seller_id {}, '
+                             '  updated {}, errors {}, answer {}'
+                             .format(seller_id,
+                                     result_stocks, stock_error, response.text))
+                print('answer send_stocks_oson_v2', response.text)
+
+        else:
+            result_stocks = wh_list[1]
+
+    if base_price:
+        link = 'https://api-seller.ozon.ru/v1/product/import/prices'
+        price = int(base_price) * 8
+        data_price = {
+            "prices": [
+                {
+                    "auto_action_enabled": "UNKNOWN",
+                    "currency_code": "RUB",
+                    "min_price": price,
+                    "offer_id": articul_product,
+                    # "old_price": "",
+                    "price": price,
+                    "price_strategy_enabled": "UNKNOWN",
+                    "product_id": external_sku
+                }
+            ]
+        }
+        answer_price = requests.post(link, json=data_price, headers=headers)
+        if answer_price.ok:
+            data_answer = answer_price.json()
+            if data_answer.get('updated'):
+                flag_result_price = True
+                result_price += 1
+
+    return flag_result_stocks, result_stocks, flag_result_price, result_price
+
+
 def send_product_price(key_acceptor=None, acceptor=None, send_tg=True):
     metod = 'https://api-seller.ozon.ru/v1/product/import/prices'
     #   "limit": 1000
@@ -545,3 +644,4 @@ def send_product_price(key_acceptor=None, acceptor=None, send_tg=True):
 # asyncio.run(create_data_stocks())
 # create_data_stocks_from_db(seller_id="1278621", is_stocks_null=False)
 # create_data_price_for_send(seller_id="1278621", from_db=True)
+# post_get_warehouse('1392220', 'd6ce8a16-f2e7-4c29-9f9b-92ec731d4691')

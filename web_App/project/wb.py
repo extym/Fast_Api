@@ -71,14 +71,14 @@ def get_wh(key=None):
         return answer.status_code, answer.json()
     else:
         print('errot_get_wh', answer.text)
-        return answer.status_code, answer.text
+        return answer.status_code, answer.json().get('message')
 
 
 def get_wh_v2(shop_name=None, split_wh=False, user_id=None):
     with Session(engine) as session:
         # we get ALL because maybe a few keys with different tags
         key_data = session.scalars(select(Marketplaces)
-                             .where(Marketplaces.shop_name==shop_name)).all()
+                                   .where(Marketplaces.shop_name == shop_name)).all()
     for row in key_data:
         print(346788888, row.tags)
         proxy = ''
@@ -94,11 +94,11 @@ def get_wh_v2(shop_name=None, split_wh=False, user_id=None):
                 if not split_wh:
                     wh = [i['id'] for i in answer.json()]
                     result = session.execute(update(Marketplaces)
-                                             .where(Marketplaces.shop_name==proxy)
+                                             .where(Marketplaces.shop_name == proxy)
                                              .values(warehouses=wh, warehouse_name='all_wh')
                                              )
                     session.commit()
-                    print('SUCCESS_get_warehouses', wh,  result)
+                    print('SUCCESS_get_warehouses', wh, result)
                 else:
                     wh = {i['id']: i['name'] for i in answer.json()}
                     for key, value in wh.items():
@@ -328,14 +328,14 @@ def send_price_to_wb(seller_id=None, sourse=None):
 
 
 def make_import_export_wb_price(donor=None, acceptor=None,
-                                  k=1):
+                                k=1):
     if donor is not None and acceptor is not None:
         data = []
         with Session(engine) as session:
             session.begin()
             acceptor_data = session.execute(select(Marketplaces.seller_id,
-                                                    Marketplaces.key_mp)
-                                             .where(Marketplaces.shop_name == acceptor)) \
+                                                   Marketplaces.key_mp)
+                                            .where(Marketplaces.shop_name == acceptor)) \
                 .first()
             product_data = session.query(Product).filter_by(shop_name=donor).all()
 
@@ -412,6 +412,7 @@ def send_stocks_wb_v2(seller_id=None, is_stocks_null=None, sourse=None):
                 print('All_ride_send to WB - wh {} stocks {} - result {}'
                       .format(wh_id, len(wh_id), answer.text))
 
+
 # send_stocks_wb_v2(seller_id='198178')
 
 def send_stocks_wb_v3(donor=None, acceptor=None):
@@ -427,7 +428,7 @@ def send_stocks_wb_v3(donor=None, acceptor=None):
             key_wh_recip = datas.mp_key
             key_acceptor = datas.mp_key
 
-    if key_wh_recip != ''  and key_acceptor != '':
+    if key_wh_recip != '' and key_acceptor != '':
         data = make_send_data_stocks_v3(key_wh_recip=key_wh_recip, seller_id=donor)
         for wh_id, value in data.items():
             metod = f'https://suppliers-api.wildberries.ru/api/v3/stocks/{wh_id}'
@@ -444,6 +445,64 @@ def send_stocks_wb_v3(donor=None, acceptor=None):
     else:
         logging.error("Some error with keys from send_stocks_wb_v3 - donor {}, res {}"
                       .format(donor, acceptor))
+
+
+async def send_stocks_price_wb(articul_product=None,
+                               external_sku=None,
+                               quantity=None,
+                               seller_id=None,
+                               key_mp=None,
+                               base_price=None):
+    headers = {'Content-type': 'application/json',
+               'Authorization': key_mp}
+    result_price = False
+    result_stocks = False
+    if base_price:
+        price = int(base_price) * 8
+        data_price = {"data": [
+            {
+                "nmID": external_sku,
+                "price": price,
+                "discount": None
+            }
+        ]
+        }
+        url_price = 'https://discounts-prices-api.wildberries.ru/api/v2/upload/task'
+        answer_price = requests.post(url_price,
+                                     data=json.dumps(data_price),
+                                     headers=headers)
+        result_price = not answer_price.json().get("data")["errors"]
+    if quantity:
+        outlets_data = get_wh(key=key_mp)
+        if outlets_data[0] == 200:
+            outlets = [i['id'] for i in outlets_data[1]]
+
+            data_stocks = {}
+            count, error_count = 0, 0
+            for w_house in outlets:
+                proxy = {
+                    'sku': external_sku,
+                    'amount': quantity
+                }
+                data_stocks[w_house] = {'stocks': proxy}
+
+            for key, value in data_stocks.items():
+                metod = '/api/v3/stocks/'
+                target = link + metod + str(key)
+                print('SEND_WB', key, len(value['stocks']))
+                answer = requests.put(target, data=json.dumps(value), headers=headers)
+                re_data = answer.text
+                if answer.ok:
+                    count += 1
+                    result_stocks = True
+                    print(33334, re_data)
+                else:
+                    error_count += 1
+
+        else:
+            result_stocks = outlets_data[1]
+
+    return result_stocks, result_price
 
 
 def check_is_exist(id_mp, shop):

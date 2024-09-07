@@ -1,9 +1,10 @@
 import datetime
 import logging
 import os
+import sys
 import time
 from html import unescape
-from .creds import LOCAL_MODE, WHEELS
+from project.creds import LOCAL_MODE, WHEELS
 from flask import Blueprint, request, flash, render_template, redirect, url_for
 from flask_login import login_user, logout_user, login_required, current_user
 from psycopg2.errors import UniqueViolation
@@ -52,11 +53,13 @@ auth = Blueprint('auth', __name__)
 
 ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
+
 def reverse_date(string_date):
     t = string_date.split('/')
     t.insert(0, t[-1])
 
     return '-'.join(t[:-1])
+
 
 def back_shops_tasks():
     with Session(engine) as session:
@@ -229,6 +232,55 @@ def back_upload_prices():
                                   markup=row.upload_prices_markup,
                                   discount=row.upload_price_discount)
 
+
+async def back_send_stocks(store_dict=None,
+                           quantity: int = None,
+                           price=None):
+    count_oson_price, count_oson_stocks = 0, 0
+    count_wb_price, count_wb_stocks = 0, 0
+    for key, value in store_dict.items():
+        seller_id = value[0]
+        with Session(engine) as session:
+            data_mp = session.execute(
+                select(Marketplaces.key_mp, Marketplaces.name_mp)
+                .where(Marketplaces.seller_id == seller_id)) \
+                .first()
+            # print(55555555, data_mp)
+
+            if data_mp[1] == 'ozon':
+                result = await oson.send_stocks_price_oson(
+                    articul_product=key,
+                    external_sku=value[1],
+                    quantity=quantity,
+                    seller_id=seller_id,
+                    key_mp=data_mp[1],
+                    base_price=price)
+                if result[0]:
+                    count_oson_stocks += 1
+                else:
+                    count_oson_stocks = result[1]
+                if result[2]:
+                    count_oson_price += 1
+                else:
+                    count_oson_price = result[3]
+
+            elif data_mp[1] == 'wb':
+                result = await wb.send_stocks_price_wb(
+                    articul_product=key,
+                    external_sku=value[1],
+                    quantity=quantity,
+                    seller_id=seller_id,
+                    key_mp=data_mp[1],
+                    base_price=price)
+                if result[0]:
+                    count_wb_stocks += 1
+                if result[1]:
+                    count_wb_price += 1
+
+    return count_oson_price, count_oson_stocks, count_wb_price, count_wb_stocks
+
+
+# back_send_stocks(store_dict={'НФ-00001814/322': ('1392220', '1283050212')})
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -1303,7 +1355,7 @@ def edit_price_product(product=None):
 
 @auth.route('/edit_price_product', methods=['POST'])
 @login_required
-def edit_price_product_post():
+async def edit_price_product_post():
     data = request.form.to_dict()
     print(23423456, data)
     role = current_user.roles
@@ -1312,7 +1364,8 @@ def edit_price_product_post():
     if not photo or photo is None:
         photo = 'prof-music-2.jpg'
     # print('/edit_product', *data, sep='\n')
-    print('Page_edit_product', *data, sep=', \n')
+    # print('Page_edit_product', *data, sep=', \n')
+    make = data.get('make')
     if 'search_product' in data:
         prod = None
         articul = data.get('search_product')
@@ -1334,16 +1387,12 @@ def edit_price_product_post():
             product = {}
         else:
             product = dict(prod[0].__dict__)
-            # print(111111111, *product.items(), sep='\n')
+            # print(111111111222222222222, *product.items(), sep='\n')
         rows_shops = db.session \
             .execute(select(Marketplaces.shop_name)
                      .where(Marketplaces.company_id == current_user.company_id)) \
             .all()
-        # print(rows_shops, type(rows_shops))
         rows = [row[0] for row in rows_shops]
-        # prod = Product.query.filter_by(articul_product="12345").first().__dict__
-        # print(22222, *product.items(), sep='\n')  # ' sep=' = prod.get(""),\n')
-        # print(33333, product)
 
         return render_template('/product-edit-price.html',
                                product=product,
@@ -1352,45 +1401,126 @@ def edit_price_product_post():
                                role=role,
                                user_name=user_name)
 
-    elif 'save_and_send' in data:
-        prod_set = Product(
-            uid_edit_user=current_user.id,
-            selected_mp=data.get('selected_mp', '0'),
-            shop_name=data.get('set_shop_name', '0'),
-            articul_product=data.get('articul_product', '0'),
-            name_product=data.get('name_product', '0'),
-            price_product_base=int(data.get('price_product_base', '0')),
-            price_add_k=data.get('price_add_k', '1'),
-            discount_mp_product=data.get('discount_mp_product', '0'),
-            quantity=data.get('quantity', '0'),
-            set_shop_name=data.get('set_shop_name', '0'),
-            # external_sku=data.get('external_sku', '0'),
-            quantity_for_shop=data.get('quantity_for_shop', '0'),
-            final_price=0.0
-        )
-
+    elif make == 'save_and_send':
+        product_id = data.get('id')
+        selected_mp = data.get('selected_mp', '0')
+        shop_name = data.get('shop_name')
+        store_id = data.get('store_id')
+        external_sku = data.get('external_sku', '0')
+        articul_product = data.get('articul_product')
         try:
-            db.session.merge(prod_set)
-            db.session.commit()
-            flash('Товар удачно сохранен', 'success')
+            price_product_base = int(data.get('price_product_base'))
+        except:
+            price_product_base = None
+        try:
+            quantity = int(data.get('quantity'))
+        except:
+            quantity = None
 
-        except IntegrityError as e:
-            if isinstance(e.orig, UniqueViolation):
-                # print('!!!!!!!!!!!!!!!!!!!!!!!!!!', data)
-                db.session.rollback()
-                articul_product = data.get('articul_product')
-                product = Product.query.filter_by(articul_product=articul_product).update(data)
-                # # print('!!!!!!!!!!!!!!!!!!!!!!!!!!', data, product)
+        store_product_set = Product.query \
+            .where(Product.articul_product == articul_product) \
+            .all()
+
+        for prod_row in store_product_set:
+            # if price_product_base and quantity:
+            #     prod_set = Product(
+            #         id=prod_row.id,
+            #         store_id=prod_row.store_id,
+            #         external_sku=external_sku,
+            #         articul_product=articul_product,
+            #         selected_mp=selected_mp,
+            #         price_product_base=price_product_base,
+            #         quantity=quantity,
+            #         uid_edit_user=current_user.id
+            #     )
+            #     db.session.merge(prod_set)
+            #     db.session.commit()
+            #     flash('Товар удачно сохранен', 'success')
+            #
+            # elif price_product_base and not quantity:
+            #     prod_set = Product(
+            #         id=prod_row.id,
+            #         store_id=prod_row.store_id,
+            #         external_sku=external_sku,
+            #         articul_product=articul_product,
+            #         selected_mp=selected_mp,
+            #         price_product_base=price_product_base,
+            #         uid_edit_user=current_user.id
+            #     )
+            #     db.session.merge(prod_set)
+            #     db.session.commit()
+            #     flash('Товар удачно сохранен', 'success')
+            #
+            # elif not price_product_base and quantity:
+            #     prod_set = Product(
+            #         id=prod_row.id,
+            #         store_id=prod_row.store_id,
+            #         external_sku=external_sku,
+            #         articul_product=articul_product,
+            #         selected_mp=selected_mp,
+            #         quantity=quantity,
+            #         uid_edit_user=current_user.id
+            #     )
+            #     db.session.merge(prod_set)
+            #     db.session.commit()
+            #     flash('Товар удачно сохранен', 'success')
+
+            shop_set = {articul_product: (i.store_id, i.external_sku) for i in store_product_set}
+            ###########################################################################
+            # job = q.enqueue_call(back_send_stocks(store_dict=shop_set,
+            #                                       quantity=quantity))
+            # print('@' * 100, job.get_id, shop_set)
+            ###########################################################################
+            if not price_product_base and not quantity:
+                flash("Укажите количество и/или цену для этого артикула")
+            elif not quantity:
+                result = await back_send_stocks(store_dict=shop_set,
+                                                price=price_product_base)
+                prod_set = Product(
+                    id=prod_row.id,
+                    articul_product=articul_product,
+                    price_product_base=price_product_base,
+                    uid_edit_user=current_user.id
+                )
+                db.session.merge(prod_set)
                 db.session.commit()
-                flash(f'Товар с артикулом {articul_product} удачно обновлен', 'success')
-        except Exception as error:
-            db.session.rollback()
-            logging.error('Ошибка сохранения отредактированного товара {} {}'
-                          .format(current_user.id, error))
-            flash('Уже существует продукт с таким Артикулом (ID)', 'error')
+                # flash('Товар удачно сохранен', 'success')
+                flash(f"Отправлено: остатки в {result[0]} магазинов Озон,  "
+                      f"остатки в {result[2]} магазинов ВБ. Товар удачно сохранен.")
+            elif not price_product_base:
+                result = await back_send_stocks(store_dict=shop_set,
+                                                quantity=quantity)
+                prod_set = Product(
+                    id=prod_row.id,
+                    articul_product=articul_product,
+                    quantity=quantity,
+                    uid_edit_user=current_user.id
+                )
+                db.session.merge(prod_set)
+                db.session.commit()
+                flash('Товар удачно сохранен', 'success')
+                flash(f"Отправлено: цена в {result[1]} магазинов озон, "
+                      f"цена в {result[3]} магазинов ВБ. Товар удачно сохранен")
+            else:
+                result = await back_send_stocks(store_dict=shop_set,
+                                                price=price_product_base,
+                                                quantity=quantity)
+                prod_set = Product(
+                    id=prod_row.id,
+                    price_product_base=price_product_base,
+                    quantity=quantity,
+                    uid_edit_user=current_user.id
+                )
+                db.session.merge(prod_set)
+                db.session.commit()
+                # flash('Товар удачно сохранен', 'success')
+                flash(f"Отправлено: остатки в {result[0]} магазинов Озон, цена в {result[1]} магазинов озон, "
+                      f"остатки в {result[2]} магазинов ВБ, цена в {result[3]} магазинов ВБ. Товар удачно сохранен")
 
-        finally:
-            db.session.close()
+        return redirect('/edit_price_product')
+
+    elif make == 'made_clean':
+        return redirect('/edit_price_product')
 
     return redirect('/edit_price_product')
 
@@ -1919,43 +2049,42 @@ def assembly_sales(page=1):
         for row in assembly_orders.items:
             # print(1111111111, row)
             get_photo_prod = (select(Product.photo)
-                       .where(Product.articul_product == row.article)
-                       .where(Product.shop_name == row.shop_name))
+                              .where(Product.articul_product == row.article)
+                              .where(Product.shop_name == row.shop_name))
 
             photo_prod = db.session.execute(get_photo_prod).first()
             if not photo_prod or photo_prod is None:
                 photo_prod = 'нет фото'
 
             rows_assembly += '<tr>' \
-                    f'<td ><img class="img-fluid" data-toggle="modal" href="#row-settings" src="{photo_prod[0]}" alt="" style="max-width:150px;"></td>' \
-                    f'<td>{row.name}</td>' \
-                    f'<th >{row.total_sales} шт</th>' \
-                    f'<th>{row.price}</th>' \
-                    f'<td >{row.article}</td>' \
-                    f'<td >{row.shop_name}</td>' \
-                    f'<td >{str(row.shipment_date).replace("T", " ").replace("Z", "")}</td>' \
-                    f'</tr>'
+                             f'<td ><img class="img-fluid" data-toggle="modal" href="#row-settings" src="{photo_prod[0]}" alt="" style="max-width:150px;"></td>' \
+                             f'<td>{row.name}</td>' \
+                             f'<th >{row.total_sales} шт</th>' \
+                             f'<th>{row.price}</th>' \
+                             f'<td >{row.article}</td>' \
+                             f'<td >{row.shop_name}</td>' \
+                             f'<td >{str(row.shipment_date).replace("T", " ").replace("Z", "")}</td>' \
+                             f'</tr>'
 
         for row2 in shipment_orders.items:
             # print(22222222222, row2)
             get_photo_prod2 = (select(Product.photo)
-                       .where(Product.articul_product == row2.article)
-                       .where(Product.shop_name == row2.shop_name))
+                               .where(Product.articul_product == row2.article)
+                               .where(Product.shop_name == row2.shop_name))
 
             photo_prod2 = db.session.execute(get_photo_prod2).first()
             if not photo_prod2 or photo_prod2 is None:
                 photo_prod2 = 'нет фото'
 
             rows_shipment += '<tr>' \
-                    f'<td ><img class="img-fluid" data-toggle="modal" href="#row-settings" src="{photo_prod2[0]}" alt="" style="max-width:150px;"></td>' \
-                    f'<td>{row2.name}</td>' \
-                    f'<th >{row2.total_sales} шт</th>' \
-                    f'<th>{row2.price}</th>' \
-                    f'<td >{row2.article}</td>' \
-                    f'<td >{row2.shop_name}</td>' \
-                    f'<td >{str(row2.shipment_date).replace("T", " ").replace("Z", "")}</td>' \
-                    f'</tr>'
-
+                             f'<td ><img class="img-fluid" data-toggle="modal" href="#row-settings" src="{photo_prod2[0]}" alt="" style="max-width:150px;"></td>' \
+                             f'<td>{row2.name}</td>' \
+                             f'<th >{row2.total_sales} шт</th>' \
+                             f'<th>{row2.price}</th>' \
+                             f'<td >{row2.article}</td>' \
+                             f'<td >{row2.shop_name}</td>' \
+                             f'<td >{str(row2.shipment_date).replace("T", " ").replace("Z", "")}</td>' \
+                             f'</tr>'
 
         return unescape(render_template('table-assembly-shipment.html',
                                         rows_assembly=rows_assembly, role=role,
@@ -1967,7 +2096,6 @@ def assembly_sales(page=1):
                                         user_name=user_name,
                                         shops=rows_shops,
                                         select_shop_name=shop))
-
 
 
 @auth.route('/users-table')
