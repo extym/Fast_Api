@@ -122,8 +122,10 @@ from collections import OrderedDict
 def get_product_info(articul : str):
     client = get_client_treolan()
     response = client.service.ProductInfoV2(treolan_login, treolan_password, Articul=articul)
-
-    return Helper(response).get('Result')
+    if response.ok:
+        return Helper(response).get('Result')
+    else:
+        return None
 
 
 
@@ -164,21 +166,25 @@ def create_csv_for_category_from_treolan():
                         print("Error not found price treolan", prod)
                         continue
                     currency = prod.get('recommendedcurrency', prod.get('currency'))
-                    proxy['full_price'] = str(proxy['target_price']) + ' ' + currency
                     if currency == 'RUB':
                         proxy['currency'] = "RUR"
-                    articul = prod.get('articul')
-                    add_data = get_product_info(articul)
-                    sub_root = ET.fromstring(add_data)
-                    tr = {ii.attrib.get('Name'): ii.attrib.get('Value') for ii in sub_root.iter('Property')}
-                    proxy['images'] = ''.join([images.attrib.get('Link') for images in sub_root.iter('row') if images.attrib.get('Link')])
-                    ######################################################################
-                    proxy.update(prod)
-                    proxy.update(tr)
-                    rewrite_properties.update(prod)
-                    rewrite_properties.update(tr)
-                    result_list.append(proxy.copy())
-                    ######################################################################
+                    proxy['full_price'] = str(proxy['target_price']) + ' ' + currency
+                    try:
+                        # it's need check for return 404
+                        articul = prod.get('articul')
+                        add_data = get_product_info(articul)
+                        sub_root = ET.fromstring(add_data)
+                        tr = {ii.attrib.get('Name'): ii.attrib.get('Value') for ii in sub_root.iter('Property')}
+                        proxy['images'] = ''.join([images.attrib.get('Link') for images in sub_root.iter('row') if images.attrib.get('Link')])
+                        ######################################################################
+                        proxy.update(prod)
+                        proxy.update(tr)
+                        rewrite_properties.update(prod)
+                        rewrite_properties.update(tr)
+                        result_list.append(proxy.copy())
+                        ######################################################################
+                    except:
+                        continue
 
                 # print('*' * 50)
                 # print(type(prod), prod)

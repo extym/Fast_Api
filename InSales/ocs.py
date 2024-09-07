@@ -106,11 +106,23 @@ def get_content_batch(list_ids):
     method = '/api/v2/content/batch'
     url = link + method
     answer = requests.post(url, json=list_ids, headers=headers)
-    print(444444444, answer.text)
-    return answer.json().get('result')
+    if answer.ok:
+        return answer.json().get('result')
+    else:
+        # print(444444444, answer.text)
+        return []
 
 
 def get_product_banch(categories):
+    '''
+    Получение информации о состоянии
+    склада и ценах по товарным
+    категориям (batch-версия с
+    возможностью передать большое
+    количество категорий для выборки)
+    :param categories:
+    :return:
+    '''
     method = '/api/v2/catalog/categories/batch/products'
     url = link + method
     # print("categories_banch", len(categories), categories)
@@ -244,7 +256,7 @@ def create_csv_for_category_from_ocs_v2():  ##for import goods only (maybe)
         try:
             data = get_product_banch(category_groups.get(key))[1]
             for prod in data['result']:
-                price = str(prod.get('price').get('priceList').get('value'))
+                price = str(prod.get('price').get('order').get('value'))
                 if price:
                     proxy = dict()
                     proxy['published'] = site_category_path[prod.get('product').get('category')]
@@ -300,7 +312,7 @@ def create_csv_for_category_from_ocs_v3():  ##for import goods only (maybe)
     'vatPercent': 20.0, 'serialNumberAvailability': False, 'catalogPath': [{'category': 'V06', 'name': 'Расходные
     материалы'}, {'category': 'V0605', 'name': 'Запчасти для принтеров и МФУ'}]}, 'isAvailableForOrder': True,
     'packageInformation': {'weight': 0.001, 'width': 0.01, 'height': 0.01, 'depth': 0.01, 'volume': 1e-06,
-    'multiplicity': 1, 'units': 'шт'}, 'price': {'priceList': {'value': 742.82, 'currency': 'RUR'}, 'order': {
+    'multiplicity': 1, 'units': 'шт'}, 'price': {'priceList': {'value': 742.82, 'currency': 'USD'}, 'order': {
     'value': 742.82, 'currency': 'RUR'}, 'discountB2B': 0.0}, 'locations': [{'location': 'МСК', 'description':
     'Москва', 'type': 'Local', 'quantity': {'value': 1, 'isGreatThan': False}, 'canReserve': True, 'deliveryDate':
     '2023-12-15T00:00:00'}]} :return:
@@ -328,7 +340,7 @@ def create_csv_for_category_from_ocs_v3():  ##for import goods only (maybe)
             if datases[0] != 403:
                 data = datases[1]
                 for prod in data['result']:
-                    price = str(prod.get('price').get('priceList').get('value'))
+                    price = str(prod.get('price').get('order').get('value'))
                     if price:
                         proxy = dict()
                         proxy['published'] = site_category_path[prod.get('product').get('category')]
@@ -361,7 +373,7 @@ def create_csv_for_category_from_ocs_v3():  ##for import goods only (maybe)
             #     error = {'error': datases[1], 'key': key}
             #     result_list.append(error)
         except Exception as error:
-            print("Some_fuckup_ocs_bunch_v3 {} {} {}".format(error, prod, key))
+            print("Some_problem_ocs_bunch_v3 {} {} {}".format(error, prod, key))
             continue
         try:
             # print(77777, maxy)
@@ -419,7 +431,8 @@ def check_len_keys(cats):
 # get_smth('/api/v2/logistic/shipment/cities')
 # get_product('all')
 # get_product('V0303')
-# create_csv_for_category_from_ocs_v2()
-# create_csv_for_category_from_ocs()
+
+# get_content_batch(['1000718504'])
+
 # create_csv_for_category_from_ocs_v3()
 

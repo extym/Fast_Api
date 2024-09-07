@@ -461,30 +461,43 @@ async def save_categories_netlab():
 
 
 async def save_data_netlab():
-    proxy, faxy, maxy = [], [], []
+    proxy, faxy, vendor_categories = [], [], []
     catalog_name = "В наличии"
     pre_vendor_categories = execute_query_return(query_read_need_category, ('netlab',))
-    [maxy.extend(i) for i in pre_vendor_categories]
-    # print('vendor_categories', maxy)
-    for cat in maxy:
-        data = category_action(catalog_name, int(cat))
-        goods = data.get('goods')
-        if goods:  # List
-            for prod in goods:
-                props = prod.get('properties')
-                print('props', props)
-                price = props.get('цена по категории D') * 1.08
-                stocks = props.get('количество на Лобненской') + props.get('количество на Калужской')
-                need_goods = (props['id'], props.get('производитель'), price,
-                              'netlab', int(cat), props.get('название'), stocks)
-                # props.get('цена по категории N'), props.get('цена по категории D'),
-                # props.get('PN'), props.get('НДС'),
-                proxy.append(need_goods)
-        elif not goods and not data.get('leaf'):  # FIXME is it check sub_category??
-            # faxy.append(int(cat))
-            faxy.append((cat, goods))
-            # sub_category = await execute_query_return(query_read_category, ('netlab', cat))
-            # print(333333, cat, goods, data, faxy)
+    for row in pre_vendor_categories:
+         if row[0] != '0':
+            pre = row[0].split(', ')
+            vendor_categories.extend(pre)
+
+    # print('vendor_categories', len(vendor_categories), vendor_categories)
+    # os.abort()
+
+    for cat in vendor_categories:
+        if cat != ' ' and cat != '':
+            data = category_action(catalog_name, int(cat))
+            goods = data.get('goods')
+            props = ''
+            if goods:  # List
+                for prod in goods:
+                    props = prod.get('properties')
+                    # print('props', props)
+                    price = round(props.get('цена по категории D') * 1.08, 2)
+                    stocks = props.get('количество на Лобненской') + props.get('количество на Калужской')
+                    need_goods = (props['id'], props.get('производитель'), price,
+                                  'netlab', int(cat), props.get('название'), stocks, props.get('PN'))
+                    # props.get('цена по категории N'), props.get('цена по категории D'),
+                    # props.get('PN'), props.get('НДС'),
+                    proxy.append(need_goods)
+
+            elif not goods and not data.get('leaf'):  # FIXME is it check sub_category??
+                # faxy.append(int(cat))
+                faxy.append((cat, goods))
+                # sub_category = await execute_query_return(query_read_category, ('netlab', cat))
+                # print(333333, cat, goods, data, faxy)
+            else:
+                continue
+
+            print('props', props)
         else:
             continue
 
@@ -592,7 +605,7 @@ def get_goods_images(product_id):
 # # goods_description_by_uid(1974813)
 # # goods_description_by_category(1974806)
 # # get_goods_properties(1974806, 1974813)
-# # asyncio.run(save_data_netlab())
+asyncio.run(save_data_netlab())
 # # create_csv_file_from_netlab_v2()
 # # create_csv_file_from_netlab('Прайс-лист', [1974806])  #127955)
 # # create_csv_for_category_from_netlab_v3()

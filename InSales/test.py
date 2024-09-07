@@ -240,6 +240,27 @@ osc_products = {
   "errors": []
 }
 
+W33335 = {'product': {
+        'itemId': '1000710717',
+       'productKey': '1000710717',
+       'partNumber': 'NLS-PG6750-01',
+       'producer': 'Newland',
+       'category': 'V2050',
+       'itemName': 'Пистолетная рукоятка/ Pistol grip for MT67 series.',
+       'itemNameRus': 'Пистолетная рукоятка',
+       'productName': 'Newland NLS-PG6750-01',
+       'hsCode': '8473308000', 'traceable': False,
+       'condition': 'Regular', 'vatPercent': 20.0,
+       'serialNumberAvailability': False,
+       'catalogPath': [{'category': 'V20', 'name': 'AutoIDC и электронное торговое оборудование'},
+                       {'category': 'V2050', 'name': 'Аксессуары для оборудования AutoIDC'}]},
+       'isAvailableForOrder': True,
+    'packageInformation': {
+        'weight': 0.2, 'width': 0.17, 'height': 0.08, 'depth': 0.18, 'volume': 0.002448, 'multiplicity': 1,
+        'units': 'шт'},
+    'price': {'priceList': {'value': 54.0, 'currency': 'USD'},
+              'order': {'value': 4955.82, 'currency': 'RUR'}, 'discountB2B': 0.0}, 'locations': [{'location': 'МСК', 'description': 'Москва', 'type': 'Local', 'quantity': {'value': 2, 'isGreatThan': False}, 'canReserve': True, 'deliveryDate': '2024-08-30T00:00:00'}]}
+
 
 osc_category = [
     {

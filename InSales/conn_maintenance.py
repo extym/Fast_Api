@@ -11,6 +11,7 @@ vendor_name TEXT,
 price varchar,
 status TEXT,
 vendor_shop_name TEXT, 
+sku varchar,
 netlab_category_id varchar,
 netlab_parent_category_id varchar,
 netlab_price TEXT,
@@ -21,7 +22,7 @@ logic_price TEXT,
 logic_stock INT,
 product_name varchar, 
 quantity INT,
-UNIQUE (id)
+UNIQUE (shop_id, vendor_shop_name)
 )
 """
 
@@ -29,8 +30,8 @@ UNIQUE (id)
 
 query_write_product = ("INSERT INTO goods "
     "(shop_id, date_Added, date_Modifed, vendor_name, price, vendor_shop_name, "
-                     "netlab_category_id, product_name, quantity)"
-                     "VALUES (%s, NOW(), NOW(), %s, %s, %s, %s, %s, %s)")
+                     "netlab_category_id, product_name, quantity, sku)"
+                     "VALUES (%s, NOW(), NOW(), %s, %s, %s, %s, %s, %s, %s)")
 
 query_write_vendors = ("INSERT INTO vendors "
     "(vendor_name, category_name, category_id, date_Added, date_Modifed, "
