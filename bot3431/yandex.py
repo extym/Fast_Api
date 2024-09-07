@@ -29,8 +29,8 @@ def get_current_orders(campaign_id: int):
         answer = requests.get(link, params=params, headers=headers)
         if answer.ok:
             data = answer.json()
-            print(len(data['orders']), type(data))
-            print('!!!!!!!!!!!! - page', page, data['pager'])
+            # print(len(data['orders']), type(data))
+            # print('!!!!!!!!!!!! - page', page, data['pager'])
             result.extend(data['orders'])
             if data['pager']['pagesCount'] > page:
                 page += 1
@@ -41,7 +41,7 @@ def get_current_orders(campaign_id: int):
 
     # result.extend(data['orders'])
 
-    print(222222, len(result))
+    # print(222222, len(result))
     return result
 
 
@@ -64,8 +64,8 @@ def get_current_orders_ym_v2(campaign_id: int, time_delta: int=1):
         answer = requests.get(link, params=params, headers=headers)
         if answer.ok:
             data = answer.json()
-            print(len(data['orders']), type(data))
-            print('!!!!!!!!!!!! - page', page, data['pager'])
+            # print(len(data['orders']), type(data))
+            # print('!!!!!!!!!!!! - page', page, data['pager'])
             result.extend(data['orders'])
             if data['pager']['pagesCount'] > page:
                 page += 1
@@ -76,7 +76,7 @@ def get_current_orders_ym_v2(campaign_id: int, time_delta: int=1):
 
     # result.extend(data['orders'])
 
-    print(222222, len(result))
+    # print(222222, len(result))
     return result
 
 

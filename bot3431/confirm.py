@@ -20,7 +20,7 @@ def confirm_data_transfer(app_url, user):
                                        headers=headers,
                                        allow_redirects=False).text)
 
-    print(2222, response)
+    # print(2222, response)
     if response.get('general').get('response') == 10404:
         print('Данные для подтверждения отсутствуют')
         return False

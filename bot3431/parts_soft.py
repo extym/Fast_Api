@@ -49,7 +49,7 @@ async def change_status(ids: str):
     }
     token_ps = HTTPBasicAuth(admin_ps_login, admin_ps_pass)
     answer = requests.post(url=url, auth=token_ps, data=data)
-    print('answer_changed_status', answer.text)
+    # print('answer_changed_status', answer.text)
     if answer.ok:
         return True
     else:
@@ -64,7 +64,7 @@ def change_status_v2(ids: str, status_id=0):
     }
     token_ps = HTTPBasicAuth(admin_ps_login, admin_ps_pass)
     answer = requests.post(url=url, auth=token_ps, data=data)
-    print('answer_changed_status_v2 ids {}, to status {}, answer {}.'.format(ids, status_id, answer.text))
+    # print('answer_changed_status_v2 ids {}, to status {}, answer {}.'.format(ids, status_id, answer.text))
     if answer.ok:
         return True
     else:
@@ -148,7 +148,7 @@ def get_orders_v2(customer_id: str,
                     result = marketplace_id
                 else:
                     page += 1
-                    print('page ', page)
+                    # print('page ', page)
                 if page >= 3:
                     bot_tg.send_get('Не найдено отправление {} для {}. '
                                     'Требуется ручная обработка для изменения статуса на Выдано'
@@ -184,9 +184,10 @@ def get_orders_v2(customer_id: str,
                                     .format(proxy, status[0], customer_id))
 
     except Exception as error:
-        print(222222222222222222, proxy)
-        print('datas_error', error)
-    print('datas', datas)
+        # print(222222222222222222, proxy)
+        print('datas_error', error) #04/09/2024 datas_error list index out of range
+
+
     return datas
 
 
@@ -218,7 +219,7 @@ async def make_data_for_request_v2(data_file, market):
         bot_tg.send_get("Не найдено заказов для {} на {}."
                         .format(market, shipment_date))
 
-    print('All_order_items', proxy)
+    # print('All_order_items', proxy)
 
 
 ## FOR VERSION 1 API - CLIENT ONLY!
@@ -234,7 +235,7 @@ def get_current_client_smth(metod, key=None):
     }
     answer = requests.get(url, params=params)
 
-    print(answer.text)
+    # print(444444, answer.text)
 
 
 def send_current_basket_to_order(key: str = None):
@@ -270,7 +271,7 @@ def make_basket(qnt=None, exter_order_id=None, key=None, propousal=None):
         "api_hash": propousal.get('hash_key')
     }
     answer = requests.post(url, headers=headers, data=data)
-    print("!!!!!!!!!!!!!!!!", answer.text)
+    # print("!!!!!!!!!!!!!!!!", answer.text)
 
     return answer.status_code
 

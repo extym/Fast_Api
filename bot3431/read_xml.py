@@ -21,9 +21,9 @@ def rewrite_asia_tires():
     # print(22)
     # xml = xmltodict.parse(data)
 
-    print(type(xml['data']['tires']))
-    print(xml.keys())
-    print(len(xml['data']['tires']))
+    # print(type(xml['data']['tires']))
+    # print(xml.keys())
+    # print(len(xml['data']['tires']))
     fields = ['price_rnd', 'price_spb', 'name', 'model', 'articul', 'season', 'speed_index', 'img', 'brand',
               'load_index', 'thorn', 'price_spb_rozn', 'rest_spb', 'width', 'diameter', 'height', 'runflat',
               'price_krd_rozn', 'price_nvt', '@internal-id', 'price_krd', 'rest_nvt', 'rest_krd',

@@ -30,12 +30,12 @@ def read_xlsx(file):
         name = row[1][1]
         maxy.append(row[1][1])
         if name not in prod.keys():
-            print(f'"{name}": row.get("{name}"),')
+            # print(f'"{name}": row.get("{name}"),')
             faxy.append(row[1][1])
         else:
             print(f'"{name}": {prod.get(name)}.')
-    print(faxy)
-    print(maxy)
+    # print(faxy)
+    # print(maxy)
 
 
 def read_xlsx_v2(file, market):
@@ -118,7 +118,7 @@ def rewrite_xlsx_v2(file1, file2): # for uploading if file2 has form uploading
             articul = str(row[0])
 
             if articul.upper() == sber_articul.upper():
-                print(55555555555, articul, sber_articul)
+                # print(55555555555, articul, sber_articul)
                 maxy = list(sber.values[i])
                 sber_max = sber.values[i][5]
                 availible_stock = int(row[4])
@@ -142,12 +142,12 @@ def rewrite_xlsx_v2(file1, file2): # for uploading if file2 has form uploading
 
     example = {i[0].upper(): i for i in proxy}
     so_example = {i[0].upper(): i for i in df2}
-    print(5555, len(example.keys()), len(so_example.keys()))
+    # print(5555, len(example.keys()), len(so_example.keys()))
     faxy = so_example.copy()
     for key in so_example.keys():
         if key in example:
             del faxy[key]
-    print(7777, len(faxy.keys()))
+    # print(7777, len(faxy.keys()))
     baxy = [i for i in faxy.values()]
     pr = pd.DataFrame(proxy)
     pr.to_excel('output-11-07-new.xlsx', sheet_name='Товары, доступные для поставки')   #,

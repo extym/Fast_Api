@@ -25,7 +25,7 @@ def stocks_update():
             "stocks": stocks_sb
         }
     }
-    print('create_send_stocks_sb', len(stocks_sb))
+    # print('create_send_stocks_sb', len(stocks_sb))
 
     return send_data
 
@@ -57,7 +57,7 @@ def check_is_accept_sb(list_items):
 
     if cnt == len(list_items):
         result_global = True
-    print('check_is_accept_sb', result_global, list_items)
+    # print('check_is_accept_sb', result_global, list_items)
     return result_global, list_items
 
 
@@ -93,7 +93,7 @@ def get_current_shipments(shipments):
     answer =  requests.post(url=url, data=json.dumps(data), headers=headers)
     if answer.ok:
         data = answer.json()
-        print(34343, data)
+        # print(34343, data)
     else:
         print(answer.text)
 

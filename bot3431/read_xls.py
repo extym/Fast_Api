@@ -42,7 +42,7 @@ def read_csv_make_vendor():
                 proxy['vendor'] = vendor_name
     
             faxy.append(proxy)
-        print(11, len(faxy), count)
+        # print(11, len(faxy), count)
 
     return faxy
 
@@ -55,6 +55,6 @@ def rewrite_vendor():
         writer = csv.DictWriter(file, fieldnames=fieldsnames)
         writer.writeheader()
         writer.writerows(data)
-        print('ALL RIDE_rewrite_vendors')
+        # print('ALL RIDE_rewrite_vendors')
 
-rewrite_vendor()
+# rewrite_vendor()

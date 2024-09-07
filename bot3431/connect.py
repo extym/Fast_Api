@@ -168,7 +168,7 @@ def execute_query_v2(query, data):
                 # print("Query from execute_query executed successfully")
                 return True
             except OperationalError as err:
-                print(f"The ERROR from execute_query '{err}' occured ")
+                # print(f"The ERROR from execute_query '{err}' occured ")
                 return False
 
 async def execute_query(query, data):
@@ -252,7 +252,7 @@ async def executemany_query(query, data):
     cursor = connection.cursor()
     try:
         cursor.executemany(query, data)
-        print("Query from execute_many_query executed successfully")
+        # print("Query from execute_many_query executed successfully")
 
     except OperationalError as err:
         print(f"The ERROR from execute_many_query '{err}' occured ")
@@ -268,7 +268,7 @@ def execute_query_return_id(connection, query, data):
     try:
         cursor.execute(query, data)
         lastrowid = cursor.lastroid()
-        print("Query from execute_query_return_id executed successfully")
+        # print("Query from execute_query_return_id executed successfully")
 
     except OperationalError as err:
         print(f"The ERROR from execute_query_return_id '{err}' occured ")

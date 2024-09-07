@@ -1838,8 +1838,8 @@ def get_test_propousal(oem, brand):
     metod = "/backend/price_items/api/v1/search/get_offers_by_oem_and_make_name"
     url = "http://3431.ru" + metod
     answer = requests.get(url, params=params)
-    print(111111111111111111111, answer.text)
-    print(2222222222222, *answer.json().get('data')[0].items(), sep='\n')
+    # print(111111111111111111111, answer.text)
+    # print(2222222222222, *answer.json().get('data')[0].items(), sep='\n')
 
 # get_test_propousal('C36003', 'MANN-FILTER')
 

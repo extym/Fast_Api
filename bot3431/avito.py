@@ -307,11 +307,11 @@ def update_creds_avito(answer, user_id):
         creds = json.dumps(cred)
         f.write(creds)
         f.close()
-        print('Creds avito update successfully', user_id)
+        # print('Creds avito update successfully', user_id)
         result = True
     else:
         result = False
-        print('ERPOOR get avito token data', user_id)
+        # print('ERPOOR get avito token data', user_id)
 
     return result
 
@@ -327,11 +327,11 @@ async def update_creds_avito_v2(answer, user_id):
         creds = json.dumps(cred)
         f.write(creds)
         f.close()
-        print('Creds avito update successfully', user_id)
+        # print('Creds avito update successfully', user_id)
         result = True
     else:
         result = False
-        print('ERPOOR get avito token data', user_id)
+        # print('ERPOOR get avito token data', user_id)
 
     # return result
 
@@ -366,7 +366,7 @@ def get_raw_avito_token(file):
         "grant_type": "client_credentials"
     }
     answer = requests.post(url=url, headers=headers, data=data)
-    print(22222, answer.text)
+    # print(22222, answer.text)
     update_creds_avito(answer.text)
 
 
