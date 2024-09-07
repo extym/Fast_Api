@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import os
 from base64 import b64encode
@@ -45,7 +46,7 @@ def write_json(smth_json):
 def write_smth_date():
     time = datetime.now(pytz.timezone("Africa/Nairobi")).isoformat()
     try:
-        f = open('/var/www/html/artol/test_txt.txt', 'w')
+        f = open('/var/www/html/artol/test_txt.txt', 'a')
         f.write(str(time) + '\n')
         f.close()
     except:
@@ -406,21 +407,45 @@ def create_re_cart(items):
     return data
 
 
+
+# data_pshh_2 = {
+#             "order": {
+#                 "shop": "Yandex",
+#                 "businessId": "3675591",
+#                 "id": token_generator(),
+#                 "paymentType": "PREPAREID",
+#                 "delivery": True,
+#                 "status": "accept",
+#                 "date": "31-12-2034",
+#                 "items": [
+#                     {
+#                         "shopSku": "26fb989e-fdbe-11ec-a655-00155d58510a",
+#                         "count": -1,
+#                         "price": 999999001336
+#                     }
+#                 ]
+#             }
+#         }
+
+
+
 async def send_post(data):
     headers = {'Content-type': 'application/json',
-               'Authorization': "Bearer " + basic_token,
+               # 'Authorization': "Bearer " + basic_token,
                'Content-Encoding': 'utf-8'}
     answer = requests.post(url_address, data=json.dumps(data), headers=headers, verify=False)
     if answer.ok:
-        logging.info('All_ride_send_order')
+        logging.info('All_ride_send_order_art')
     else:
-        logging.error("Error send order {} {} {}".format(answer.status_code,
+        logging.error("Error send order_artol {} {} {}".format(answer.status_code,
                                                          answer.text, data))
     # result = answer.text
     time = datetime.now(pytz.timezone("Africa/Nairobi")).isoformat()
     # print('answer1', str(time), answer, data)
     # return result
 
+
+# asyncio.run(send_post(data_pshh_2))
 
 app = Flask(__name__)
 
@@ -473,6 +498,7 @@ async def onon_push():
             se_id = str(send_data['order']['id'])
             write_smth(' order_id_accept ' + se_id)
             await send_post(send_data)
+            print('check_data_artol {}'.format(send_data))
             write_order(order, our_id)
             response = app.response_class(
                 json.dumps(common_comfirm_response),
@@ -524,6 +550,7 @@ async def onon_push():
 @app.route('/json', methods=['GET', 'POST'])
 def json_example():
     ip_addr = request.environ.get('REMOTE_ADDR')  ## return ::ffff:92.39.143.137
+    print(7777777777, ip_addr)
     if str(ip_addr) == '::ffff:92.39.143.137':
         request_data = request.get_json()
         write_json(request_data)

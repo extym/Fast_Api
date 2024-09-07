@@ -1,11 +1,15 @@
+import json
 import time
 
 from xml.dom import minidom
 from datetime import datetime
 
 import pytz
+import requests
 
+from cred import url_address, basic_token
 from read_json import processing_request, processing_json
+
 
 # not_in_YM_fbs = ['Kpsngafrls2215byxta200msi', 'Es4022', 'KPSVVngLS1x2x1', 'UTP4PR24AWGCAT5e305mVnetrennii', 'Kcpv1005', 'KPSngAFRLS1x2x02kvmmBuhta200m',
 #                  'Kvkp2075byxta200moptimus', 'Vvgngls315100', 'Gofra20mmsZondomBuhta100m', 'Kccvvngals405', 'Kcpv205', 'UTP4PR24AWGCAT5e305мVnutrenniiOptimLAN',
@@ -246,4 +250,101 @@ def create():
 #     run_pending()
 #     time.sleep(1)
 
-create()
+# create()
+
+
+
+def proxy_time():
+    dt = datetime.now().date() + timedelta(days=2)
+    d = str(dt).split('-')
+    d.reverse()
+    pt = '-'.join(d)
+
+    return pt
+
+
+def create_re_cart(items):
+    service_name = "Яндекс Доставка"
+    delivery_id = token_generator()
+    proxy_list = []
+    for item in items:
+        proxy_item = {'sellerInn': "6234113064",
+                      'delivery': True,
+                      'feedId': item['feedId'],
+                      'offerId': item['offerId'],
+                      'count': item['count']}
+        proxy_list.append(proxy_item)
+
+    data = {
+        "cart":
+            {
+                "deliveryOptions":
+                    [
+                        {
+                            "id": delivery_id,
+                            "serviceName": service_name,
+                            "type": "DELIVERY",
+                            "dates":
+                                {
+                                    "fromDate": proxy_time(),
+                                }
+                        }
+                    ],
+                "items": proxy_list,
+                "paymentMethods":
+                    [
+                        "YANDEX",
+                        "CARD_ON_DELIVERY",
+                        "CASH_ON_DELIVERY",
+                        "TINKOFF_CREDIT",
+                        "TINKOFF_INSTALLMENTS",
+                        "SBP"
+                    ]
+            }
+    }
+
+    return data
+
+
+
+data_pshh_2 = {
+            "order": {
+                "shop": "Yandex",
+                "businessId": "3675591",
+                "id": 111777,
+                "paymentType": "PREPAREID",
+                "delivery": True,
+                "status": "accept",
+                "date": "31-12-2034",
+                "items": [
+                    {
+                        "shopSku": "7580d671-d719-11e2-803a-902b34460e77",
+                        "count": 1,
+                        "price": 336
+                    }
+                ]
+            }
+        }
+
+import urllib3
+
+urllib3.disable_warnings()
+
+def send_post(data):
+    headers = {'Content-type': 'application/json',
+               # 'Authorization': "Bearer " + basic_token,
+               'Content-Encoding': 'utf-8'}
+    answer = requests.post(url_address, data=json.dumps(data), headers=headers, verify=False)
+    # if answer.ok:
+        # logging.info('All_ride_send_order_art')
+    print(answer.text, answer.status_code)
+    # else:
+    #     logging.error("Error send order {} {} {}".format(answer.status_code,
+    #                                                      answer.text, data))
+    # # result = answer.text
+    # time = datetime.now(pytz.timezone("Africa/Nairobi")).isoformat()
+    # # print('answer1', str(time), answer, data)
+    # # return result
+
+
+send_post(data_pshh_2)
