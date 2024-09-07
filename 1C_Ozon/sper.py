@@ -34,10 +34,11 @@ def send_stocks_sb():
     headers = {'Content-type': 'application/json'
                }
     metod = 'stock/update'
-    url_address = url + metod #+ '?login=' + login_lm + '&password=' + pass_lm
+    url_address = url + metod
     answer = requests.post(url_address, headers=headers, json=data)
     
     print('send_stocks_sb', answer, answer.text)
+    # print('send_stocks_sb_22', len(data), *data.get('data')['stocks'], sep='\n')
 
 
 def check_is_accept_sb(list_items):
@@ -68,3 +69,7 @@ async def post_smth_sb(metod, data):
     target_url = url + metod  #TODO for PRODUCTION
     response = requests.post(target_url, headers=headers, data=json.dumps(data))
     print('post_smth_sb', response, response.text, target_url, metod)
+
+
+
+# send_stocks_sb()

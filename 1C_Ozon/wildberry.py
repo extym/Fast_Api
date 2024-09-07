@@ -10,7 +10,8 @@ from conn import *
 from proxy import proxy_wb_orders
 #data = read_json_wb()
 #https://suppliers-api.wildberries.ru/api/v3/stocks/{warehouse}
-link = 'https://suppliers-api.wildberries.ru'
+# link = 'https://suppliers-api.wildberries.ru'
+link = 'https://marketplace-api.wildberries.ru'
 l = 'https://suppliers-api.wildberries.ru/api/v3/supplies'
 
 compare_id = {'Артикул поставщика': 'Штрихкод товара', 'OWLT190301/2': '6973720576435', 'OWLT190303/2': '6973720576442',
@@ -116,8 +117,8 @@ def make_send_data():
 
         warehouse[w_house] = {'stocks': stocks}
 
-    print('warehouse[730558]', len(warehouse[730558]['stocks']))  #,warehouse[730558])
-    print('warehouse[664706]', len(warehouse[664706]['stocks']))   #, warehouse[664706])
+    print('warehouse[1072659]', len(warehouse[1072659]['stocks']))
+    print('warehouse[989116]', len(warehouse[989116]['stocks']))
     # print(warehouse.keys())
     return warehouse
 
@@ -134,7 +135,7 @@ def send_stocks_wb():
         answer = requests.put(target, data=json.dumps(value), headers=headers)
         re_data = answer.text
 
-        # print('send_stocks_wb', key, re_data, len(value['stocks']), value)
+        print('send_stocks_wb', key, re_data, len(value['stocks']), value)
 
 # send_stocks_wb()
 
@@ -238,17 +239,18 @@ async def processing_orders_wb():
                 await executemany_query(query_write_items, [items_data])
         print(f"Write {len(orders)} orders WB")
 
-    print("fuckup orders WB")
+    print("Not found orders WB now")
 
-asyncio.run(processing_orders_wb())
+# asyncio.run(processing_orders_wb())
 
 def get_wh():
     headers = {'Content-type': 'application/json',
                'Authorization': wb_apikey }
-    link = 'https://suppliers-api.wildberries.ru/api/v2/warehouses'
+    # link = 'https://suppliers-api.wildberries.ru/api/v2/warehouses'
+    link = 'https://marketplace-api.wildberries.ru/api/v3/warehouses'
     answer = requests.get(link, headers=headers)
     text = answer.text
-    #print(answer)
+    print(answer)
     print('get_wh', text)
 
 # get_wh()

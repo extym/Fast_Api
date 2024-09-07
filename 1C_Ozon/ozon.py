@@ -2,7 +2,7 @@ import asyncio
 import json
 
 import requests
-from cred import api_key_ozon_prod, api_key_ozon_admin, client_id
+from cred import api_key_ozon_prod, api_key_ozon_admin, client_id_oson
 from read_json import read_json_on
 from time import sleep
 
@@ -20,7 +20,7 @@ host = 'https://api-seller.ozon.ru'
 last_id = 'WzQ2MzcyNzEyNyw0NjM3MjcxMjdd'
 
 headers = {
-    'Client-Id': client_id,
+    'Client-Id': client_id_oson,
     'Api-Key': api_key_ozon_admin,
     'Content-Type': 'application/json'
 }
@@ -39,29 +39,48 @@ def write_json_skus(smth_json):
 
 
 def get_smth(metod):
+    data = {}
     params = {
-        'Client-Id': client_id,
+        'Client-Id': client_id_oson,
         'Api-Key': api_key_ozon_admin,
         'Content-Type': 'application/json'
     }
     link = host + metod
     response = requests.get(link, headers=params)
-    print('get_smth_on', metod, response, response.json())
-    return response
+    if response.ok:
+        data = response.json()
+        print('get_smth_on', metod, response, data)
+    else:
+        print('get_smth_on', metod, response, response.text)
+    return data
 
 
 def post_get_smth(metod):
     link = host + metod
     response = requests.post(link, headers=headers)
-    data = response.json()
-    # print('post_get_smth',len(data['result']['items']), type(data['result']['items']))
-    result = data['result']['items']
-    total = data['result']['total']
-    last_id = data['result']['last_id']
-    print('post_get_smth_onon', result[0])
-    return result, total, last_id
+    if response.ok:
+        data = response.json()
+        # print('post_get_smth',len(data['result']['items']), type(data['result']['items']))
+        result = data.get('result')
+        items = result.get('items')
+        total = result.get('total')
+        last_id = result.get('last_id')
+        # print("SUCCESS post_get_smth_stm {} ".format(response.text))
+        return items, total, last_id
+    print("Error post_get_smth_stm {} ".format(response.text))
+    return None
 
 
+def post_get_warehouse():
+    metod = '/v1/warehouse/list'
+    link = host + metod
+    response = requests.post(link, headers=headers)
+    if response.ok:
+        data = response.json()
+        print('post_get_smth_oson_stm', *data.get('result'), sep='\n')
+
+
+# post_get_warehouse()
 # post_get_smth(metod_get_list_products)
 
 
@@ -99,6 +118,7 @@ def create_data_stocks():
             proxy['stock'] = data_read[product['offer_id']][2]
             outlets = data_read[product['offer_id']][3]
             for wh in outlets:
+                # print(1234567, outlets)
                 # if wh != 23012928587000:  # TODO for TEST only
                 proxy['warehouse_id'] = wh
                 pr = proxy.copy()
@@ -106,7 +126,7 @@ def create_data_stocks():
         else:
             proxy_errors.append(product)
 
-    print(2345677, len(proxy_errors), proxy_errors)
+    print("oson_stm_errors_create_stocks ", len(proxy_errors))
         #
         # if product['product_id'] == 1016996546:
         #     print(product)
@@ -150,24 +170,26 @@ def send_stocks_on():
     proxy = []
     for row in pre_data:
         data = {'stocks': row}
-        # print('SEND_DATA', data)
         dt = json.dumps(data)
-        # print(len(data['stocks']), dt)
+        # print('DATA SEND STOCK OSON STM {}'.format(dt))
         response = requests.post(link, headers=headers, json=data)
-        answer = response.json()
-        ans = response.text
-        print('answer send_stocks_on', response.status_code)
-        result = answer.get("result")
-        if result:
-            for row in result:
-                if len(row["errors"]) > 0:
-                    print('ERROR from send_stocks_ozon', row)
-                elif row['updated'] == False:
-                    print('ERROR update from send_stocks_ozon', row)
-                # elif row['updated'] == True:
-                #     print('SUCCES update from send_stocks_on', row)
-            proxy.append(answer)
-        sleep(1)
+        if response.ok:
+            answer = response.json()
+            print('answer send_stocks_oson_stm', response.status_code)
+            result = answer.get("result")
+            if result:
+                for row in result:
+                    if len(row["errors"]) > 0:
+                        print('ERROR from send_stocks_ozon', row)
+                    # elif row['updated'] == False:
+                    #     print('ERROR update from send_stocks_ozon', row)
+                    elif row['updated'] == True:
+                        print('SUCCES update from send_stocks_on', row)
+                proxy.append(answer)
+            sleep(1)
+
+        else:
+            print('ERROR send_stock_stm_oson', response.text)
 
 
 # send_stocks_on()

@@ -153,4 +153,4 @@ def maintenans_query(query):
 # maintenans_query(create_fresh_orders_table)
 # maintenans_query(create_order_items)
 
-get_one_order()
+# get_one_order()

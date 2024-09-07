@@ -14,13 +14,14 @@ categories = { "Бачки для унитазов": 1122, "Шкафы": 1565, '
 another_id = {'OWLT190101': 'a0026033', 'OWLM200300': 'a0027568', 'OWLT190304': 'a0027470',
               'OWLT190403S': 'a0027471', 'OWLT190302': 'a0026027'}
 
-
+coco_id = 'OWLCOCO1'
+coco_name="Угольные брикеты OWL 1975 из скорлупы кокосового ореха для гриля, для мангала 8 кг"
 
 # 	ID магазина: (ID склада, wh_from_1C, model)
 wh_yandex= {658505: (50639, 'YM.СТМ', 'FBS'), 32268653: (432708, 'YM.СклЭкспресс', 'FBS_express'), 39191045: (479988, 'YM.НашадостСклОкт', 'DBS')}
 
 
-def create_sp():
+def create_sp(coco_only=False, coco_count=5, coco_name=coco_name, vendor="OWL 1975"):
     root = minidom.Document()
 
     date = datetime.now().replace(second=0, microsecond=0)
@@ -33,11 +34,11 @@ def create_sp():
     productChild = root.createElement('shop')
 
     nameChild = root.createElement('name')
-    textName = root.createTextNode('OOO CTM')
+    textName = root.createTextNode('OWL 1975 COCO')
     nameChild.appendChild(textName)
 
     companyChild = root.createElement('company')
-    textCompany = root.createTextNode('OOO "CTM"')
+    textCompany = root.createTextNode('OOO "ГАП"')
     companyChild.appendChild(textCompany)
 
     urlChild = root.createElement('url')
@@ -71,19 +72,32 @@ def create_sp():
     pickupChild.appendChild(pickupOptionChild)
 
     ##For add product only? custom:111
-    # categoriesChild = root.createElement('categories')
-    #
-    # categoryChild = root.createElement('category')
-    # categoryChild.setAttribute('id', '1')
-    # textCategory = root.createTextNode('Строительство и ремонт')
-    # categoryChild.appendChild(textCategory)
-    # categoriesChild.appendChild(categoryChild)
-    #
-    # categoryChild = root.createElement('category')
-    # categoryChild.setAttribute('id', '2')
-    # textCategory = root.createTextNode('Товары для дома')
-    # categoryChild.appendChild(textCategory)
-    # categoriesChild.appendChild(categoryChild)
+    categoriesChild = root.createElement('categories')
+
+    categoryChild = root.createElement('category')
+    categoryChild.setAttribute('id', '1')
+    textCategory = root.createTextNode("Все товары")  #('Строительство и ремонт')
+    categoryChild.appendChild(textCategory)
+    categoriesChild.appendChild(categoryChild)
+
+    categoryChild = root.createElement('category')
+    categoryChild.setAttribute('id', '2')
+    textCategory = root.createTextNode('Угольные брикеты и кубики для гриля')  #'Товары для дома')
+    categoryChild.appendChild(textCategory)
+    categoriesChild.appendChild(categoryChild)
+
+    categoryChild = root.createElement('category')
+    categoryChild.setAttribute('id', '3')
+    textCategory = root.createTextNode('Строительство и ремонт')  # ('Строительство и ремонт')
+    categoryChild.appendChild(textCategory)
+    categoriesChild.appendChild(categoryChild)
+
+    categoryChild = root.createElement('category')
+    categoryChild.setAttribute('id', '4')
+    textCategory = root.createTextNode('Товары для дома')  # 'Товары для дома')
+    categoryChild.appendChild(textCategory)
+    categoriesChild.appendChild(categoryChild)
+
     #
     # for key in categories.keys():
     #     category_vendor = key
@@ -97,7 +111,7 @@ def create_sp():
 
 
     offersChild = root.createElement('offers')
-    def create_offer(product_code, count):  #(name, vendor, product_code, category_id, description,  url, count, price)
+    def create_offer(product_code, count, coco_name=coco_name):  #(name, vendor, product_code, category_id, description,  url, count, price)
 
         offerChild = root.createElement('offer')
         offerChild.setAttribute('id', product_code)
@@ -105,15 +119,28 @@ def create_sp():
         offerChild.setAttribute('available', 'true')
         offersChild.appendChild(offerChild)
 
-        # nameOfferChild = root.createElement('name')
-        # textNameOffer = root.createTextNode(name)
-        # nameOfferChild.appendChild(textNameOffer)
-        # offerChild.appendChild(nameOfferChild)
+        if coco_only:
+            categoryIdOfferChild = root.createElement('categoryId')
+            textCategoryIdOffer = root.createTextNode("2")
+            categoryIdOfferChild.appendChild(textCategoryIdOffer)
+            offerChild.appendChild(categoryIdOfferChild)
 
-        # vendorOfferChild = root.createElement('vendor')
-        # textVendorOffer = root.createTextNode(vendor)
-        # vendorOfferChild.appendChild(textVendorOffer)
-        # offerChild.appendChild(vendorOfferChild)
+
+            nameOfferChild = root.createElement('name')
+            textNameOffer = root.createTextNode(coco_name)
+            nameOfferChild.appendChild(textNameOffer)
+            offerChild.appendChild(nameOfferChild)
+
+        else:
+            categoryIdOfferChild = root.createElement('categoryId')
+            textCategoryIdOffer = root.createTextNode("4")
+            categoryIdOfferChild.appendChild(textCategoryIdOffer)
+            offerChild.appendChild(categoryIdOfferChild)
+
+        vendorOfferChild = root.createElement('vendor')
+        textVendorOffer = root.createTextNode(vendor)
+        vendorOfferChild.appendChild(textVendorOffer)
+        offerChild.appendChild(vendorOfferChild)
 
         vendorCodeOfferChild = root.createElement('vendorCode')
         textVendorCodeOffer = root.createTextNode(product_code)
@@ -130,33 +157,35 @@ def create_sp():
         deliveryOfferChild.appendChild(textMinQuantityOffer)
         offerChild.appendChild(deliveryOfferChild)
 
-        pickupOfferChild = root.createElement('pickup')
-        textMinQuantityOffer = root.createTextNode('true')
-        pickupOfferChild.appendChild(textMinQuantityOffer)
-        offerChild.appendChild(pickupOfferChild)
+        # pickupOfferChild = root.createElement('pickup')
+        # textMinQuantityOffer = root.createTextNode('true')
+        # pickupOfferChild.appendChild(textMinQuantityOffer)
+        # offerChild.appendChild(pickupOfferChild)
 
         countOfferChild = root.createElement('count')
         textcountOffer = root.createTextNode(count)
         countOfferChild.appendChild(textcountOffer)
         offerChild.appendChild(countOfferChild)
 
+    if not coco_only:
+        need_data = process_json_list()
+        cnt = 0
+        for row in need_data:
+            if 'SBMM.Сбермегамаркет' in row[4]:
+                count = row[3]
+                if count is None:
+                    count = 0
+                product_code = row[1]
+                if product_code in another_id:
+                    product_code = another_id[product_code]
+                if product_code != '':
+                    create_offer(product_code, str(count))  #(name, vendor, product_code, category_id, description,  url, count, price)
+                    cnt += 1
+        print('row00000', row)
+        print('cnt', cnt)
 
-    need_data = process_json_list()
-    #print(type(need_data), len(need_data))
-    cnt = 0
-    for row in need_data:
-        if 'SBMM.Сбермегамаркет' in row[4]:
-            count = row[3]
-            if count is None:
-                count = 0
-            product_code = row[1]
-            if product_code in another_id:
-                product_code = another_id[product_code]
-            if product_code != '':
-                create_offer(product_code, str(count))  #(name, vendor, product_code, category_id, description,  url, count, price)
-                cnt += 1
-    print('row00000', row)
-    print('cnt', cnt)
+    else:
+        create_offer(coco_id, str(coco_count))  # (name, vendor, product_code, category_id, description,  url, count, price)
 
     productChild.appendChild(nameChild)
     productChild.appendChild(companyChild)
@@ -167,23 +196,22 @@ def create_sp():
     productChild.appendChild(pickupChild)
     # productChild.appendChild(currenciesChild)
     # currenciesChild.appendChild(currencyChild)
-    #productChild.appendChild(categoriesChild)
+    productChild.appendChild(categoriesChild)
     productChild.appendChild(offersChild)
 
     xml_root.appendChild(productChild)
 
     xml_str = root.toprettyxml(indent="\t", encoding="UTF-8")
     try:
-        save_path_file = "sber.xml"
+        save_path_file = "/var/www/html/stm/sber-stocks.xml"
         with open(save_path_file, "wb") as f:
             f.write(xml_str)
     except:
-        save_path_file = "/var/www/html/2c/sber.xml"
-
+        save_path_file = "sber-stocks.xml"
         with open(save_path_file, "wb") as f:
             f.write(xml_str)
 
 
+# http://stm-data.i-bots.ru/sber.xml
 
-
-create_sp()
+create_sp(coco_only=False, coco_name=coco_name)

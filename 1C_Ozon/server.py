@@ -51,7 +51,7 @@ def write_json(smth_json):
 
 def write_smth_date():
     try:
-        f = open('/var/www/html/stm/data_txt.txt', 'w')
+        f = open('/var/www/html/stm/data_txt.txt', 'a')
         time = datetime.now(pytz.timezone("Africa/Nairobi")).isoformat()
         f.write(str(time) + '\n')
         f.close()
@@ -677,13 +677,17 @@ def bay_bay():
 def get_json():
     ip_addr = request.environ.get('REMOTE_ADDR')  ## return ::ffff:46.21.252.7
     #'X-Forwarded-For': '46.21.252.7'
-    addr = request.headers.get('X-Forwarded-For')
-    print("Data from", ip_addr, addr)
+    # addr = request.headers.get('X-Forwarded-For')
+    print("Data from", ip_addr)
     if ip_addr == '::ffff:46.21.252.7' or ip_addr == '46.21.252.7'\
             or ip_addr == '62.76.102.53':
         request_data = request.get_json()
-        write_json(request_data)
-        write_smth_date()
+        check = request_data.get('56fa1ff7-9b29-11ee-994b-00155d942107')
+        if check[2].get("Остаток") == 12:
+            write_smth("fuckup_data")
+        else:
+            write_json(request_data)
+            write_smth_date()
 
         response = app.response_class(
             status=200
@@ -862,7 +866,7 @@ def stocks_ym():
     headers = dict(request.headers)
     request_data = request.get_json()
     #write_smth(request_data)
-    write_smth('stocks')
+    write_smth(' stocks')
       ## for debag
     token = request.headers.get('Authorization')
     if token in tokens_market:
@@ -1064,7 +1068,7 @@ async def check_order():
             }
             response = json.dumps(empty_data)
 
-    elif ip_addr == '212.12.15.45':   #левый олень какой то бомбит
+    else: # ip_addr == '212.12.15.45' or ip_addr == '85.113.39.242':   #левый олень какой то бомбит
         data_pshh_2 = {
             "order": {
                 "shop": "Yandex",
@@ -1073,7 +1077,7 @@ async def check_order():
                 "paymentType": "PREPAREID",
                 "delivery": True,
                 "status": "accept",
-                "date": "21-12-2024",
+                "date": "31-12-2034",
                 "items": [
                     {
                         "shopSku": "26fb989e-fdbe-11ec-a655-00155d58510a",
@@ -1086,11 +1090,11 @@ async def check_order():
         response = app.response_class(
             json.dumps(data_pshh_2),
             status=403)
-
-    else:
-        response = app.response_class(
-            status=402
-        )
+    #
+    # else:
+    #     response = app.response_class(
+    #         status=402
+    #     )
 
     return response
 

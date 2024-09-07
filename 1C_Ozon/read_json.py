@@ -83,7 +83,7 @@ def process_json_dict_v2(outlet):
 
 # process_json_dict_v2(u'YM.СТМ')
 
-def read_json_wb():
+def read_json_wb(is_null: bool = False):
     r = requests.get(link)
     data = r.json()
     result_list = []
@@ -96,7 +96,7 @@ def read_json_wb():
             outlets = value[4]
             barcode = value[3].get(u'Штрихкод')
             quantity = value[2].get(u'Остаток', 0)  # - value[2].get(u'Резерв', 0)
-            if quantity < 3:
+            if is_null or quantity < 3:
                 quantity = 0
             # quantity = 0
             proxy = (id_1c, vendor_code, barcode, quantity, outlets)
@@ -114,7 +114,7 @@ sub_vendor_code = {'ИМOWLIB191101': 'OWLIB191101', 'ИМOWLIB191102': 'OWLIB19
                    'ИМOWLIB191108': 'OWLIB191108'}  # 'ИМOWLIB191107': 'OWLIB191107',
 
 
-def read_json_lm():
+def read_json_lm(is_null: bool = False):
     r = requests.get(link)
     data = r.json()
     result_dict = {}
@@ -192,24 +192,27 @@ from proxy import ozon_wh_id
 #     print('result_dict', len(result_dict), in_outlet, result_dict)
 #     return result_dict
 
+
 def read_json_on():
     r = requests.get(link)
     data = r.json()
     result_dict = {}
     for key, value in data.items():
         outlets = value[4].keys()
+        # print(23234, outlets)
         id_1c = key
         vendor_code = value[0]
         price = value[1].get(u'Цена')  # ["\u0426\u0435\u043d\u0430"]
-        quantity = value[2].get(u'Остаток', 0)  # - value[2].get(u'Резерв', 0)
-        if quantity < 3:
+        quantity = value[2].get("Остаток")  # - value[2].get(u'Резерв', 0)
+        if not quantity or quantity < 3:
             quantity = 0
+            print('FUCK_UUUUUUUUUUUUUUUUUUUUUP_ERROR {} {} {}'.format(key, value, quantity))
 
         in_outlets = [ozon_wh_id[out][0] for out in ozon_wh_id if out in outlets]
         proxy = (id_1c, price, quantity, in_outlets)
         result_dict[vendor_code] = proxy
 
-    print('result_dict_on', len(result_dict))
+    print('result_dict_on', *result_dict.items(), sep='\n')
     return result_dict
 
 
