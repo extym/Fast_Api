@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+import datetime
 
 import uvicorn
-from fastapi import Request, FastAPI, Cookie, Header
+from fastapi import Request, FastAPI, Cookie, Header, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse, Response
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
@@ -38,16 +39,19 @@ users = []
 
 @app.post('/messages')
 def got_user_message(feedback: Feedback):
-    try:
-        all.append({"name": feedback.name, 'message': feedback.message})
-        return {'result': 'All_ride'}
-    except Exception as err:
-        return {'error': '{}'.format(err)}
+    # try:
+    all.append({"name": feedback.name, 'message': feedback.message})
+    return {'result': f'All_ride, {feedback.name}!'}
+    # except Exception as err:
+    #     return {'error': '{}'.format(err)}
 
 
 @app.get("/items/")
-async def read_items(user_agent: Annotated[str | None, Header()] = None):
-    return {"User-Agent": user_agent}
+async def read_items(request: Request,  response: Response,
+                     user_agent: Annotated[str | None, Header()] = None):
+    response.set_cookie(key="falala", value="oxoxoxo")
+    headers = dict(request.headers)
+    return {"User-Agent": user_agent, "1": headers}
 
 
 @app.post('/create_user')
@@ -63,17 +67,12 @@ def create_user(create_user: UserCreate):
 
 from test import *
 @app.get('/products/search')
-def search_product(limit:int = 10, keyword: str = None, category:str = None):
+def search_product(keyword: str, limit:int = 10, category:str = None):
     proxy = []
     for product in sample_products:
-        if product.get('keyword') == keyword \
-                or product.get('category') == category:
-            proxy.append({
-                "product_id": product.get('product_id'),
-                "name": product.get('name'),
-                "category": product.get('category'),
-                "price": product.get('price')
-            })
+        if keyword in product.get('name') \
+                and product.get('category') == category:
+            proxy.append(product)
 
     return proxy[:limit]
 
@@ -90,24 +89,42 @@ def prod_id(product_id: int):
 
 users_login = {"user123": "password123"}
 
-@app.get('/login')
-def login(response: Response , username: str, userpass: str):
-    if username in users_login and users_login.get(username) == userpass:
+
+@app.post('/login')
+# @app.get('/login')
+def login(response: Response , user: User):
+    if user.name in users_login and user.password == users_login.get(user.name):
         response.set_cookie(key='access_token', value='23114151')
+        return JSONResponse({"message": "all ride"})  #Jinja2Templates('index.html')
+    # response.delete_cookie("access_token")
+    return Response(content="Unauthorized",
+                    status_code=401)
 
 
+@app.get('/luser')
+def luses(response: Response, request: Request):
+    response.set_cookie(key="last_visit", value=str(datetime.datetime.now()))
 
-@app.post('/user')
-def check_user(user: User):
-    if user.age >= 18:
-        user.is_adult = True
 
-    return JSONResponse(dict(user))
+@app.get('/user')
+@app.post('/user/{id}')
+def check_user(request: Request,
+               response: Response, id: int = None):
+    if request.cookies.get('access_token'):
+        print('xexe')
+    # if user.age >= 18:
+    #     user.is_adult = True
+    # if id in fake_users:
+    #     return HTMLResponse('Hi')
+        return JSONResponse("dict(user)")
+    response.set_cookie(key="last_visit", value=str(datetime.time))
+    return Response(content="Unautorized user",
+                    status_code=401)
 
 
 @app.get('/')
-async def get_smth():
-    return {'message': "Hello World"}
+async def get_smth(last_visit = Cookie()):
+    return  {"last visit": last_visit}
 
 
 @app.get("/index")
@@ -119,6 +136,16 @@ async def get_index(request: Request):
 async def calculate(item: Item):
     result = item.num1 + item.num2
     return JSONResponse({'result': result})
+
+
+@app.get('/headers')
+async def get_headers(user_agent: Annotated[str | None, Header()] = None,
+                      accept_language: Annotated[str | None, Header()] = None):
+    if accept_language != "en-US,en;q=0.9,es;q=0.8" or not user_agent:
+        raise HTTPException(status_code=400, detail="Not found needed headers")
+    return JSONResponse({"User-agent": user_agent, "Accept-Language": accept_language})
+
+
 
 
 def print_hi(name):
